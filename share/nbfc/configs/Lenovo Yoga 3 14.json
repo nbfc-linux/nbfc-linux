@@ -1,0 +1,26 @@
+{
+ "NotebookModel": "80JH",
+ "Author": "None",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 6,
+	 "WriteRegister": 86,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 80,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Fan1",
+	 "TemperatureThresholds": [],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 50
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

@@ -1,0 +1,23 @@
+{
+ "NotebookModel": "HP Pavilion 14-v066br",
+ "Author": "None",
+ "EcPollInterval": 290,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 89,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 0,
+	 "WriteRegister": 183,
+	 "MinSpeedValue": 50,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

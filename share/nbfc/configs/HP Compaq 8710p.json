@@ -1,0 +1,19 @@
+{
+ "NotebookModel": "HP Compaq 8710p (GC102EA#ABD)",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 215,
+	 "WriteRegister": 215,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 30,
+	 "TemperatureThresholds": [],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

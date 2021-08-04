@@ -1,0 +1,20 @@
+{
+ "NotebookModel": "HP ProBook 4710s",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "Author": "Marcin",
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 214,
+	 "WriteRegister": 215,
+	 "MinSpeedValue": 1,
+	 "MaxSpeedValue": 100,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "TemperatureThresholds": [],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

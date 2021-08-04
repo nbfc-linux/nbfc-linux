@@ -1,0 +1,100 @@
+#!/bin/bash
+
+_nbfc() {
+  local cur prev words cword split args w
+  _init_completion -s || return
+
+  _count_args "" ""
+  for w in "${COMP_WORDS[@]}"; do
+    case "$w" in
+      start) _nbfc_start && return 0;;
+      stop) _nbfc_stop && return 0;;
+      restart) _nbfc_restart && return 0;;
+      status) _nbfc_status && return 0;;
+      config) _nbfc_config && return 0;;
+      set) _nbfc_set && return 0;;
+      help) _nbfc_help && return 0;;
+    esac
+  done
+
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help --version' -- "$cur"))
+
+  case $args in
+    1)
+       COMPREPLY+=($(compgen -W 'start stop restart status config set help' -- "$cur"))
+       return 0;;
+  esac
+
+  return 1
+}
+
+_nbfc_start() {
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --readonly' -- "$cur"))
+
+  return 1
+}
+
+_nbfc_stop() {
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help' -- "$cur"))
+
+  return 1
+}
+
+_nbfc_restart() {
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --readonly' -- "$cur"))
+
+  return 1
+}
+
+_nbfc_status() {
+  case "$prev" in
+    --fan|-f)
+       
+       return 0;;
+    --watch|-w)
+       
+       return 0;;
+  esac
+
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -a --all -s --service -f --fan -w --watch' -- "$cur"))
+
+  return 1
+}
+
+_nbfc_config() {
+  case "$prev" in
+    --set|-s)
+       COMPREPLY=($(compgen -f -- "$cur"))
+       return 0;;
+    --apply|-a)
+       COMPREPLY=($(compgen -f -- "$cur"))
+       return 0;;
+  esac
+
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -l --list -s --set -a --apply -r --recommend' -- "$cur"))
+
+  return 1
+}
+
+_nbfc_set() {
+  case "$prev" in
+    --speed|-s)
+       
+       return 0;;
+    --fan|-f)
+       
+       return 0;;
+  esac
+
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -a --auto -s --speed -f --fan' -- "$cur"))
+
+  return 1
+}
+
+_nbfc_help() {
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help' -- "$cur"))
+
+  return 1
+}
+
+complete -F _nbfc nbfc

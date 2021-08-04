@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<FanControlConfigV2 xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <NotebookModel>Acer Aspire 5745G</NotebookModel>
+  <Author>xen20</Author>
+  <EcPollInterval>1000</EcPollInterval>
+  <ReadWriteWords>false</ReadWriteWords>
+  <CriticalTemperature>93</CriticalTemperature>
+  <FanConfigurations>
+    <FanConfiguration>
+      <ReadRegister>94</ReadRegister>
+      <WriteRegister>94</WriteRegister>
+      <MinSpeedValue>1</MinSpeedValue>
+      <MaxSpeedValue>13</MaxSpeedValue>
+      <IndependentReadMinMaxValues>false</IndependentReadMinMaxValues>
+      <MinSpeedValueRead>0</MinSpeedValueRead>
+      <MaxSpeedValueRead>0</MaxSpeedValueRead>
+      <ResetRequired>true</ResetRequired>
+      <FanSpeedResetValue>4</FanSpeedResetValue>
+      <FanDisplayName>Main</FanDisplayName>
+      <TemperatureThresholds>
+        <TemperatureThreshold>
+          <UpThreshold>68</UpThreshold>
+          <DownThreshold>58</DownThreshold>
+          <FanSpeed>33.3333359</FanSpeed>
+        </TemperatureThreshold>
+        <TemperatureThreshold>
+          <UpThreshold>75</UpThreshold>
+          <DownThreshold>66</DownThreshold>
+          <FanSpeed>50</FanSpeed>
+        </TemperatureThreshold>
+        <TemperatureThreshold>
+          <UpThreshold>60</UpThreshold>
+          <DownThreshold>48</DownThreshold>
+          <FanSpeed>16.6666679</FanSpeed>
+        </TemperatureThreshold>
+        <TemperatureThreshold>
+          <UpThreshold>82</UpThreshold>
+          <DownThreshold>73</DownThreshold>
+          <FanSpeed>100</FanSpeed>
+        </TemperatureThreshold>
+        <TemperatureThreshold>
+          <UpThreshold>0</UpThreshold>
+          <DownThreshold>0</DownThreshold>
+          <FanSpeed>0</FanSpeed>
+        </TemperatureThreshold>
+        <TemperatureThreshold>
+          <UpThreshold>50</UpThreshold>
+          <DownThreshold>1</DownThreshold>
+          <FanSpeed>0</FanSpeed>
+        </TemperatureThreshold>
+      </TemperatureThresholds>
+      <FanSpeedPercentageOverrides>
+      </FanSpeedPercentageOverrides>
+    </FanConfiguration>
+  </FanConfigurations>
+  <RegisterWriteConfigurations />
+</FanControlConfigV2>

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+_nbfc_service() {
+  local cur prev words cword split args w
+  _init_completion -s || return
+
+  case "$prev" in
+    --config-file|-c)
+       COMPREPLY=($(compgen -f -- "$cur"))
+       return 0;;
+    --state-file|-s)
+       COMPREPLY=($(compgen -f -- "$cur"))
+       return 0;;
+    --embedded-controller|-e)
+       COMPREPLY=($(compgen -W 'dummy ec_linux ec_sys_linux' -- "$cur"))
+       return 0;;
+  esac
+
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --readonly -f --fork -d --debug -c --config-file -s --state-file -e --embedded-controller' -- "$cur"))
+
+  return 1
+}
+
+complete -F _nbfc_service nbfc_service
