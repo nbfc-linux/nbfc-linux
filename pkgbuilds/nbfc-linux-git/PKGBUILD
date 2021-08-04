@@ -6,7 +6,7 @@ pkgver=0.0.1
 pkgrel=1
 pkgdesc="Lightweight C port of NoteBook FanControl (no Mono required)"
 arch=('i686' 'x86_64')
-url="https://github.com/braph/nbfc-linux"
+url="https://github.com/nbfc-linux/nbfc-linux"
 optdepends=('dmidecode: for getting recommended notebook configurations')
 makedepends=('lm_sensors')
 license=('GPL3')
@@ -22,5 +22,5 @@ build() {
 
 package() {
   cd nbfc-linux
-  make prefix="${pkgdir}/usr" confdir="${pkgdir}/etc" install
+  make DESTDIR="${pkgdir}" install
 }
