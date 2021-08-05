@@ -287,7 +287,7 @@ if __name__ == '__main__':
         os.environ['PATH'] += ':./src'
 
     if not os.path.isdir(service.CONFIG_DIR):
-        os.path.mkdir(service.CONFIG_DIR)
+        os.mkdir(service.CONFIG_DIR)
 
     opts = argp.parse_args()
 
