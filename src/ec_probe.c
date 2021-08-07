@@ -232,8 +232,6 @@ int main(int argc, char* const argv[]) {
   signal(SIGINT,  Handle_Signal);
   signal(SIGTERM, Handle_Signal);
   ec = &EC_SysLinux_VTable;
-  e = ec->Init();
-  e_die();
   e = ec->Open();
   e_die();
 

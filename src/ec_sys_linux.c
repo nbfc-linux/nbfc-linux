@@ -9,22 +9,27 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#define EC_SysLinux_EC0_IO_Path "/sys/kernel/debug/ec/ec0/io"
-#define EC_SysLinux_Module_Cmd  "modprobe ec_sys write_support=1"
+#define EC_SysLinux_ACPI_EC_Path "/dev/ec"
+#define EC_SysLinux_EC0_IO_Path  "/sys/kernel/debug/ec/ec0/io"
+#define EC_SysLinux_Module_Cmd   "modprobe ec_sys write_support=1"
 
 static int EC_SysLinux_FD = -1;
 
 static inline Error* EC_SysLinux_LoadKernelModule();
 
-Error* EC_SysLinux_Init() {
-  return EC_SysLinux_LoadKernelModule();
-}
-
 Error* EC_SysLinux_Open() {
+  EC_SysLinux_FD = open(EC_SysLinux_ACPI_EC_Path, O_RDWR | O_EXCL);
+  if (EC_SysLinux_FD != -1)
+    return err_success();
+
+  Error* e = EC_SysLinux_LoadKernelModule();
+  e_check();
+
   EC_SysLinux_FD = open(EC_SysLinux_EC0_IO_Path, O_RDWR | O_EXCL);
   if (EC_SysLinux_FD == -1)
     return err_stdlib(0, EC_SysLinux_EC0_IO_Path);
-  return err_success();
+  else
+    return err_success();
 }
 
 void EC_SysLinux_Close() {
@@ -72,7 +77,6 @@ static inline Error* EC_SysLinux_LoadKernelModule() {
 }
 
 EC_VTable EC_SysLinux_VTable = {
-  EC_SysLinux_Init,
   EC_SysLinux_Open,
   EC_SysLinux_Close,
   EC_SysLinux_ReadByte,

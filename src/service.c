@@ -187,11 +187,7 @@ static Error* SetupEC(EmbeddedControllerType ec_type) {
     ec = &EC_Debug_VTable;
   }
 
-  Error* e = ec->Init();
-  e = ec->Init();
-  e_check();
-  e = ec->Open();
-  return e;
+  return ec->Open();
 }
 
 static Error* ResetEC() {

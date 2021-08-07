@@ -6,10 +6,6 @@
 static uint16_t* EC_Dummy_FakeRegisters;
 #define          EC_Dummy_FakeRegistersSize 256
 
-Error* EC_Dummy_Init() {
-  return err_success();
-}
-
 Error* EC_Dummy_Open() {
   if (! EC_Dummy_FakeRegisters)
     EC_Dummy_FakeRegisters = (uint16_t*) Mem_Calloc(EC_Dummy_FakeRegistersSize, sizeof(uint16_t));
@@ -46,7 +42,6 @@ Error* EC_Dummy_ReadWord(int register_, uint16_t* out) {
 }
 
 EC_VTable EC_Dummy_VTable = {
-  EC_Dummy_Init,
   EC_Dummy_Open,
   EC_Dummy_Close,
   EC_Dummy_ReadByte,

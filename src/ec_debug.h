@@ -6,7 +6,6 @@
 extern EC_VTable  EC_Debug_VTable;
 extern EC_VTable* EC_Debug_Controller;
 
-Error*   EC_Debug_Init();
 Error*   EC_Debug_Open();
 void     EC_Debug_Close();
 Error*   EC_Debug_WriteByte(int, uint8_t);

@@ -9,7 +9,6 @@
 
 extern EC_VTable EC_Linux_VTable;
 
-Error*   EC_Linux_Init();
 Error*   EC_Linux_Open();
 void     EC_Linux_Close();
 Error*   EC_Linux_WriteByte(int register_, uint8_t value);

@@ -4,10 +4,6 @@
 
 EC_VTable* EC_Debug_Controller;
 
-Error* EC_Debug_Init() {
-  return EC_Debug_Controller->Init();
-}
-
 Error* EC_Debug_Open() {
   return EC_Debug_Controller->Open();
 }
@@ -45,7 +41,6 @@ Error* EC_Debug_ReadWord(int register_, uint16_t* out) {
 }
 
 EC_VTable EC_Debug_VTable = {
-  EC_Debug_Init,
   EC_Debug_Open,
   EC_Debug_Close,
   EC_Debug_ReadByte,

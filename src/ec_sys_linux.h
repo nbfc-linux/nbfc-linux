@@ -5,7 +5,6 @@
 
 extern EC_VTable EC_SysLinux_VTable;
 
-Error*   EC_SysLinux_Init();
 Error*   EC_SysLinux_Open();
 void     EC_SysLinux_Close();
 Error*   EC_SysLinux_WriteByte(int, uint8_t);

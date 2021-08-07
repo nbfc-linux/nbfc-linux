@@ -16,10 +16,6 @@
 
 static int EC_Linux_FD = -1;
 
-Error* EC_Linux_Init() {
-  return err_success();
-}
-
 Error* EC_Linux_Open() {
   EC_Linux_FD = open(EC_Linux_PortFilePath, O_RDWR | O_EXCL);
   if (EC_Linux_FD < 0)
@@ -213,7 +209,6 @@ Error* EC_Linux_ReadWord(int register_, uint16_t* val) {
 }
 
 EC_VTable EC_Linux_VTable = {
-  EC_Linux_Init,
   EC_Linux_Open,
   EC_Linux_Close,
   EC_Linux_ReadByte,

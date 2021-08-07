@@ -5,7 +5,6 @@
 
 extern EC_VTable EC_Dummy_VTable;
 
-Error*   EC_Dummy_Init();
 Error*   EC_Dummy_Open();
 void     EC_Dummy_Close();
 Error*   EC_Dummy_WriteByte(int, uint8_t);
