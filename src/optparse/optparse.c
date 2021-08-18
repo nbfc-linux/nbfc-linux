@@ -242,7 +242,7 @@ static inline uint64_t cli99_GetNextState(const char* s) {
  *     considering `foo` to be an argument of `-o`.
  */
 bool cli99_StateCtl(cli99* self, cli99_operation operation, uint64_t flags_) {
-  const uint64_t flags  = cli99_FilterFlags(flags_);
+  const uint64_t flags = cli99_FilterFlags(flags_);
 
 apply_state:
 switch (my._state) {

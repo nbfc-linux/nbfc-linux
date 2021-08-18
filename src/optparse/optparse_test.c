@@ -25,7 +25,6 @@ static const cli99_option cli_options[] = {
   {"-b|--bool",                -'b',         1|cli99_type(bool)},
   {"-s|--string",              -'s',         1},
   {"-o|--optional",            -'o',        '?'},
-  {"-q|--quiet",               -'q',         0},
   {"--print-flags",            -'P',         0},
   {"-r|--repeat",              -'r',         1|cli99_type(unsigned)},
   {"command",                   'C',         1|cli99_required_option},
@@ -38,25 +37,6 @@ static const cli99_option cli_test_positionals[] = {
   cli99_options_end(),
 };
 
-static struct {
-  bool        A, B, C;
-  bool        F;
-  unsigned    u;
-  int         i;
-  float       f;
-  double      d;
-  long double D;
-  char        c;
-  bool        b;
-  const char* s;
-  const char* o;
-  unsigned    r;
-  bool        quiet;
-  bool        print_flags;
-  const char* command;
-  const char* pos1;
-} options;
-
 static void parse_opts(int argc, char* const argv[]) {
   cli99 p;
   cli99_Init(&p, argc, argv, cli_options, cli99_options_python);
@@ -67,26 +47,27 @@ static void parse_opts(int argc, char* const argv[]) {
       printf("Handling: %d (%c)\n", o, abs(o));
 
     switch (o) {
-    case 1:     options.pos1 = p.optarg; break;
-    case -'F':  options.F = 1;           break;
-    case -'c':  options.c = p.optval.c;  break;
-    case -'f':  options.f = p.optval.f;  break;
-    case -'d':  options.d = p.optval.d;  break;
-    case -'D':  options.D = p.optval.d;  break;
-    case -'i':  options.i = p.optval.i;  break;
-    case -'u':  options.u = p.optval.u;  break;
-    case -'b':  options.b = p.optval.b;  break;
-    case -'s':  options.s = p.optarg;    break;
-    case -'o':  options.o = p.optarg;    break;
-    case -'A':  options.A = 1;           break;
-    case -'B':  options.B = 1;           break;
-    case -'C':  options.C = 1;           break;
-    case -'q':  options.quiet = 1;       break;
-    case -'P':  cli99_PrintFlagMask(&p); break;
-    case -'r':  options.r = p.optval.u;  break;
-    case  'C':  options.command = p.optarg;
+    case 1:     printf("--pos1=%s ", p.optarg); break;
+    case -'F':  printf("-F=True ");             break;
+    case -'c':  printf("-c=%c ",  p.optval.c);  break;
+    case -'f':  printf("-f=%f ",  p.optval.f);  break;
+    case -'d':  printf("-d=%f ", p.optval.d);   break;
+    case -'D':  printf("-D=%f ", p.optval.d);   break;
+    case -'i':  printf("-i=%d ", p.optval.i);   break;
+    case -'u':  printf("-u=%u ", p.optval.u);   break;
+    case -'b':  printf("-b=True ");             break;
+    case -'s':  printf("-s=%s ", p.optarg);     break;
+    case -'o':  printf("-o=%s ", p.optarg);     break;
+    case -'A':  printf("-A=True ");             break;
+    case -'B':  printf("-B True ");             break;
+    case -'C':  printf("-C True ");             break;
+//  case -'P':  cli99_PrintFlagMask(&p); break;
+//  case -'r':  options.r = p.optval.u;  break;
+    case  'C':  printf("command=%s ", p.optarg);
                 if (! strcmp(p.optarg, "positionals"))
                   cli99_SetOptions(&p, cli_test_positionals, false);
+                else if (! strcmp(p.optarg, "test"))
+                    ;
                 else
                   printf("Unknown command %s\n", p.optarg);
                 break;
@@ -95,26 +76,13 @@ static void parse_opts(int argc, char* const argv[]) {
   }
 end:
 
+/*
   if (options.quiet)
     return;
+*/
 
   if (! cli99_CheckRequired(&p))
     cli99_ExplainError(&p);
-
-#define print_opt(O, FMT) printf("-" #O ": " FMT "\n", options.O)
-  print_opt(A, "%d");
-  print_opt(B, "%d");
-  print_opt(C, "%d");
-  print_opt(F, "%d");
-  print_opt(c, "%c");
-  print_opt(f, "%f");
-  print_opt(i, "%d");
-  print_opt(u, "%u");
-  print_opt(b, "%d");
-  print_opt(s, "%s");
-  print_opt(o, "%s");
-  print_opt(command, "%s");
-  print_opt(pos1, "%s");
 
   if (!cli99_End(&p)) {
     fprintf(stderr, "Too much arguments\n");
@@ -128,8 +96,10 @@ int main(int argc, char* const argv[])
 {
   setlocale(LC_NUMERIC, "C");
   parse_opts(argc, argv);
+/*
   for (unsigned i = 0; i < options.r; ++i)
     parse_opts(argc, argv);
+*/
   return 0;
 }
 
