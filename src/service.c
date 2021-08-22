@@ -73,8 +73,14 @@ Error* Service_Init() {
 
   if (options.embedded_controller_type != EmbeddedControllerType_Unset)
     e = SetupEC(options.embedded_controller_type); // --embedded-controller given
-  else
+  else if (service_config.EmbeddedControllerType != EmbeddedControllerType_Unset)
     e = SetupEC(service_config.EmbeddedControllerType);
+  else {
+    e = SetupEC(EmbeddedControllerType_ECSysLinux);
+    if (e)
+      e = SetupEC(EmbeddedControllerType_ECLinux);
+  }
+
   e_check();
 
   e = (sensor = &FS_Sensors_VTable)->Init();

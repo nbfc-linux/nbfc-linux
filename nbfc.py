@@ -235,7 +235,7 @@ def wait_for_hwmon(opts):
 
 
 argp = argparse.ArgumentParser(prog='nbfc', description='NoteBook FanControl CLI Client')
-argp.add_argument('--version', action='version', version='nbfc 0.1.5')
+argp.add_argument('--version', action='version', version='nbfc 0.1.6')
 subp = argp.add_subparsers(description='commands')
 
 cmdp = subp.add_parser('start',       help='Start the service')

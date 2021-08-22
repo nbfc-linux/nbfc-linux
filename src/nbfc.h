@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define NBFC_VERSION                     "0.1.5"
+#define NBFC_VERSION                     "0.1.6"
 #define NBFC_MAX_FILE_SIZE               32768
 #define NBFC_TEMPERATURE_FILTER_TIMESPAN 6000  /*ms*/
 #define NBFC_CONFIGS_DIR                 "/usr/share/nbfc/configs"
