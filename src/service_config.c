@@ -10,7 +10,7 @@
 ServiceConfig service_config = {
   "",                                /* SelectedConfigId */
   Boolean_False,                     /* ReadOnly */
-  EmbeddedControllerType_ECSysLinux, /* EmbeddedControllerType */
+  EmbeddedControllerType_Unset,      /* EmbeddedControllerType */
   {NULL, 0}                          /* TargetFanSpeeds */
 };
 
