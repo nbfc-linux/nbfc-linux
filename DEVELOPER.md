@@ -1,5 +1,15 @@
 ## Some notes about the project
 
+### xml/
+
+For fetching configuration files from the original project, do
+
+`cd xml; make fetch_from_original_nbfc`
+
+For translating them to JSON, do
+
+`cd xml; make transform_to_json`
+
 ### error.c
 
 For chaining error messages, there is a `Error error_stack[16];`.
