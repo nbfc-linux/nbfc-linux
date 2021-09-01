@@ -290,7 +290,7 @@ static void set_config(const nx_json *cfg) {
   fclose(state_file);
 }
 
-char *get_fan_status(const nx_json *fan) {
+static char *get_fan_status(const nx_json *fan) {
   char *status = malloc(512);
   sprintf(status,
           "Fan Display Name         : %s\n"
@@ -685,22 +685,16 @@ int main(int argc, char *const argv[]) {
           }
         }
       } else if (options.fancount) {
-        const nx_json *fan = nx_json_get(state, "fans")->val.children.first;
+        const nx_json *fans = nx_json_get(state, "fans");
         int fan_count = nx_json_get(state, "fans")->val.children.length;
-        char **fans = malloc(sizeof(char *) * fan_count);
         int *vis = calloc(sizeof(int), fan_count);
-        int i = 0;
-        while (fan != NULL) {
-          fans[i++] = get_fan_status(fan);
-          fan = fan->next;
-        }
         for (int i = 0; i < options.fancount; i++) {
           if (options.fans[i] > fan_count) {
             fprintf(stderr, "Fan number %d not found!\n", options.fans[i]);
             return NBFC_EXIT_FAILURE;
           }
           if (!vis[options.fans[i] - 1]) {
-            printf("%s\n", fans[options.fans[i] - 1]);
+            printf("%s\n", get_fan_status(nx_json_item(fans, options.fans[i] - 1)));
             vis[options.fans[i] - 1] = 1;
           }
         }
