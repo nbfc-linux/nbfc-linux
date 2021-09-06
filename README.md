@@ -76,8 +76,8 @@ Differences en detail
 Troubleshooting
 ---------------
 The preferred way of running nbfc is using the `ECSysLinux` implementation, which depends on the `ec_sys` kernel module.
-There is also an alternative implementation which uses `/dev/port`, called `ECLinux`.
-It can be specified on the commandline using `--embedded-controller=ECLinux` and permanently set in `/etc/nbfc/nbfc.json` with `"EmbeddedControllerType": "ECLinux"`.
+There is also an alternative implementation which uses `/dev/port`, called `ec_linux`.
+It can be specified on the commandline using `--embedded-controller=ec_linux` and permanently set in `/etc/nbfc/nbfc.json` with `"EmbeddedControllerType": "ec_linux"`.
 
 For running NBFC with Secure Boot and Lockdown Kernel, see [acpi\_ec](https://github.com/MusiKid/acpi_ec)
 

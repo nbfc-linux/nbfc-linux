@@ -104,9 +104,9 @@ static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* v, const n
   const char* s = NULL;
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
-  else if (!strcmp(s, "ECSysLinux")) *v = EmbeddedControllerType_ECSysLinux;
-  else if (!strcmp(s, "ECLinux"))    *v = EmbeddedControllerType_ECLinux;
-  else if (!strcmp(s, "ECDummy"))    *v = EmbeddedControllerType_ECDummy;
+  else if (!strcmp(s, "ec_sys_linux")) *v = EmbeddedControllerType_ECSysLinux;
+  else if (!strcmp(s, "ec_linux"))     *v = EmbeddedControllerType_ECLinux;
+  else if (!strcmp(s, "dummy"))        *v = EmbeddedControllerType_ECDummy;
   else return err_string(0, "Invalid value for EmbeddedControllerType");
   return e;
 }
