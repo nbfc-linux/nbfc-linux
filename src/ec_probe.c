@@ -416,6 +416,7 @@ static void Register_PrintDump(RegisterBuf* self) {
                             Console_Red);
 
   Register_PrintRegister(self, c);
+  printf("%s", Console_Reset);
 }
 
 // ============================================================================
