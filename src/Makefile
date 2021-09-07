@@ -3,9 +3,10 @@
 release: nbfc_service ec_probe nbfc
 debug:   nbfc_service-debug ec_probe-debug nbfc-debug
 
-sysconfdir = /etc
+confdir = /etc
+sharedir = /usr/share
 CCFLAGS = $(CFLAGS) -Wall -Wextra -Wfatal-errors -Wpedantic -lm
-CFLAGS_MAIN = $(CCFLAGS) -DSYSCONFDIR=\"$(sysconfdir)\"
+CFLAGS_MAIN = $(CCFLAGS) -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(sharedir)\"
 
 nbfc_service-debug: \
 	build.c \

@@ -2,7 +2,7 @@ confdir = $(DESTDIR)/etc
 bindir =  $(DESTDIR)/usr/bin
 sharedir = $(DESTDIR)/usr/share
 
-build: src/nbfc_service src/ec_probe
+build: src/nbfc_service src/ec_probe #src/nbfc
 
 install: build
 	# Binaries
@@ -10,6 +10,7 @@ install: build
 	install nbfc.py           $(bindir)/nbfc
 	install src/nbfc_service  $(bindir)/nbfc_service
 	install src/ec_probe      $(bindir)/ec_probe
+#   install src/nbfc          $(bindir)/nbfc   #client written in c
 	
 	# /etc/systemd/system
 	mkdir -p $(confdir)/systemd/system
@@ -54,6 +55,9 @@ src/nbfc_service:
 
 src/ec_probe:
 	(cd src; make ec_probe)
+
+src/nbfc:
+	(cd src; make nbfc)
 
 # =============================================================================
 # Documentation ===============================================================

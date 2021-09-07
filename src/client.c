@@ -19,7 +19,7 @@
 // check euid
 static void check_root() {
   if (geteuid()) {
-    fprintf(stderr, "This operation must be run as root");
+    fprintf(stderr, "This operation must be run as root\n");
     exit(NBFC_EXIT_CMDLINE);
   }
 }
@@ -32,7 +32,7 @@ static char *get_system_product() {
   nanosleep(&sleeptime, NULL);
   char *result = (char *)malloc(100);
   if (!fscanf(proc, "%[^\n]", result)) {
-    fprintf(stderr, "Failed to read dmidecode output");
+    fprintf(stderr, "Failed to read dmidecode output\n");
     exit(NBFC_EXIT_FAILURE);
   }
   int proc_exit_code = pclose(proc);
@@ -124,7 +124,7 @@ static struct ConfigList get_configs() {
   struct dirent *config;
   configs = opendir(NBFC_CONFIGS_DIR);
   if (configs == NULL) {
-    fprintf(stderr, "The directory %s doesn't exist", NBFC_CONFIGS_DIR);
+    fprintf(stderr, "The directory %s doesn't exist\n", NBFC_CONFIGS_DIR);
     exit(NBFC_EXIT_FAILURE);
   }
   config = readdir(configs); // .
@@ -262,7 +262,7 @@ static const nx_json *get_config() {
   }
   if (config_file == NULL) {
     fprintf(stderr, NBFC_SERVICE_CONFIG
-            " is not accessible\nAre you sure you're running this as root?");
+            " is not accessible");
     exit(NBFC_EXIT_FAILURE);
   }
   fseek(config_file, 0, SEEK_END);
@@ -279,10 +279,11 @@ static const nx_json *get_config() {
 }
 
 static void set_config(const nx_json *cfg) {
+  check_root();
   FILE *state_file = fopen(NBFC_SERVICE_CONFIG, "w");
   if (state_file == NULL) {
     fprintf(stderr, NBFC_SERVICE_CONFIG
-            " is not accessible\nAre you sure you're running this as root?");
+            " is not accessible");
     exit(NBFC_EXIT_FAILURE);
   }
   char *contents = nx_json_to_string(cfg);
