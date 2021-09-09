@@ -72,6 +72,7 @@ static int get_service_pid() {
 
 // start the service
 static void service_start(int readonly) {
+  check_root();
   int pid = get_service_pid();
   if (pid != -1)
     printf("Service already running: %d\n", pid);
@@ -91,6 +92,7 @@ static void service_start(int readonly) {
 
 // stop the service
 static void service_stop() {
+  check_root();
   int pid = get_service_pid();
   if (pid == -1)
     return;
@@ -99,6 +101,7 @@ static void service_stop() {
 
 // restart the service
 static void service_restart(int readonly) {
+  check_root();
   service_stop();
   sleep(1);
   service_start(readonly);
