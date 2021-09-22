@@ -28,7 +28,7 @@
       install nbfc.py           $out/bin/nbfc
       install src/nbfc_service  $out/bin/nbfc_service
       install src/ec_probe      $out/bin/ec_probe
-  #   install src/nbfc          $(bindir)/nbfc   #client written in c   
+  #   install src/nbfc          $out/bin/nbfc   #client written in c   
       mkdir -p $out/share/nbfc/configs
       cp -r share/nbfc/configs/* $out/share/nbfc/configs
       
