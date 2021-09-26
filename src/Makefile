@@ -34,7 +34,7 @@ nbfc_service-debug: \
 	temperature_filter.c temperature_filter.h \
 	temperature_threshold_manager.c temperature_threshold_manager.h \
 	optparse/optparse.h optparse/optparse.c
-	$(CC) $(CFLAGS_MAIN) -Og -g build.c -o nbfc_service-debug
+	$(CC) -Og -g build.c -o nbfc_service-debug $(CFLAGS_MAIN)
 
 nbfc_service: \
 	build.c \
@@ -62,7 +62,7 @@ nbfc_service: \
 	temperature_filter.c temperature_filter.h \
 	temperature_threshold_manager.c temperature_threshold_manager.h \
 	optparse/optparse.h optparse/optparse.c
-	$(CC) $(CFLAGS_MAIN) -Os -DNDEBUG -s build.c -o nbfc_service
+	$(CC) -Os -DNDEBUG -s build.c -o nbfc_service $(CFLAGS_MAIN)
 
 ec_probe-debug: \
 	ec_probe.c \
@@ -72,7 +72,7 @@ ec_probe-debug: \
 	nbfc.h \
 	memory.h memory.c \
 	optparse/optparse.h optparse/optparse.c
-	$(CC) $(CFLAGS_MAIN) -Og -g ec_probe.c -o ec_probe-debug
+	$(CC) -Og -g ec_probe.c -o ec_probe-debug $(CFLAGS_MAIN)
 
 ec_probe: \
 	ec_probe.c \
@@ -82,7 +82,7 @@ ec_probe: \
 	nbfc.h \
 	memory.h memory.c \
 	optparse/optparse.h optparse/optparse.c
-	$(CC) $(CFLAGS_MAIN) -Os -DNDEBUG -s ec_probe.c -o ec_probe
+	$(CC) -Os -DNDEBUG -s ec_probe.c -o ec_probe $(CFLAGS_MAIN)
 
 nbfc-debug: \
 	client.c \
@@ -91,7 +91,7 @@ nbfc-debug: \
 	optparse/optparse.h optparse/optparse.c \
 	nxjson.c reverse_nxjson.c nxjson.h \
 	nbfc.h
-	$(CC) $(CFLAGS_MAIN) -Og -g client.c -o nbfc-debug
+	$(CC) -Og -g client.c -o nbfc-debug $(CFLAGS_MAIN)
 
 nbfc: \
 	client.c \
@@ -100,7 +100,7 @@ nbfc: \
 	optparse/optparse.h optparse/optparse.c \
 	nxjson.c reverse_nxjson.c nxjson.h \
 	nbfc.h
-	$(CC) $(CFLAGS_MAIN) -Os -DNDEBUG -s client.c -o nbfc
+	$(CC) -Os -DNDEBUG -s client.c -o nbfc $(CFLAGS_MAIN)
 
 generated/: .force
 	mkdir -p generated

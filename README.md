@@ -21,6 +21,7 @@ Comparison of NBFC C# and NBFC Linux
 
 The [service](doc/nbfc_service.md) and the [probing tool](doc/ec_probe.md) are written in C.
 The [client](doc/nbfc.md) is written in Python.
+Another [client](doc/nbfc.md) has also been [written in C](src/client.c).
 
 Installation
 ------------
