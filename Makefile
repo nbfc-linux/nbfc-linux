@@ -10,7 +10,7 @@ install: build
 	install nbfc.py           $(bindir)/nbfc
 	install src/nbfc_service  $(bindir)/nbfc_service
 	install src/ec_probe      $(bindir)/ec_probe
-#   install src/nbfc          $(bindir)/nbfc   #client written in c
+	#install src/nbfc          $(bindir)/nbfc   #client written in c
 	
 	# /etc/systemd/system
 	mkdir -p $(confdir)/systemd/system
@@ -41,6 +41,37 @@ install: build
 	cp completion/fish/nbfc.fish           $(sharedir)/fish/completions/
 	cp completion/fish/nbfc_service.fish   $(sharedir)/fish/completions/
 	cp completion/fish/ec_probe.fish       $(sharedir)/fish/completions/
+
+uninstall:
+	# Binaries
+	rm $(bindir)/nbfc
+	rm $(bindir)/nbfc_service
+	rm $(bindir)/ec_probe
+	
+	# /etc/systemd/system
+	rm $(confdir)/systemd/system/nbfc_service.service
+	
+	# /usr/share/nbfc/configs
+	rm -r $(sharedir)/nbfc
+	
+	# Documentation
+	rm $(sharedir)/man/man1/ec_probe.1
+	rm $(sharedir)/man/man1/nbfc.1
+	rm $(sharedir)/man/man1/nbfc_service.1
+	rm $(sharedir)/man/man5/nbfc_service.json.5
+	
+	# Completion
+	rm $(sharedir)/zsh/site-functions/_nbfc
+	rm $(sharedir)/zsh/site-functions/_nbfc_service
+	rm $(sharedir)/zsh/site-functions/_ec_probe
+	
+	rm $(sharedir)/bash-completion/completions/nbfc
+	rm $(sharedir)/bash-completion/completions/nbfc_service
+	rm $(sharedir)/bash-completion/completions/ec_probe
+	 
+	rm $(sharedir)/fish/completions/nbfc.fish
+	rm $(sharedir)/fish/completions/nbfc_service.fish
+	rm $(sharedir)/fish/completions/ec_probe.fish
 
 clean:
 	rm -rf __pycache__ tools/argparse-tool/__pycache__
