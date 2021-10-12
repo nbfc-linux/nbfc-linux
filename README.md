@@ -72,6 +72,8 @@ Differences en detail
 
 - The original NBFC service adjusts the fan speeds in intervals of `EcPollIntervall` according to `TemperatureThresholds`. - NBFC Linux directly sets the fan speed (also according to `TemperatureThresholds`).
 
+- The original NBFC service selects a TemperatureThreshold when the temperature exceeds its `UpThreshold`. In contrast, NBFC Linux will select the *next* TemperatureThreshold when the temperature exceeds the *current* `UpThreshold`. The provided config files have been reconfigured to account for this change, so that they provide the same behaviour as the original NBFC service. If you have a custom config file that works well with the original service, you can port it to NBFC Linux using the [provided tool](/tools/config_to_json.py).
+
 - NBFC Linux dropped the `Autostart` option, since it relies on the systemd service file only.
 
 Troubleshooting
