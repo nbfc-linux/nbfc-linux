@@ -30,6 +30,9 @@ for infile in opts.infile:
                 thresholds[i]['UpThreshold'] = thresholds[i+1]['UpThreshold']
             thresholds[-1]['UpThreshold'] = p['CriticalTemperature']
 
+            #if thresholds[0]['UpThreshold'] == 0:
+            #    raise Exception('UpThreshold of 0 detected.')
+
             p['FanConfigurations'][0]['TemperatureThresholds'] = thresholds
             s = json.dumps(p, indent=1)
 
