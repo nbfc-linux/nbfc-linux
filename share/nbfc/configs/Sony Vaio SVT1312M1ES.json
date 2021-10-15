@@ -13,27 +13,27 @@
 	 "FanSpeedResetValue": 107,
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 45,
+	   "UpThreshold": 50,
 	   "DownThreshold": 44,
 	   "FanSpeed": 48.026315789473685
 	  },
 	  {
-	   "UpThreshold": 50,
+	   "UpThreshold": 55,
 	   "DownThreshold": 44,
 	   "FanSpeed": 60.526315789473685
 	  },
 	  {
-	   "UpThreshold": 55,
+	   "UpThreshold": 60,
 	   "DownThreshold": 47,
 	   "FanSpeed": 70.39473684210526
 	  },
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 65,
 	   "DownThreshold": 51,
 	   "FanSpeed": 80.26315789473685
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 75,
 	   "DownThreshold": 57,
 	   "FanSpeed": 100.0
 	  }

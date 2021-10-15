@@ -18,32 +18,32 @@
 	 "FanDisplayName": "CPU/GPU",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 44,
+	   "UpThreshold": 45,
 	   "DownThreshold": 0,
 	   "FanSpeed": 12.5
 	  },
 	  {
-	   "UpThreshold": 45,
+	   "UpThreshold": 56,
 	   "DownThreshold": 41,
 	   "FanSpeed": 37.5
 	  },
 	  {
-	   "UpThreshold": 56,
+	   "UpThreshold": 62,
 	   "DownThreshold": 53,
 	   "FanSpeed": 50.0
 	  },
 	  {
 	   "UpThreshold": 66,
-	   "DownThreshold": 61,
-	   "FanSpeed": 87.5
-	  },
-	  {
-	   "UpThreshold": 62,
 	   "DownThreshold": 57,
 	   "FanSpeed": 75.0
 	  },
 	  {
 	   "UpThreshold": 69,
+	   "DownThreshold": 61,
+	   "FanSpeed": 87.5
+	  },
+	  {
+	   "UpThreshold": 90,
 	   "DownThreshold": 67,
 	   "FanSpeed": 100.0
 	  }

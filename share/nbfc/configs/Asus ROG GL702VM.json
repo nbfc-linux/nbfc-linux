@@ -18,37 +18,37 @@
 	 "FanDisplayName": "CPU",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 30,
+	   "UpThreshold": 35,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 35,
+	   "UpThreshold": 55,
 	   "DownThreshold": 30,
 	   "FanSpeed": 12.5
 	  },
 	  {
-	   "UpThreshold": 55,
+	   "UpThreshold": 60,
 	   "DownThreshold": 45,
 	   "FanSpeed": 37.5
 	  },
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 65,
 	   "DownThreshold": 50,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 69,
 	   "DownThreshold": 55,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 69,
+	   "UpThreshold": 75,
 	   "DownThreshold": 62,
 	   "FanSpeed": 100.0
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 80,
 	   "DownThreshold": 65,
 	   "FanSpeed": 100.0
 	  }
@@ -68,37 +68,37 @@
 	 "FanDisplayName": "GPU",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 30,
+	   "UpThreshold": 35,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 35,
+	   "UpThreshold": 55,
 	   "DownThreshold": 30,
 	   "FanSpeed": 12.5
 	  },
 	  {
-	   "UpThreshold": 55,
+	   "UpThreshold": 60,
 	   "DownThreshold": 45,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 65,
 	   "DownThreshold": 50,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 69,
 	   "DownThreshold": 55,
 	   "FanSpeed": 87.5
 	  },
 	  {
-	   "UpThreshold": 69,
+	   "UpThreshold": 75,
 	   "DownThreshold": 62,
 	   "FanSpeed": 100.0
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 80,
 	   "DownThreshold": 65,
 	   "FanSpeed": 100.0
 	  }
@@ -118,12 +118,12 @@
 	 "FanDisplayName": "3rd Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 0,
+	   "UpThreshold": 60,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 80,
 	   "DownThreshold": 50,
 	   "FanSpeed": 100.0
 	  }

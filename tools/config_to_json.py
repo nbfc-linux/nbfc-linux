@@ -22,20 +22,21 @@ for infile in opts.infile:
 
         # reconfigure temperature thresholds to account for the new logic:
         p = json.loads(s)
-        thresholds = p['FanConfigurations'][0].get('TemperatureThresholds')
-        if thresholds:
-            thresholds.sort(key=lambda x: x['UpThreshold'])
+        for fan_configuration in p['FanConfigurations']:
+            thresholds = fan_configuration.get('TemperatureThresholds')
+            if thresholds:
+                thresholds.sort(key=lambda x: x['UpThreshold'])
 
-            for i in range(len(thresholds)-1):
-                thresholds[i]['UpThreshold'] = thresholds[i+1]['UpThreshold']
-            thresholds[-1]['UpThreshold'] = p['CriticalTemperature']
+                for i in range(len(thresholds)-1):
+                    thresholds[i]['UpThreshold'] = thresholds[i+1]['UpThreshold']
+                thresholds[-1]['UpThreshold'] = p['CriticalTemperature']
 
-            #if thresholds[0]['UpThreshold'] == 0:
-            #    raise Exception('UpThreshold of 0 detected.')
+                #if thresholds[0]['UpThreshold'] == 0:
+                #    raise Exception('UpThreshold of 0 detected.')
 
-            p['FanConfigurations'][0]['TemperatureThresholds'] = thresholds
-            s = json.dumps(p, indent=1)
+                fan_configuration['TemperatureThresholds'] = thresholds
 
+        s = json.dumps(p, indent=1)
         s = s.replace('\n  ', '\n\t')
 
         json_file = os.path.join(opts.out_dir, basename[0:-4] + '.json')

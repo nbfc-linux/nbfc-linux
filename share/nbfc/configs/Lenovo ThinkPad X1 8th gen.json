@@ -18,29 +18,29 @@
 	 "FanDisplayName": "System Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 0,
+	   "UpThreshold": 75,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
 	   "UpThreshold": 81,
+	   "DownThreshold": 50,
+	   "FanSpeed": 14.2857151
+	  },
+	  {
+	   "UpThreshold": 85,
 	   "DownThreshold": 65,
 	   "FanSpeed": 28.57143
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 90,
 	   "DownThreshold": 75,
 	   "FanSpeed": 42.8571434
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 97,
 	   "DownThreshold": 80,
 	   "FanSpeed": 100.0
-	  },
-	  {
-	   "UpThreshold": 75,
-	   "DownThreshold": 50,
-	   "FanSpeed": 14.2857151
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": []

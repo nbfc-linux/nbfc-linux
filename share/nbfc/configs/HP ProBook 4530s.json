@@ -15,47 +15,47 @@
 	 "FanDisplayName": "CPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 0,
+	   "UpThreshold": 55,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 55,
+	   "UpThreshold": 59,
 	   "DownThreshold": 50,
 	   "FanSpeed": 12.5
 	  },
 	  {
-	   "UpThreshold": 59,
+	   "UpThreshold": 61,
 	   "DownThreshold": 48,
 	   "FanSpeed": 25.0
 	  },
 	  {
-	   "UpThreshold": 61,
+	   "UpThreshold": 65,
 	   "DownThreshold": 53,
 	   "FanSpeed": 30.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 67,
 	   "DownThreshold": 55,
 	   "FanSpeed": 35.0
 	  },
 	  {
-	   "UpThreshold": 67,
+	   "UpThreshold": 68,
 	   "DownThreshold": 59,
 	   "FanSpeed": 40.0
 	  },
 	  {
-	   "UpThreshold": 68,
+	   "UpThreshold": 69,
 	   "DownThreshold": 63,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 69,
+	   "UpThreshold": 71,
 	   "DownThreshold": 65,
 	   "FanSpeed": 65.0
 	  },
 	  {
-	   "UpThreshold": 71,
+	   "UpThreshold": 75,
 	   "DownThreshold": 67,
 	   "FanSpeed": 100.0
 	  }

@@ -19,13 +19,13 @@
 	 "TemperatureThresholds": [
 	  {
 	   "UpThreshold": 60,
-	   "DownThreshold": 60,
-	   "FanSpeed": 100.0
-	  },
-	  {
-	   "UpThreshold": 59,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 60,
+	   "FanSpeed": 100.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": []

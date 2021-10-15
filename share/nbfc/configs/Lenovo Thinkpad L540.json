@@ -18,22 +18,22 @@
 	 "FanDisplayName": "None",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 0,
+	   "UpThreshold": 65,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 75,
 	   "DownThreshold": 58,
 	   "FanSpeed": 46.6666679
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 85,
 	   "DownThreshold": 68,
 	   "FanSpeed": 66.6666641
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 90,
 	   "DownThreshold": 78,
 	   "FanSpeed": 100.0
 	  }

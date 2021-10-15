@@ -18,32 +18,32 @@
 	 "FanDisplayName": "Fan speed",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 46,
+	   "UpThreshold": 49,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 49,
+	   "UpThreshold": 54,
 	   "DownThreshold": 46,
 	   "FanSpeed": 10.0
 	  },
 	  {
-	   "UpThreshold": 54,
+	   "UpThreshold": 59,
 	   "DownThreshold": 49,
 	   "FanSpeed": 30.0
 	  },
 	  {
-	   "UpThreshold": 59,
+	   "UpThreshold": 64,
 	   "DownThreshold": 54,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 64,
+	   "UpThreshold": 67,
 	   "DownThreshold": 59,
 	   "FanSpeed": 70.0
 	  },
 	  {
-	   "UpThreshold": 67,
+	   "UpThreshold": 75,
 	   "DownThreshold": 64,
 	   "FanSpeed": 100.0
 	  }
@@ -63,12 +63,12 @@
 	 "FanDisplayName": "Thermo profile",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 0,
+	   "UpThreshold": 63,
 	   "DownThreshold": 0,
 	   "FanSpeed": 100.0
 	  },
 	  {
-	   "UpThreshold": 63,
+	   "UpThreshold": 75,
 	   "DownThreshold": 62,
 	   "FanSpeed": 0.0
 	  }
@@ -99,12 +99,12 @@
 	 "FanDisplayName": "Fan switch (on/off)",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 52,
+	   "UpThreshold": 53,
 	   "DownThreshold": 46,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 53,
+	   "UpThreshold": 75,
 	   "DownThreshold": 46,
 	   "FanSpeed": 100.0
 	  }

@@ -19,18 +19,18 @@
 	 "TemperatureThresholds": [
 	  {
 	   "UpThreshold": 70,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 80,
 	   "DownThreshold": 55,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 85,
 	   "DownThreshold": 65,
 	   "FanSpeed": 100.0
-	  },
-	  {
-	   "UpThreshold": 69,
-	   "DownThreshold": 0,
-	   "FanSpeed": 0.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": [
@@ -65,18 +65,18 @@
 	 "TemperatureThresholds": [
 	  {
 	   "UpThreshold": 70,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 80,
 	   "DownThreshold": 55,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 85,
 	   "DownThreshold": 65,
 	   "FanSpeed": 100.0
-	  },
-	  {
-	   "UpThreshold": 69,
-	   "DownThreshold": 0,
-	   "FanSpeed": 0.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": [
@@ -110,7 +110,7 @@
 	 "FanDisplayName": "Fan switch (on/off)",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 100,
+	   "UpThreshold": 85,
 	   "DownThreshold": 0,
 	   "FanSpeed": 100.0
 	  }
@@ -142,13 +142,13 @@
 	 "TemperatureThresholds": [
 	  {
 	   "UpThreshold": 90,
-	   "DownThreshold": 85,
-	   "FanSpeed": 100.0
-	  },
-	  {
-	   "UpThreshold": 89,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 85,
+	   "FanSpeed": 100.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": [

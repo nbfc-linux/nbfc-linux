@@ -18,32 +18,32 @@
 	 "FanDisplayName": "Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 0,
+	   "UpThreshold": 60,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 70,
 	   "DownThreshold": 50,
 	   "FanSpeed": 5.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 80,
 	   "DownThreshold": 60,
 	   "FanSpeed": 36.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 85,
 	   "DownThreshold": 70,
 	   "FanSpeed": 64.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 90,
 	   "DownThreshold": 80,
 	   "FanSpeed": 80.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 95,
 	   "DownThreshold": 85,
 	   "FanSpeed": 100.0
 	  }

@@ -15,22 +15,22 @@
 	 "FanDisplayName": "Left fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 0,
+	   "UpThreshold": 66,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 66,
+	   "UpThreshold": 68,
 	   "DownThreshold": 59,
 	   "FanSpeed": 10.191083
 	  },
 	  {
-	   "UpThreshold": 68,
+	   "UpThreshold": 71,
 	   "DownThreshold": 63,
 	   "FanSpeed": 32.4840775
 	  },
 	  {
-	   "UpThreshold": 71,
+	   "UpThreshold": 80,
 	   "DownThreshold": 67,
 	   "FanSpeed": 100.0
 	  }
@@ -47,22 +47,22 @@
 	 "FanDisplayName": "Right fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 0,
+	   "UpThreshold": 66,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 66,
+	   "UpThreshold": 70,
 	   "DownThreshold": 58,
 	   "FanSpeed": 10.191083
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 71,
 	   "DownThreshold": 60,
 	   "FanSpeed": 30.5732479
 	  },
 	  {
-	   "UpThreshold": 71,
+	   "UpThreshold": 80,
 	   "DownThreshold": 67,
 	   "FanSpeed": 100.0
 	  }
