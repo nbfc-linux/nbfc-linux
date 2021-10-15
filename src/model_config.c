@@ -208,12 +208,18 @@ Error* Config_Validate(Config* c) {
       has_100_FanSpeed |= (t->FanSpeed == 100);
 
       if (t->UpThreshold < t->DownThreshold) {
-        e = err_string(0, "UpThreshold must be greater than DownThreshold");
+        e = err_string(0, "UpThreshold cannot be less than DownThreshold");
         goto err;
       }
 
-      if (t->UpThreshold >= c->CriticalTemperature) {
-        e = err_string(0, "UpThreshold must be lower than critical temperature");
+      if (t->UpThreshold > c->CriticalTemperature) {
+        e = err_string(0, "UpThreshold cannot be greater than CriticalTemperature");
+        goto err;
+      }
+
+      if (t->UpThreshold == 0) {
+        e = err_string(0, "UpThreshold must be greater than 0.\nFor information "
+          "on how NBFC Linux differs to the original NBFC, consult the README");
         goto err;
       }
 
@@ -266,4 +272,3 @@ Error* Config_FromFile(Config* config, const char* file) {
   e_check();
   return Config_FromJson(config, js);
 }
-
