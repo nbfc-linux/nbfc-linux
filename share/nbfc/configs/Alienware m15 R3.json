@@ -38,9 +38,9 @@
 			   "FanSpeed": 80.0
 			  },
 			  {
-			   "DownThreshold": 70,
+			   "DownThreshold": 80,
 			   "UpThreshold": 90,
-			   "FanSpeed": 100.0
+			   "FanSpeed": 90.0
 			  },
 			  {
 			   "DownThreshold": 90,
@@ -89,9 +89,9 @@
 		  "FanSpeed": 80.0
 		 },
 		 {
-		  "DownThreshold": 70,
+		  "DownThreshold": 80,
 		  "UpThreshold": 90,
-		  "FanSpeed": 100.0
+		  "FanSpeed": 90.0
 		 },
 		 {
 		  "DownThreshold": 90,
