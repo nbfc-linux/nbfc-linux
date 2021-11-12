@@ -70,7 +70,7 @@ Error* Info_Write(Config* cfg, float temperature, bool readonly, array_of(Fan)* 
       Bool_ToStr[fan->isCritical],
       Fan_GetCurrentSpeed(fan),
       Fan_GetTargetSpeed(fan),
-      0,
+      Fan_GetSpeedSteps(fan),
       (++i != fans->size ? ',' : ' ')
     );
   }

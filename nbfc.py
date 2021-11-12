@@ -56,6 +56,7 @@ class NbfcService:
     def stop(self):
         import signal
         os.kill(self.get_service_pid(), signal.SIGINT)
+        os.remove(self.STATE_FILE)
 
     def restart(self, readonly=False):
         try:     self.stop()
@@ -215,7 +216,7 @@ def restart(opts):
 
 def wait_for_hwmon(opts):
     HWMonNameFiles = ["/sys/class/hwmon/hwmon{}/name", "/sys/class/hwmon/hwmon{}/device/name"]
-    LinuxTempSensorNames = ["coretemp", "k10temp"]
+    LinuxTempSensorNames = ["coretemp", "k10temp", "zenpower"]
 
     for try_ in range(30):
         for name_file_fmt in HWMonNameFiles:
