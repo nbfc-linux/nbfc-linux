@@ -23,6 +23,7 @@ struct Fan {
   int   maxSpeedValueRead;         /*const*/
   int   minSpeedValueReadAbs;      /*const*/
   int   maxSpeedValueReadAbs;      /*const*/
+  int   fanSpeedSteps;             /*const*/
   int   criticalTemperatureOffset;
 
   ThresholdManager threshMan;
@@ -37,6 +38,7 @@ Error* Fan_Init(Fan*, FanConfiguration*, int criticalTemperature, bool readWrite
 Error* Fan_UpdateCurrentSpeed(Fan*);
 float  Fan_GetCurrentSpeed(Fan*);
 float  Fan_GetTargetSpeed(const Fan*);
+int    Fan_GetSpeedSteps(Fan*);
 
 void   Fan_SetTemperature(Fan*, float temperature);
 Error* Fan_SetFixedSpeed(Fan*, float speed);

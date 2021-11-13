@@ -22,6 +22,7 @@ Error* Fan_Init(Fan* self, FanConfiguration* cfg, int criticalTemperature, bool 
   my.maxSpeedValueRead    = same ? my.maxSpeedValueWrite : cfg->MaxSpeedValueRead;
   my.minSpeedValueReadAbs = min(my.minSpeedValueRead, my.maxSpeedValueRead);
   my.maxSpeedValueReadAbs = max(my.minSpeedValueRead, my.maxSpeedValueRead);
+  my.fanSpeedSteps        = my.maxSpeedValueReadAbs - my.minSpeedValueReadAbs;
 
   // TODO #1: How to handle empty TemperatureThresholds? [see model_config.c]
   if (! cfg->TemperatureThresholds.size)
@@ -155,12 +156,16 @@ Error* Fan_UpdateCurrentSpeed(Fan* self) {
   for (range(int, i, 0, 3)) {
     e = Fan_ECReadValue(self, &speed);
     if (speed >= my.minSpeedValueReadAbs && speed <= my.maxSpeedValueReadAbs) {
-      my.currentSpeed = Fan_FanSpeedToPercentage(self, speed);
       break;
     }
   }
 
+  my.currentSpeed = Fan_FanSpeedToPercentage(self, speed);
   return e;
+}
+
+int Fan_GetSpeedSteps(Fan* self) {
+  return my.fanSpeedSteps;
 }
 
 Error* Fan_ECReset(Fan* self) {

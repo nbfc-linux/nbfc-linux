@@ -50,7 +50,7 @@ static char *get_system_product() {
     error_msg = "dmidecode isn't executable";
     break;
   }
-  fprintf(stderr, "%s\ndmidecode exit code: %d", error_msg,
+  fprintf(stderr, "%s\ndmidecode exit code: %d\n", error_msg,
           proc_exit_code / 256);
   exit(NBFC_EXIT_CMDLINE);
 }
@@ -61,7 +61,7 @@ static int get_service_pid() {
   if (pid_file) {
     int pid;
     if (!fscanf(pid_file, "%d", &pid)) {
-      fprintf(stderr, "Failed to read the pid file");
+      fprintf(stderr, "Failed to read the pid file\n");
       exit(NBFC_EXIT_FAILURE);
     }
     fclose(pid_file);
@@ -83,7 +83,7 @@ static void service_start(int readonly) {
     int run = system(cmd);
     if (run == -1) {
       fprintf(stderr,
-              "Can't run nbfc_service, make sure the binary is installed");
+              "Can't run nbfc_service, make sure the binary is installed\n");
       exit(NBFC_EXIT_CMDLINE);
     }
   }
@@ -97,6 +97,7 @@ static void service_stop() {
   if (pid == -1)
     return;
   kill(pid, SIGINT);
+  remove(NBFC_STATE_FILE);
 }
 
 // restart the service
@@ -143,7 +144,7 @@ static struct ConfigList get_configs() {
     }
     closedir(configs);
   } else {
-    fprintf(stderr, NBFC_CONFIGS_DIR " is not accessible");
+    fprintf(stderr, NBFC_CONFIGS_DIR " is not accessible\n");
     exit(NBFC_EXIT_CMDLINE);
   }
   return files;
@@ -242,7 +243,7 @@ float words_difference(char *a, char *b) {
 static const nx_json *get_status() {
   FILE *state_file = fopen(NBFC_STATE_FILE, "r");
   if (state_file == NULL) {
-    fprintf(stderr, "Service not running");
+    fprintf(stderr, "Service not running\n");
     exit(NBFC_EXIT_FAILURE);
   }
   fseek(state_file, 0, SEEK_END);
@@ -250,7 +251,7 @@ static const nx_json *get_status() {
   rewind(state_file);
   char *contents = malloc(fsize + 1);
   if (!fread(contents, 1, fsize, state_file)) {
-    fprintf(stderr, "Failed to read the file");
+    fprintf(stderr, "Failed to read the file\n");
     exit(NBFC_EXIT_FAILURE);
   }
   fclose(state_file);
@@ -265,7 +266,7 @@ static const nx_json *get_config() {
   }
   if (config_file == NULL) {
     fprintf(stderr, NBFC_SERVICE_CONFIG
-            " is not accessible");
+            " is not accessible\n");
     exit(NBFC_EXIT_FAILURE);
   }
   fseek(config_file, 0, SEEK_END);
@@ -273,7 +274,7 @@ static const nx_json *get_config() {
   rewind(config_file);
   char *contents = malloc(fsize + 1);
   if (!fread(contents, 1, fsize, config_file)) {
-    fprintf(stderr, "Failed to read the file");
+    fprintf(stderr, "Failed to read the file\n");
     exit(NBFC_EXIT_FAILURE);
   }
   fclose(config_file);
@@ -286,7 +287,7 @@ static void set_config(const nx_json *cfg) {
   FILE *state_file = fopen(NBFC_SERVICE_CONFIG, "w");
   if (state_file == NULL) {
     fprintf(stderr, NBFC_SERVICE_CONFIG
-            " is not accessible");
+            " is not accessible\n");
     exit(NBFC_EXIT_FAILURE);
   }
   char *contents = nx_json_to_string(cfg);
@@ -300,9 +301,9 @@ static char *get_fan_status(const nx_json *fan) {
           "Fan Display Name         : %s\n"
           "Auto Control Enabled     : %s\n"
           "Critical Mode Enabled    : %s\n"
-          "Current Fan Speed        : %lf\n"
-          "Target Fan Speed         : %lf\n"
-          "Fan Speed Steps          : %ld\n",
+          "Current Fan Speed        : %.2f\n"
+          "Target Fan Speed         : %.2f\n"
+          "Fan Speed Steps          : %d\n",
           nx_json_get(fan, "name")->val.text,
           nx_json_get(fan, "automode")->val.i ? "true" : "false",
           nx_json_get(fan, "critical")->val.i ? "true" : "false",
@@ -677,7 +678,7 @@ int main(int argc, char *const argv[]) {
       if (options.a || options.s) {
         printf("Read-only                : %s\n"
                "Selected Config Name     : %s\n"
-               "Temperature              : %lf\n",
+               "Temperature              : %.2f\n",
                nx_json_get(state, "readonly")->val.i ? "true" : "false",
                nx_json_get(state, "config")->val.text,
                nx_json_get(state, "temperature")->val.dbl);
@@ -714,12 +715,12 @@ int main(int argc, char *const argv[]) {
     break;
   }
   case Command_Wait_For_Hwmon: {
-    enum { file_names_length = 2, sensor_names_length = 2 };
+    enum { file_names_length = 2, sensor_names_length = 3 };
     char *hwmon_file_names[file_names_length] = {
         "/sys/class/hwmon/hwmon%d/name",
         "/sys/class/hwmon/hwmon%d/device/name"};
-    char *linux_temp_sensor_names[sensor_names_length] = {"coretemp",
-                                                          "k10temp"};
+    char *linux_temp_sensor_names[sensor_names_length] = {
+        "coretemp", "k10temp", "zenpower"};
     for (int _ = 0; _ < 30; _++) {
       for (int i = 0; i < file_names_length; i++) {
         for (int j = 0; j < 10; j++) {
@@ -733,7 +734,7 @@ int main(int argc, char *const argv[]) {
           rewind(file);
           char *contents = malloc(fsize + 1);
           if (!fread(contents, 1, fsize, file)) {
-            fprintf(stderr, "Failed to read the file");
+            fprintf(stderr, "Failed to read the file\n");
             return NBFC_EXIT_FAILURE;
           }
           // trim the newline
