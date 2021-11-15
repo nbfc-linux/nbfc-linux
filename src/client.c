@@ -412,8 +412,8 @@ int main(int argc, char *const argv[]) {
   enum Command cmd = Command_Help;
   cli99 p;
   char o;
-  options.fans = malloc(0);
-  options.speeds = malloc(0);
+  options.fans = calloc(1, 1);
+  options.speeds = calloc(1, 1);
   int size = 1;
   cli99_Init(&p, argc, argv, main_options, cli99_options_python);
   while ((o = cli99_GetOpt(&p))) {
