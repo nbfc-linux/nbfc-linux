@@ -296,8 +296,8 @@ static void set_config(const nx_json *cfg) {
 }
 
 static char *get_fan_status(const nx_json *fan) {
-  char *status = malloc(512);
-  sprintf(status,
+  char status[1024];
+  snprintf(status, sizeof status,
           "Fan Display Name         : %s\n"
           "Auto Control Enabled     : %s\n"
           "Critical Mode Enabled    : %s\n"
@@ -310,7 +310,7 @@ static char *get_fan_status(const nx_json *fan) {
           nx_json_get(fan, "current_speed")->val.dbl,
           nx_json_get(fan, "target_speed")->val.dbl,
           (long long) nx_json_get(fan, "speed_steps")->val.i);
-  return status;
+  return strdup(status);
 }
 
 static const cli99_option main_options[] = {
