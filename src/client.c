@@ -303,13 +303,13 @@ static char *get_fan_status(const nx_json *fan) {
           "Critical Mode Enabled    : %s\n"
           "Current Fan Speed        : %.2f\n"
           "Target Fan Speed         : %.2f\n"
-          "Fan Speed Steps          : %d\n",
+          "Fan Speed Steps          : %lld\n",
           nx_json_get(fan, "name")->val.text,
           nx_json_get(fan, "automode")->val.i ? "true" : "false",
           nx_json_get(fan, "critical")->val.i ? "true" : "false",
           nx_json_get(fan, "current_speed")->val.dbl,
           nx_json_get(fan, "target_speed")->val.dbl,
-          nx_json_get(fan, "speed_steps")->val.i);
+          (long long) nx_json_get(fan, "speed_steps")->val.i);
   return status;
 }
 
