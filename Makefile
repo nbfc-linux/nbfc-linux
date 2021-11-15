@@ -10,31 +10,28 @@ PROGS = src/nbfc_service src/ec_probe #src/nbfc
 
 all: $(PROGS)
 
-install: $(PROGS)
-	# Binaries
-	mkdir -p $(DESTDIR)$(bindir)
-	install nbfc.py           $(DESTDIR)$(bindir)/nbfc
-	install src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
-	install src/ec_probe      $(DESTDIR)$(bindir)/ec_probe
-	#install src/nbfc          $(bindir)/nbfc   #client written in c
-	
+install-systemd: etc/systemd/system/nbfc_service.service
 	# /etc/systemd/system
-	mkdir -p $(DESTDIR)$(confdir)/systemd/system
-	cp etc/systemd/system/nbfc_service.service $(DESTDIR)$(confdir)/systemd/system/nbfc_service.service
-	
+	install -Dm 644 etc/systemd/system/nbfc_service.service $(DESTDIR)$(confdir)/systemd/system/nbfc_service.service
+
+install-bin: $(PROGS)
+	install -Dm 755 nbfc.py   $(DESTDIR)$(bindir)/nbfc
+	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
+	install -Dm 755 src/ec_probe      $(DESTDIR)$(bindir)/ec_probe
+	#install -Dm 755 src/nbfc         $(DESTDIR)$(bindir)/nbfc   #client written in c
+
+install-configs:
 	# /usr/share/nbfc/configs
 	mkdir -p $(DESTDIR)$(sharedir)/nbfc/configs
 	cp -r share/nbfc/configs/* $(DESTDIR)$(sharedir)/nbfc/configs
-	
-	# Documentation
-	mkdir -p $(DESTDIR)$(sharedir)/man/man1
-	mkdir -p $(DESTDIR)$(sharedir)/man/man5
-	cp doc/ec_probe.1            $(DESTDIR)$(sharedir)/man/man1
-	cp doc/nbfc.1                $(DESTDIR)$(sharedir)/man/man1
-	cp doc/nbfc_service.1        $(DESTDIR)$(sharedir)/man/man1
-	cp doc/nbfc_service.json.5   $(DESTDIR)$(sharedir)/man/man5
-	
-	# Completion
+
+install-docs:
+	install -Dm 644 doc/ec_probe.1   $(DESTDIR)$(sharedir)/man/man1/ec_probe.1
+	install -Dm 644 doc/nbfc.1       $(DESTDIR)$(sharedir)/man/man1/nbfc.1
+	install -Dm 644 doc/nbfc_service.1        $(DESTDIR)$(sharedir)/man/man1/nbfc_service.1
+	install -Dm 644 doc/nbfc_service.json.5   $(DESTDIR)$(sharedir)/man/man5/nbfc_service.json.5
+
+install-completion:
 	mkdir -p $(DESTDIR)$(sharedir)/zsh/site-functions
 	cp completion/zsh/_nbfc                $(DESTDIR)$(sharedir)/zsh/site-functions/
 	cp completion/zsh/_nbfc_service        $(DESTDIR)$(sharedir)/zsh/site-functions/
@@ -47,6 +44,8 @@ install: $(PROGS)
 	cp completion/fish/nbfc.fish           $(DESTDIR)$(sharedir)/fish/completions/
 	cp completion/fish/nbfc_service.fish   $(DESTDIR)$(sharedir)/fish/completions/
 	cp completion/fish/ec_probe.fish       $(DESTDIR)$(sharedir)/fish/completions/
+
+install: install-bin install-systemd install-configs install-docs install-completion
 
 uninstall:
 	# Binaries
