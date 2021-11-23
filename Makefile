@@ -1,86 +1,116 @@
-PREFIX=/usr/local
+PREFIX   = /usr/local
 
-confdir = $(PREFIX)/etc
-bindir =  $(PREFIX)/bin
+bindir   = $(PREFIX)/bin
+confdir  = $(PREFIX)/etc
 sharedir = $(PREFIX)/share
+sysddir  = $(PREFIX)/lib/systemd/system
 
-CFLAGS_MAIN = $(CCFLAGS) -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(sharedir)\"
+ifeq ($(BUILD), debug)
+	CFLAGS   = -Og -g
+else
+	CPPFLAGS = -DNDEBUG
+	CFLAGS   = -Os
+	LDFLAGS  = -s
+endif
 
-PROGS = src/nbfc_service src/ec_probe #src/nbfc
+override LDLIBS   += -lm
+override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(sharedir)\"
+
+CORE  = src/nbfc_service src/ec_probe
+PROGS = $(CORE) src/nbfc
 
 all: $(PROGS)
 
-install-systemd: etc/systemd/system/nbfc_service.service
-	# /etc/systemd/system
-	install -Dm 644 etc/systemd/system/nbfc_service.service $(DESTDIR)$(confdir)/systemd/system/nbfc_service.service
-
-install-bin: $(PROGS)
-	install -Dm 755 nbfc.py   $(DESTDIR)$(bindir)/nbfc
+install-core: $(CORE)
 	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
 	install -Dm 755 src/ec_probe      $(DESTDIR)$(bindir)/ec_probe
-	#install -Dm 755 src/nbfc         $(DESTDIR)$(bindir)/nbfc   #client written in c
+
+nbfc.py: nbfc.py.in
+	sed 's:@CONFDIR@:'$(confdir)':; s:@DATADIR@:'$(sharedir)':' < $< >$@
+
+install-client-py:  nbfc.py
+	install -Dm 755 nbfc.py           $(DESTDIR)$(bindir)/nbfc
+
+install-client-c:   src/nbfc
+	install -Dm 755 src/nbfc          $(DESTDIR)$(bindir)/nbfc
 
 install-configs:
-	# /usr/share/nbfc/configs
+	# /usr/local/etc/nbfc
+	mkdir -p $(DESTDIR)$(confdir)/nbfc
+
+	# /usr/local/share/nbfc/configs
 	mkdir -p $(DESTDIR)$(sharedir)/nbfc/configs
 	cp -r share/nbfc/configs/* $(DESTDIR)$(sharedir)/nbfc/configs
 
+nbfc_service.service: etc/systemd/system/nbfc_service.service.in
+	sed 's:@BINDIR@:'$(bindir)':' < $< >$@
+
+install-systemd:    nbfc_service.service
+	# /usr/local/lib/systemd/system
+	install -Dm 644 nbfc_service.service     $(DESTDIR)$(sysddir)/nbfc_service.service
+
 install-docs:
-	install -Dm 644 doc/ec_probe.1   $(DESTDIR)$(sharedir)/man/man1/ec_probe.1
-	install -Dm 644 doc/nbfc.1       $(DESTDIR)$(sharedir)/man/man1/nbfc.1
-	install -Dm 644 doc/nbfc_service.1        $(DESTDIR)$(sharedir)/man/man1/nbfc_service.1
-	install -Dm 644 doc/nbfc_service.json.5   $(DESTDIR)$(sharedir)/man/man5/nbfc_service.json.5
+	install -Dm 644 doc/ec_probe.1           $(DESTDIR)$(sharedir)/man/man1/ec_probe.1
+	install -Dm 644 doc/nbfc.1               $(DESTDIR)$(sharedir)/man/man1/nbfc.1
+	install -Dm 644 doc/nbfc_service.1       $(DESTDIR)$(sharedir)/man/man1/nbfc_service.1
+	install -Dm 644 doc/nbfc_service.json.5  $(DESTDIR)$(sharedir)/man/man5/nbfc_service.json.5
 
 install-completion:
 	mkdir -p $(DESTDIR)$(sharedir)/zsh/site-functions
-	cp completion/zsh/_nbfc                $(DESTDIR)$(sharedir)/zsh/site-functions/
-	cp completion/zsh/_nbfc_service        $(DESTDIR)$(sharedir)/zsh/site-functions/
-	cp completion/zsh/_ec_probe            $(DESTDIR)$(sharedir)/zsh/site-functions/
+	cp completion/zsh/_nbfc               $(DESTDIR)$(sharedir)/zsh/site-functions/
+	cp completion/zsh/_nbfc_service       $(DESTDIR)$(sharedir)/zsh/site-functions/
+	cp completion/zsh/_ec_probe           $(DESTDIR)$(sharedir)/zsh/site-functions/
 	mkdir -p $(DESTDIR)$(sharedir)/bash-completion/completions
-	cp completion/bash/nbfc                $(DESTDIR)$(sharedir)/bash-completion/completions/
-	cp completion/bash/nbfc_service        $(DESTDIR)$(sharedir)/bash-completion/completions/
-	cp completion/bash/ec_probe            $(DESTDIR)$(sharedir)/bash-completion/completions/
+	cp completion/bash/nbfc               $(DESTDIR)$(sharedir)/bash-completion/completions/
+	cp completion/bash/nbfc_service       $(DESTDIR)$(sharedir)/bash-completion/completions/
+	cp completion/bash/ec_probe           $(DESTDIR)$(sharedir)/bash-completion/completions/
 	mkdir -p $(DESTDIR)$(sharedir)/fish/completions
-	cp completion/fish/nbfc.fish           $(DESTDIR)$(sharedir)/fish/completions/
-	cp completion/fish/nbfc_service.fish   $(DESTDIR)$(sharedir)/fish/completions/
-	cp completion/fish/ec_probe.fish       $(DESTDIR)$(sharedir)/fish/completions/
+	cp completion/fish/nbfc.fish          $(DESTDIR)$(sharedir)/fish/completions/
+	cp completion/fish/nbfc_service.fish  $(DESTDIR)$(sharedir)/fish/completions/
+	cp completion/fish/ec_probe.fish      $(DESTDIR)$(sharedir)/fish/completions/
 
-install: install-bin install-systemd install-configs install-docs install-completion
+install: install-core install-client-py install-configs install-systemd install-docs install-completion
+
+install-c: install-core install-client-c install-configs install-systemd install-docs install-completion
 
 uninstall:
 	# Binaries
-	rm $(DESTDIR)$(bindir)/nbfc
-	rm $(DESTDIR)$(bindir)/nbfc_service
-	rm $(DESTDIR)$(bindir)/ec_probe
+	rm -f $(DESTDIR)$(bindir)/nbfc
+	rm -f $(DESTDIR)$(bindir)/nbfc_config
+	rm -f $(DESTDIR)$(bindir)/nbfc_service
+	rm -f $(DESTDIR)$(bindir)/ec_probe
 	
-	# /etc/systemd/system
-	rm $(DESTDIR)$(confdir)/systemd/system/nbfc_service.service
+	# /usr/local/lib/systemd/system
+	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service
 	
-	# /usr/share/nbfc/configs
-	rm -r $(DESTDIR)$(sharedir)/nbfc
+	# /usr/local/share/nbfc/configs
+	rm -rf $(DESTDIR)$(sharedir)/nbfc
+	
+	# /usr/local/etc/nbfc
+	rm -rf $(DESTDIR)$(confdir)/nbfc
 	
 	# Documentation
-	rm $(DESTDIR)$(sharedir)/man/man1/ec_probe.1
-	rm $(DESTDIR)$(sharedir)/man/man1/nbfc.1
-	rm $(DESTDIR)$(sharedir)/man/man1/nbfc_service.1
-	rm $(DESTDIR)$(sharedir)/man/man5/nbfc_service.json.5
+	rm -f $(DESTDIR)$(sharedir)/man/man1/ec_probe.1
+	rm -f $(DESTDIR)$(sharedir)/man/man1/nbfc.1
+	rm -f $(DESTDIR)$(sharedir)/man/man1/nbfc_service.1
+	rm -f $(DESTDIR)$(sharedir)/man/man5/nbfc_service.json.5
 	
 	# Completion
-	rm $(DESTDIR)$(sharedir)/zsh/site-functions/_nbfc
-	rm $(DESTDIR)$(sharedir)/zsh/site-functions/_nbfc_service
-	rm $(DESTDIR)$(sharedir)/zsh/site-functions/_ec_probe
+	rm -f $(DESTDIR)$(sharedir)/zsh/site-functions/_nbfc
+	rm -f $(DESTDIR)$(sharedir)/zsh/site-functions/_nbfc_service
+	rm -f $(DESTDIR)$(sharedir)/zsh/site-functions/_ec_probe
 	
-	rm $(DESTDIR)$(sharedir)/bash-completion/completions/nbfc
-	rm $(DESTDIR)$(sharedir)/bash-completion/completions/nbfc_service
-	rm $(DESTDIR)$(sharedir)/bash-completion/completions/ec_probe
+	rm -f $(DESTDIR)$(sharedir)/bash-completion/completions/nbfc
+	rm -f $(DESTDIR)$(sharedir)/bash-completion/completions/nbfc_service
+	rm -f $(DESTDIR)$(sharedir)/bash-completion/completions/ec_probe
 	 
-	rm $(DESTDIR)$(sharedir)/fish/completions/nbfc.fish
-	rm $(DESTDIR)$(sharedir)/fish/completions/nbfc_service.fish
-	rm $(DESTDIR)$(sharedir)/fish/completions/ec_probe.fish
+	rm -f $(DESTDIR)$(sharedir)/fish/completions/nbfc.fish
+	rm -f $(DESTDIR)$(sharedir)/fish/completions/nbfc_service.fish
+	rm -f $(DESTDIR)$(sharedir)/fish/completions/ec_probe.fish
 
 clean:
 	rm -rf __pycache__ tools/argparse-tool/__pycache__
-	rm -f $(PROGS) src/*.o
+	rm -f $(PROGS) src/*.o nbfc_service.service nbfc.py
 
 # =============================================================================
 # Binaries ====================================================================
@@ -112,7 +142,7 @@ src/nbfc_service: \
 	src/temperature_filter.c src/temperature_filter.h \
 	src/temperature_threshold_manager.c src/temperature_threshold_manager.h \
 	src/optparse/optparse.h src/optparse/optparse.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDFLAGS) $(CFLAGS_MAIN)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDLIBS) $(LDFLAGS)
 
 src/ec_probe: \
 	src/ec_probe.c \
@@ -122,7 +152,8 @@ src/ec_probe: \
 	src/nbfc.h \
 	src/memory.h src/memory.c \
 	src/optparse/optparse.h src/optparse/optparse.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDFLAGS) $(CFLAGS_MAIN)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDLIBS) $(LDFLAGS)
+
 src/nbfc: \
 	src/client.c \
 	src/error.h src/error.c \
@@ -130,7 +161,7 @@ src/nbfc: \
 	src/optparse/optparse.h src/optparse/optparse.c \
 	src/nxjson.c src/reverse_nxjson.c src/nxjson.h \
 	src/nbfc.h
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDFLAGS) $(CFLAGS_MAIN)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS) $(LDFLAGS)
 
 src/generated/: .force
 	mkdir -p src/generated
