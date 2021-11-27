@@ -1,2 +1,5 @@
 __pycache__
 ccls-cache/
+nbfc.py
+nbfc_service.service
+.vscode/
