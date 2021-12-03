@@ -36,7 +36,7 @@ struct Error {
 };
 ```
 
-The return value of functions is either an poiinter to `error_stack` or `NULL` (no error).
+The return value of functions is either a pointer to `error_stack` or `NULL` (no error).
 
 ### memory.c
 

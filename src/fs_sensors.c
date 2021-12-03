@@ -109,11 +109,11 @@ Error* FS_Sensors_Init() {
 
           float t;
           e = FS_TemperatureSource_GetTemperature(source, &t);
-          fprintf(stderr, "Using '%s' as temperature source\n", file);
 #ifndef NDEBUG
           e_warn();
 #endif
           if (! e) {
+            fprintf(stderr, "Using '%s' as temperature source\n", file);
             source->file = Mem_Strdup(file);
             if (++source == sources_end)
               goto end;

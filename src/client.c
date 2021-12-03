@@ -13,6 +13,7 @@
 #include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -170,7 +171,7 @@ static struct ConfigList recommended_configs() {
   size_t x = -1;
   while (++x < files.list_size)
     files.config_list[x].diff =
-        words_difference(files.config_list[x].config_name, product);
+        words_difference(product, files.config_list[x].config_name);
   qsort(files.config_list, files.list_size, sizeof(struct ConfigFile),
         compare_configs);
   return files;
@@ -178,7 +179,8 @@ static struct ConfigList recommended_configs() {
 
 // compare function for qsort
 int compare_configs(const void *a, const void *b) {
-  return (((struct ConfigFile *)a)->diff - ((struct ConfigFile *)b)->diff);
+  return (((struct ConfigFile *)a)->diff > ((struct ConfigFile *)b)->diff)
+       - (((struct ConfigFile *)a)->diff < ((struct ConfigFile *)b)->diff);
 }
 
 // convert string to lowercase
@@ -210,8 +212,7 @@ char **sep(char *text, char *delims) {
       words[word_count - 1][char_count++] = text[i];
     }
   }
-  words[word_count - 1][char_count] = 0;
-  words[word_count - 1] = NULL;
+  words[word_count] = NULL;
   return words;
 }
 
@@ -222,9 +223,9 @@ int word_difference(char *a, char *b) {
   if (a == b)
     return 0;
   int diff = 0;
-  for (size_t i = 0; i < min(strlen(a), strlen(b));
-       i++, diff += abs(a[i] - b[i]))
-    ;
+  for (size_t i = 0; i < min(strlen(a), strlen(b)); i++) {
+    diff += abs(a[i] - b[i]);
+  }
   return diff;
 }
 
@@ -291,26 +292,26 @@ static void set_config(const nx_json *cfg) {
     exit(NBFC_EXIT_FAILURE);
   }
   char *contents = nx_json_to_string(cfg);
-  fprintf(state_file, "%s", contents);
+  fprintf(state_file, "%s\n", contents);
   fclose(state_file);
 }
 
 static char *get_fan_status(const nx_json *fan) {
-  char *status = malloc(512);
-  sprintf(status,
+  char status[1024];
+  snprintf(status, sizeof status,
           "Fan Display Name         : %s\n"
           "Auto Control Enabled     : %s\n"
           "Critical Mode Enabled    : %s\n"
           "Current Fan Speed        : %.2f\n"
           "Target Fan Speed         : %.2f\n"
-          "Fan Speed Steps          : %d\n",
+          "Fan Speed Steps          : %lld\n",
           nx_json_get(fan, "name")->val.text,
           nx_json_get(fan, "automode")->val.i ? "true" : "false",
           nx_json_get(fan, "critical")->val.i ? "true" : "false",
           nx_json_get(fan, "current_speed")->val.dbl,
           nx_json_get(fan, "target_speed")->val.dbl,
-          nx_json_get(fan, "speed_steps")->val.i);
-  return status;
+          (long long) nx_json_get(fan, "speed_steps")->val.i);
+  return strdup(status);
 }
 
 static const cli99_option main_options[] = {
@@ -409,11 +410,12 @@ int main(int argc, char *const argv[]) {
     printf(CLIENT_HELP_TEXT);
     return NBFC_EXIT_SUCCESS;
   }
+  mkdir(NBFC_CONFIG_DIR, 0755);
   enum Command cmd = Command_Help;
   cli99 p;
   char o;
-  options.fans = malloc(0);
-  options.speeds = malloc(0);
+  options.fans = calloc(1, 1);
+  options.speeds = calloc(1, 1);
   int size = 1;
   cli99_Init(&p, argc, argv, main_options, cli99_options_python);
   while ((o = cli99_GetOpt(&p))) {
@@ -533,7 +535,6 @@ int main(int argc, char *const argv[]) {
         struct ConfigList files = recommended_configs();
         if (files.list_size && !files.config_list[0].diff) {
           model = files.config_list[0].config_name;
-          return NBFC_EXIT_SUCCESS;
         } else {
           fprintf(stderr,
                   "No recommended config found to apply automatically\n");
@@ -734,7 +735,7 @@ int main(int argc, char *const argv[]) {
           rewind(file);
           char *contents = malloc(fsize + 1);
           if (!fread(contents, 1, fsize, file)) {
-            fprintf(stderr, "Failed to read the file\n");
+            fprintf(stderr, "Failed to read %s\n", file_name);
             return NBFC_EXIT_FAILURE;
           }
           // trim the newline

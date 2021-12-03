@@ -55,7 +55,7 @@ It can be queried by `sudo nbfc status -a`.
 If you wish `nbfc_service` to get started on boot, use `sudo systemctl enable nbfc_service`.
 
 
-Differences en detail
+Differences in detail
 ---------------------
 
 |Files                            | NBFC Mono                             | NBFC Linux                                  |
