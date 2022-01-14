@@ -1,5 +1,40 @@
 #!/usr/bin/python3 -B
 
+def default_temperature_thresholds():
+    defaults = """
+          [{
+	   "UpThreshold": 0,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 48,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 55,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 59,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 63,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 67,
+	   "FanSpeed": 100.0
+	  }]"""
+
+    return json.loads(defaults)
+
 import sys, os, json, config, argparse
 
 argp = argparse.ArgumentParser()
@@ -24,6 +59,9 @@ for infile in opts.infile:
         p = json.loads(s)
         for fan_configuration in p['FanConfigurations']:
             thresholds = fan_configuration.get('TemperatureThresholds')
+
+            if not thresholds:
+                thresholds = default_temperature_thresholds()
             if thresholds:
                 thresholds.sort(key=lambda x: x['UpThreshold'])
 
