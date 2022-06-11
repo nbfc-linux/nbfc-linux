@@ -3,7 +3,7 @@
  "Author": "cicada",
  "EcPollInterval": 1000,
  "ReadWriteWords": false,
- "CriticalTemperature": 75,
+ "CriticalTemperature": 85,
  "FanConfigurations": [
 	{
 	 "ReadRegister": 149,
