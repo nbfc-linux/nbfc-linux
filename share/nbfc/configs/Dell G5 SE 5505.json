@@ -3,7 +3,7 @@
  "Author": "cicada",
  "EcPollInterval": 1000,
  "ReadWriteWords": false,
- "CriticalTemperature": 85,
+ "CriticalTemperature": 90,
  "FanConfigurations": [
 	{
 	 "ReadRegister": 149,
@@ -18,34 +18,49 @@
 	 "FanDisplayName": "small",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 54,
-	   "DownThreshold": 0,
-	   "FanSpeed": 0.0
-	  },
-	  {
-	   "UpThreshold": 63,
-	   "DownThreshold": 55,
-	   "FanSpeed": 20.0
-	  },
-	  {
-	   "UpThreshold": 66,
-	   "DownThreshold": 55,
-	   "FanSpeed": 20.0
-	  },
-	  {
-	   "UpThreshold": 68,
-	   "DownThreshold": 59,
-	   "FanSpeed": 50.0
-	  },
-	  {
-	   "UpThreshold": 71,
-	   "DownThreshold": 63,
-	   "FanSpeed": 80.46511
-	  },
-	  {
-	   "UpThreshold": 75,
-	   "DownThreshold": 67,
-	   "FanSpeed": 100.0
+           "UpThreshold": 40,
+           "DownThreshold": 0,
+           "FanSpeed": 0.0
+          },
+          {
+           "UpThreshold": 50,
+           "DownThreshold": 0,
+           "FanSpeed": 10.0
+          },
+          {
+           "UpThreshold": 55,
+           "DownThreshold": 53,
+           "FanSpeed": 15.0
+          },
+          {
+           "UpThreshold": 60,
+           "DownThreshold": 55,
+           "FanSpeed": 30.0
+          },
+          {
+           "UpThreshold": 65,
+           "DownThreshold": 59,
+           "FanSpeed": 40.0
+          },
+          {
+           "UpThreshold": 70,
+           "DownThreshold": 63,
+           "FanSpeed": 50.0
+          },
+          {
+           "UpThreshold": 75,
+           "DownThreshold": 67,
+           "FanSpeed": 60.0
+          },
+          {
+           "UpThreshold": 80,
+           "DownThreshold": 0,
+           "FanSpeed": 80.0
+          },
+          {
+           "UpThreshold": 85,
+           "DownThreshold": 0,
+           "FanSpeed": 100.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": []
@@ -63,35 +78,51 @@
 	 "FanDisplayName": "big",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 52,
+	   "UpThreshold": 40,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
+          {
+           "UpThreshold": 50,
+           "DownThreshold": 0,
+           "FanSpeed": 10.0
+          },
+
 	  {
-	   "UpThreshold": 63,
+	   "UpThreshold": 55,
 	   "DownThreshold": 53,
-	   "FanSpeed": 10.0
+	   "FanSpeed": 15.0
 	  },
 	  {
-	   "UpThreshold": 66,
+	   "UpThreshold": 60,
 	   "DownThreshold": 55,
-	   "FanSpeed": 20.0
+	   "FanSpeed": 30.0
 	  },
 	  {
-	   "UpThreshold": 68,
+	   "UpThreshold": 65,
 	   "DownThreshold": 59,
-	   "FanSpeed": 50.0
+	   "FanSpeed": 40.0
 	  },
 	  {
-	   "UpThreshold": 71,
+	   "UpThreshold": 70,
 	   "DownThreshold": 63,
-	   "FanSpeed": 80.0
+	   "FanSpeed": 50.0
 	  },
 	  {
 	   "UpThreshold": 75,
 	   "DownThreshold": 67,
-	   "FanSpeed": 100.0
-	  }
+	   "FanSpeed": 60.0
+	  },
+	  {
+           "UpThreshold": 80,
+           "DownThreshold": 0,
+           "FanSpeed": 80.0
+          },
+	  {
+           "UpThreshold": 85,
+           "DownThreshold": 0,
+           "FanSpeed": 100.0
+          }
 	 ],
 	 "FanSpeedPercentageOverrides": []
 	}
