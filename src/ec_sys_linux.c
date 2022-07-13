@@ -11,7 +11,11 @@
 
 #define EC_SysLinux_ACPI_EC_Path "/dev/ec"
 #define EC_SysLinux_EC0_IO_Path  "/sys/kernel/debug/ec/ec0/io"
+#if defined(ACPI_EC)
+#define EC_SysLinux_Module_Cmd   "modprobe acpi_ec write_support=1"
+#else
 #define EC_SysLinux_Module_Cmd   "modprobe ec_sys write_support=1"
+#endif
 
 static int EC_SysLinux_FD = -1;
 
