@@ -36,6 +36,7 @@ Installation
 
 - In general:
   - `make && sudo make install`
+  - With openrc support (`make && sudo make install install-openrc`)
 
 Getting started
 ---------------

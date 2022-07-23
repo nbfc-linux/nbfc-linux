@@ -4,6 +4,7 @@ bindir   = $(PREFIX)/bin
 confdir  = $(PREFIX)/etc
 sharedir = $(PREFIX)/share
 sysddir  = $(PREFIX)/lib/systemd/system
+orcdir   = $(PREFIX)/etc/init.d
 
 ifeq ($(BUILD), debug)
 	CFLAGS   = -Og -g
@@ -61,6 +62,13 @@ install-systemd:    nbfc_service.service
 	# /usr/local/lib/systemd/system
 	install -Dm 644 nbfc_service.service     $(DESTDIR)$(sysddir)/nbfc_service.service
 
+nbfc_service: etc/init.d/nbfc_service.in
+	sed 's:@BINDIR@:'$(bindir)':' < $< >$@
+
+install-openrc:     nbfc_service
+	# /usr/local/etc/init.d
+	install -Dm 644 nbfc_service             $(DESTDIR)$(orcdir)/nbfc_service
+
 install-docs:
 	install -Dm 644 doc/ec_probe.1           $(DESTDIR)$(sharedir)/man/man1/ec_probe.1
 	install -Dm 644 doc/nbfc.1               $(DESTDIR)$(sharedir)/man/man1/nbfc.1
@@ -94,6 +102,9 @@ uninstall:
 	
 	# /usr/local/lib/systemd/system
 	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service
+
+	# /usr/local/etc/init.d
+	rm -f $(DESTDIR)$(orcdir)/nbfc_service
 	
 	# /usr/local/share/nbfc/configs
 	rm -rf $(DESTDIR)$(sharedir)/nbfc
