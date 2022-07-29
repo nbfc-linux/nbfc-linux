@@ -1,4 +1,4 @@
-PREFIX   = /usr
+PREFIX   = /
 
 bindir   = $(PREFIX)/bin
 confdir  = $(PREFIX)/etc

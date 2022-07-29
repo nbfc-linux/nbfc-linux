@@ -11,4 +11,5 @@ if [ ! -e "/etc/nbfc/nbfc.json" ] ; then
 	touch /etc/nbfc.nbfc.json
 fi
 
-$APPDIR/usr/bin/nbfc
+export PATH=$PATH:$APPDIR/bin
+$APPDIR/bin/nbfc $1 $2 $3 $4 $5 $6 $7 $8 $9
