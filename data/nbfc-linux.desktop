@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=nbfc-linux
+Exec=nbfc
+Comment=notebook fan control.
+Icon=nbfc-linux
+Categories=Utility;
+Terminal=true
+X-AppImage-Name=nbfc-linux
+X-AppImage-Arch=x86_64
