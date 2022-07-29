@@ -1,0 +1,14 @@
+#!/bin/bash
+if [ ! -e "/etc/systemd/system/nbfc_service.service" ] ; then
+	cp "$APPDIR/usr/share/lib/systemd/system/nbfc_service.service" "/etc/systemd/system/nbfc_service.service"
+fi
+
+if [ ! -e "/etc/nbfc" ] ; then
+	mkdir /etc/nbfc
+fi
+
+if [ ! -e "/etc/nbfc/nbfc.json" ] ; then
+	touch /etc/nbfc.nbfc.json
+fi
+
+$APPDIR/usr/bin/nbfc
