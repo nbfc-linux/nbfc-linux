@@ -8,7 +8,8 @@ if [ ! -e "appimagetool-x86_64.AppImage" ] ; then
     chmod +x "appimagetool-x86_64.AppImage"
 fi
 
-wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64" "AppDir/AppRun"
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64"
+mv "AppRun-x86_64" "AppDir/AppRun"
 chmod +x "AppDir/AppRun"
 
 cp "data/nbfc-linux.svg" "AppDir/nbfc-linux.svg"

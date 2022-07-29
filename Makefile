@@ -123,6 +123,7 @@ uninstall:
 clean:
 	rm -rf __pycache__ tools/argparse-tool/__pycache__
 	rm -rf AppDir
+	rm -f appimagetool-x86_64.AppImage
 	rm -f $(PROGS) src/*.o nbfc_service.service nbfc.py
 
 # =============================================================================
