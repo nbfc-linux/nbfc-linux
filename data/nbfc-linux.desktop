@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=nbfc-linux
-Exec=nbfc
+Exec=run
 Comment=notebook fan control.
 Icon=nbfc-linux
 Categories=Utility;

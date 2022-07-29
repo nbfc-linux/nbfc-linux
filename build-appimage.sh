@@ -14,5 +14,7 @@ chmod +x "AppDir/AppRun"
 
 cp "data/nbfc-linux.svg" "AppDir/nbfc-linux.svg"
 cp "data/nbfc-linux.desktop" "AppDir/nbfc-linux.desktop"
+cp "data/run" "AppDir/usr/bin/run"
+chmod +x "AppDir/usr/bin/run"
 
 ./appimagetool-x86_64.AppImage AppDir

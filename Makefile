@@ -1,4 +1,4 @@
-PREFIX   = /usr/local
+PREFIX   = /usr
 
 bindir   = $(PREFIX)/bin
 confdir  = $(PREFIX)/etc
