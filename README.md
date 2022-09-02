@@ -33,6 +33,7 @@ Installation
 - With Nix:
   - With legacy nix (`nix-env -if .`)
   - With nix flakes (`nix profile install`)
+  - [On NixOS](nixos-installation.md)
 
 - In general:
   - `make && sudo make install`
