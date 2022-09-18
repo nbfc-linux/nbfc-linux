@@ -59,15 +59,32 @@ let
   command = "bin/nbfc_service --config-file '/home/${myUser}/.config/nbfc.json'";
 
 # If you don't use flakes:
-#  nbfc = import 
-#    ( pkgs.fetchFromGitHub 
-#      { 
-#        owner = "nbfc-linux"; 
-#        repo = "nbfc-linux"; 
-#        rev= "4c2b75e4a875459e86a9892319889ff945e9cadf";
-#        sha256= "UxaL4V8FkA+eONCj7vTHAlRSJxoXqRB2aW7A/KJyvlY=";
-#      }
-#    );
+#  nbfc = pkgs.stdenv.mkDerivation {
+#  name = "nbfc-linux";
+#  version = "0.1.7";
+
+#  src  = pkgs.fetchFromGitHub {
+#    owner  = "nbfc-linux";
+#    repo   = "nbfc-linux";
+#    rev    = "4c2b75e4a875459e86a9892319889ff945e9cadf";
+#    sha256 = "UxaL4V8FkA+eONCj7vTHAlRSJxoXqRB2aW7A/KJyvlY=";
+#  };
+
+#  buildFlags = [ "PREFIX=$(out)" "confdir=/etc" ];
+
+#  installPhase =
+#    let
+#      installFlags = [ "PREFIX=$out" ];
+#    in
+#    ''
+#      make ${builtins.concatStringsSep " " installFlags}\
+#           install-core \
+#           install-client-c\
+#           install-configs\
+#           install-docs\
+#           install-completion
+#    '';
+# };
 in
 {
 
