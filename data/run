@@ -1,0 +1,15 @@
+#!/bin/bash
+if [ ! -e "/etc/systemd/system/nbfc_service.service" ] ; then
+	cp "$APPDIR/lib/systemd/system/nbfc_service.service" "/etc/systemd/system/nbfc_service.service"
+fi
+
+if [ ! -e "/etc/nbfc" ] ; then
+	mkdir /etc/nbfc
+fi
+
+if [ ! -e "/etc/nbfc/nbfc.json" ] ; then
+	touch /etc/nbfc.nbfc.json
+fi
+
+export PATH=$PATH:$APPDIR/bin
+$APPDIR/bin/nbfc $1 $2 $3 $4 $5 $6 $7 $8 $9
