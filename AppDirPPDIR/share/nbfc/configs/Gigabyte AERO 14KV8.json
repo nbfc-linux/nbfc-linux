@@ -1,0 +1,141 @@
+{
+ "NotebookModel": "Gigabyte",
+ "Author": "Christian Steinert",
+ "EcPollInterval": 500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 252,
+	 "WriteRegister": 176,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 229,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 22,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 30.1310024
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 63,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 67,
+	   "FanSpeed": 60.2620049
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 77,
+	   "FanSpeed": 80.34934
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 254,
+	 "WriteRegister": 177,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 229,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 22,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "GPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 30.1310024
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 63,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 67,
+	   "FanSpeed": 60.2620049
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 77,
+	   "FanSpeed": 80.34934
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 6,
+	 "Value": 30,
+	 "ResetRequired": true,
+	 "ResetValue": 20,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set custom fan mode type to 'fixed speed'"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 8,
+	 "Value": 0,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Disable quiet mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 12,
+	 "Value": 80,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Disable gaming mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 13,
+	 "Value": 1,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set custom mode on"
+	}
+ ]
+}

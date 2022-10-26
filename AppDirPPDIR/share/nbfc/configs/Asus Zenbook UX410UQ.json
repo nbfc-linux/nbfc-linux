@@ -1,0 +1,78 @@
+{
+ "NotebookModel": "ASUSTeK COMPUTER INC. UX410UQK",
+ "Author": "xant1, jws, jonas1312",
+ "EcPollInterval": 300,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 9,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 53,
+	   "DownThreshold": 40,
+	   "FanSpeed": 12.5
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 43,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 51,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 58,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 65,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 72,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10,
+	 "ResetWriteMode": "Set"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10,
+	 "ResetWriteMode": "Set"
+	}
+ ]
+}

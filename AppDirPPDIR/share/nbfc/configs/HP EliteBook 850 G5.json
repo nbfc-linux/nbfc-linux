@@ -1,0 +1,92 @@
+{
+ "NotebookModel": "HP EliteBook 850 G5",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 78,
+ "Author": "pustotnik",
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 46,
+	 "WriteRegister": 47,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 40,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 45,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 48,
+	   "FanSpeed": 60.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 50,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 56,
+	   "FanSpeed": 78.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 60,
+	   "FanSpeed": 88.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 62,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 66,
+	   "FanSpeed": 96.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 255,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 34,
+	 "Value": 1,
+	 "ResetRequired": true,
+	 "ResetValue": 1,
+	 "ResetWriteMode": "Set",
+	 "Description": "Select thermal zone"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 38,
+	 "Value": 28,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Fake thermal zone temperature"
+	}
+ ]
+}

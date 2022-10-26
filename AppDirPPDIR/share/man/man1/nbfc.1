@@ -1,0 +1,210 @@
+.nh
+.TH NBFC\_SERVICE 1 "MARCH 2021" Notebook FanControl
+.SH NAME
+.PP
+nbfc\_service \- Notebook FanControl service
+
+.SH DESCRIPTION
+.PP
+NoteBook FanControl CLI Client
+
+.SH SYNOPSIS
+.PP
+\fB\fCnbfc\fR [OPTIONS]
+
+.SH OPTIONS
+.PP
+\fB\fC\-h, \-\-help\fR
+    show this help message and exit
+
+.PP
+\fB\fC\-\-version\fR
+    show program's version number and exit
+
+.PP
+\fB\fC[start, stop, restart, status, config, set, help]\fR
+    None
+
+.SH COMMANDS
+.PP
+start, stop, restart, status, config, set, help
+
+.SH DESCRIPTION
+.PP
+Start the service
+
+.SH SYNOPSIS
+.PP
+\fB\fCstart\fR [OPTIONS]
+
+.SH OPTIONS
+.PP
+\fB\fC\-h, \-\-help\fR
+    show this help message and exit
+
+.PP
+\fB\fC\-e, \-\-enabled\fR
+    Start in enabled mode (default)
+
+.PP
+\fB\fC\-r, \-\-readonly\fR
+    Start in read\-only mode
+
+.SH DESCRIPTION
+.PP
+Stop the service
+
+.SH SYNOPSIS
+.PP
+\fB\fCstop\fR [OPTIONS]
+
+.SH OPTIONS
+.PP
+\fB\fC\-h, \-\-help\fR
+    show this help message and exit
+
+.SH DESCRIPTION
+.PP
+Restart the service
+
+.SH SYNOPSIS
+.PP
+\fB\fCrestart\fR [OPTIONS]
+
+.SH OPTIONS
+.PP
+\fB\fC\-h, \-\-help\fR
+    show this help message and exit
+
+.PP
+\fB\fC\-e, \-\-enabled\fR
+    Restart in enabled mode (default)
+
+.PP
+\fB\fC\-r, \-\-readonly\fR
+    Restart in read\-only mode
+
+.SH DESCRIPTION
+.PP
+Show the service status
+
+.SH SYNOPSIS
+.PP
+\fB\fCstatus\fR [OPTIONS]
+
+.SH OPTIONS
+.PP
+\fB\fC\-h, \-\-help\fR
+    show this help message and exit
+
+.PP
+\fB\fC\-a, \-\-all\fR
+    Show service and fan status (default)
+
+.PP
+\fB\fC\-s, \-\-service\fR
+    Show service status
+
+.PP
+\fB\fC\-f, \-\-fan FAN INDEX\fR
+    Show fan status
+
+.PP
+\fB\fC\-w, \-\-watch SECONDS\fR
+    Show status periodically
+
+.SH DESCRIPTION
+.PP
+List or apply configs
+
+.SH SYNOPSIS
+.PP
+\fB\fCconfig\fR [OPTIONS]
+
+.SH OPTIONS
+.PP
+\fB\fC\-h, \-\-help\fR
+    show this help message and exit
+
+.PP
+\fB\fC\-l, \-\-list\fR
+    List all available configs (default)
+
+.PP
+\fB\fC\-s, \-\-set config\fR
+    Set a config
+
+.PP
+\fB\fC\-a, \-\-apply config\fR
+    Set a config and enable fan control
+
+.PP
+\fB\fC\-r, \-\-recommend\fR
+    List configs which may work for your device
+
+.SH DESCRIPTION
+.PP
+Control fan speed
+
+.SH SYNOPSIS
+.PP
+\fB\fCset\fR [OPTIONS]
+
+.SH OPTIONS
+.PP
+\fB\fC\-h, \-\-help\fR
+    show this help message and exit
+
+.PP
+\fB\fC\-a, \-\-auto\fR
+    Set fan speed to 'auto'
+
+.PP
+\fB\fC\-s, \-\-speed PERCENT\fR
+    Set fan speed to PERCENT
+
+.PP
+\fB\fC\-f, \-\-fan FAN INDEX\fR
+    Fan index (zero based)
+
+.SH DESCRIPTION
+.PP
+Show help
+
+.SH SYNOPSIS
+.PP
+\fB\fChelp\fR [OPTIONS]
+
+.SH OPTIONS
+.PP
+\fB\fC\-h, \-\-help\fR
+    show this help message and exit
+
+.SH FILES
+.PP
+\fI/var/run/nbfc\_service.pid\fP
+  File containing the PID of current running nbfc\_service.
+
+.PP
+\fI/var/run/nbfc\_service.state.json\fP
+  State file of nbfc\_service. Updated every \fIEcPollInterval\fP miliseconds See nbfc\_service.json(5) for further details.
+
+.PP
+\fI/etc/nbfc/nbfc.json\fP
+  The system wide configuration file. See nbfc\_service.json(5) for further details.
+
+.PP
+\fI/etc/nbfc/configs/*\&.json\fP
+  Configuration files for various notebook models. See nbfc\_service.json(5) for further details.
+
+.SH BUGS
+.PP
+Bugs to https://github.com/nbfc\-/nbfc\-linux
+
+.SH AUTHOR
+.PP
+Benjamin Abendroth (braph93@gmx.de)
+
+.SH SEE ALSO
+.PP
+nbfc\_service(1), nbfc\_service.json(5), ec\_probe(1), fancontrol(1)

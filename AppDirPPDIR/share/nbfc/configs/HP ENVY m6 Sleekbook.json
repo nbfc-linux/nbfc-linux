@@ -1,0 +1,69 @@
+{
+ "NotebookModel": "HP ENVY m6 Sleekbook",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 17,
+	 "WriteRegister": 20,
+	 "MinSpeedValue": 28,
+	 "MaxSpeedValue": 41,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 48,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 55,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 59,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 63,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 67,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 76.92307692307693,
+	   "FanSpeedValue": 39
+	  },
+	  {
+	   "FanSpeedPercentage": 38.46153846153847,
+	   "FanSpeedValue": 34
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Or",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 15,
+	 "Value": 8,
+	 "ResetRequired": true,
+	 "ResetValue": 5,
+	 "Description": "Manual Override"
+	}
+ ]
+}

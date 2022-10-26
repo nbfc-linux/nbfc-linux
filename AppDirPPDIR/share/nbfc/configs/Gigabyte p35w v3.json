@@ -1,0 +1,33 @@
+{
+ "NotebookModel": "Gigabyte p35w v3",
+ "ReadWriteWords": false,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 96,
+	 "WriteRegister": 176,
+	 "MinSpeedValue": 80,
+	 "MaxSpeedValue": 221,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 100,
+	 "FanDisplayName": "CPU fan"
+	},
+	{
+	 "ReadRegister": 96,
+	 "WriteRegister": 177,
+	 "MinSpeedValue": 80,
+	 "MaxSpeedValue": 221,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 100,
+	 "FanDisplayName": "GPU fan"
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 1,
+	 "Value": 163,
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

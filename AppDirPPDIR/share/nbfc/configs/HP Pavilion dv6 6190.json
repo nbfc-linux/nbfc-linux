@@ -1,0 +1,169 @@
+{
+ "NotebookModel": "HP Pavilion dv6 6190 Notebook PC",
+ "Author": "Maxi",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 107,
+	 "WriteRegister": 91,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 2,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 100,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Stationary profile (silent/balanced/performance)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 55,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 2,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 1,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 50.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	},
+	{
+	 "ReadRegister": 107,
+	 "WriteRegister": 90,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 2,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 100,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Mobile profile (silent/balanced/performance)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 55,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 1,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 50.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 2,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	},
+	{
+	 "ReadRegister": 107,
+	 "WriteRegister": 243,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 1,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 100,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Fan switch (on/off)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 0,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 2,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	},
+	{
+	 "ReadRegister": 123,
+	 "WriteRegister": 123,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 1,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 1,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 1,
+	 "FanDisplayName": "Temperature warning via touch-pad LED (on/off)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 85,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 1,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

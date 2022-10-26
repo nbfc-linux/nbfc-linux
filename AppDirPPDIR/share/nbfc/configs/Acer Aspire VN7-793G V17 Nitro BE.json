@@ -1,0 +1,120 @@
+{
+ "NotebookModel": "Aspire VN7-793G V17 Nitro BE",
+ "Author": "Jens Lange",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 92,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 90,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "Right fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 50,
+	   "FanSpeed": 7.272727
+	  },
+	  {
+	   "UpThreshold": 69,
+	   "DownThreshold": 57,
+	   "FanSpeed": 16.969698
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 65,
+	   "FanSpeed": 30.3030319
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 67,
+	   "FanSpeed": 52.12121
+	  },
+	  {
+	   "UpThreshold": 92,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 152,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 98,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "Left fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 64,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 54,
+	   "FanSpeed": 7.64331245
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 58,
+	   "FanSpeed": 33.75796
+	  },
+	  {
+	   "UpThreshold": 77,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50.9554138
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 67,
+	   "FanSpeed": 80.891716
+	  },
+	  {
+	   "UpThreshold": 92,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 150,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set"
+	}
+ ]
+}

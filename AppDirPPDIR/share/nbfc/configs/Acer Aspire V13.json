@@ -1,0 +1,58 @@
+{
+ "NotebookModel": "Acer Aspire V13",
+ "Author": "Aleksandar Perisic",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 86,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 196,
+	 "FanDisplayName": "Processor fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 0,
+	   "FanSpeed": 15.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 35,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 50,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 65,
+	   "FanSpeed": 85.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

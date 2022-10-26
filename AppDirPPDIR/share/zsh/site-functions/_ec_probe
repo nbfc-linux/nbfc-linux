@@ -1,0 +1,47 @@
+#compdef ec_probe
+
+_ec_probe() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    '(--embedded-controller -e)'{--embedded-controller=,-e+}'[Specify embedded controller to use]':EC:'(ec_linux ec_sys_linux)'\
+    :command:"(('dump\\:Dump all EC registers' 'read\\:Read a byte from a EC register' 'write\\:Write a byte to a EC register' 'monitor\\:Monitor all EC registers for changes'))"\
+    '*::arg:->args'
+  for w in $line; do
+    case $w in
+      (dump) _ec_probe_dump; break;;
+      (read) _ec_probe_read; break;;
+      (write) _ec_probe_write; break;;
+      (monitor) _ec_probe_monitor; break;;
+    esac
+  done
+}
+
+_ec_probe_dump() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'
+}
+
+_ec_probe_read() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    :'Register source':'({0..255})'
+}
+
+_ec_probe_write() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    :'Register destination':'({0..255})'\
+    :'Value to write':'({0..255})'
+}
+
+_ec_probe_monitor() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    '(--interval -i)'{--interval=,-i+}'[Monitored timespan]':seconds:'()'\
+    '(--timespan -t)'{--timespan=,-t+}'[Set poll intervall]':seconds:'()'\
+    '(--report -r)'{--report=,-r+}'[Save all readings as a CSV file]':report:_files\
+    '(--clearly -c)'{--clearly,-c}'[Blanks out consecutive duplicate readings]'::'()'\
+    '(--decimal -d)'{--decimal,-d}'[Output readings in decimal format instead of hexadecimal format]'::'()'
+}
+
+_ec_probe "$@"

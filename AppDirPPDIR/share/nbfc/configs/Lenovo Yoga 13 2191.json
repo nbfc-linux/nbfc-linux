@@ -1,0 +1,89 @@
+{
+ "NotebookModel": "2191",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "Author": "And_Yoga",
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 243,
+	 "WriteRegister": 243,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 1,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Left Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 62,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 70,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 83,
+	   "DownThreshold": 73,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 81,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 242,
+	 "WriteRegister": 242,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 1,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Right Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 51,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 69,
+	   "DownThreshold": 57,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 66,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 73,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 76,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

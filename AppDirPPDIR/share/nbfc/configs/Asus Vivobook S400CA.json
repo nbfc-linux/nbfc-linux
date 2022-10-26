@@ -1,0 +1,62 @@
+{
+ "NotebookModel": "S400CA",
+ "EcPollInterval": 150,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 147,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 9,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 1,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 46,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 50,
+	   "FanSpeed": 12.5
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 64,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 67,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 70,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10
+	}
+ ]
+}

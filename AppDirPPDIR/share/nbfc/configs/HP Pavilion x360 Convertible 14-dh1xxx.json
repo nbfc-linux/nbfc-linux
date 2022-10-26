@@ -1,0 +1,77 @@
+{
+ "NotebookModel": "HP Pavilion x360 Convertible 14-dh1xxx",
+ "Author": "Jakov Gudec",
+ "EcPollInterval": 200,
+ "ReadWriteWords": true,
+ "CriticalTemperature": 92,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 175,
+	 "MaxSpeedValue": 75,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 63,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 67,
+	   "FanSpeed": 35.0
+	  },
+	  {
+	   "UpThreshold": 82,
+	   "DownThreshold": 71,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 86,
+	   "DownThreshold": 78,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 82,
+	   "FanSpeed": 85.0
+	  },
+	  {
+	   "UpThreshold": 92,
+	   "DownThreshold": 86,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 255,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

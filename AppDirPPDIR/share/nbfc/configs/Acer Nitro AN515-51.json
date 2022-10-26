@@ -1,0 +1,141 @@
+{
+ "NotebookModel": "Acer Nitro AN515-51",
+ "Author": "Chandradeep Dey (modified by satcom886)",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": true,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 19,
+	 "WriteRegister": 55,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 6122,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 50,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 43,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 44,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 50,
+	   "FanSpeed": 45.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 56,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 63,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 68,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 78,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 21,
+	 "WriteRegister": 58,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 6122,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 50,
+	 "FanDisplayName": "GPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 43,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 44,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 50,
+	   "FanSpeed": 45.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 56,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 63,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 68,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 78,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 34,
+	 "Value": 12,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "CPU fan manual mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 33,
+	 "Value": 48,
+	 "ResetRequired": true,
+	 "ResetValue": 16,
+	 "ResetWriteMode": "Set",
+	 "Description": "GPU fan manual mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 16,
+	 "Value": 0,
+	 "ResetRequired": true,
+	 "ResetValue": 1,
+	 "ResetWriteMode": "Set",
+	 "Description": "CoolBoost off"
+	}
+ ]
+}

@@ -1,0 +1,71 @@
+{
+ "NotebookModel": "Lenovo u330p",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": true,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 146,
+	 "WriteRegister": 146,
+	 "MinSpeedValue": 768,
+	 "MaxSpeedValue": 257,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 65535,
+	 "FanDisplayName": "System Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 55,
+	   "FanSpeed": 3.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 58,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 63,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 68,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 73,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 65535,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 144,
+	 "Value": 0,
+	 "ResetRequired": true,
+	 "ResetValue": 128,
+	 "ResetWriteMode": "Set",
+	 "Description": "Turn Off Auto Control"
+	}
+ ]
+}

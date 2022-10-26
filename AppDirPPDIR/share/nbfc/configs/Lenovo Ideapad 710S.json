@@ -1,0 +1,111 @@
+{
+ "NotebookModel": "Ideapad 710S",
+ "Author": "Florian Melsheimer",
+ "EcPollInterval": 750,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 92,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 72,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 72,
+	 "FanDisplayName": "Fan #1",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 50,
+	   "FanSpeed": 20.765028
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50.81967
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 70,
+	   "FanSpeed": 75.4098358
+	  },
+	  {
+	   "UpThreshold": 92,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 152,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 72,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 72,
+	 "FanDisplayName": "Fan #2",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 57,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 52,
+	   "FanSpeed": 20.21858
+	  },
+	  {
+	   "UpThreshold": 77,
+	   "DownThreshold": 62,
+	   "FanSpeed": 50.81967
+	  },
+	  {
+	   "UpThreshold": 83,
+	   "DownThreshold": 72,
+	   "FanSpeed": 74.86339
+	  },
+	  {
+	   "UpThreshold": 92,
+	   "DownThreshold": 77,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Enable manual EC control"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 150,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Enable manual EC control"
+	}
+ ]
+}

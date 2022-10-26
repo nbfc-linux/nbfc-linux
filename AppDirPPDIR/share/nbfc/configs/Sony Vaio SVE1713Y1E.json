@@ -1,0 +1,81 @@
+{
+ "NotebookModel": "SVE1713Y1E",
+ "Author": "marogo",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 83,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 102,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 196,
+	 "FanDisplayName": "VAIO",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 54,
+	   "DownThreshold": 42,
+	   "FanSpeed": 30.7189541
+	  },
+	  {
+	   "UpThreshold": 58,
+	   "DownThreshold": 46,
+	   "FanSpeed": 40.5228767
+	  },
+	  {
+	   "UpThreshold": 62,
+	   "DownThreshold": 50,
+	   "FanSpeed": 50.3267975
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 54,
+	   "FanSpeed": 60.7843132
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 58,
+	   "FanSpeed": 70.5882339
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 62,
+	   "FanSpeed": 80.39216
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 66,
+	   "FanSpeed": 90.1960754
+	  },
+	  {
+	   "UpThreshold": 83,
+	   "DownThreshold": 70,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

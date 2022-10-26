@@ -1,0 +1,165 @@
+{
+ "NotebookModel": "Lenovo Yoga 510-14 (80S7)",
+ "EcPollInterval": 500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 6,
+	 "WriteRegister": 176,
+	 "MinSpeedValue": 38,
+	 "MaxSpeedValue": 90,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 20,
+	 "MaxSpeedValueRead": 41,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 52,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 47,
+	   "FanSpeed": 15.3846159
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 23.0769234
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 55,
+	   "FanSpeed": 30.7692318
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 58,
+	   "FanSpeed": 40.384613
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 63,
+	   "FanSpeed": 59.615387
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 60,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 15.3846159,
+	   "FanSpeedValue": 24,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 21.1538467,
+	   "FanSpeedValue": 25,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 25.0,
+	   "FanSpeedValue": 26,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 30.7692318,
+	   "FanSpeedValue": 27,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 34.615387,
+	   "FanSpeedValue": 28,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 40.384613,
+	   "FanSpeedValue": 29,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 44.2307663,
+	   "FanSpeedValue": 30,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 50.0,
+	   "FanSpeedValue": 31,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 55.76923,
+	   "FanSpeedValue": 32,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 61.5384636,
+	   "FanSpeedValue": 33,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 65.38461,
+	   "FanSpeedValue": 34,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 71.15385,
+	   "FanSpeedValue": 35,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 75.0,
+	   "FanSpeedValue": 36,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 80.7692261,
+	   "FanSpeedValue": 37,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 86.53847,
+	   "FanSpeedValue": 38,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 90.38461,
+	   "FanSpeedValue": 39,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 96.15385,
+	   "FanSpeedValue": 40,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 41,
+	   "TargetOperation": "Read"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

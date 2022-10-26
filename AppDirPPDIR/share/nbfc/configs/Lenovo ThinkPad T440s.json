@@ -1,0 +1,52 @@
+{
+ "NotebookModel": "Lenovo T440s 20AQCTO1WW",
+ "EcPollInterval": 300,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 78,
+	 "WriteRegister": 78,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 7,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 128,
+	 "FanDisplayName": "System Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 46,
+	   "FanSpeed": 14.285714285714285
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 60,
+	   "FanSpeed": 42.857142857142854
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 66,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "Description": "System Fan Thermal Zone",
+	 "WriteOccasion": "OnInitialization",
+	 "WriteMode": "Set",
+	 "Register": 27,
+	 "Value": 28,
+	 "ResetRequired": true,
+	 "ResetWriteMode": "Set",
+	 "ResetValue": 0
+	}
+ ]
+}

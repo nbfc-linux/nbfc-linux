@@ -1,0 +1,77 @@
+{
+ "NotebookModel": "Acer Aspire E1-772",
+ "Author": "i5-4200M",
+ "EcPollInterval": 500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 236,
+	 "WriteRegister": 236,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 6,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 5,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 1,
+	 "FanDisplayName": "Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 50,
+	   "FanSpeed": 16.6666679
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 55,
+	   "FanSpeed": 33.3333359
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 59,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 63,
+	   "FanSpeed": 66.66667
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 67,
+	   "FanSpeed": 83.33333
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 73,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 96,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 238,
+	 "Value": 1,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "EC Temp - FAN Trigger"
+	}
+ ]
+}

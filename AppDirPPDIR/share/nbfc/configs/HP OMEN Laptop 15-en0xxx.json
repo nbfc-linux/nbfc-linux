@@ -1,0 +1,120 @@
+{
+ "NotebookModel": "HP OMEN Laptop 15-en0xxx",
+ "Author": "utk-spartan",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 100,
+ "FanConfigurations": [
+	{
+	 "FanDisplayName": "CPU fan",
+	 "ReadRegister": 46,
+	 "WriteRegister": 44,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 57,
+	   "DownThreshold": 49,
+	   "FanSpeed": 18.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 56,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 59,
+	   "FanSpeed": 35.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 62,
+	   "FanSpeed": 53.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 65,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 69,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 71,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "FanDisplayName": "GPU fan",
+	 "ReadRegister": 47,
+	 "WriteRegister": 45,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 57,
+	   "DownThreshold": 49,
+	   "FanSpeed": 18.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 56,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 59,
+	   "FanSpeed": 35.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 62,
+	   "FanSpeed": 53.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 65,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 69,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 71,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

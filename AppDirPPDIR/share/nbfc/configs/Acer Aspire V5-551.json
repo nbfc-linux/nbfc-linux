@@ -1,0 +1,105 @@
+{
+ "NotebookModel": "Aspire V5-551",
+ "EcPollInterval": 1500,
+ "ReadWriteWords": true,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 92,
+	 "WriteRegister": 85,
+	 "MinSpeedValue": 409,
+	 "MaxSpeedValue": 194,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 46,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 47,
+	   "DownThreshold": 46,
+	   "FanSpeed": 0.5586592
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 37,
+	   "FanSpeed": 16.7441864
+	  },
+	  {
+	   "UpThreshold": 52,
+	   "DownThreshold": 42,
+	   "FanSpeed": 33.0232544
+	  },
+	  {
+	   "UpThreshold": 56,
+	   "DownThreshold": 44,
+	   "FanSpeed": 50.23256
+	  },
+	  {
+	   "UpThreshold": 58,
+	   "DownThreshold": 48,
+	   "FanSpeed": 66.04651
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 83.25581
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 52,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 7,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 0.5586592,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 16.7441864,
+	   "FanSpeedValue": 8,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 33.0232544,
+	   "FanSpeedValue": 9,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 50.23256,
+	   "FanSpeedValue": 10,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 66.04651,
+	   "FanSpeedValue": 11,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 83.25581,
+	   "FanSpeedValue": 12,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 13,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

@@ -1,0 +1,78 @@
+{
+ "NotebookModel": "G501JW",
+ "Author": "j",
+ "EcPollInterval": 300,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 9,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 69,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 67,
+	   "FanSpeed": 12.5
+	  },
+	  {
+	   "UpThreshold": 73,
+	   "DownThreshold": 69,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 71,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 77,
+	   "DownThreshold": 73,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 79,
+	   "DownThreshold": 75,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 76,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 45,
+	 "ResetRequired": true,
+	 "ResetValue": 45,
+	 "ResetWriteMode": "Set"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 45,
+	 "ResetRequired": true,
+	 "ResetValue": 45,
+	 "ResetWriteMode": "Set"
+	}
+ ]
+}

@@ -1,0 +1,60 @@
+{
+ "NotebookModel": "Ideapad 500S-13ISK",
+ "Author": "blyskawica",
+ "EcPollInterval": 1500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 6,
+	 "WriteRegister": 176,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 44,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 20,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 58,
+	   "FanSpeed": 45.4545479
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 68,
+	   "FanSpeed": 61.363636
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 78,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 45.4545479,
+	   "FanSpeedValue": 50,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 61.363636,
+	   "FanSpeedValue": 56,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 192,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

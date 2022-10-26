@@ -1,0 +1,50 @@
+{
+ "NotebookModel": "HP Pavilion Gaming Laptop 15-ec1xxx",
+ "Author": "bLeDy",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 68,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 88,
+	 "WriteRegister": 88,
+	 "MinSpeedValue": 20,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 20,
+	 "MaxSpeedValueRead": 100,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 38,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 41,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 45,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 50,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

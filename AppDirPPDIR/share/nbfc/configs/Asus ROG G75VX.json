@@ -1,0 +1,152 @@
+{
+ "NotebookModel": "Asus ROG G75VX",
+ "Author": "RypeDub - https://www.YouTube.com/RypeDub",
+ "EcPollInterval": 100,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 91,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 9,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Intel Core i7-3630QM CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 40,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 45,
+	   "FanSpeed": 11.1111116
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 22.2222233
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 55,
+	   "FanSpeed": 33.3333359
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 44.4444466
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 65,
+	   "FanSpeed": 55.5555573
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 70,
+	   "FanSpeed": 66.66667
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 75,
+	   "FanSpeed": 77.77778
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 80,
+	   "FanSpeed": 88.88889
+	  },
+	  {
+	   "UpThreshold": 91,
+	   "DownThreshold": 85,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 255,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	},
+	{
+	 "ReadRegister": 152,
+	 "WriteRegister": 152,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 9,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "nVidia GTX 670MX GPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 40,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 45,
+	   "FanSpeed": 11.1111116
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 22.2222233
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 55,
+	   "FanSpeed": 33.3333359
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 44.4444466
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 65,
+	   "FanSpeed": 55.5555573
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 70,
+	   "FanSpeed": 66.66667
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 75,
+	   "FanSpeed": 77.77778
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 80,
+	   "FanSpeed": 88.88889
+	  },
+	  {
+	   "UpThreshold": 91,
+	   "DownThreshold": 85,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 255,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

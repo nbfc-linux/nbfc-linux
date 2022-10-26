@@ -1,0 +1,125 @@
+{
+ "NotebookModel": "Acer Aspire VN7-593G",
+ "Author": "Subeta",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 74,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "Right fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 64,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 48,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 59,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 73,
+	   "DownThreshold": 63,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 76,
+	   "DownThreshold": 67,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 79,
+	   "DownThreshold": 71,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 152,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 74,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "Left fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 48,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 59,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 73,
+	   "DownThreshold": 63,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 76,
+	   "DownThreshold": 67,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 79,
+	   "DownThreshold": 71,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 150,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set"
+	}
+ ]
+}

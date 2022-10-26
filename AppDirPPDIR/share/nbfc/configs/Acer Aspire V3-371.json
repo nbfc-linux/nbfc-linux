@@ -1,0 +1,64 @@
+{
+ "NotebookModel": "Aspire V3-371",
+ "Author": "h",
+ "EcPollInterval": 6000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 94,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 0,
+	 "IndependentReadMinMaxValues": false,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 4,
+	 "FanDisplayName": "None",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 53,
+	   "FanSpeed": 7.058824
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 62,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 83,
+	   "DownThreshold": 72,
+	   "FanSpeed": 29.92126
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 77,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 94,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set Ec"
+	}
+ ]
+}

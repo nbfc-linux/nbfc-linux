@@ -1,0 +1,44 @@
+{
+ "NotebookModel": "Lenovo Yoga 710 KabyLake",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 99,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 6,
+	 "WriteRegister": 176,
+	 "MinSpeedValue": 22,
+	 "MaxSpeedValue": 80,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 59,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 45,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 55,
+	   "FanSpeed": 75.86207
+	  },
+	  {
+	   "UpThreshold": 99,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

@@ -1,0 +1,75 @@
+{
+ "NotebookModel": "Vostro 3350",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 250,
+	 "MaxSpeedValue": 73,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 14,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 30,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 59,
+	   "DownThreshold": 52,
+	   "FanSpeed": 43.333333333333336
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 56,
+	   "FanSpeed": 47.083333333333336
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50.83333333333333
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 64,
+	   "FanSpeed": 53.75
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 68,
+	   "FanSpeed": 63.74999999999999
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 72,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 90.0,
+	   "FanSpeedValue": 10
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 14,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

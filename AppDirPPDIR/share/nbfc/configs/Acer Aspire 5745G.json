@@ -1,0 +1,55 @@
+{
+ "NotebookModel": "Acer Aspire 5745G",
+ "Author": "xen20",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 93,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 94,
+	 "WriteRegister": 94,
+	 "MinSpeedValue": 1,
+	 "MaxSpeedValue": 13,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 4,
+	 "FanDisplayName": "Main",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 1,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 48,
+	   "FanSpeed": 16.6666679
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 58,
+	   "FanSpeed": 33.3333359
+	  },
+	  {
+	   "UpThreshold": 82,
+	   "DownThreshold": 66,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 93,
+	   "DownThreshold": 73,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

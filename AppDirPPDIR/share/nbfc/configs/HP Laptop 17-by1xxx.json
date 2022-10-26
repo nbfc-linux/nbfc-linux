@@ -1,0 +1,65 @@
+{
+ "NotebookModel": "HP Laptop 17-by1xxx",
+ "Author": "Zwergesel",
+ "EcPollInterval": 300,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 113,
+	 "WriteRegister": 219,
+	 "MinSpeedValue": 45,
+	 "MaxSpeedValue": 80,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 7,
+	 "MaxSpeedValueRead": 17,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 50,
+	   "FanSpeed": 11.4285717
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 52,
+	   "FanSpeed": 31.4285717
+	  },
+	  {
+	   "UpThreshold": 73,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 65,
+	   "FanSpeed": 74.28571
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 69,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 30,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}
