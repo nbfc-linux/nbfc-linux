@@ -1,0 +1,110 @@
+{
+ "NotebookModel": "Asus K501LX",
+ "EcPollInterval": 100,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 4,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 255,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 4,
+	 "FanDisplayName": "left FAN",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 55,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 65,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 152,
+	 "WriteRegister": 152,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 4,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 4,
+	 "FanDisplayName": "right FAN",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 55,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 65,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 25,
+	 "ResetRequired": false,
+	 "ResetValue": 10,
+	 "ResetWriteMode": "Set",
+	 "Description": "SetMinCPUTemp"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 165,
+	 "Value": 25,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "SetMinGPUTemp"
+	}
+ ]
+}

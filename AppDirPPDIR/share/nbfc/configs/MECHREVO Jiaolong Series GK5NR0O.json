@@ -1,0 +1,55 @@
+{
+ "NotebookModel": "MECHREVO Jiaolong Series GK5NR0O",
+ "Author": "None",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 88,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 62,
+	 "WriteRegister": 62,
+	 "MinSpeedValue": 31,
+	 "MaxSpeedValue": 78,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 41,
+	   "FanSpeed": 6.5
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 46,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 51,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 87,
+	   "DownThreshold": 61,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 88,
+	   "DownThreshold": 66,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

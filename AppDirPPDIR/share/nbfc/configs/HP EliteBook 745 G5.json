@@ -1,0 +1,88 @@
+{
+ "NotebookModel": "HP EliteBook 745 G5",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "Author": "Nailim",
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 46,
+	 "WriteRegister": 47,
+	 "MinSpeedValue": 168,
+	 "MaxSpeedValue": 40,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 50,
+	   "FanSpeed": 5.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 55,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 60,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 65,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 70,
+	   "FanSpeed": 55.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 75,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 255
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 34,
+	 "Value": 1,
+	 "ResetRequired": true,
+	 "ResetValue": 1,
+	 "ResetWriteMode": "Set",
+	 "Description": "Select thermal zone"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 38,
+	 "Value": 28,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Fake thermal zone temperature"
+	}
+ ]
+}

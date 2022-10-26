@@ -1,0 +1,55 @@
+{
+ "NotebookModel": "HP Pavilion dv6 Notebook PC",
+ "Author": "unknown, Rany H.",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 177,
+	 "WriteRegister": 177,
+	 "MinSpeedValue": 9,
+	 "MaxSpeedValue": 23,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 9,
+	 "MaxSpeedValueRead": 20,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "None",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 57,
+	   "DownThreshold": 45,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 55,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 59,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 88,
+	   "DownThreshold": 76,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 85,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

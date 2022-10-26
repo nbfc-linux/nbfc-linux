@@ -1,0 +1,101 @@
+{
+ "NotebookModel": "UX301LA",
+ "EcPollInterval": 300,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 9,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 12.5
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 58,
+	   "FanSpeed": 22.5
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 60,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 64,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 152,
+	 "WriteRegister": 152,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 9,
+	 "FanDisplayName": "2",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 12.5
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 58,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 60,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 64,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 45,
+	 "ResetRequired": true,
+	 "ResetValue": 45,
+	 "ResetWriteMode": "Set"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 45,
+	 "ResetRequired": true,
+	 "ResetValue": 45,
+	 "ResetWriteMode": "Set"
+	}
+ ]
+}

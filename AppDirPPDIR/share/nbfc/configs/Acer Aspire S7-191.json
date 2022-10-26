@@ -1,0 +1,113 @@
+{
+ "NotebookModel": "Aspire S7-191",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "Author": "Benjamin Wetzel",
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 214,
+	 "WriteRegister": 214,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 200,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "FAN2 (R)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 40,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 53,
+	   "FanSpeed": 15.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 60,
+	   "FanSpeed": 45.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 64,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 77,
+	   "DownThreshold": 68,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 73,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 216,
+	 "WriteRegister": 216,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 168,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "FAN1 (L)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 40,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 53,
+	   "FanSpeed": 15.476190476190476
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 60,
+	   "FanSpeed": 45.23809523809524
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 64,
+	   "FanSpeed": 70.23809523809523
+	  },
+	  {
+	   "UpThreshold": 77,
+	   "DownThreshold": 68,
+	   "FanSpeed": 90.47619047619048
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 73,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 215,
+	 "Value": 255,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "Description": "SET FAN-L1 TO man-mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 213,
+	 "Value": 255,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "Description": "SET FAN-R2 TO man-mode"
+	}
+ ]
+}

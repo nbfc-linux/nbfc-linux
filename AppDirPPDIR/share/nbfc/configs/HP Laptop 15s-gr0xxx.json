@@ -1,0 +1,73 @@
+{
+ "NotebookModel": "HP Laptop 15s-gr0xxx",
+ "Author": "X0rzAvi",
+ "EcPollInterval": 100,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 77,
+ "CriticalTemperatureOffset": 7,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 17,
+	 "WriteRegister": 20,
+	 "MinSpeedValue": 20,
+	 "MaxSpeedValue": 59,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 20,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 40,
+	   "DownThreshold": 10,
+	   "FanSpeed": 23.0769234
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 20,
+	   "FanSpeed": 44.1860466
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 40,
+	   "FanSpeed": 66.66667
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 50,
+	   "FanSpeed": 89.74359
+	  },
+	  {
+	   "UpThreshold": 76,
+	   "DownThreshold": 60,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 59,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 15,
+	 "Value": 8,
+	 "ResetRequired": true,
+	 "ResetValue": 5,
+	 "ResetWriteMode": "Set",
+	 "Description": "Override"
+	}
+ ]
+}

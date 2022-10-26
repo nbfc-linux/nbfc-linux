@@ -1,0 +1,54 @@
+{
+ "NotebookModel": "HP Pavilion 14-v066br",
+ "Author": "None",
+ "EcPollInterval": 290,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 89,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 0,
+	 "WriteRegister": 183,
+	 "MinSpeedValue": 50,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 48,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 55,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 59,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 63,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 89,
+	   "DownThreshold": 67,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

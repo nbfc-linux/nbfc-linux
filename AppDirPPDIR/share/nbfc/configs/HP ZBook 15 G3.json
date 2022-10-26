@@ -1,0 +1,123 @@
+{
+ "NotebookModel": "HP ZBook 15 G3",
+ "Author": "Tijmen van Nisselrooij",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 46,
+	 "WriteRegister": 47,
+	 "MinSpeedValue": 164,
+	 "MaxSpeedValue": 60,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "Left CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 56,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 63,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 71,
+	   "FanSpeed": 60.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 76,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 255,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	},
+	{
+	 "ReadRegister": 53,
+	 "WriteRegister": 54,
+	 "MinSpeedValue": 164,
+	 "MaxSpeedValue": 60,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "Right CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 56,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 63,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 71,
+	   "FanSpeed": 60.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 76,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 255,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 34,
+	 "Value": 1,
+	 "ResetRequired": true,
+	 "ResetValue": 1,
+	 "ResetWriteMode": "Set",
+	 "Description": "Select thermal zone"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 38,
+	 "Value": 28,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Fake thermal zone temperature"
+	}
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "NotebookModel": "Acer Swift SF314-54G",
+ "Author": "Cel",
+ "EcPollInterval": 4000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 0,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 4,
+	 "FanDisplayName": "Main Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 62,
+	   "DownThreshold": 45,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 52,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 55,
+	   "FanSpeed": 45.4901962
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 64,
+	   "FanSpeed": 50.9803963
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 65,
+	   "FanSpeed": 60.0000038
+	  },
+	  {
+	   "UpThreshold": 94,
+	   "DownThreshold": 75,
+	   "FanSpeed": 65.4902
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set Ec"
+	}
+ ]
+}

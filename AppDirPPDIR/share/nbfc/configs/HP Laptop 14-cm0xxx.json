@@ -1,0 +1,66 @@
+{
+ "NotebookModel": "HP Laptop 14-cm0xxx",
+ "Author": "Matias Hiltunen",
+ "EcPollInterval": 200,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 113,
+	 "WriteRegister": 219,
+	 "MinSpeedValue": 55,
+	 "MaxSpeedValue": 75,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 5,
+	 "MaxSpeedValueRead": 12,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 54,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 73,
+	   "DownThreshold": 62,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 66,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 70,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 74,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 75,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

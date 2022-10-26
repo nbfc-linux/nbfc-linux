@@ -1,0 +1,70 @@
+#compdef nbfc
+
+_nbfc() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    '(--version)'--version"[show program's version number and exit]"::'()'\
+    :command:"(('start\\:Start the service' 'stop\\:Stop the service' 'restart\\:Restart the service' 'status\\:Show the service status' 'config\\:List or apply configs' 'set\\:Control fan speed' 'help\\:Show help'))"\
+    '*::arg:->args'
+  for w in $line; do
+    case $w in
+      (start) _nbfc_start; break;;
+      (stop) _nbfc_stop; break;;
+      (restart) _nbfc_restart; break;;
+      (status) _nbfc_status; break;;
+      (config) _nbfc_config; break;;
+      (set) _nbfc_set; break;;
+      (help) _nbfc_help; break;;
+    esac
+  done
+}
+
+_nbfc_start() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    '(--readonly -r)'{--readonly,-r}'[Start in read-only mode]'::'()'
+}
+
+_nbfc_stop() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'
+}
+
+_nbfc_restart() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    '(--readonly -r)'{--readonly,-r}'[Restart in read-only mode]'::'()'
+}
+
+_nbfc_status() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    '(--all --fan --service -a -f -s)'{--all,-a}'[Show service and fan status (default)]'::'()'\
+    '(--all --fan --service -a -f -s)'{--service,-s}'[Show service status]'::'()'\
+    '(--all --fan --service -a -f -s)'{--fan=,-f+}'[Show fan status]':'FAN INDEX':'()'\
+    '(--watch -w)'{--watch=,-w+}'[Show status periodically]':SECONDS:'()'
+}
+
+_nbfc_config() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    '(--apply --list --recommend --set -a -l -r -s)'{--list,-l}'[List all available configs (default)]'::'()'\
+    '(--apply --list --recommend --set -a -l -r -s)'{--set=,-s+}'[Set a config]':config:_files\
+    '(--apply --list --recommend --set -a -l -r -s)'{--apply=,-a+}'[Set a config and enable fan control]':config:_files\
+    '(--apply --list --recommend --set -a -l -r -s)'{--recommend,-r}'[List configs which may work for your device]'::'()'
+}
+
+_nbfc_set() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
+    '(--auto --speed -a -s)'{--auto,-a}"[Set fan speed to 'auto']"::'()'\
+    '(--auto --speed -a -s)'{--speed=,-s+}'[Set fan speed to PERCENT]':PERCENT:'()'\
+    '(--fan -f)'{--fan=,-f+}'[Fan index (zero based)]':'FAN INDEX':'()'
+}
+
+_nbfc_help() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'
+}
+
+_nbfc "$@"

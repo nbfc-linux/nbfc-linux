@@ -1,0 +1,69 @@
+{
+ "NotebookModel": "Asus K43SD",
+ "Author": "ALBERT-XIAO",
+ "EcPollInterval": 150,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 73,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 1,
+	 "FanDisplayName": "FAN",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 0,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 45,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 50,
+	   "FanSpeed": 62.5
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 87.5
+	  },
+	  {
+	   "UpThreshold": 73,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10,
+	 "ResetWriteMode": "Set"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10,
+	 "ResetWriteMode": "Set"
+	}
+ ]
+}

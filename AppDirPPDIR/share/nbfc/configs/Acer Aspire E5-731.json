@@ -1,0 +1,61 @@
+{
+ "NotebookModel": "Aspire E5-731",
+ "EcPollInterval": 500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 85,
+	 "WriteRegister": 85,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 7,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 48,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 55,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 59,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 63,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 67,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

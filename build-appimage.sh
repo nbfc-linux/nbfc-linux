@@ -1,5 +1,5 @@
 #!/bin/bash
-make
+make appimage
 mkdir AppDir
 DESTDIR=AppDir make install
 

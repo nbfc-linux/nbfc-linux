@@ -1,0 +1,45 @@
+{
+ "NotebookModel": "Acer Aspire 5749",
+ "Author": "Phneom",
+ "EcPollInterval": 150,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 85,
+	 "WriteRegister": 85,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 6,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 1,
+	 "FanDisplayName": "main",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 55,
+	   "FanSpeed": 16.666666
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 65,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 70,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

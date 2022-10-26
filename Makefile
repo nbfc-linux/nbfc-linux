@@ -31,6 +31,39 @@ override CPPFLAGS += $(EC_MODULE)
 CORE  = src/nbfc_service src/ec_probe
 PROGS = $(CORE) src/nbfc
 
+appimage:
+bindir   = $APPDIR/bin
+confdir  = $APPDIR/etc
+sharedir = $APPDIR/share
+sysddir  = $APPDIR/lib/systemd/system
+
+ifeq ($(BUILD), debug)
+	CFLAGS   = -Og -g
+else
+	CPPFLAGS = -DNDEBUG
+	CFLAGS   = -Os
+	LDFLAGS  = -s
+endif
+
+EC_MODULE = 
+ifeq ($(EMBEDDED_CONTROLLER), acpi_ec)
+override EC_MODULE += -DACPI_EC
+else ifeq ($(EMBEDDED_CONTROLLER), ec_sys)
+override EC_MODULE +=
+else ifeq ($(EMBEDDED_CONTROLLER), )
+override EC_MODULE +=
+else
+$(error Unsupported embeded controller module: $(EMBEDDED_CONTROLLER))
+endif
+
+override LDLIBS   += -lm
+override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(sharedir)\"
+override CPPFLAGS += $(EC_MODULE)
+
+CORE  = src/nbfc_service src/ec_probe
+PROGS = $(CORE) src/nbfc
+
+
 all: $(PROGS)
 
 install-core: $(CORE)

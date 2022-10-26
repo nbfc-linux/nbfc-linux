@@ -1,0 +1,35 @@
+{
+ "NotebookModel": "TravelMate 7730G",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 70,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 85,
+	 "WriteRegister": 85,
+	 "MinSpeedValue": 1,
+	 "MaxSpeedValue": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 56,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 46,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 175
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

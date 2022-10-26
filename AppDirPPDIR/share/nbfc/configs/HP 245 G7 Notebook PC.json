@@ -1,0 +1,66 @@
+{
+ "NotebookModel": "HP 245 G7",
+ "Author": "CloudedQuartz",
+ "EcPollInterval": 200,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 113,
+	 "WriteRegister": 219,
+	 "MinSpeedValue": 54,
+	 "MaxSpeedValue": 89,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 7,
+	 "MaxSpeedValueRead": 14,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 40,
+	   "FanSpeed": 11.4285717
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 50,
+	   "FanSpeed": 51.4285736
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 50,
+	   "FanSpeed": 74.28571
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 65,
+	   "FanSpeed": 91.42857
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Read"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

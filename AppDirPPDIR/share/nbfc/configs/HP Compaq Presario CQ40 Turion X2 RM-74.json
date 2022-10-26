@@ -1,0 +1,80 @@
+{
+ "NotebookModel": "HP Compaq Presario CQ40",
+ "Author": "msafwan",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 176,
+	 "WriteRegister": 176,
+	 "MinSpeedValue": 41,
+	 "MaxSpeedValue": 79,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 48,
+	 "MaxSpeedValueRead": 57,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 40,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 48,
+	   "DownThreshold": 43,
+	   "FanSpeed": 14.0
+	  },
+	  {
+	   "UpThreshold": 51,
+	   "DownThreshold": 46,
+	   "FanSpeed": 23.0
+	  },
+	  {
+	   "UpThreshold": 54,
+	   "DownThreshold": 49,
+	   "FanSpeed": 32.0
+	  },
+	  {
+	   "UpThreshold": 57,
+	   "DownThreshold": 52,
+	   "FanSpeed": 41.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 55,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 58,
+	   "FanSpeed": 59.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 61,
+	   "FanSpeed": 68.0
+	  },
+	  {
+	   "UpThreshold": 69,
+	   "DownThreshold": 64,
+	   "FanSpeed": 77.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 67,
+	   "FanSpeed": 86.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 70,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

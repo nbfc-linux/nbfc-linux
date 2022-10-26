@@ -1,0 +1,58 @@
+{
+ "NotebookModel": "Asus Zenbook UX330UA",
+ "EcPollInterval": 150,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "Author": "guster23",
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 9,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 47,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 52,
+	   "DownThreshold": 42,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 44,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 62,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10
+	}
+ ]
+}

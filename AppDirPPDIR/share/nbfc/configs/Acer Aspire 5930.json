@@ -1,0 +1,66 @@
+{
+ "NotebookModel": "Aspire 5930",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 68,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 105,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 4,
+	 "FanDisplayName": "None",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 33,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 36,
+	   "DownThreshold": 30,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 33,
+	   "FanSpeed": 45.0
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 36,
+	   "FanSpeed": 60.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 45,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 85.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 55,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

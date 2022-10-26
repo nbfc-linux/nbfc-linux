@@ -1,0 +1,65 @@
+{
+ "NotebookModel": "Aspire E5-475G",
+ "Author": "arra",
+ "EcPollInterval": 250,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 93,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 88,
+	 "WriteRegister": 88,
+	 "MinSpeedValue": 10,
+	 "MaxSpeedValue": 99,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 0,
+	   "FanSpeed": 12.5
+	  },
+	  {
+	   "UpThreshold": 56,
+	   "DownThreshold": 41,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 62,
+	   "DownThreshold": 53,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 57,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 69,
+	   "DownThreshold": 61,
+	   "FanSpeed": 87.5
+	  },
+	  {
+	   "UpThreshold": 93,
+	   "DownThreshold": 67,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

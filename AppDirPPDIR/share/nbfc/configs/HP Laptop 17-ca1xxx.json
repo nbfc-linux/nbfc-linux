@@ -1,0 +1,55 @@
+{
+ "NotebookModel": "HP Laptop 17-ca1xxx",
+ "Author": "Harald Rohan",
+ "EcPollInterval": 200,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 81,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 128,
+	 "WriteRegister": 219,
+	 "MinSpeedValue": 34,
+	 "MaxSpeedValue": 80,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 7,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 50,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 55,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 60,
+	   "FanSpeed": 60.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 65,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 81,
+	   "DownThreshold": 70,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

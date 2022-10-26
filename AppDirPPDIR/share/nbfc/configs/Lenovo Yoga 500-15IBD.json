@@ -1,0 +1,66 @@
+{
+ "NotebookModel": "Lenovo Yoga 500-15IBD",
+ "Author": "Martin Pavelek",
+ "EcPollInterval": 300,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 80,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 80,
+	 "FanDisplayName": "Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 50,
+	   "FanSpeed": 5.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 60,
+	   "FanSpeed": 36.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 70,
+	   "FanSpeed": 64.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 80,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 85,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Enable manual control"
+	}
+ ]
+}

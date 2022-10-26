@@ -1,0 +1,96 @@
+{
+ "NotebookModel": "HP Spectre x360 Convertible 15t-df1xx",
+ "Author": "rpli",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 179,
+	 "WriteRegister": 244,
+	 "MinSpeedValue": 6,
+	 "MaxSpeedValue": 0,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 11,
+	 "MaxSpeedValueRead": 21,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 6,
+	 "FanDisplayName": "CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 55,
+	   "FanSpeed": 16.6666679
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 60,
+	   "FanSpeed": 33.3333359
+	  },
+	  {
+	   "UpThreshold": 82,
+	   "DownThreshold": 65,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 86,
+	   "DownThreshold": 70,
+	   "FanSpeed": 66.66667
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 75,
+	   "FanSpeed": 83.33333
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "Read"
+	  },
+	  {
+	   "FanSpeedPercentage": 16.6666679,
+	   "FanSpeedValue": 39,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 33.3333359,
+	   "FanSpeedValue": 40,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 50.0,
+	   "FanSpeedValue": 43,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 66.66667,
+	   "FanSpeedValue": 63,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 83.33333,
+	   "FanSpeedValue": 71,
+	   "TargetOperation": "Write"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 91,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

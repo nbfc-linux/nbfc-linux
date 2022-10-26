@@ -1,0 +1,68 @@
+{
+ "NotebookModel": "UX51VZA",
+ "Author": "xant1, jws",
+ "EcPollInterval": 150,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 9,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 50,
+	   "FanSpeed": 28.5714283
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 60,
+	   "FanSpeed": 57.1428566
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 70,
+	   "FanSpeed": 85.71429
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10,
+	 "ResetWriteMode": "Set"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 10,
+	 "ResetRequired": true,
+	 "ResetValue": 10,
+	 "ResetWriteMode": "Set"
+	}
+ ]
+}

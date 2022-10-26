@@ -1,0 +1,64 @@
+{
+ "NotebookModel": "Lenovo Ideapad U160",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 64,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 64,
+	 "FanDisplayName": "System Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 58,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 63,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 68,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Turn Off Auto Control"
+	}
+ ]
+}

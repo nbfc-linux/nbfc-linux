@@ -1,0 +1,35 @@
+{
+ "NotebookModel": "HP Notebook 15-ba010ng",
+ "Author": "Webloft",
+ "EcPollInterval": 750,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 17,
+	 "WriteRegister": 25,
+	 "MinSpeedValue": 3,
+	 "MaxSpeedValue": 54,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 5,
+	 "MaxSpeedValueRead": 62,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Main Fan",
+	 "TemperatureThresholds": [],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 21,
+	 "Value": 1,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Manual Override"
+	}
+ ]
+}

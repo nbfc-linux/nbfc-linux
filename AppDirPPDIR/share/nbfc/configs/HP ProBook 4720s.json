@@ -1,0 +1,55 @@
+{
+ "NotebookModel": "HP ProBook 4720s",
+ "Author": "c01nd01r",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 214,
+	 "WriteRegister": 213,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 112,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 20,
+	 "FanDisplayName": "Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 40,
+	   "DownThreshold": 0,
+	   "FanSpeed": 20.90909
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 30,
+	   "FanSpeed": 41.07143
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 40,
+	   "FanSpeed": 56.25
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 50,
+	   "FanSpeed": 66.36364
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 60,
+	   "FanSpeed": 80.90909
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 70,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

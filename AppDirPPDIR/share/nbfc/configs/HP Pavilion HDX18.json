@@ -1,0 +1,54 @@
+{
+ "NotebookModel": "HP Pavilion HDX18",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 177,
+	 "WriteRegister": 177,
+	 "MinSpeedValue": 9,
+	 "MaxSpeedValue": 17,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 9,
+	 "FanDisplayName": "CPU",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 40,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 45,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 37.5
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 55,
+	   "FanSpeed": 62.5
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 67,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

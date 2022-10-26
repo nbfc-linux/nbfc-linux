@@ -1,0 +1,134 @@
+{
+	"NotebookModel": "Alienware m15 R3",
+	"Author": "samuaz",
+	"EcPollInterval": 500,
+	"ReadWriteWords": false,
+	"CriticalTemperature": 100,
+	"FanConfigurations": [
+	   {
+		"ReadRegister": 0x17,
+		"WriteRegister": 0x17,
+		"MinSpeedValue": 0,
+		"MaxSpeedValue": 140,
+		"IndependentReadMinMaxValues": false,
+		"MinSpeedValueRead": 0,
+		"MaxSpeedValueRead": 0,
+		"ResetRequired": true,
+		"FanSpeedResetValue": 50,
+		"FanDisplayName": "CPU",
+		"TemperatureThresholds": [
+		   {
+			   "DownThreshold": 0,
+			   "UpThreshold": 55,
+			   "FanSpeed": 0.0
+			  },
+			  {
+			   "DownThreshold": 55,
+			   "UpThreshold": 65,
+			   "FanSpeed": 50.0
+			  },
+			  {
+			   "DownThreshold": 65,
+			   "UpThreshold": 70,
+			   "FanSpeed": 70.0
+			  },
+			  {
+			   "DownThreshold": 70,
+			   "UpThreshold": 80,
+			   "FanSpeed": 80.0
+			  },
+			  {
+			   "DownThreshold": 80,
+			   "UpThreshold": 90,
+			   "FanSpeed": 90.0
+			  },
+			  {
+			   "DownThreshold": 90,
+			   "UpThreshold": 100,
+			   "FanSpeed": 100.0
+			  }
+		],
+		"FanSpeedPercentageOverrides": [
+		   {
+			"FanSpeedPercentage": 100.0,
+			"FanSpeedValue": 140,
+			"TargetOperation": "ReadWrite"
+		   }
+		  ]
+	   },
+	   {
+		"ReadRegister": 0x18,
+		"WriteRegister": 0x18,
+		"MinSpeedValue": 0,
+		"MaxSpeedValue": 140,
+		"IndependentReadMinMaxValues": false,
+		"MinSpeedValueRead": 0,
+		"MaxSpeedValueRead": 0,
+		"ResetRequired": true,
+		"FanSpeedResetValue": 8,
+		"FanDisplayName": "GPU",
+		"TemperatureThresholds": [
+		 {
+		  "DownThreshold": 0,
+		  "UpThreshold": 55,
+		  "FanSpeed": 0.0
+		 },
+		 {
+		  "DownThreshold": 55,
+		  "UpThreshold": 65,
+		  "FanSpeed": 50.0
+		 },
+		 {
+		  "DownThreshold": 65,
+		  "UpThreshold": 70,
+		  "FanSpeed": 70.0
+		 },
+		 {
+		  "DownThreshold": 70,
+		  "UpThreshold": 80,
+		  "FanSpeed": 80.0
+		 },
+		 {
+		  "DownThreshold": 80,
+		  "UpThreshold": 90,
+		  "FanSpeed": 90.0
+		 },
+		 {
+		  "DownThreshold": 90,
+		  "UpThreshold": 100,
+		  "FanSpeed": 100.0
+		 }
+		],
+		"FanSpeedPercentageOverrides": [
+		   {
+			"FanSpeedPercentage": 100.0,
+			"FanSpeedValue": 140,
+			"TargetOperation": "ReadWrite"
+		   }
+		  ]
+	   }
+	],
+	"RegisterWriteConfigurations": [
+	   {
+		"WriteMode": "Set",
+		"WriteOccasion": "OnWriteFanSpeed",
+		"Register": 0x17,
+		"Value": 10,
+		"ResetRequired": true,
+		"ResetValue": 10,
+		"ResetWriteMode": "Set",
+		"Description": "CPU FAN"
+	   },
+	   {
+		"WriteMode": "Set",
+		"WriteOccasion": "OnWriteFanSpeed",
+		"Register": 0x18,
+		"Value": 10,
+		"ResetRequired": true,
+		"ResetValue": 10,
+		"ResetWriteMode": "Set",
+		"Description": "GPU FAN"
+	   }
+	]
+   }
+   

@@ -1,0 +1,35 @@
+{
+ "NotebookModel": "HP ENVY dv6 Notebook PC",
+ "Author": "mbc07",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 250,
+	 "MaxSpeedValue": 102,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU/GPU fan",
+	 "TemperatureThresholds": [],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Enable manual fan speed control"
+	}
+ ]
+}

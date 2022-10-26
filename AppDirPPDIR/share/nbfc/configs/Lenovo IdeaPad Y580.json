@@ -1,0 +1,45 @@
+{
+ "NotebookModel": "Lenovo IdeaPad Y580",
+ "Author": "IL_DECAMERON",
+ "EcPollInterval": 500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 100,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 6,
+	 "WriteRegister": 95,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 95,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 35,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "FAN",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 54,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 46,
+	   "FanSpeed": 67.36842
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 50,
+	   "FanSpeed": 83.1579
+	  },
+	  {
+	   "UpThreshold": 100,
+	   "DownThreshold": 60,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

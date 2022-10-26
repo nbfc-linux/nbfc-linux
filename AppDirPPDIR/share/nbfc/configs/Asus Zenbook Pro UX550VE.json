@@ -1,0 +1,101 @@
+{
+ "NotebookModel": "Asus Zenbook Pro UX550VE",
+ "Author": "FloThinksPi",
+ "EcPollInterval": 200,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 8,
+	 "FanDisplayName": "Left Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 12.5
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 56,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 63,
+	   "FanSpeed": 62.5
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 68,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 152,
+	 "WriteRegister": 152,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 8,
+	 "FanDisplayName": "Right Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 12.5
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 56,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 63,
+	   "FanSpeed": 62.5
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 68,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 8,
+	 "ResetRequired": true,
+	 "ResetValue": 8,
+	 "ResetWriteMode": "Set",
+	 "Description": "Left FAN"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 8,
+	 "ResetRequired": true,
+	 "ResetValue": 8,
+	 "ResetWriteMode": "Set",
+	 "Description": "Right FAN"
+	}
+ ]
+}

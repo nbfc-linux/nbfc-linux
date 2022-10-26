@@ -1,0 +1,76 @@
+{
+ "NotebookModel": "Inspiron 7375",
+ "Author": "danielfm123",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 75,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 14,
+	 "TemperatureThresholds": [
+	  {
+	   "DownThreshold": 0,
+	   "UpThreshold": 55,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "DownThreshold": 45,
+	   "UpThreshold": 60,
+	   "FanSpeed": 62.0
+	  },
+	  {
+	   "DownThreshold": 47,
+	   "UpThreshold": 65,
+	   "FanSpeed": 77.0
+	  },
+	  {
+	   "DownThreshold": 52,
+	   "UpThreshold": 80,
+	   "FanSpeed": 87.0
+	  },
+	  {
+	   "DownThreshold": 60,
+	   "UpThreshold": 88,
+	   "FanSpeed": 93.0
+	  },
+	  {
+	   "DownThreshold": 75,
+	   "UpThreshold": 90,
+	   "FanSpeed": 97.0
+	  },
+	  {
+	   "DownThreshold": 85,
+	   "UpThreshold": 95,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 73.0,
+	   "FanSpeedValue": 10,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 147,
+	 "Value": 255,
+	 "ResetRequired": true,
+	 "ResetValue": 14,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

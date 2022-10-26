@@ -1,0 +1,56 @@
+{
+ "NotebookModel": "Thinkpad L540",
+ "Author": "None",
+ "EcPollInterval": 1500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 116,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 116,
+	 "FanDisplayName": "None",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 58,
+	   "FanSpeed": 46.6666679
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 68,
+	   "FanSpeed": 66.6666641
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 78,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Enable manual EC control"
+	}
+ ]
+}

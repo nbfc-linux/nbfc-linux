@@ -1,0 +1,62 @@
+{
+ "NotebookModel": "UX31A",
+ "EcPollInterval": 300,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 151,
+	 "WriteRegister": 151,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 8,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 9,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 58,
+	   "FanSpeed": 22.5
+	  },
+	  {
+	   "UpThreshold": 69,
+	   "DownThreshold": 61,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 64,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 67,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 160,
+	 "Value": 45,
+	 "ResetRequired": true,
+	 "ResetValue": 45
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 166,
+	 "Value": 45,
+	 "ResetRequired": true,
+	 "ResetValue": 45
+	}
+ ]
+}

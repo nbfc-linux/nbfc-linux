@@ -1,0 +1,52 @@
+{
+ "NotebookModel": "HP Omen 15 dc-00xxxx",
+ "Author": "Juanbanpar",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 91,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 88,
+	 "WriteRegister": 88,
+	 "MinSpeedValue": 57,
+	 "MaxSpeedValue": 99,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Fans",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 55,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 76,
+	   "DownThreshold": 61,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 83,
+	   "DownThreshold": 66,
+	   "FanSpeed": 40.4761925
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 77,
+	   "FanSpeed": 64.28571
+	  },
+	  {
+	   "UpThreshold": 91,
+	   "DownThreshold": 84,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

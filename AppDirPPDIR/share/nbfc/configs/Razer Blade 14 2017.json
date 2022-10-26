@@ -1,0 +1,120 @@
+{
+ "NotebookModel": "Razer Blade 14 2017",
+ "Author": "keeper121",
+ "EcPollInterval": 100,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 200,
+	 "WriteRegister": 196,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 20,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "fan 1",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 21,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 45,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 55,
+	   "FanSpeed": 55.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 67,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 71,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 87,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 202,
+	 "WriteRegister": 198,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 20,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "fan 2",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 45,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 21,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 62,
+	   "DownThreshold": 45,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 55,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 62,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 71,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 87,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 85,
+	 "Value": 255,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set"
+	}
+ ]
+}

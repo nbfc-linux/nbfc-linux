@@ -1,0 +1,86 @@
+{
+ "NotebookModel": "XPS M1530",
+ "Author": "lembi",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 247,
+	 "MaxSpeedValue": 95,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 14,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 39,
+	   "DownThreshold": 30,
+	   "FanSpeed": 20.3947372
+	  },
+	  {
+	   "UpThreshold": 43,
+	   "DownThreshold": 36,
+	   "FanSpeed": 28.9473686
+	  },
+	  {
+	   "UpThreshold": 46,
+	   "DownThreshold": 40,
+	   "FanSpeed": 38.81579
+	  },
+	  {
+	   "UpThreshold": 51,
+	   "DownThreshold": 44,
+	   "FanSpeed": 50.6578941
+	  },
+	  {
+	   "UpThreshold": 56,
+	   "DownThreshold": 47,
+	   "FanSpeed": 60.5263176
+	  },
+	  {
+	   "UpThreshold": 61,
+	   "DownThreshold": 52,
+	   "FanSpeed": 70.39474
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 57,
+	   "FanSpeed": 80.26316
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 62,
+	   "FanSpeed": 90.7894745
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 10,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 147,
+	 "Value": 255,
+	 "ResetRequired": true,
+	 "ResetValue": 14,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

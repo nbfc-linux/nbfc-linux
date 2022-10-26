@@ -1,0 +1,75 @@
+{
+ "NotebookModel": "HP ProBook 6455b",
+ "Author": "KirraBu",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 85,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 215,
+	 "WriteRegister": 214,
+	 "MinSpeedValue": 30,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 20,
+	 "FanDisplayName": "CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 0,
+	   "FanSpeed": 22.8571434
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 43,
+	   "FanSpeed": 28.57143
+	  },
+	  {
+	   "UpThreshold": 57,
+	   "DownThreshold": 49,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 59,
+	   "DownThreshold": 54,
+	   "FanSpeed": 45.7142868
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 56,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 58,
+	   "FanSpeed": 54.285717
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 59,
+	   "FanSpeed": 60.0000038
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 64,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 69,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 74,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

@@ -1,0 +1,40 @@
+{
+ "NotebookModel": "Vestel SmartBoard OPS Series",
+ "Author": "tunasahinn",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 197,
+	 "WriteRegister": 94,
+	 "MinSpeedValue": 1,
+	 "MaxSpeedValue": 3,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 205,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 2,
+	 "FanDisplayName": "CPU Fan Level",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 35,
+	   "DownThreshold": 20,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 35,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 50,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}

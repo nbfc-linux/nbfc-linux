@@ -1,0 +1,55 @@
+{
+ "NotebookModel": "SVT1312M1ES",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 149,
+	 "WriteRegister": 148,
+	 "MinSpeedValue": 255,
+	 "MaxSpeedValue": 107,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 107,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 44,
+	   "FanSpeed": 48.026315789473685
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 44,
+	   "FanSpeed": 60.526315789473685
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 47,
+	   "FanSpeed": 70.39473684210526
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 51,
+	   "FanSpeed": 80.26315789473685
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 57,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}

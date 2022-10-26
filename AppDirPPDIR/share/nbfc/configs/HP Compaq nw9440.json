@@ -1,0 +1,72 @@
+{
+ "NotebookModel": "HP Compaq nw9440",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 86,
+ "Author": "Rafael Severien",
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 215,
+	 "WriteRegister": 215,
+	 "MinSpeedValue": 20,
+	 "MaxSpeedValue": 100,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 55,
+	 "FanDisplayName": "None",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 55,
+	   "FanSpeed": 35.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 65,
+	   "FanSpeed": 45.0
+	  },
+	  {
+	   "UpThreshold": 77,
+	   "DownThreshold": 68,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 79,
+	   "DownThreshold": 72,
+	   "FanSpeed": 60.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 74,
+	   "FanSpeed": 72.5
+	  },
+	  {
+	   "UpThreshold": 83,
+	   "DownThreshold": 75,
+	   "FanSpeed": 85.0
+	  },
+	  {
+	   "UpThreshold": 86,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}
