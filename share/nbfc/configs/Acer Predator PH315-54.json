@@ -1,0 +1,242 @@
+{
+ "NotebookModel": "Acer Predator PH315-54",
+ "Author": "Snowy O'Neill",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": true,
+ "CriticalTemperature": 100,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 19,
+	 "WriteRegister": 55,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 5263,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 50,
+	 "FanDisplayName": "CPU fan (INTEL 11800H)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 40,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 42,
+	   "DownThreshold": 40,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 44,
+	   "DownThreshold": 41,
+	   "FanSpeed": 32.0
+	  },
+	  {
+	   "UpThreshold": 48,
+	   "DownThreshold": 43,
+	   "FanSpeed": 34.0
+	  },
+	  {
+	   "UpThreshold": 52,
+	   "DownThreshold": 46,
+	   "FanSpeed": 36.0
+	  },
+	  {
+	   "UpThreshold": 54,
+	   "DownThreshold": 50,
+	   "FanSpeed": 38.0
+	  },
+	  {
+	   "UpThreshold": 58,
+	   "DownThreshold": 53,
+	   "FanSpeed": 41.0
+	  },
+	  {
+	   "UpThreshold": 62,
+	   "DownThreshold": 56,
+	   "FanSpeed": 44.0
+	  },
+	  {
+	   "UpThreshold": 64,
+	   "DownThreshold": 60,
+	   "FanSpeed": 47.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 63,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 66,
+	   "FanSpeed": 55.0
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 70,
+	   "FanSpeed": 61.0
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 73,
+	   "FanSpeed": 68.0
+	  },
+	  {
+	   "UpThreshold": 82,
+	   "DownThreshold": 76,
+	   "FanSpeed": 76.0
+	  },
+	  {
+	   "UpThreshold": 84,
+	   "DownThreshold": 80,
+	   "FanSpeed": 85.0
+	  },
+	  {
+	   "UpThreshold": 88,
+	   "DownThreshold": 83,
+	   "FanSpeed": 94.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 86,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 21,
+	 "WriteRegister": 58,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 5660,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 50,
+	 "FanDisplayName": "GPU fan (RTX 3060 Mobile)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 40,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 42,
+	   "DownThreshold": 40,
+	   "FanSpeed": 22.0
+	  },
+	  {
+	   "UpThreshold": 44,
+	   "DownThreshold": 41,
+	   "FanSpeed": 24.0
+	  },
+	  {
+	   "UpThreshold": 48,
+	   "DownThreshold": 43,
+	   "FanSpeed": 26.0
+	  },
+	  {
+	   "UpThreshold": 52,
+	   "DownThreshold": 46,
+	   "FanSpeed": 28.0
+	  },
+	  {
+	   "UpThreshold": 54,
+	   "DownThreshold": 50,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 58,
+	   "DownThreshold": 53,
+	   "FanSpeed": 34.0
+	  },
+	  {
+	   "UpThreshold": 62,
+	   "DownThreshold": 56,
+	   "FanSpeed": 38.0
+	  },
+	  {
+	   "UpThreshold": 64,
+	   "DownThreshold": 60,
+	   "FanSpeed": 42.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 63,
+	   "FanSpeed": 46.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 66,
+	   "FanSpeed": 52.0
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 70,
+	   "FanSpeed": 59.0
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 73,
+	   "FanSpeed": 67.0
+	  },
+	  {
+	   "UpThreshold": 82,
+	   "DownThreshold": 76,
+	   "FanSpeed": 76.0
+	  },
+	  {
+	   "UpThreshold": 84,
+	   "DownThreshold": 80,
+	   "FanSpeed": 86.0
+	  },
+	  {
+	   "UpThreshold": 88,
+	   "DownThreshold": 83,
+	   "FanSpeed": 96.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 86,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 34,
+	 "Value": 92,
+	 "ResetRequired": true,
+	 "ResetValue": 84,
+	 "ResetWriteMode": "Set",
+	 "Description": "CPU fan manual mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 33,
+	 "Value": 112,
+	 "ResetRequired": true,
+	 "ResetValue": 80,
+	 "ResetWriteMode": "Set",
+	 "Description": "GPU fan manual mode"
+	},
+	// Disable messing with Coolboost (whihch doesnt exist in this model)
+	// {
+	//  "WriteMode": "Set",
+	//  "WriteOccasion": "OnInitialization",
+	//  "Register": 16,
+	//  "Value": 1,
+	//  "ResetRequired": true,
+	//  "ResetValue": 1,
+	//  "ResetWriteMode": "Set",
+	//  "Description": "CoolBoost off"
+	// }
+ ]
+}
