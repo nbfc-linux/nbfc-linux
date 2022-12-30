@@ -1,5 +1,3 @@
-#!/bin/bash
-
 _nbfc_service() {
   local cur prev words cword split args w
   _init_completion -s || return
