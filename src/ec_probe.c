@@ -170,6 +170,7 @@ static int va_find_string(const char* needle, ...) {
 
 int main(int argc, char* const argv[]) {
   options.interval = 500;
+  ec = &EC_SysLinux_VTable;
   enum Command cmd = Command_Help;
 
   cli99 p;
@@ -231,7 +232,6 @@ int main(int argc, char* const argv[]) {
   Error* e = NULL;
   signal(SIGINT,  Handle_Signal);
   signal(SIGTERM, Handle_Signal);
-  ec = &EC_SysLinux_VTable;
   e = ec->Open();
   e_die();
 
