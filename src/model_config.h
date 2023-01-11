@@ -54,9 +54,9 @@ typedef char                          Boolean;
 
 #endif /* packed enums */
 
-#include "macros.h" // model_config.generated.h
-#include "nxjson.h" // model_config.generated.h
-#include "error.h"  // model_config.generated.h
+#include "macros.h" // for model_config.generated.h
+#include "nxjson.h" // for model_config.generated.h
+#include "error.h"  // for model_config.generated.h
 #include "generated/model_config.generated.h"
 
 Error* Config_Validate(Config*);

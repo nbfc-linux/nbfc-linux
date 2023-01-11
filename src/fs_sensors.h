@@ -1,7 +1,7 @@
 #ifndef NBFC_FS_SENSORS_H_
 #define NBFC_FS_SENSORS_H_
 
-#include "nbfc.h"
+#include "sensors.h"
 
 Error* FS_Sensors_Init();
 void   FS_Sensors_Cleanup();

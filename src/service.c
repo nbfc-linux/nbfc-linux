@@ -23,7 +23,7 @@ static Config            model_config;
 static Sensor_VTable*    sensor;
 static TemperatureFilter temp_filter;
 static array_of(Fan)     fans;
-static int               Service_Initialized;
+static bool              service_initialized;
 
 static Error* ApplyRegisterWriteConfig(int, uint8_t, RegisterWriteMode);
 static Error* ApplyRegisterWriteConfgurations(bool);
@@ -108,7 +108,7 @@ Error* Service_Init() {
     default: _exit(0);
     }
 
-  Service_Initialized = 1;
+  service_initialized = 1;
   return err_success();
 }
 
@@ -164,7 +164,7 @@ void Service_Error(Error* e) {
   if (++failures >= 100) {
     e_warn();
     fprintf(stderr, "We tried %d times, exiting now...\n", failures);
-    exit(1);
+    exit(NBFC_EXIT_FAILURE);
   }
 
   usleep(10000);
@@ -246,7 +246,7 @@ static Error* ApplyRegisterWriteConfgurations(bool initializing) {
 
 void Service_Cleanup() {
   Info_Close();
-  if (Service_Initialized)
+  if (service_initialized)
     if (ec) {
       ResetEC();
       ec->Close();

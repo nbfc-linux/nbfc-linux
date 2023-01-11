@@ -1,12 +1,7 @@
 #ifndef NBFC_SERVICE_CONFIG_H_
 #define NBFC_SERVICE_CONFIG_H_
 
-#include <stdbool.h>
-
-#include "nbfc.h"
-#include "nxjson.h"
-#include "macros.h"
-#include "error.h"
+#include "model_config.h"
 
 extern ServiceConfig service_config;
 

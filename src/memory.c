@@ -1,6 +1,7 @@
 #include "memory.h"
 
 #include "macros.h" // ARRAY_SSIZE
+#include "nbfc.h"
 
 #include <errno.h>  // errno
 #include <stdlib.h> // malloc
@@ -11,7 +12,7 @@ Memory MemoryTemp;
 
 static inline void Memory_FatalError(const char* cause) {
   fprintf(stderr, "%s: %s\n", cause, strerror(errno));
-  exit(5);
+  exit(NBFC_EXIT_FATAL);
 }
 
 void Memory_AddPool(Memory* mem, char* buffer, size_t size) {

@@ -1,7 +1,6 @@
 #ifndef NBFC_INFO_H_
 #define NBFC_INFO_H_
 
-#include "model_config.h"
 #include "error.h"
 #include "fan.h"
 

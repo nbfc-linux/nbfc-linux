@@ -2,6 +2,8 @@
 
 #include "macros.h"
 #include "memory.h"
+#include "nbfc.h"
+#include "slurp_file.h"
 
 #include <string.h>
 #include <stdio.h>

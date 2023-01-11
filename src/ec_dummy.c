@@ -1,6 +1,5 @@
 #include "ec_dummy.h"
 
-#include "error.h"
 #include "memory.h"
 
 static uint16_t* EC_Dummy_FakeRegisters;

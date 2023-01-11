@@ -1,11 +1,7 @@
 #ifndef EC_LINUX_H_
 #define EC_LINUX_H_
 
-#include <stdint.h>
-#include <stdbool.h>
-
-#include "nbfc.h"
-#include "error.h"
+#include "ec.h"
 
 extern EC_VTable EC_Linux_VTable;
 

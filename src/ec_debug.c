@@ -1,6 +1,6 @@
 #include "ec_debug.h"
 
-#include "error.h"
+#include <stdio.h>
 
 EC_VTable* EC_Debug_Controller;
 

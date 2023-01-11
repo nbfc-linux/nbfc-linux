@@ -1,13 +1,11 @@
 #include "fan.h"
 
-#include "nbfc.h"
 #include "error.h"
+#include "ec.h"
 
 #include <math.h>
 
-// ============================================================================
-// CONSTRUCTOR
-// ============================================================================
+extern EC_VTable* ec;
 
 Error* Fan_Init(Fan* self, FanConfiguration* cfg, int criticalTemperature, bool readWriteWords) {
   my.fanConfig            = cfg;

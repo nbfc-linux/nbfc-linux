@@ -1,6 +1,8 @@
 #ifndef NBFC_STRINGBUF_H_
 #define NBFC_STRINGBUF_H_
 
+#include <stdio.h>
+
 typedef struct StringBuf StringBuf;
 struct StringBuf {
   char* s;

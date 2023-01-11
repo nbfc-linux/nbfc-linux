@@ -1,4 +1,6 @@
+#include "error.h"
 #include "generated/client.help.h"
+#include "macros.h"
 #include "nbfc.h"
 #include "nxjson.c"
 #include "nxjson.h"

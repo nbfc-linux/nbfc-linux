@@ -1,7 +1,7 @@
 #ifndef NBFC_LM_SENSORS_H_
 #define NBFC_LM_SENSORS_H_
 
-#include "nbfc.h"
+#include "sensors.h"
 
 Error* LM_Sensors_Init();
 void   LM_Sensors_Cleanup();

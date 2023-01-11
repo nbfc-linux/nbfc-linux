@@ -37,7 +37,7 @@ static void LM_Sensors_parse_error_wfn(const char* err, const char* filename, in
 
 static void LM_Sensors_fatal_error(const char* proc, const char* err) {
   fprintf(stderr, "Fatal error in `%s': %s\n", proc, err);
-  exit(2);
+  exit(NBFC_EXIT_FATAL);
 }
 
 Error* LM_Sensors_Init(FILE* fh) {

@@ -1,7 +1,5 @@
 ﻿#include "ec_linux.h"
 
-#include "error.h"
-
 #include <unistd.h>
 #include <stdbool.h>
 #include <endian.h>

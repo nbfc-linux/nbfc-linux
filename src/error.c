@@ -1,6 +1,7 @@
 #include "error.h"
 
 #include "stringbuf.h"
+#include "nxjson.h"
 
 #include <stdio.h>
 #include <stdlib.h>

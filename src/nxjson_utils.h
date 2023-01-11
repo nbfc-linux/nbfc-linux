@@ -6,8 +6,10 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#include "nbfc.h"
+#include "error.h"
+#include "memory.h"
 #include "nxjson.h"
+#include "slurp_file.h"
 
 #define nx_json_for_each(VAR, OBJECT) \
   for (const nx_json* VAR = OBJECT->val.children.first; VAR; VAR = VAR->next)
