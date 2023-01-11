@@ -1,7 +1,5 @@
 #include "ec_sys_linux.h"
 
-#include "error.h"
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <endian.h>
@@ -76,7 +74,7 @@ static inline Error* EC_SysLinux_LoadKernelModule() {
   switch (system(EC_SysLinux_Module_Cmd)) {
   case 0:  return err_success();
   case -1: return err_stdlib(0, "system");
-  default: return err_string(0, "Could not load `ec_sys' kernel module");
+  default: return err_string(0, "Could not execute `" EC_SysLinux_Module_Cmd "'");
   }
 }
 
