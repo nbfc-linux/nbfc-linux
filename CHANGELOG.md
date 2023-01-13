@@ -22,3 +22,6 @@
 - Added CHANGELOG.md
 - Added --version flags to all programs
 - Added pre-commit hook
+
+## nbfc-linux-0.1.7 (2013-01-13)
+- ec\_probe now respects the --embedded-controller option
