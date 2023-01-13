@@ -1,0 +1,141 @@
+{
+ "NotebookModel": "Gigabyte",
+ "Author": "Jinglin",
+ "EcPollInterval": 500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 179,
+	 "WriteRegister": 176,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 229,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 22,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 40,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 30,
+	   "FanSpeed": 17.90393
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 24.4541473
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 63,
+	   "FanSpeed": 30.5676842
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 67,
+	   "FanSpeed": 65.065506
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 77,
+	   "FanSpeed": 85.58952
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 180,
+	 "WriteRegister": 177,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 229,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 22,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "GPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 40,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 30,
+	   "FanSpeed": 17.90393
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 24.4541473
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 63,
+	   "FanSpeed": 30.5676842
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 67,
+	   "FanSpeed": 65.065506
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 77,
+	   "FanSpeed": 85.58952
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Or",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 13,
+	 "Value": 128,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set custom mode on"
+	},
+	{
+	 "WriteMode": "Or",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 6,
+	 "Value": 16,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Fix mode"
+	},
+	{
+	 "WriteMode": "And",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 8,
+	 "Value": 191,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "No eco"
+	}
+ ]
+}

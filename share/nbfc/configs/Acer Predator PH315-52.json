@@ -1,0 +1,111 @@
+{
+ "NotebookModel": "Acer Predator PH315-52",
+ "Author": "R. H. Manoa",
+ "EcPollInterval": 100,
+ "ReadWriteWords": true,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 112,
+	 "WriteRegister": 219,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 4500,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 50,
+	 "FanDisplayName": "CPU fan (INTEL i7-9750H)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 41,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 61,
+	   "FanSpeed": 95.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 71,
+	   "FanSpeed": 95.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 92,
+	 "WriteRegister": 221,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 5000,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 50,
+	 "FanDisplayName": "GPU fan (RTX 2060 Mobile)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 41,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 61,
+	   "FanSpeed": 95.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 71,
+	   "FanSpeed": 95.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 34,
+	 "Value": 12,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "CPU fan manual mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 33,
+	 "Value": 48,
+	 "ResetRequired": true,
+	 "ResetValue": 16,
+	 "ResetWriteMode": "Set",
+	 "Description": "GPU fan manual mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 245,
+	 "Value": 0,
+	 "ResetRequired": true,
+	 "ResetValue": 1,
+	 "ResetWriteMode": "Set",
+	 "Description": "CoolBoost off"
+	}
+ ]
+}

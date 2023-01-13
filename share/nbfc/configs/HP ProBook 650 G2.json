@@ -36,8 +36,13 @@
 	 "FanSpeedPercentageOverrides": [
 	  {
 	   "FanSpeedPercentage": 0.0,
-	   "FanSpeedValue": 255,
+	   "FanSpeedValue": 254,
 	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 255,
+	   "TargetOperation": "Read"
 	  }
 	 ]
 	}
