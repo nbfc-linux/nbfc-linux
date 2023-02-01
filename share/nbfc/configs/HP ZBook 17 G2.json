@@ -1,0 +1,97 @@
+{
+ "NotebookModel": "HP ZBook 17 G2",
+ "Author": "fdeh75",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 46,
+	 "WriteRegister": 47,
+	 "MinSpeedValue": 87,
+	 "MaxSpeedValue": 35,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 47,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 47,
+	   "FanSpeed": 5.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 50,
+	   "FanSpeed": 8.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 55,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 63,
+	   "FanSpeed": 15.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 55,
+	   "FanSpeed": 25.0
+	  },
+	  {
+	   "UpThreshold": 69,
+	   "DownThreshold": 59,
+	   "FanSpeed": 40.384613
+	  },
+	  {
+	   "UpThreshold": 71,
+	   "DownThreshold": 65,
+	   "FanSpeed": 65.38461
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 75,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 255,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 34,
+	 "Value": 1,
+	 "ResetRequired": true,
+	 "ResetValue": 1,
+	 "ResetWriteMode": "Set",
+	 "Description": "Select thermal zone"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 38,
+	 "Value": 28,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Fake thermal zone temperature"
+	}
+ ]
+}
