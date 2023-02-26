@@ -199,12 +199,14 @@ static Error* SetupEC(EmbeddedControllerType ec_type) {
 static Error* ResetEC() {
   Error* e, *r = NULL;
 
-  e_try_n(3, ResetRegisterWriteConfigs());
-  if (e) r = e;
-
-  for_each_array(Fan*, f, fans) {
-    e_try_n(3, Fan_ECReset(f));
+  for (int tries = 3; tries; tries--) {
+    e = ResetRegisterWriteConfigs();
     if (e) r = e;
+
+    for_each_array(Fan*, f, fans) {
+      e = Fan_ECReset(f);
+      if (e) r = e;
+    }
   }
 
   return r;
