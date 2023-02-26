@@ -1,4 +1,4 @@
-/* Auto generated code ['../tools/config.py', 'source'] */
+/* Auto generated code ['../../tools/config.py', 'source'] */
 
 struct TemperatureThreshold TemperatureThreshold_Unset = {
 	short_Unset,
@@ -210,7 +210,7 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 		self->TemperatureThresholds = Config_DefaultTemperatureThresholds;
 
 	if (self->FanSpeedPercentageOverrides.data == NULL)
-		return err_string(err_string(0, "FanSpeedPercentageOverrides"), "Missing option");
+		self->FanSpeedPercentageOverrides = Config_DefaultFanSpeedPercentageOverrides;
 	return err_success();
 }
 

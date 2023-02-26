@@ -1,4 +1,4 @@
-/* Auto generated code ['../tools/config.py', 'header'] */
+/* Auto generated code ['./tools/config.py', 'header'] */
 
 struct TemperatureThreshold {
 	short           UpThreshold;

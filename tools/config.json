@@ -142,7 +142,8 @@
     "FanSpeedPercentageOverrides": {
       "type": "array_of(FanSpeedPercentageOverride)",
       "unset": "{NULL, 0}",
-      "is_unset": "$1.data == NULL"
+      "is_unset": "$1.data == NULL",
+      "default": "Config_DefaultFanSpeedPercentageOverrides"
     }
   },
 

@@ -1,8 +1,10 @@
 #!/usr/bin/python3 -B
 
+import sys, os, json, config, argparse
+
 def default_temperature_thresholds():
-    defaults = """
-          [{
+    return [
+	  {
 	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
@@ -31,11 +33,7 @@ def default_temperature_thresholds():
 	   "UpThreshold": 71,
 	   "DownThreshold": 67,
 	   "FanSpeed": 100.0
-	  }]"""
-
-    return json.loads(defaults)
-
-import sys, os, json, config, argparse
+	  }]
 
 argp = argparse.ArgumentParser()
 argp.add_argument('--out-dir', default='.')
@@ -62,17 +60,17 @@ for infile in opts.infile:
 
             if not thresholds:
                 thresholds = default_temperature_thresholds()
-            if thresholds:
-                thresholds.sort(key=lambda x: x['UpThreshold'])
 
-                for i in range(len(thresholds)-1):
-                    thresholds[i]['UpThreshold'] = thresholds[i+1]['UpThreshold']
-                thresholds[-1]['UpThreshold'] = p['CriticalTemperature']
+            thresholds.sort(key=lambda x: x['UpThreshold'])
 
-                #if thresholds[0]['UpThreshold'] == 0:
-                #    raise Exception('UpThreshold of 0 detected.')
+            for i in range(len(thresholds)-1):
+                thresholds[i]['UpThreshold'] = thresholds[i+1]['UpThreshold']
+            thresholds[-1]['UpThreshold'] = p['CriticalTemperature']
 
-                fan_configuration['TemperatureThresholds'] = thresholds
+            #if thresholds[0]['UpThreshold'] == 0:
+            #    raise Exception('UpThreshold of 0 detected.')
+
+            fan_configuration['TemperatureThresholds'] = thresholds
 
         s = json.dumps(p, indent=1)
         s = s.replace('\n  ', '\n\t')
