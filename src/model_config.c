@@ -223,12 +223,6 @@ Error* Config_Validate(Config* c) {
         goto err;
       }
 
-      if (t->UpThreshold == 0) {
-        e = err_string(0, "UpThreshold must be greater than 0.\nFor information "
-          "on how NBFC Linux differs to the original NBFC, consult the README");
-        goto err;
-      }
-
       for_each_array(TemperatureThreshold*, t1, f->TemperatureThresholds) {
         if (t != t1 && t->UpThreshold == t1->UpThreshold) {
           e = err_string(0, "Duplicate UpThreshold");
@@ -238,6 +232,7 @@ Error* Config_Validate(Config* c) {
     }
     t = NULL;
 
+    /* TODO: print a warning
     if (! has_0_FanSpeed) {
       e = err_string(0, "No threshold with FanSpeed == 0 found");
       goto err;
@@ -247,6 +242,7 @@ Error* Config_Validate(Config* c) {
       e = err_string(0, "No threshold with FanSpeed == 100 found");
       goto err;
     }
+    */
   }
 
 err:
