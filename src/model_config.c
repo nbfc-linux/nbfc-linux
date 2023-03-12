@@ -105,6 +105,7 @@ static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* v, const n
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
   else if (!strcmp(s, "ec_sys_linux")) *v = EmbeddedControllerType_ECSysLinux;
+  else if (!strcmp(s, "ec_acpi"))      *v = EmbeddedControllerType_ECSysLinuxACPI;
   else if (!strcmp(s, "ec_linux"))     *v = EmbeddedControllerType_ECLinux;
   else if (!strcmp(s, "dummy"))        *v = EmbeddedControllerType_ECDummy;
   else return err_string(0, "Invalid value for EmbeddedControllerType");
@@ -257,14 +258,14 @@ err:
         r - c->RegisterWriteConfigurations.data);
   }
   else if (f) {
-    StringBuf_Printf(&s, "FanConfigurations[%td]: ",
+    StringBuf_Printf(&s, "FanConfigurations[%td]",
         f - c->FanConfigurations.data);
 
     if (o)
-      StringBuf_Printf(&s, "FanSpeedPercentageOverrides[%td]",
+      StringBuf_Printf(&s, ": FanSpeedPercentageOverrides[%td]",
         o - f->FanSpeedPercentageOverrides.data);
     else if (t)
-      StringBuf_Printf(&s, "TemperatureThresholds[%td]",
+      StringBuf_Printf(&s, ": TemperatureThresholds[%td]",
         t - f->TemperatureThresholds.data);
   }
 

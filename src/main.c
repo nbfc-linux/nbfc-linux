@@ -51,6 +51,7 @@ static void parse_opts(int argc, char* const argv[]) {
       /**/ if (! strcmp(p.optarg, "dummy"))        options.embedded_controller_type = EmbeddedControllerType_ECDummy;
       else if (! strcmp(p.optarg, "ec_linux"))     options.embedded_controller_type = EmbeddedControllerType_ECLinux;
       else if (! strcmp(p.optarg, "ec_sys_linux")) options.embedded_controller_type = EmbeddedControllerType_ECSysLinux;
+      else if (! strcmp(p.optarg, "ec_acpi"))      options.embedded_controller_type = EmbeddedControllerType_ECSysLinuxACPI;
       else {
         fprintf(stderr, "Invalid value for %s: %s\n", p.optopt, p.optarg);
         exit(NBFC_EXIT_CMDLINE);

@@ -36,7 +36,7 @@ Installation
   - [On NixOS](nixos-installation.md)
 
 - In general:
-  - `make && sudo make install`
+  - `make PREFIX=/usr confdir=/etc && sudo make PREFIX=/usr confdir=/etc install`
 
 Getting started
 ---------------
@@ -83,9 +83,7 @@ The preferred way of running nbfc is using the `ECSysLinux` implementation, whic
 There is also an alternative implementation which uses `/dev/port`, called `ec_linux`.
 It can be specified on the commandline using `--embedded-controller=ec_linux` and permanently set in `/etc/nbfc/nbfc.json` with `"EmbeddedControllerType": "ec_linux"`.
 
-Many Linux distributions do not provide the `ec_sys` module, and the module should be compiled manually. Alternatively, the [`acpi_ec`](https://github.com/MusiKid/acpi_ec) module can be used. The `acpi_ec` module comes with a DKMS config script, which automatically rebuilds the `acpi_ec` module when a new kernel is installed and supports running NBFC with Secure Boot and Lockdown Kernel. To compile with the `acpi_ec` module, use the command:
-
-`make EMBEDDED_CONTROLLER=acpi_ec`
+Many Linux distributions do not provide the `ec_sys` module, and the module should be compiled manually. Alternatively, the [`acpi_ec`](https://github.com/MusiKid/acpi_ec) module can be used. The `acpi_ec` module comes with a DKMS config script, which automatically rebuilds the `acpi_ec` module when a new kernel is installed and supports running NBFC with Secure Boot and Lockdown Kernel. NBFC-Linux will try to use the `acpi_ec` module if available.
 
 Shell autocompletion
 --------------------

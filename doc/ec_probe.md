@@ -11,7 +11,7 @@ Probing tool for embedded controllers
   `-h, --help`
     show this help message and exit
 
-  `-e, --embedded-controller EC [ec_linux, ec_sys_linux]`
+  `-e, --embedded-controller EC [ec_linux, ec_sys_linux, ec_acpi]`
     Specify embedded controller to use
 
 ### dump

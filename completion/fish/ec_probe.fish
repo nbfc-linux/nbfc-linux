@@ -1,5 +1,5 @@
 complete -c ec_probe -s h -l help -d 'show this help message and exit'
-complete -c ec_probe -x -s e -l embedded-controller -d 'Specify embedded controller to use' -a 'ec_linux ec_sys_linux'
+complete -c ec_probe -x -s e -l embedded-controller -d 'Specify embedded controller to use' -a 'ec_linux ec_sys_linux ec_acpi'
 # command dump
 complete -c ec_probe -f -n 'not __fish_seen_subcommand_from dump monitor read write' -d 'Dump all EC registers' -a dump
 complete -c ec_probe -n '__fish_seen_subcommand_from dump' -s h -l help -d 'show this help message and exit'

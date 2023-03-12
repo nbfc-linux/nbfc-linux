@@ -38,7 +38,7 @@ static inline Error* nx_json_parse_file(const nx_json** out, const char* file) {
   char buf[16384];
   int len = slurp_file(buf, sizeof(buf) - 1, file);
   if (len < 0)
-    return err_stdlib(0, file);
+    return err_stdlib(0, NULL);
 
   char* tmp = Temp_Strdup(buf);
 

@@ -8,7 +8,7 @@ _nbfc_service() {
     '(--debug -d)'{--debug,-d}'[Enable tracing of reads and writes of the embedded controller]'::'()'\
     '(--config-file -c)'{--config-file=,-c+}'[Use alternative config file (default /etc/nbfc/nbfc.json)]':config:_files\
     '(--state-file -s)'{--state-file=,-s+}'[Write state to an alternative file (default /var/run/nbfc_service.state.json)]':'state.json':_files\
-    '(--embedded-controller -e)'{--embedded-controller=,-e+}'[Specify embedded controller to use]':EC:'(dummy ec_linux ec_sys_linux)'
+    '(--embedded-controller -e)'{--embedded-controller=,-e+}'[Specify embedded controller to use]':EC:'(dummy ec_linux ec_sys_linux ec_acpi)'
 }
 
 _nbfc_service "$@"

@@ -1,227 +1,267 @@
-{
-  "TemperatureThreshold": {
-    "_help": "Defines how fast the fan runs at different temperatures",
-
-    "UpThreshold": {
-      "type": "short",
-      "help": "NBFC will select the next upper threshold as soon as the temperature exceeds *UpThreshold*. in celsius"
-    },
-    "DownThreshold": {
-      "type": "short",
-      "help": "NBFC will select the next lower threshold as soon as the temperature falls below the *DownThreshold*. in celsius"
-    },
-    "FanSpeed": {
-      "type": "float",
-      "valid": "parameter >= 0.0 && parameter <= 100.0",
-      "help": "The fan speed in percent"
-    }
+[
+  {
+    "name": "TemperatureThreshold",
+    "help": "Defines how fast the fan runs at different temperatures",
+    "fields": [
+      {
+        "name": "UpThreshold",
+        "type": "short",
+        "help": "NBFC will select the next upper threshold as soon as the temperature exceeds *UpThreshold*. in celsius"
+      },
+      {
+        "name": "DownThreshold",
+        "type": "short",
+        "help": "NBFC will select the next lower threshold as soon as the temperature falls below the *DownThreshold*. in celsius"
+      },
+      {
+        "name": "FanSpeed",
+        "type": "float",
+        "valid": "parameter >= 0.0 && parameter <= 100.0",
+        "help": "The fan speed in percent"
+      }
+    ]
+  },
+  {
+    "name": "FanSpeedPercentageOverride",
+    "help": "Overrides the default algorithm to calculate fan speeds",
+    "fields": [
+      {
+        "name": "FanSpeedPercentage",
+        "type": "float",
+        "valid": "parameter >= 0.0 && parameter <= 100.0",
+        "help": "The fan speed in percent"
+      },
+      {
+        "name": "FanSpeedValue",
+        "type": "short",
+        "help": "Fan fan speed value which will be written to WriteRegister"
+      },
+      {
+        "name": "TargetOperation",
+        "type": "OverrideTargetOperation",
+        "default": "OverrideTargetOperation_ReadWrite",
+        "help": "Defines for which operations the speeds should be overridden:\n\n- Read: Value->Percentage\n- Write: Percentage->Value\n- ReadWrite: both"
+      }
+    ]
   },
 
 
-  "FanSpeedPercentageOverride": {
-    "_help": "Overrides the default algorithm to calculate fan speeds",
-
-    "FanSpeedPercentage": {
-      "type": "float",
-      "valid": "parameter >= 0.0 && parameter <= 100.0",
-      "help": "The fan speed in percent"
-    },
-    "FanSpeedValue": {
-      "type": "short",
-      "help": "Fan fan speed value which will be written to WriteRegister"
-    },
-    "TargetOperation": {
-      "type": "OverrideTargetOperation",
-      "default": "OverrideTargetOperation_ReadWrite",
-      "help": "Defines for which operations the speeds should be overridden:\n\n- Read: Value->Percentage\n- Write: Percentage->Value\n- ReadWrite: both"
-    }
+  {
+    "name": "RegisterWriteConfiguration",
+    "help": "Allows to write to any EC register",
+    "fields": [
+      {
+        "name": "WriteMode",
+        "type": "RegisterWriteMode",
+        "default": "RegisterWriteMode_Set",
+        "help": "Defines how the value will be written:\n\n- And: register = register bitwise_and value\n- Or: register = register bitwise_or value\n- Set register = value\n"
+      },
+      {
+        "name": "WriteOccasion",
+        "type": "RegisterWriteOccasion",
+        "default": "RegisterWriteOccasion_OnInitialization",
+        "help": "Defines when the value should be written:\n\n- OnInitialization: writes the value once upon initialization (everytimee the fan control service is enabled or a config is applied)\n- OnWriteFanSpeed: writes the value everytimee the fan speed is set.\n"
+      },
+      {
+        "name": "Register",
+        "type": "short",
+        "help": "The register which will be manipulated.",
+        "valid": "parameter >= 0 && parameter <= 255"
+      },
+      {
+        "name": "Value",
+        "type": "short",
+        "help": "The Value which will be written"
+      },
+      {
+        "name": "ResetRequired",
+        "type": "Boolean",
+        "default": "Boolean_False",
+        "help": "Defines if the register should be reset before the service is shut down."
+      },
+      {
+        "name": "ResetValue",
+        "type": "short",
+        "help": "The value which will be written upon reset."
+      },
+      {
+        "name": "ResetWriteMode",
+        "type": "RegisterWriteMode",
+        "default": "RegisterWriteMode_Set",
+        "help": "See WriteMode. Will only be applied on reset. Valid values: Set/And/Or"
+      },
+      {
+        "name": "Description",
+        "type": "const char*",
+        "default": "\"\"",
+        "help": "A short description of what effect the RegisterWriteConfiguration will have"
+      }
+    ]
   },
-
-
-  "RegisterWriteConfiguration": {
-    "_help": "Allows to write to any EC register",
-
-    "WriteMode": {
-      "type": "RegisterWriteMode",
-      "default": "RegisterWriteMode_Set",
-      "help": "Defines how the value will be written:\n\n- And: register = register bitwise_and value\n- Or: register = register bitwise_or value\n- Set register = value\n"
-    },
-    "WriteOccasion": {
-      "type": "RegisterWriteOccasion",
-      "default": "RegisterWriteOccasion_OnInitialization",
-      "help": "Defines when the value should be written:\n\n- OnInitialization: writes the value once upon initialization (everytimee the fan control service is enabled or a config is applied)\n- OnWriteFanSpeed: writes the value everytimee the fan speed is set.\n"
-    },
-    "Register": {
-      "type": "short",
-      "help": "The register which will be manipulated.",
-      "valid": "parameter >= 0 && parameter <= 255"
-    },
-    "Value": {
-      "type": "short",
-      "help": "The Value which will be written"
-    },
-    "ResetRequired": {
-      "type": "Boolean",
-      "default": "Boolean_False",
-      "help": "Defines if the register should be reset before the service is shut down."
-    },
-    "ResetValue": {
-      "type": "short",
-      "help": "The value which will be written upon reset."
-    },
-    "ResetWriteMode": {
-      "type": "RegisterWriteMode",
-      "default": "RegisterWriteMode_Set",
-      "help": "See WriteMode. Will only be applied on reset. Valid values: Set/And/Or"
-    },
-    "Description": {
-      "type": "const char*",
-      "default": "\"\"",
-      "help": "A short description of what effect the RegisterWriteConfiguration will have"
-    }
+  {
+    "name": "FanConfiguration",
+    "help": "Defines how NBFC controls a fan",
+    "fields": [
+      {
+        "name": "FanDisplayName",
+        "type": "const char*",
+        "default": "\"\"",
+        "help": "Fan display name"
+      },
+      {
+        "name": "ReadRegister",
+        "type": "short",
+        "valid": "parameter >= 0 && parameter <= 255",
+        "help": "The register from which NBFC reads the fan speed."
+      },
+      {
+        "name": "WriteRegister",
+        "type": "short",
+        "valid": "parameter >= 0 && parameter <= 255",
+        "help": "The register which NBFC uses to control the fan"
+      },
+      {
+        "name": "MinSpeedValue",
+        "type": "short",
+        "help": "The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if ReadWriteWords is `true`. Note: MinSpeedValue does not necessarily have to be smaller than MaxSpeedValue"
+      },
+      {
+        "name": "MaxSpeedValue",
+        "type": "short",
+        "help": "The value which puts the fan to the highest possible fan speed."
+      },
+      {
+        "name": "MinSpeedValueRead",
+        "type": "short",
+        "default": 0,
+        "help": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
+      },
+      {
+        "name": "MaxSpeedValueRead",
+        "type": "short",
+        "default": 0,
+        "help": "The value which  corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
+      },
+      {
+        "name": "IndependentReadMinMaxValues",
+        "type": "Boolean",
+        "default": "Boolean_False",
+        "help": "Defines if independent minimum/maximum values should be applied for read operations"
+      },
+      {
+        "name": "ResetRequired",
+        "type": "Boolean",
+        "default": "Boolean_False",
+        "help": "Defines if the EC should be reset before the service is shut down."
+      },
+      {
+        "name": "FanSpeedResetValue",
+        "type": "short",
+        "default": 0,
+        "help": "Defines the value which will be written to WriteRegister to reset the EC."
+      },
+      {
+        "name": "TemperatureThresholds",
+        "type": "array_of(TemperatureThreshold)",
+        "unset": "{NULL, 0}",
+        "is_unset": "parameter.data == NULL",
+        "default": "Config_DefaultTemperatureThresholds"
+      },
+      {
+        "name": "FanSpeedPercentageOverrides",
+        "type": "array_of(FanSpeedPercentageOverride)",
+        "unset": "{NULL, 0}",
+        "is_unset": "parameter.data == NULL",
+        "default": "Config_DefaultFanSpeedPercentageOverrides"
+      }
+    ]
   },
-
-
-  "FanConfiguration": {
-    "_help": "Defines how NBFC controls a fan",
-
-    "FanDisplayName": {
-      "type": "const char*",
-      "default": "\"\"",
-      "help": "Fan display name"
-    },
-    "ReadRegister": {
-      "type": "short",
-      "valid": "parameter >= 0 && parameter <= 255",
-      "help": "The register from which NBFC reads the fan speed."
-    },
-    "WriteRegister": {
-      "type": "short",
-      "valid": "parameter >= 0 && parameter <= 255",
-      "help": "The register which NBFC uses to control the fan"
-    },
-    "MinSpeedValue": {
-      "type": "short",
-      "help": "The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if ReadWriteWords is `true`. Note: MinSpeedValue does not necessarily have to be smaller than MaxSpeedValue"
-    },
-    "MaxSpeedValue": {
-      "type": "short",
-      "help": "The value which puts the fan to the highest possible fan speed."
-    },
-    "MinSpeedValueRead": {
-      "type": "short",
-      "default": 0,
-      "help": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
-    },
-    "MaxSpeedValueRead": {
-      "type": "short",
-      "default": 0,
-      "help": "The value which  corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
-    },
-    "IndependentReadMinMaxValues": {
-      "type": "Boolean",
-      "default": "Boolean_False",
-      "help": "Defines if independent minimum/maximum values should be applied for read operations"
-    },
-    "ResetRequired": {
-      "type": "Boolean",
-      "default": "Boolean_False",
-      "help": "Defines if the EC should be reset before the service is shut down."
-    },
-    "FanSpeedResetValue": {
-      "type": "short",
-      "default": 0,
-      "help": "Defines the value which will be written to WriteRegister to reset the EC."
-    },
-    "TemperatureThresholds": {
-      "type": "array_of(TemperatureThreshold)",
-      "unset": "{NULL, 0}",
-      "is_unset": "$1.data == NULL",
-      "default": "Config_DefaultTemperatureThresholds"
-    },
-    "FanSpeedPercentageOverrides": {
-      "type": "array_of(FanSpeedPercentageOverride)",
-      "unset": "{NULL, 0}",
-      "is_unset": "$1.data == NULL",
-      "default": "Config_DefaultFanSpeedPercentageOverrides"
-    }
+  {
+    "name": "Config",
+    "help": "",
+    "fields": [
+      {
+        "name": "NotebookModel",
+        "type": "const char*",
+        "help": "The Notebook Model as described in your BIOS. See `sudo dmidecode -s system-product-name`."
+      },
+      {
+        "name": "Author",
+        "type": "const char*",
+        "default": "\"\"",
+        "help": "The Author of the config file. Enter whatever you want."
+      },
+      {
+        "name": "EcPollInterval",
+        "type": "short",
+        "default": "3000",
+        "valid": "parameter > 0",
+        "help": "Defines how often NBFC polls the EC for changes (in miliseconds)."
+      },
+      {
+        "name": "CriticalTemperature",
+        "type": "short",
+        "default": "75",
+        "help": "If the temperature exceeds this threshold, NBFC will ignore all Temperature threshold elements and set the fan to 100% speed until the temperature drops below (`CriticalTemperature` - `CriticalTemperatureOffset`)"
+      },
+      {
+        "name": "CriticalTemperatureOffset",
+        "type": "short",
+        "default": "15",
+        "valid": "parameter > 0",
+        "help": "See `CriticalTemperature`"
+      },
+      {
+        "name": "ReadWriteWords",
+        "type": "Boolean",
+        "help": "If `true`, NBFC will combine two 8 bit registers to one 16-bit register when reading from or writing to the EC registers.",
+        "default": "Boolean_False"
+      },
+      {
+        "name": "FanConfigurations",
+        "type": "array_of(FanConfiguration)",
+        "unset": "{NULL, 0}",
+        "is_unset": "parameter.data == NULL",
+        "valid": "parameter.size > 0",
+        "help": "Array of at least one FanConfiguration"
+      },
+      {
+        "name": "RegisterWriteConfigurations",
+        "type": "array_of(RegisterWriteConfiguration)",
+        "unset": "{NULL, 0}",
+        "is_unset": "parameter.data == NULL",
+        "help": "Array of RegisterWriteConfiguration"
+      }
+    ]
   },
-
-
-  "Config": {
-    "_help": "",
-
-    "NotebookModel": {
-      "type": "const char*",
-      "help": "The Notebook Model as described in your BIOS. See `sudo dmidecode -s system-product-name`."
-    },
-    "Author": {
-      "type": "const char*",
-      "default": "\"\"",
-      "help": "The Author of the config file. Enter whatever you want."
-    },
-    "EcPollInterval": {
-      "type": "short",
-      "default": "3000",
-      "valid": "parameter > 0",
-      "help": "Defines how often NBFC polls the EC for changes (in miliseconds)."
-    },
-    "CriticalTemperature": {
-      "type": "short",
-      "default": "75",
-      "help": "If the temperature exceeds this threshold, NBFC will ignore all Temperature threshold elements and set the fan to 100% speed until the temperature drops below (`CriticalTemperature` - `CriticalTemperatureOffset`)"
-    },
-    "CriticalTemperatureOffset": {
-      "type": "short",
-      "default": "15",
-      "valid": "parameter > 0",
-      "help": "See `CriticalTemperature`"
-    },
-    "ReadWriteWords": {
-      "type": "Boolean",
-      "help": "If `true`, NBFC will combine two 8 bit registers to one 16-bit register when reading from or writing to the EC registers.",
-      "default": "Boolean_False"
-    },
-    "FanConfigurations": {
-      "type": "array_of(FanConfiguration)",
-      "unset": "{NULL, 0}",
-      "is_unset": "$1.data == NULL",
-      "valid": "parameter.size > 0",
-      "help": "Array of at least one FanConfiguration"
-    },
-    "RegisterWriteConfigurations": {
-      "type": "array_of(RegisterWriteConfiguration)",
-      "unset": "{NULL, 0}",
-      "is_unset": "$1.data == NULL",
-      "help": "Array of RegisterWriteConfiguration"
-    }
-  },
-
-  "ServiceConfig": {
-    "_help": "Main configuration file of nbfc_service",
-
-    "SelectedConfigId": {
-      "type": "const char*",
-      "help": "The selected config model. This equals the basename of a notebook model configuration file."
-    },
-
-    "ReadOnly": {
-      "type": "Boolean",
-      "help": "If `true`, fan speeds will not be written to the embedded controller",
-      "default": "Boolean_False"
-    },
-
-    "EmbeddedControllerType": {
-      "type": "EmbeddedControllerType",
-      "help": "Either `ECSysLinux` for using the `ec_sys` kernel module, or `ECLinux` for an alternative implementation using `/dev/port` without depending on kernel modules.",
-      "default": "EmbeddedControllerType_ECSysLinux"
-    },
-
-    "TargetFanSpeeds": {
-      "type": "array_of(float)",
-      "help": "This holds the fixed speed of the fans. A value of `-1` means the fan should be left in auto mode.",
-      "unset": "{NULL, 0}",
-      "is_unset": "false"
-    }
+  {
+    "name": "ServiceConfig",
+    "help": "Main configuration file of nbfc_service",
+    "fields": [
+      {
+        "name": "SelectedConfigId",
+        "type": "const char*",
+        "help": "The selected config model. This equals the basename of a notebook model configuration file."
+      },
+      {
+        "name": "ReadOnly",
+        "type": "Boolean",
+        "help": "If `true`, fan speeds will not be written to the embedded controller",
+        "default": "Boolean_False"
+      },
+      {
+        "name": "EmbeddedControllerType",
+        "type": "EmbeddedControllerType",
+        "help": "Either `ECSysLinux` for using the `ec_sys` kernel module, or `ECLinux` for an alternative implementation using `/dev/port` without depending on kernel modules.",
+        "default": "EmbeddedControllerType_ECSysLinux"
+      },
+      {
+        "name": "TargetFanSpeeds",
+        "type": "array_of(float)",
+        "help": "This holds the fixed speed of the fans. A value of `-1` means the fan should be left in auto mode.",
+        "unset": "{NULL, 0}",
+        "is_unset": "false"
+      }
+    ]
   }
-}
+]

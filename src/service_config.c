@@ -31,6 +31,7 @@ Error* ServiceConfig_Init(const char* file) {
   for_each_array(float*, f, service_config.TargetFanSpeeds) {
     if (*f > 100.00f) {
       e = err_string(0, "TargetFanSpeed > 100");
+      e = err_string(e, file);
       return e;
     }
   }

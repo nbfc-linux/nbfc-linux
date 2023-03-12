@@ -168,9 +168,41 @@ static int va_find_string(const char* needle, ...) {
   return -1;
 }
 
+static bool TestEC(EC_VTable* ec) {
+  Error* e = ec->Open();
+  if (e)
+    return false;
+
+  uint8_t byte;
+  e = ec->ReadByte(0, &byte);
+  ec->Close();
+  return !e;
+}
+
+static Error* FindEC() {
+  Error* e;
+
+  if (TestEC(&EC_SysLinux_VTable)) {
+    ec = &EC_SysLinux_VTable;
+    return err_success();
+  }
+
+  if (TestEC(&EC_SysLinux_ACPI_VTable)) {
+    ec = &EC_SysLinux_ACPI_VTable;
+    return err_success();
+  }
+
+  if (TestEC(&EC_Linux_VTable)) {
+    ec = &EC_Linux_VTable;
+    return err_success();
+  }
+
+  return err_string(0, "No working implementation found for reading the embedded controller");
+}
+
 int main(int argc, char* const argv[]) {
   options.interval = 500;
-  ec = &EC_SysLinux_VTable;
+  ec = NULL;
   enum Command cmd = Command_Help;
 
   cli99 p;
@@ -201,6 +233,7 @@ int main(int argc, char* const argv[]) {
     case -'d':  options.decimal  = 1;                    break;
     case -'v':  options.verbose  = 1;                    break;
     case -'e':  if (!strcmp("ec_sys_linux", p.optarg))   ec = &EC_SysLinux_VTable;
+                else if (!strcmp("ec_acpi", p.optarg))   ec = &EC_SysLinux_ACPI_VTable;
                 else if (!strcmp("ec_linux", p.optarg))  ec = &EC_Linux_VTable;
                 else die(NBFC_EXIT_CMDLINE, "Invalid value: %s\n", p.optarg);
                 break;
@@ -232,6 +265,12 @@ int main(int argc, char* const argv[]) {
   Error* e = NULL;
   signal(SIGINT,  Handle_Signal);
   signal(SIGTERM, Handle_Signal);
+
+  if (ec == NULL) {
+    e = FindEC();
+    e_die();
+  }
+
   e = ec->Open();
   e_die();
 

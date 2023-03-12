@@ -3,7 +3,7 @@
 _ec_probe() {
   _arguments \
     '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
-    '(--embedded-controller -e)'{--embedded-controller=,-e+}'[Specify embedded controller to use]':EC:'(ec_linux ec_sys_linux)'\
+    '(--embedded-controller -e)'{--embedded-controller=,-e+}'[Specify embedded controller to use]':EC:'(ec_linux ec_sys_linux ec_acpi)'\
     :command:"(('dump\\:Dump all EC registers' 'read\\:Read a byte from a EC register' 'write\\:Write a byte to a EC register' 'monitor\\:Monitor all EC registers for changes'))"\
     '*::arg:->args'
   for w in $line; do

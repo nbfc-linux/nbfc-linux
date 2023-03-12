@@ -37,7 +37,7 @@ OPTIONS
   `-s, --state-file state.json`
     Write state to an alternative file (default /var/run/nbfc_service.state.json)
 
-  `-e, --embedded-controller EC [dummy, ec_linux, ec_sys_linux]`
+  `-e, --embedded-controller EC [dummy, ec_linux, ec_sys_linux, ec_acpi]`
     Specify embedded controller to use
 
 

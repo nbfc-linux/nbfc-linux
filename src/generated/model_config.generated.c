@@ -1,4 +1,4 @@
-/* Auto generated code ['../../tools/config.py', 'source'] */
+/* Auto generated code ['./tools/config.py', 'source'] */
 
 struct TemperatureThreshold TemperatureThreshold_Unset = {
 	short_Unset,
@@ -8,15 +8,15 @@ struct TemperatureThreshold TemperatureThreshold_Unset = {
 
 Error* TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
 	if (self->UpThreshold == short_Unset)
-		return err_string(err_string(0, "UpThreshold"), "Missing option");
+		return err_string(0, "UpThreshold: Missing option");
 
 	if (self->DownThreshold == short_Unset)
-		return err_string(err_string(0, "DownThreshold"), "Missing option");
+		return err_string(0, "DownThreshold: Missing option");
 
 	if (self->FanSpeed == float_Unset)
-		return err_string(err_string(0, "FanSpeed"), "Missing option");
+		return err_string(0, "FanSpeed: Missing option");
 	else if (! (self->FanSpeed >= 0.0 && self->FanSpeed <= 100.0))
-		return err_string(err_string(0, "FanSpeed"), "requires: parameter >= 0.0 && parameter <= 100.0");
+		return err_string(0, "FanSpeed: requires: parameter >= 0.0 && parameter <= 100.0");
 	return err_success();
 }
 
@@ -50,12 +50,12 @@ struct FanSpeedPercentageOverride FanSpeedPercentageOverride_Unset = {
 
 Error* FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* self) {
 	if (self->FanSpeedPercentage == float_Unset)
-		return err_string(err_string(0, "FanSpeedPercentage"), "Missing option");
+		return err_string(0, "FanSpeedPercentage: Missing option");
 	else if (! (self->FanSpeedPercentage >= 0.0 && self->FanSpeedPercentage <= 100.0))
-		return err_string(err_string(0, "FanSpeedPercentage"), "requires: parameter >= 0.0 && parameter <= 100.0");
+		return err_string(0, "FanSpeedPercentage: requires: parameter >= 0.0 && parameter <= 100.0");
 
 	if (self->FanSpeedValue == short_Unset)
-		return err_string(err_string(0, "FanSpeedValue"), "Missing option");
+		return err_string(0, "FanSpeedValue: Missing option");
 
 	if (self->TargetOperation == OverrideTargetOperation_Unset)
 		self->TargetOperation = OverrideTargetOperation_ReadWrite;
@@ -103,18 +103,18 @@ Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* sel
 		self->WriteOccasion = RegisterWriteOccasion_OnInitialization;
 
 	if (self->Register == short_Unset)
-		return err_string(err_string(0, "Register"), "Missing option");
+		return err_string(0, "Register: Missing option");
 	else if (! (self->Register >= 0 && self->Register <= 255))
-		return err_string(err_string(0, "Register"), "requires: parameter >= 0 && parameter <= 255");
+		return err_string(0, "Register: requires: parameter >= 0 && parameter <= 255");
 
 	if (self->Value == short_Unset)
-		return err_string(err_string(0, "Value"), "Missing option");
+		return err_string(0, "Value: Missing option");
 
 	if (self->ResetRequired == Boolean_Unset)
 		self->ResetRequired = Boolean_False;
 
 	if (self->ResetValue == short_Unset)
-		return err_string(err_string(0, "ResetValue"), "Missing option");
+		return err_string(0, "ResetValue: Missing option");
 
 	if (self->ResetWriteMode == RegisterWriteMode_Unset)
 		self->ResetWriteMode = RegisterWriteMode_Set;
@@ -176,20 +176,20 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 		self->FanDisplayName = "";
 
 	if (self->ReadRegister == short_Unset)
-		return err_string(err_string(0, "ReadRegister"), "Missing option");
+		return err_string(0, "ReadRegister: Missing option");
 	else if (! (self->ReadRegister >= 0 && self->ReadRegister <= 255))
-		return err_string(err_string(0, "ReadRegister"), "requires: parameter >= 0 && parameter <= 255");
+		return err_string(0, "ReadRegister: requires: parameter >= 0 && parameter <= 255");
 
 	if (self->WriteRegister == short_Unset)
-		return err_string(err_string(0, "WriteRegister"), "Missing option");
+		return err_string(0, "WriteRegister: Missing option");
 	else if (! (self->WriteRegister >= 0 && self->WriteRegister <= 255))
-		return err_string(err_string(0, "WriteRegister"), "requires: parameter >= 0 && parameter <= 255");
+		return err_string(0, "WriteRegister: requires: parameter >= 0 && parameter <= 255");
 
 	if (self->MinSpeedValue == short_Unset)
-		return err_string(err_string(0, "MinSpeedValue"), "Missing option");
+		return err_string(0, "MinSpeedValue: Missing option");
 
 	if (self->MaxSpeedValue == short_Unset)
-		return err_string(err_string(0, "MaxSpeedValue"), "Missing option");
+		return err_string(0, "MaxSpeedValue: Missing option");
 
 	if (self->MinSpeedValueRead == short_Unset)
 		self->MinSpeedValueRead = 0;
@@ -267,7 +267,7 @@ struct Config Config_Unset = {
 
 Error* Config_ValidateFields(Config* self) {
 	if (self->NotebookModel == str_Unset)
-		return err_string(err_string(0, "NotebookModel"), "Missing option");
+		return err_string(0, "NotebookModel: Missing option");
 
 	if (self->Author == str_Unset)
 		self->Author = "";
@@ -275,7 +275,7 @@ Error* Config_ValidateFields(Config* self) {
 	if (self->EcPollInterval == short_Unset)
 		self->EcPollInterval = 3000;
 	else if (! (self->EcPollInterval > 0))
-		return err_string(err_string(0, "EcPollInterval"), "requires: parameter > 0");
+		return err_string(0, "EcPollInterval: requires: parameter > 0");
 
 	if (self->CriticalTemperature == short_Unset)
 		self->CriticalTemperature = 75;
@@ -283,18 +283,18 @@ Error* Config_ValidateFields(Config* self) {
 	if (self->CriticalTemperatureOffset == short_Unset)
 		self->CriticalTemperatureOffset = 15;
 	else if (! (self->CriticalTemperatureOffset > 0))
-		return err_string(err_string(0, "CriticalTemperatureOffset"), "requires: parameter > 0");
+		return err_string(0, "CriticalTemperatureOffset: requires: parameter > 0");
 
 	if (self->ReadWriteWords == Boolean_Unset)
 		self->ReadWriteWords = Boolean_False;
 
 	if (self->FanConfigurations.data == NULL)
-		return err_string(err_string(0, "FanConfigurations"), "Missing option");
+		return err_string(0, "FanConfigurations: Missing option");
 	else if (! (self->FanConfigurations.size > 0))
-		return err_string(err_string(0, "FanConfigurations"), "requires: parameter.size > 0");
+		return err_string(0, "FanConfigurations: requires: parameter.size > 0");
 
 	if (self->RegisterWriteConfigurations.data == NULL)
-		return err_string(err_string(0, "RegisterWriteConfigurations"), "Missing option");
+		return err_string(0, "RegisterWriteConfigurations: Missing option");
 	return err_success();
 }
 
@@ -339,7 +339,7 @@ struct ServiceConfig ServiceConfig_Unset = {
 
 Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
 	if (self->SelectedConfigId == str_Unset)
-		return err_string(err_string(0, "SelectedConfigId"), "Missing option");
+		return err_string(0, "SelectedConfigId: Missing option");
 
 	if (self->ReadOnly == Boolean_Unset)
 		self->ReadOnly = Boolean_False;
@@ -348,7 +348,7 @@ Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
 		self->EmbeddedControllerType = EmbeddedControllerType_ECSysLinux;
 
 	if (false)
-		return err_string(err_string(0, "TargetFanSpeeds"), "Missing option");
+		return err_string(0, "TargetFanSpeeds: Missing option");
 	return err_success();
 }
 

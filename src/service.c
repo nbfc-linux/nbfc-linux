@@ -45,9 +45,13 @@ Error* Service_Init() {
     snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, service_config.SelectedConfigId);
     e = Config_FromFile(&model_config, path);
   }
-  e_check();
+
+  if (e)
+    return err_string(e, path);
+
   e = Config_Validate(&model_config);
-  e_check();
+  if (e)
+    return err_string(e, path);
 
   fans.size = model_config.FanConfigurations.size;
   fans.data = (Fan*) Mem_Calloc(fans.size, sizeof(Fan));
@@ -77,8 +81,11 @@ Error* Service_Init() {
     e = SetupEC(service_config.EmbeddedControllerType);
   else {
     e = SetupEC(EmbeddedControllerType_ECSysLinux);
-    if (e)
-      e = SetupEC(EmbeddedControllerType_ECLinux);
+    if (e) {
+      e = SetupEC(EmbeddedControllerType_ECSysLinuxACPI);
+      if (e)
+        e = SetupEC(EmbeddedControllerType_ECLinux);
+    }
   }
 
   e_check();
@@ -172,17 +179,21 @@ void Service_Error(Error* e) {
 
 static Error* SetupEC(EmbeddedControllerType ec_type) {
   switch (ec_type) {
+    case EmbeddedControllerType_ECSysLinuxACPI:
+      ec = &EC_SysLinux_ACPI_VTable;
+      fprintf(stderr, "Using 'ec_acpi' as EmbeddedControllerType\n");
+      break;
     case EmbeddedControllerType_ECSysLinux:
       ec = &EC_SysLinux_VTable;
-      fprintf(stderr, "Using 'ECSysLinux' as EmbeddedControllerType\n");
+      fprintf(stderr, "Using 'ec_sys_linux' as EmbeddedControllerType\n");
       break;
     case EmbeddedControllerType_ECLinux:
       ec = &EC_Linux_VTable;
-      fprintf(stderr, "Using 'ECLinux' as EmbeddedControllerType\n");
+      fprintf(stderr, "Using 'ec_linux' as EmbeddedControllerType\n");
       break;
     case EmbeddedControllerType_ECDummy:
       ec = &EC_Dummy_VTable;
-      fprintf(stderr, "Using 'Dummy' as EmbeddedControllerType\n");
+      fprintf(stderr, "Using 'dummy' as EmbeddedControllerType\n");
       break;
     case EmbeddedControllerType_Unset:
       abort();

@@ -27,6 +27,7 @@ enum NBFC_PACKED_ENUM OverrideTargetOperation_ {
 
 enum NBFC_PACKED_ENUM EmbeddedControllerType_ {
   EmbeddedControllerType_ECSysLinux,
+  EmbeddedControllerType_ECSysLinuxACPI,
   EmbeddedControllerType_ECLinux,
   EmbeddedControllerType_ECDummy,
   EmbeddedControllerType_Unset,

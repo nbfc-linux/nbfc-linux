@@ -10,11 +10,11 @@ def find_config_json():
 # =============================================================================
 
 class StructDefinition:
-    def __init__(self, name, fields, **optional):
+    def __init__(self, name, fields, help=""):
         self.name   = name
         self.type   = 'struct'
         self.fields = fields
-        self.help   = optional.get('help', "")
+        self.help   = help
 
     def __iter__(self):
         return iter(self.fields)
@@ -93,11 +93,6 @@ class CRegisterWriteMode(str):
     def parse(s):     return CRegisterWriteMode(s)
     def to_cpp(self): return "RegisterWriteMode_"+self
 
-# the `unset` attribute is C source - it does not fit in a real datatype
-class CUnsetValue(str):
-    def to_cpp(self):
-        return self
-
 # =============================================================================
 # Complex
 # =============================================================================
@@ -111,14 +106,21 @@ class Array(list):
         return '{%s}'% ',\n'.join(f.to_cpp() for f in self)
 
 with open(find_config_json(), 'r') as fh:
-    structs = json.load(fh, object_pairs_hook=OrderedDict)
+    definitions = json.load(fh)
+    structs = OrderedDict()
 
-    for struct_name, fields in structs.items():
-        new_fields = []
-        _help = fields.pop('_help', None)
-        for field_name, field in fields.items():
-            new_fields.append(FieldDefinition(field_name, field['type'], **field))
-        structs[struct_name] = StructDefinition(struct_name, new_fields, help=_help)
+    for struct in definitions:
+        fields = []
+        for field in struct['fields']:
+            fields.append(FieldDefinition(field['name'], field['type'], **field))
+        structs[struct['name']] = StructDefinition(struct['name'], fields, struct.get('help', ''))
+
+    #for struct_name, fields in structs.items():
+    #    new_fields = []
+    #    _help = fields.pop('_help', None)
+    #    for field_name, field in fields.items():
+    #        new_fields.append(FieldDefinition(field_name, field['type'], **field))
+    #    structs[struct_name] = StructDefinition(struct_name, new_fields, help=_help)
 
 # =============================================================================
 # XML Parsing
@@ -131,7 +133,7 @@ def xml_remove_comments(node):
             node.remove(n)
         xml_remove_comments(n)
 
-def handle_xml_node(node, definition, add_c_unset=False):
+def handle_xml_node(node, definition):
     if node.tag == 'FanControlConfigV2':
         pass # this is a exception
     elif node.tag != definition.name:
@@ -139,22 +141,16 @@ def handle_xml_node(node, definition, add_c_unset=False):
 
     if definition.type == 'struct':
         ret = Struct()
-        ret.type = definition.name
-
-        if add_c_unset:
-            for field in definition:
-                ret[field.name] = CUnsetValue(field.unset)
 
         for n in node:
-            ret[n.tag] = handle_xml_node(n, definition[n.tag], add_c_unset)
+            ret[n.tag] = handle_xml_node(n, definition[n.tag])
 
     elif definition.type.startswith('array_of('):
         definition = structs[definition.type.split('(')[1].strip(')')]
         ret = Array()
-        ret.type = definition.name
 
         for n in node:
-            ret.append(handle_xml_node(n, definition, add_c_unset))
+            ret.append(handle_xml_node(n, definition))
 
     else:
         ret = {
@@ -171,12 +167,12 @@ def handle_xml_node(node, definition, add_c_unset=False):
     return ret
 
 
-def parse_xml_file(file, add_unset=False):
+def parse_xml_file(file):
     from lxml import etree
     tree = etree.parse(file)
     root = tree.getroot()
     xml_remove_comments(root)
-    return handle_xml_node(root, structs['Config'], add_unset)
+    return handle_xml_node(root, structs['Config'])
 
 
 def write_header(fh):
@@ -214,14 +210,14 @@ def write_validate_fields(struct, fh):
     p(f'Error* {struct.name}_ValidateFields({struct.name}* self) {{', end='')
     for field in struct:
         if field.is_unset is not None:
-            is_unset = field.is_unset.replace('$1', f'self->{field.name}')
+            is_unset = field.is_unset.replace('parameter', f'self->{field.name}')
         else:
             is_unset = f'self->{field.name} == {field.unset}'
 
         if field.default is not None:
             set_or_throw = f'self->{field.name} = {field.default}'
         else:
-            set_or_throw = f'return err_string(err_string(0, "{field.name}"), "Missing option")'
+            set_or_throw = f'return err_string(0, "{field.name}: Missing option")'
 
         if field.valid is not None:
             is_valid = field.valid.replace('parameter', f'self->{field.name}')
@@ -231,7 +227,7 @@ def write_validate_fields(struct, fh):
         p(f'\t\t{set_or_throw};')
         if field.valid is not None:
             p(f'\telse if (! ({is_valid}))')
-            p(f'\t\treturn err_string(err_string(0, "{field.name}"), "requires: {field.valid}");')
+            p(f'\t\treturn err_string(0, "{field.name}: requires: {field.valid}");')
 
     p('\treturn err_success();')
     p('}\n')
