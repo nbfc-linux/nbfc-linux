@@ -35,7 +35,7 @@ static bool EC_Linux_WritePort(int port, uint8_t value)
 
 static bool EC_Linux_ReadPort(int port, uint8_t* out)
 {
-  return (1 != pread(EC_Linux_FD, out, 1, port));
+  return (1 == pread(EC_Linux_FD, out, 1, port));
 }
 
 /* ========================================================================== *
