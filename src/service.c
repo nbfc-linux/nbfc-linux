@@ -102,11 +102,10 @@ Error* Service_Init() {
   e = TemperatureFilter_Init(&temp_filter, model_config.EcPollInterval, NBFC_TEMPERATURE_FILTER_TIMESPAN);
   e_check();
 
-  if (options.read_only)
-    e = ResetEC();
-  else
+  if (! options.read_only) {
     e = ApplyRegisterWriteConfgurations(true);
-  e_check();
+    e_check();
+  }
 
   if (options.fork)
     switch (fork()) {
@@ -135,14 +134,15 @@ Error* Service_Loop() {
       e_warn();
 
     // Re-init if current fan speeds are off by more than 15%
-    if (fabs(Fan_GetCurrentSpeed(f) - Fan_GetTargetSpeed(f)) > 15)
+    if (fabs(Fan_GetCurrentSpeed(f) - Fan_GetTargetSpeed(f)) > 15) {
       re_init_required = true;
+
+      if (options.debug)
+        fprintf(stderr, "re_init_required = 1;\n");
+    }
   }
 
   if (! options.read_only) {
-    if (options.debug)
-      fprintf(stderr, "re_init_required = 1;\n");
-
     e = ApplyRegisterWriteConfgurations(re_init_required);
     e_warn();
   }
@@ -261,7 +261,8 @@ void Service_Cleanup() {
   Info_Close();
   if (service_initialized)
     if (ec) {
-      ResetEC();
+      if (! options.read_only)
+        ResetEC();
       ec->Close();
     }
   if (sensor)
