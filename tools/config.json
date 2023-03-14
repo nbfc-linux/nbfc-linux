@@ -33,8 +33,9 @@
       },
       {
         "name": "FanSpeedValue",
-        "type": "short",
-        "help": "Fan fan speed value which will be written to WriteRegister"
+        "type": "int",
+        "help": "Fan fan speed value which will be written to WriteRegister",
+        "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
         "name": "TargetOperation",
@@ -44,8 +45,6 @@
       }
     ]
   },
-
-
   {
     "name": "RegisterWriteConfiguration",
     "help": "Allows to write to any EC register",
@@ -70,8 +69,9 @@
       },
       {
         "name": "Value",
-        "type": "short",
-        "help": "The Value which will be written"
+        "type": "int",
+        "help": "The Value which will be written",
+        "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
         "name": "ResetRequired",
@@ -81,8 +81,9 @@
       },
       {
         "name": "ResetValue",
-        "type": "short",
-        "help": "The value which will be written upon reset."
+        "type": "int",
+        "help": "The value which will be written upon reset.",
+        "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
         "name": "ResetWriteMode",
@@ -122,25 +123,29 @@
       },
       {
         "name": "MinSpeedValue",
-        "type": "short",
-        "help": "The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if ReadWriteWords is `true`. Note: MinSpeedValue does not necessarily have to be smaller than MaxSpeedValue"
+        "type": "int",
+        "help": "The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if ReadWriteWords is `true`. Note: MinSpeedValue does not necessarily have to be smaller than MaxSpeedValue",
+        "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
         "name": "MaxSpeedValue",
-        "type": "short",
-        "help": "The value which puts the fan to the highest possible fan speed."
+        "type": "int",
+        "help": "The value which puts the fan to the highest possible fan speed.",
+        "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
         "name": "MinSpeedValueRead",
-        "type": "short",
+        "type": "int",
         "default": 0,
-        "help": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
+        "help": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`.",
+        "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
         "name": "MaxSpeedValueRead",
-        "type": "short",
+        "type": "int",
         "default": 0,
-        "help": "The value which  corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
+        "help": "The value which  corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`.",
+        "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
         "name": "IndependentReadMinMaxValues",
@@ -156,9 +161,10 @@
       },
       {
         "name": "FanSpeedResetValue",
-        "type": "short",
+        "type": "int",
         "default": 0,
-        "help": "Defines the value which will be written to WriteRegister to reset the EC."
+        "help": "Defines the value which will be written to WriteRegister to reset the EC.",
+        "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
         "name": "TemperatureThresholds",

@@ -12,7 +12,7 @@ Error* TemperatureThreshold_FromJson(TemperatureThreshold*, const nx_json*);
 
 struct FanSpeedPercentageOverride {
 	float           FanSpeedPercentage;
-	short           FanSpeedValue;
+	int             FanSpeedValue;
 	OverrideTargetOperation TargetOperation;
 };
 
@@ -24,9 +24,9 @@ struct RegisterWriteConfiguration {
 	RegisterWriteMode WriteMode;
 	RegisterWriteOccasion WriteOccasion;
 	short           Register;
-	short           Value;
+	int             Value;
 	Boolean         ResetRequired;
-	short           ResetValue;
+	int             ResetValue;
 	RegisterWriteMode ResetWriteMode;
 	const char*     Description;
 };
@@ -39,13 +39,13 @@ struct FanConfiguration {
 	const char*     FanDisplayName;
 	short           ReadRegister;
 	short           WriteRegister;
-	short           MinSpeedValue;
-	short           MaxSpeedValue;
-	short           MinSpeedValueRead;
-	short           MaxSpeedValueRead;
+	int             MinSpeedValue;
+	int             MaxSpeedValue;
+	int             MinSpeedValueRead;
+	int             MaxSpeedValueRead;
 	Boolean         IndependentReadMinMaxValues;
 	Boolean         ResetRequired;
-	short           FanSpeedResetValue;
+	int             FanSpeedResetValue;
 	array_of(TemperatureThreshold) TemperatureThresholds;
 	array_of(FanSpeedPercentageOverride) FanSpeedPercentageOverrides;
 };

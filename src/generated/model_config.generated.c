@@ -44,7 +44,7 @@ Error* TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* j
 
 struct FanSpeedPercentageOverride FanSpeedPercentageOverride_Unset = {
 	float_Unset,
-	short_Unset,
+	int_Unset,
 	OverrideTargetOperation_Unset,
 };
 
@@ -54,8 +54,10 @@ Error* FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* sel
 	else if (! (self->FanSpeedPercentage >= 0.0 && self->FanSpeedPercentage <= 100.0))
 		return err_string(0, "FanSpeedPercentage: requires: parameter >= 0.0 && parameter <= 100.0");
 
-	if (self->FanSpeedValue == short_Unset)
+	if (self->FanSpeedValue == int_Unset)
 		return err_string(0, "FanSpeedValue: Missing option");
+	else if (! (self->FanSpeedValue >= 0 && self->FanSpeedValue <= 65535))
+		return err_string(0, "FanSpeedValue: requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->TargetOperation == OverrideTargetOperation_Unset)
 		self->TargetOperation = OverrideTargetOperation_ReadWrite;
@@ -74,7 +76,7 @@ Error* FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, cons
 		else if (!strcmp(c->key, "FanSpeedPercentage"))
 			e = float_FromJson(&obj->FanSpeedPercentage, c);
 		else if (!strcmp(c->key, "FanSpeedValue"))
-			e = short_FromJson(&obj->FanSpeedValue, c);
+			e = int_FromJson(&obj->FanSpeedValue, c);
 		else if (!strcmp(c->key, "TargetOperation"))
 			e = OverrideTargetOperation_FromJson(&obj->TargetOperation, c);
 		else
@@ -88,9 +90,9 @@ struct RegisterWriteConfiguration RegisterWriteConfiguration_Unset = {
 	RegisterWriteMode_Unset,
 	RegisterWriteOccasion_Unset,
 	short_Unset,
-	short_Unset,
+	int_Unset,
 	Boolean_Unset,
-	short_Unset,
+	int_Unset,
 	RegisterWriteMode_Unset,
 	str_Unset,
 };
@@ -107,14 +109,18 @@ Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* sel
 	else if (! (self->Register >= 0 && self->Register <= 255))
 		return err_string(0, "Register: requires: parameter >= 0 && parameter <= 255");
 
-	if (self->Value == short_Unset)
+	if (self->Value == int_Unset)
 		return err_string(0, "Value: Missing option");
+	else if (! (self->Value >= 0 && self->Value <= 65535))
+		return err_string(0, "Value: requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->ResetRequired == Boolean_Unset)
 		self->ResetRequired = Boolean_False;
 
-	if (self->ResetValue == short_Unset)
+	if (self->ResetValue == int_Unset)
 		return err_string(0, "ResetValue: Missing option");
+	else if (! (self->ResetValue >= 0 && self->ResetValue <= 65535))
+		return err_string(0, "ResetValue: requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->ResetWriteMode == RegisterWriteMode_Unset)
 		self->ResetWriteMode = RegisterWriteMode_Set;
@@ -140,11 +146,11 @@ Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, cons
 		else if (!strcmp(c->key, "Register"))
 			e = short_FromJson(&obj->Register, c);
 		else if (!strcmp(c->key, "Value"))
-			e = short_FromJson(&obj->Value, c);
+			e = int_FromJson(&obj->Value, c);
 		else if (!strcmp(c->key, "ResetRequired"))
 			e = Boolean_FromJson(&obj->ResetRequired, c);
 		else if (!strcmp(c->key, "ResetValue"))
-			e = short_FromJson(&obj->ResetValue, c);
+			e = int_FromJson(&obj->ResetValue, c);
 		else if (!strcmp(c->key, "ResetWriteMode"))
 			e = RegisterWriteMode_FromJson(&obj->ResetWriteMode, c);
 		else if (!strcmp(c->key, "Description"))
@@ -160,13 +166,13 @@ struct FanConfiguration FanConfiguration_Unset = {
 	str_Unset,
 	short_Unset,
 	short_Unset,
-	short_Unset,
-	short_Unset,
-	short_Unset,
-	short_Unset,
+	int_Unset,
+	int_Unset,
+	int_Unset,
+	int_Unset,
 	Boolean_Unset,
 	Boolean_Unset,
-	short_Unset,
+	int_Unset,
 	{NULL, 0},
 	{NULL, 0},
 };
@@ -185,17 +191,25 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	else if (! (self->WriteRegister >= 0 && self->WriteRegister <= 255))
 		return err_string(0, "WriteRegister: requires: parameter >= 0 && parameter <= 255");
 
-	if (self->MinSpeedValue == short_Unset)
+	if (self->MinSpeedValue == int_Unset)
 		return err_string(0, "MinSpeedValue: Missing option");
+	else if (! (self->MinSpeedValue >= 0 && self->MinSpeedValue <= 65535))
+		return err_string(0, "MinSpeedValue: requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->MaxSpeedValue == short_Unset)
+	if (self->MaxSpeedValue == int_Unset)
 		return err_string(0, "MaxSpeedValue: Missing option");
+	else if (! (self->MaxSpeedValue >= 0 && self->MaxSpeedValue <= 65535))
+		return err_string(0, "MaxSpeedValue: requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->MinSpeedValueRead == short_Unset)
+	if (self->MinSpeedValueRead == int_Unset)
 		self->MinSpeedValueRead = 0;
+	else if (! (self->MinSpeedValueRead >= 0 && self->MinSpeedValueRead <= 65535))
+		return err_string(0, "MinSpeedValueRead: requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->MaxSpeedValueRead == short_Unset)
+	if (self->MaxSpeedValueRead == int_Unset)
 		self->MaxSpeedValueRead = 0;
+	else if (! (self->MaxSpeedValueRead >= 0 && self->MaxSpeedValueRead <= 65535))
+		return err_string(0, "MaxSpeedValueRead: requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->IndependentReadMinMaxValues == Boolean_Unset)
 		self->IndependentReadMinMaxValues = Boolean_False;
@@ -203,8 +217,10 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (self->ResetRequired == Boolean_Unset)
 		self->ResetRequired = Boolean_False;
 
-	if (self->FanSpeedResetValue == short_Unset)
+	if (self->FanSpeedResetValue == int_Unset)
 		self->FanSpeedResetValue = 0;
+	else if (! (self->FanSpeedResetValue >= 0 && self->FanSpeedResetValue <= 65535))
+		return err_string(0, "FanSpeedResetValue: requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->TemperatureThresholds.data == NULL)
 		self->TemperatureThresholds = Config_DefaultTemperatureThresholds;
@@ -230,19 +246,19 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 		else if (!strcmp(c->key, "WriteRegister"))
 			e = short_FromJson(&obj->WriteRegister, c);
 		else if (!strcmp(c->key, "MinSpeedValue"))
-			e = short_FromJson(&obj->MinSpeedValue, c);
+			e = int_FromJson(&obj->MinSpeedValue, c);
 		else if (!strcmp(c->key, "MaxSpeedValue"))
-			e = short_FromJson(&obj->MaxSpeedValue, c);
+			e = int_FromJson(&obj->MaxSpeedValue, c);
 		else if (!strcmp(c->key, "MinSpeedValueRead"))
-			e = short_FromJson(&obj->MinSpeedValueRead, c);
+			e = int_FromJson(&obj->MinSpeedValueRead, c);
 		else if (!strcmp(c->key, "MaxSpeedValueRead"))
-			e = short_FromJson(&obj->MaxSpeedValueRead, c);
+			e = int_FromJson(&obj->MaxSpeedValueRead, c);
 		else if (!strcmp(c->key, "IndependentReadMinMaxValues"))
 			e = Boolean_FromJson(&obj->IndependentReadMinMaxValues, c);
 		else if (!strcmp(c->key, "ResetRequired"))
 			e = Boolean_FromJson(&obj->ResetRequired, c);
 		else if (!strcmp(c->key, "FanSpeedResetValue"))
-			e = short_FromJson(&obj->FanSpeedResetValue, c);
+			e = int_FromJson(&obj->FanSpeedResetValue, c);
 		else if (!strcmp(c->key, "TemperatureThresholds"))
 			e = array_of_TemperatureThreshold_FromJson(&obj->TemperatureThresholds, c);
 		else if (!strcmp(c->key, "FanSpeedPercentageOverrides"))

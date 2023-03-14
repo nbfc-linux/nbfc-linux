@@ -31,8 +31,9 @@ class StructDefinition:
 class FieldDefinition:
     def __init__(self, name_, type_, **optional):
         type           = type_.replace('const char*', 'str')
-        type           = type.replace('(','_')
-        type           = type.replace(')','_')
+        type           = type.replace('(', '_')
+        type           = type.replace(')', '_')
+        type           = type.replace(' ', '_')
         type           = type.strip('_')
         self.name      = name_
         self.type      = type_
