@@ -2,37 +2,63 @@
 
 import sys, os, time, argparse, json
 
-# Unused - depends on `dmidecode` module
-#def dmidecode_py_get_system_product():
-#    import dmidecode
-#    r = dmidecode.system()
-#    def find_product(d):
-#        if type(d) is dict:
-#            for key, value in d.items():
-#                if key == 'Product Name':
-#                    return str(value, encoding='UTF-8')
-#                r = find_product(value)
-#                if r:
-#                    return r
-#        else:
-#            return None
-#    return find_product(r)
+DmiIdDirectoryPath = "/sys/devices/virtual/dmi/id"
 
 def check_root():
     if os.geteuid() != 0:
         raise Exception('This operation has to be run as root')
 
-def dmidecode_bin_get_system_product():
-    import subprocess
-
-    try:
-        proc = subprocess.Popen(['dmidecode', '-s', 'system-product-name'], stdout=subprocess.PIPE)
-        return str(proc.communicate()[0], encoding='UTF-8')
-    except FileNotFoundError:
-        raise Exception('Binary `dmidecode` not found. Make sure it is installed')
-
 def get_system_product():
-    return dmidecode_bin_get_system_product()
+    with open(DmiIdDirectoryPath + '/product_name', 'r') as fh:
+        return fh.read().strip()
+
+def get_system_vendor():
+    with open(DmiIdDirectoryPath + '/sys_vendor', 'r') as fh:
+        return fh.read().strip()
+
+def get_model_name():
+    vendor_aliases = { "Hewlett-Packard": "HP" }
+
+    product = get_system_product()
+    if not product:
+        raise Exception('Could not get product name')
+
+    vendor = get_system_vendor()
+    if not vendor:
+        raise Exception('Could not get system vendor')
+
+    vendor = vendor_aliases.get(vendor, vendor)
+
+    if not product.lower().startswith(vendor.lower()):
+        product = f"{vendor} {product}"
+
+    return product
+
+def get_longest_common_substrings(str1, str2):
+    if not str1 or not str2:
+        return []
+
+    lookup = [[0] * (len(str2) + 1) for _ in range(len(str1) + 1)]
+    max_len = 0
+    end_indices = []
+
+    for i in range(1, len(str1) + 1):
+        for j in range(1, len(str2) + 1):
+            if str1[i - 1] == str2[j - 1]:
+                lookup[i][j] = lookup[i - 1][j - 1] + 1
+                if lookup[i][j] > max_len:
+                    max_len = lookup[i][j]
+                    end_indices = [i]
+                elif lookup[i][j] == max_len:
+                    end_indices.append(i)
+
+    return [str1[end - max_len:end] for end in end_indices]
+
+def get_longest_common_substring(str1, str2):
+    lcs = get_longest_common_substrings(str1, str2)
+    if lcs:
+        return lcs[0]
+    return ""
 
 class NbfcService:
     CONFIG_DIR  = '@CONFDIR@/nbfc'
@@ -51,7 +77,7 @@ class NbfcService:
             print('Service already running:', pid)
             return 0
         except:
-            return os.system('nbfc_service -f%s' % ('-r' if readonly else ''))
+            return os.system('nbfc_service -f%s' % (' -r' if readonly else ''))
 
     def stop(self):
         import signal
@@ -67,34 +93,35 @@ class NbfcService:
     def list_configs(self):
         return os.listdir(self.CONFIGS_DIR)
 
-    def recommended_configs(self, product_name):
-        def word_difference(a, b):
-            a = a.lower()
-            b = b.lower()
-            if a == b: return 0
-            diff = 0
-            for a_c, b_c in zip(a, b):
-                diff += abs(ord(a_c) - ord(b_c))
-            return diff
+    def recommended_configs(self):
+        def get_similarity_index(model_name1, model_name2):
+            result = 0
+            model_name1 = model_name1.lower()
+            model_name2 = model_name2.lower()
 
-        def words_difference(a, b):
-            A = a.lower().split()
-            B = b.lower().split()
-            l = len(max(A, B))
-            diff = 0
-            for a, b in zip(A, B):
-                diff += word_difference(a, b)
-            diff /= l
-            return diff
+            for s1 in model_name1.split():
+                max_similarity = 0
 
-        product = get_system_product()
-        if not product:
-            raise Exception('Could not get product name')
+                for s2 in model_name2.split():
+                    lcs_length = len(get_longest_common_substring(s1, s2))
+
+                    if lcs_length < 2:
+                        continue
+
+                    similarity = lcs_length / max(len(s1), len(s2))
+                    max_similarity = max(max_similarity, similarity)
+
+                result += max_similarity
+
+            return result
+
+        model_name = get_model_name()
 
         files = os.listdir(self.CONFIGS_DIR)
         files = [os.path.splitext(f)[0] for f in files]
-        files = [(f, words_difference(product, f)) for f in files]
-        files.sort(key=lambda f: f[1])
+        files = [(f, get_similarity_index(model_name, f)) for f in files]
+        files = list(filter(lambda f: f[1] >= 1, files))
+        files.sort(key=lambda f: f[1], reverse=True)
         return files
 
     def get_status(self):
@@ -125,11 +152,11 @@ def config(opts):
 
     elif opts.recommend:
         check_root()
-        files = service.recommended_configs(get_system_product())
-        if len(files) and files[0][1] == 0:
+        files = service.recommended_configs()
+        if len(files) and files[0][0] == get_model_name():
             print(files[0][0])
         else:
-            for f in files[:15]:
+            for f in files:
                 print(f[0])
 
     elif opts.set or opts.apply:
@@ -138,11 +165,11 @@ def config(opts):
         model = opts.set if opts.set else opts.apply
 
         if model == 'auto':
-            files = service.recommended_configs(get_system_product())
-            if len(files) and files[0][1] == 0:
+            files = service.recommended_configs()
+            if len(files) and files[0][0] == get_model_name():
                 model = files[0][0]
             else:
-                raise Exception("Try `nbfc config -r` for recommended configs")
+                raise Exception(f"No configuration found for `{get_model_name()}`.\nTry `nbfc config -r` for recommended configs")
 
         cfg['SelectedConfigId'] = model
         service.set_config(cfg)
