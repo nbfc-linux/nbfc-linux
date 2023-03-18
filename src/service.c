@@ -19,7 +19,7 @@
 
 Service_Options options;
 
-static Config            model_config;
+static ModelConfig       model_config;
 static Sensor_VTable*    sensor;
 static TemperatureFilter temp_filter;
 static array_of(Fan)     fans;
@@ -39,17 +39,12 @@ Error* Service_Init() {
   fprintf(stderr, "Using '%s' as model config\n", service_config.SelectedConfigId);
 
   char* path = (char*)Temp_Malloc(PATH_MAX, 1);
-  snprintf(path, PATH_MAX, "./%s/%s.json", NBFC_CONFIGS_DIR, service_config.SelectedConfigId);
-  e = Config_FromFile(&model_config, path);
-  if (e) {
-    snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, service_config.SelectedConfigId);
-    e = Config_FromFile(&model_config, path);
-  }
-
+  snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, service_config.SelectedConfigId);
+  e = ModelConfig_FromFile(&model_config, path);
   if (e)
     return err_string(e, path);
 
-  e = Config_Validate(&model_config);
+  e = ModelConfig_Validate(&model_config);
   if (e)
     return err_string(e, path);
 

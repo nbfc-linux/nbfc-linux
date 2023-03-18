@@ -172,7 +172,7 @@ static array_of(FanSpeedPercentageOverride) Config_DefaultFanSpeedPercentageOver
 // Calls *_ValidateFields on each structure and does some validations
 // that cannot be auto-generated.
 
-Error* Config_Validate(Config* c) {
+Error* ModelConfig_Validate(ModelConfig* c) {
   Error* e = NULL;
   char buf[128];
   StringBuf s = { buf, 0, sizeof(buf) - 1 };
@@ -181,7 +181,7 @@ Error* Config_Validate(Config* c) {
   FanSpeedPercentageOverride* o = NULL;
   TemperatureThreshold*       t = NULL;
 
-  e = Config_ValidateFields(c);
+  e = ModelConfig_ValidateFields(c);
   e_goto(err);
 
   for_each_array(, r, c->RegisterWriteConfigurations) {
@@ -268,9 +268,9 @@ err:
   return err_string(e, Temp_Strdup(s.s));
 }
 
-Error* Config_FromFile(Config* config, const char* file) {
+Error* ModelConfig_FromFile(ModelConfig* config, const char* file) {
   const nx_json* js = NULL;
   Error* e = nx_json_parse_file(&js, file);
   e_check();
-  return Config_FromJson(config, js);
+  return ModelConfig_FromJson(config, js);
 }

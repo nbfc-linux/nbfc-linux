@@ -270,7 +270,7 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 	return err_success();
 }
 
-struct Config Config_Unset = {
+struct ModelConfig ModelConfig_Unset = {
 	str_Unset,
 	str_Unset,
 	short_Unset,
@@ -281,7 +281,7 @@ struct Config Config_Unset = {
 	{NULL, 0},
 };
 
-Error* Config_ValidateFields(Config* self) {
+Error* ModelConfig_ValidateFields(ModelConfig* self) {
 	if (self->NotebookModel == str_Unset)
 		return err_string(0, "NotebookModel: Missing option");
 
@@ -314,9 +314,9 @@ Error* Config_ValidateFields(Config* self) {
 	return err_success();
 }
 
-Error* Config_FromJson(Config* obj, const nx_json* json) {
+Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 	Error* e = NULL;
-	*obj = Config_Unset;
+	*obj = ModelConfig_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "not a JSON object");

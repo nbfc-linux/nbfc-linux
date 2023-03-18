@@ -54,7 +54,7 @@ typedef struct FanConfiguration FanConfiguration;
 declare_array_of(FanConfiguration);
 Error* FanConfiguration_FromJson(FanConfiguration*, const nx_json*);
 
-struct Config {
+struct ModelConfig {
 	const char*     NotebookModel;
 	const char*     Author;
 	short           EcPollInterval;
@@ -65,9 +65,9 @@ struct Config {
 	array_of(RegisterWriteConfiguration) RegisterWriteConfigurations;
 };
 
-typedef struct Config Config;
-declare_array_of(Config);
-Error* Config_FromJson(Config*, const nx_json*);
+typedef struct ModelConfig ModelConfig;
+declare_array_of(ModelConfig);
+Error* ModelConfig_FromJson(ModelConfig*, const nx_json*);
 
 struct ServiceConfig {
 	const char*     SelectedConfigId;

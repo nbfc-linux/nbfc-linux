@@ -183,7 +183,7 @@
     ]
   },
   {
-    "name": "Config",
+    "name": "ModelConfig",
     "help": "",
     "fields": [
       {

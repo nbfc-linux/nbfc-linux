@@ -60,7 +60,7 @@ typedef char                          Boolean;
 #include "error.h"  // for model_config.generated.h
 #include "generated/model_config.generated.h"
 
-Error* Config_Validate(Config*);
-Error* Config_FromFile(Config*, const char*);
+Error* ModelConfig_Validate(ModelConfig*);
+Error* ModelConfig_FromFile(ModelConfig*, const char*);
 
 #endif

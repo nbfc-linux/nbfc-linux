@@ -6,6 +6,6 @@
 
 Error* Info_Init(const char*);
 void   Info_Close();
-Error* Info_Write(Config*, float temperature, bool readonly, array_of(Fan)*);
+Error* Info_Write(ModelConfig*, float temperature, bool readonly, array_of(Fan)*);
 
 #endif

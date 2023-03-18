@@ -1,4 +1,4 @@
-NBFC\_SERVICE 1 "MARCH 2021" Notebook FanControl
+NBFC\_SERVICE 5 "MARCH 2021" Notebook FanControl
 ================================================
 
 NAME
@@ -25,8 +25,8 @@ Main configuration file of nbfc_service
 
 
 
-Config
-------
+ModelConfig
+-----------
 
 
 
@@ -70,16 +70,16 @@ Defines how NBFC controls a fan
 `"WriteRegister"`: *short >= 0 && short <= 255*
   The register which NBFC uses to control the fan
 
-`"MinSpeedValue"`: *short*
+`"MinSpeedValue"`: *int >= 0 && int <= 65535*
   The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if ReadWriteWords is `true`. Note: MinSpeedValue does not necessarily have to be smaller than MaxSpeedValue
 
-`"MaxSpeedValue"`: *short*
+`"MaxSpeedValue"`: *int >= 0 && int <= 65535*
   The value which puts the fan to the highest possible fan speed.
 
-`"MinSpeedValueRead"`: *short*
+`"MinSpeedValueRead"`: *int >= 0 && int <= 65535*
   The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`.
 
-`"MaxSpeedValueRead"`: *short*
+`"MaxSpeedValueRead"`: *int >= 0 && int <= 65535*
   The value which  corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`.
 
 `"IndependentReadMinMaxValues"`: *Boolean*
@@ -88,7 +88,7 @@ Defines how NBFC controls a fan
 `"ResetRequired"`: *Boolean*
   Defines if the EC should be reset before the service is shut down.
 
-`"FanSpeedResetValue"`: *short*
+`"FanSpeedResetValue"`: *int >= 0 && int <= 65535*
   Defines the value which will be written to WriteRegister to reset the EC.
 
 `"TemperatureThresholds"`: *array_of(TemperatureThreshold)*
@@ -122,13 +122,13 @@ Allows to write to any EC register
 `"Register"`: *short >= 0 && short <= 255*
   The register which will be manipulated.
 
-`"Value"`: *short*
+`"Value"`: *int >= 0 && int <= 65535*
   The Value which will be written
 
 `"ResetRequired"`: *Boolean*
   Defines if the register should be reset before the service is shut down.
 
-`"ResetValue"`: *short*
+`"ResetValue"`: *int >= 0 && int <= 65535*
   The value which will be written upon reset.
 
 `"ResetWriteMode"`: *RegisterWriteMode*
@@ -147,7 +147,7 @@ Overrides the default algorithm to calculate fan speeds
 `"FanSpeedPercentage"`: *float >= 0.0 && float <= 100.0*
   The fan speed in percent
 
-`"FanSpeedValue"`: *short*
+`"FanSpeedValue"`: *int >= 0 && int <= 65535*
   Fan fan speed value which will be written to WriteRegister
 
 `"TargetOperation"`: *OverrideTargetOperation*
@@ -192,8 +192,8 @@ AUTHOR
 
 Benjamin Abendroth (braph93@gmx.de)
 
-
 SEE ALSO
 --------
 
 [nbfc(1)](nbfc.md), [nbfc\_service(1)](nbfc_service.md), [ec\_probe(1)](ec_probe.md), fancontrol(1), sensors(1)
+

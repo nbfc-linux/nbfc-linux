@@ -6,7 +6,7 @@ def print_markdown(fh):
     p = lambda s: print(s, file=fh)
 
     p('''\
-NBFC\_SERVICE 1 "MARCH 2021" Notebook FanControl
+NBFC\_SERVICE 5 "MARCH 2021" Notebook FanControl
 ================================================
 
 NAME
@@ -38,7 +38,7 @@ FILES
 */etc/nbfc/nbfc.json*
   The system wide configuration file.
 
-*/etc/nbfc/configs/\*.json*
+*/usr/share/nbfc/configs/\*.json*
   Configuration files for various notebook models.
 
 AUTHOR
@@ -49,7 +49,7 @@ Benjamin Abendroth (braph93@gmx.de)
 SEE ALSO
 --------
 
-nbfc(1), nbfc\_service(1), ec_probe(1), fancontrol(1), sensors(1)
+[nbfc(1)](nbfc.md), [nbfc\_service(1)](nbfc_service.md), [ec\_probe(1)](ec_probe.md), fancontrol(1), sensors(1)
 ''')
 
 if __name__ == '__main__':

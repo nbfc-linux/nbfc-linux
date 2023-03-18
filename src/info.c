@@ -29,7 +29,7 @@ void Info_Close() {
   unlink(NBFC_PID_FILE);
 }
 
-Error* Info_Write(Config* cfg, float temperature, bool readonly, array_of(Fan)* fans) {
+Error* Info_Write(ModelConfig* cfg, float temperature, bool readonly, array_of(Fan)* fans) {
   static const char Bool_ToStr[2][6] = {"false","true"};
   const pid_t pid = getpid();
   char buf[256];
