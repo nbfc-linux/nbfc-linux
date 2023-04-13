@@ -1,0 +1,51 @@
+{
+ "NotebookModel": "HP Laptop 15s-fq5xxx",
+ "Author": "CarlosGS",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 177,
+	 "WriteRegister": 244,
+	 "MinSpeedValue": 51,
+	 "MaxSpeedValue": 64,
+	 "IndependentReadMinMaxValues": true,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 20,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 40,
+	   "FanSpeed": 1
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 50,
+	   "FanSpeed": 85
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 60,
+	   "FanSpeed": 100
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0,
+	   "FanSpeedValue": 2,
+	   "TargetOperation": "Write"
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": []
+}
