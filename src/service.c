@@ -10,10 +10,11 @@
 #include "memory.h"
 #include "macros.h"
 #include "info.h"
+#include "sleep.h"
 #include "model_config.h"
 
+#include <assert.h>
 #include <string.h> // memcpy
-#include <unistd.h> // usleep
 #include <math.h>   // fabs
 #include <linux/limits.h>
 
@@ -35,10 +36,12 @@ Error* Service_Init() {
   Error* e;
 
   e = ServiceConfig_Init(options.service_config);
-  e_check();
+  if (e)
+    return err_string(e, options.service_config);
+
   fprintf(stderr, "Using '%s' as model config\n", service_config.SelectedConfigId);
 
-  char* path = (char*)Temp_Malloc(PATH_MAX, 1);
+  static char path[PATH_MAX];
   snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, service_config.SelectedConfigId);
   e = ModelConfig_FromFile(&model_config, path);
   if (e)
@@ -158,7 +161,7 @@ void Service_Error(Error* e) {
   static int failures;
 
   if (! e) {
-    usleep(model_config.EcPollInterval * 1000);
+    sleep_ms(model_config.EcPollInterval);
     failures = 0;
     return;
   }
@@ -169,7 +172,7 @@ void Service_Error(Error* e) {
     exit(NBFC_EXIT_FAILURE);
   }
 
-  usleep(10000);
+  sleep_ms(10);
 }
 
 static Error* SetupEC(EmbeddedControllerType ec_type) {
@@ -191,7 +194,7 @@ static Error* SetupEC(EmbeddedControllerType ec_type) {
       fprintf(stderr, "Using 'dummy' as EmbeddedControllerType\n");
       break;
     case EmbeddedControllerType_Unset:
-      abort();
+      assert(!"Invalid value for ec_type");
   }
 
   if (options.debug) {
@@ -254,6 +257,8 @@ static Error* ApplyRegisterWriteConfgurations(bool initializing) {
 
 void Service_Cleanup() {
   Info_Close();
+  TemperatureFilter_Close(&temp_filter);
+  Mem_Free(fans.data);
   if (service_initialized)
     if (ec) {
       if (! options.read_only)

@@ -119,11 +119,10 @@ static Error* array_of_FromJson(FromJson_Callback callback, void** v_data, size_
   e_check();
 
   *v_size = 0;
-  *v_data = Mem_Malloc(json->val.children.length, size);
+  *v_data = Mem_Malloc(json->val.children.length * size);
   nx_json_for_each(child, json) {
     e = callback(((char*) *v_data) + size * *v_size, child);
     e_check();
-    //(*v_size)++;
     *v_size = *v_size + 1;
   }
   return err_success();
@@ -139,6 +138,7 @@ define_array_of_T_FromJson(TemperatureThreshold)
 define_array_of_T_FromJson(FanConfiguration)
 define_array_of_T_FromJson(FanSpeedPercentageOverride)
 define_array_of_T_FromJson(RegisterWriteConfiguration)
+define_array_of_T_FromJson(FanInfo)
 
 // ============================================================================
 // Default temperature thresholds
@@ -174,7 +174,7 @@ static array_of(FanSpeedPercentageOverride) Config_DefaultFanSpeedPercentageOver
 
 Error* ModelConfig_Validate(ModelConfig* c) {
   Error* e = NULL;
-  char buf[128];
+  static char buf[128];
   StringBuf s = { buf, 0, sizeof(buf) - 1 };
   RegisterWriteConfiguration* r = NULL;
   FanConfiguration*           f = NULL;
@@ -265,12 +265,15 @@ err:
         t - f->TemperatureThresholds.data);
   }
 
-  return err_string(e, Temp_Strdup(s.s));
+  return err_string(e, buf);
 }
 
 Error* ModelConfig_FromFile(ModelConfig* config, const char* file) {
+  char buf[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
-  Error* e = nx_json_parse_file(&js, file);
+  Error* e = nx_json_parse_file(&js, buf, sizeof(buf), file);
   e_check();
-  return ModelConfig_FromJson(config, js);
+  e = ModelConfig_FromJson(config, js);
+  nx_json_free(js);
+  return e;
 }

@@ -24,15 +24,10 @@ all: $(PROGS)
 install-core: $(CORE)
 	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
 	install -Dm 755 src/ec_probe      $(DESTDIR)$(bindir)/ec_probe
+	install -Dm 755 src/nbfc          $(DESTDIR)$(bindir)/nbfc
 
 nbfc.py: nbfc.py.in
 	sed 's:@CONFDIR@:'$(confdir)':; s:@DATADIR@:'$(sharedir)':' < $< >$@
-
-install-client-py:  nbfc.py
-	install -Dm 755 nbfc.py           $(DESTDIR)$(bindir)/nbfc
-
-install-client-c:   src/nbfc
-	install -Dm 755 src/nbfc          $(DESTDIR)$(bindir)/nbfc
 
 install-configs:
 	# /usr/local/etc/nbfc
@@ -69,9 +64,7 @@ install-completion:
 	cp completion/fish/nbfc_service.fish  $(DESTDIR)$(sharedir)/fish/completions/
 	cp completion/fish/ec_probe.fish      $(DESTDIR)$(sharedir)/fish/completions/
 
-install: install-core install-client-py install-configs install-systemd install-docs install-completion
-
-install-c: install-core install-client-c install-configs install-systemd install-docs install-completion
+install: install-core install-configs install-systemd install-docs install-completion
 
 uninstall:
 	# Binaries

@@ -15,24 +15,35 @@ ServiceConfig service_config = {
 };
 
 Error* ServiceConfig_Init(const char* file) {
+  char buf[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
-  Error* e = nx_json_parse_file(&js, file);
+  Error* e = nx_json_parse_file(&js, buf, sizeof(buf), file);
   if (e)
-    return err_string(e, file);
+    return e;
 
   e = ServiceConfig_FromJson(&service_config, js);
+  nx_json_free(js);
+
   if (e)
-    return err_string(e, file);
+    return e;
 
   e = ServiceConfig_ValidateFields(&service_config);
   if (e)
-    return err_string(e, file);
+    return e;
 
   for_each_array(float*, f, service_config.TargetFanSpeeds) {
-    if (*f > 100.00f) {
-      e = err_string(0, "TargetFanSpeed > 100");
+    if (*f > 100.0f) {
+      e = err_string(0, "TargetFanSpeeds: value cannot be greater than 100.0");
       e = err_string(e, file);
-      return e;
+      e_warn();
+      *f = 100.0f;
+    }
+
+    if (*f < 0.0f && *f != -1.0f) {
+      e = err_string(0, "TargetFanSpeeds: Please use `-1' for selecting auto mode");
+      e = err_string(e, file);
+      e_warn();
+      *f = -1.0f;
     }
   }
 

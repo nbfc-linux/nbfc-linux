@@ -6,34 +6,31 @@
 typedef struct StringBuf StringBuf;
 struct StringBuf {
   char* s;
-  int   size;
-  int   capacity;
+  int   size; // strlen, (not including '\0')
+  int   capacity; // including '\0'
 };
 
 #define StringBuf_Printf(S, ...) \
-  StringBuf_Increment((S), snprintf((S)->s + (S)->size, (S)->capacity, __VA_ARGS__))
+  StringBuf_Increment((S), snprintf((S)->s + (S)->size, (S)->capacity - (S)->size, __VA_ARGS__))
 
 static inline void StringBuf_AddCh(StringBuf* s, int c) {
-  if (s->capacity) {
-    s->s[s->size] = c;
-    s->size++;
-    s->capacity--;
+  if (s->size + 2 < s->capacity) {
+    s->s[s->size++] = c;
     s->s[s->size] = 0;
   }
 }
 
 static inline void StringBuf_Increment(StringBuf* s, int len) {
   if (len < 0) {
-    s->capacity = 0;
+    return; // -1 from printf
   }
-  else if (len > s->capacity) {
-    s->size += s->capacity;
-    s->capacity = 0;
+  else if (s->size + 1 + len > s->capacity) {
+    s->size = s->capacity - 1;
   }
   else {
     s->size += len;
-    s->capacity -= len;
   }
+
   s->s[s->size] = 0;
 }
 

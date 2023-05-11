@@ -17,5 +17,6 @@ struct TemperatureFilter {
 
 Error* TemperatureFilter_Init(TemperatureFilter*, int poll_interval, int timespan);
 float  TemperatureFilter_FilterTemperature(TemperatureFilter*, float temperature);
+void   TemperatureFilter_Close(TemperatureFilter*);
 
 #endif

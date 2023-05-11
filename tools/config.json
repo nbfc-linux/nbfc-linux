@@ -269,5 +269,74 @@
         "is_unset": "false"
       }
     ]
+  },
+  {
+    "name": "FanInfo",
+    "help": "",
+    "fields": [
+      {
+        "name": "name",
+        "type": "const char*",
+        "help": ""
+      },
+      {
+        "name": "automode",
+        "type": "Boolean",
+        "help": ""
+      },
+      {
+        "name": "critical",
+        "type": "Boolean",
+        "help": ""
+      },
+      {
+        "name": "current_speed",
+        "type": "float",
+        "help": ""
+      },
+      {
+        "name": "target_speed",
+        "type": "float",
+        "help": ""
+      },
+      {
+        "name": "speed_steps",
+        "type": "int",
+        "help": ""
+      }
+    ]
+  },
+  {
+    "name": "ServiceInfo",
+    "help": "",
+    "fields": [
+      {
+        "name": "pid",
+        "type": "int",
+        "help": ""
+      },
+      {
+        "name": "config",
+        "type": "const char*",
+        "help": ""
+      },
+      {
+        "name": "readonly",
+        "type": "Boolean",
+        "help": ""
+      },
+      {
+        "name": "temperature",
+        "type": "float",
+        "help": ""
+      },
+      {
+        "name": "fans",
+        "type": "array_of(FanInfo)",
+        "unset": "{NULL, 0}",
+        "is_unset": "parameter.data == NULL",
+        "help": ""
+      }
+    ]
   }
 ]

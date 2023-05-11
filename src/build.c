@@ -21,8 +21,8 @@
 #include "service.c"
 #include "service_config.c"
 
-#define NX_JSON_CALLOC(SIZE) ((nx_json*) Temp_Calloc(1, SIZE))
-#define NX_JSON_FREE(JSON)   ((void)0)
+#define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
+#define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 #include "nxjson.c"
 
 #include "optparse/optparse.c"

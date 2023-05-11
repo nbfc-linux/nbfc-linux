@@ -31,3 +31,11 @@ float TemperatureFilter_FilterTemperature(TemperatureFilter* self, float tempera
 
   return my.sum / (my.buffer_is_full ? my.ring_buffer.size : my.index);
 }
+
+void TemperatureFilter_Close(TemperatureFilter* self) {
+  if (my.ring_buffer.data) {
+    Mem_Free(my.ring_buffer.data);
+    my.ring_buffer.data = NULL;
+    my.ring_buffer.size = 0;
+  }
+}

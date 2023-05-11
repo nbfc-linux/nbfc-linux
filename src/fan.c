@@ -88,14 +88,20 @@ static Error* Fan_ECWriteValue(Fan* self, int value) {
 }
 
 static Error* Fan_ECReadValue(const Fan* self, int* out) {
-  union { uint8_t byte; uint16_t word; } val = {0};
-
-  Error* e = my.readWriteWords
-    ? ec->ReadWord(my.fanConfig->ReadRegister, &val.word)
-    : ec->ReadByte(my.fanConfig->ReadRegister, &val.byte);
-  if (! e)
-    *out = val.word;
-  return e;
+  if (my.readWriteWords) {
+    uint16_t word;
+    Error* e = ec->ReadWord(my.fanConfig->ReadRegister, &word);
+    if (!e)
+      *out = word;
+    return e;
+  }
+  else {
+    uint8_t byte;
+    Error* e = ec->ReadByte(my.fanConfig->ReadRegister, &byte);
+    if (!e)
+      *out = byte;
+    return e;
+  }
 }
 
 // ============================================================================
@@ -146,20 +152,22 @@ float Fan_GetCurrentSpeed(Fan* self) {
 }
 
 Error* Fan_UpdateCurrentSpeed(Fan* self) {
-  int speed = 0;
-  Error* e = err_success();
+  int speed;
 
   // If the value is out of range 3 or more times,
   // minFanSpeed and/or maxFanSpeed are probably wrong.
   for (range(int, i, 0, 3)) {
-    e = Fan_ECReadValue(self, &speed);
+    Error* e = Fan_ECReadValue(self, &speed);
+    if (e)
+      return e;
+
     if (speed >= my.minSpeedValueReadAbs && speed <= my.maxSpeedValueReadAbs) {
       break;
     }
   }
 
   my.currentSpeed = Fan_FanSpeedToPercentage(self, speed);
-  return e;
+  return err_success();
 }
 
 int Fan_GetSpeedSteps(Fan* self) {

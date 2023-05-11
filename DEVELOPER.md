@@ -38,33 +38,6 @@ struct Error {
 
 The return value of functions is either a pointer to `error_stack` or `NULL` (no error).
 
-### memory.c
-
-There are two memory pools:
-
-```
-  Memory MemoryMain;
-  Memory MemoryTemp;
-```
-
-Two kinds of macros are defined in memory.h:
-
-```
-#define Mem_AddPool(BUF, SIZE)  Memory_AddPool(&MemoryMain, BUF, SIZE)
-#define Mem_Malloc(NMEMB, SIZE) Memory_Malloc(&MemoryMain, NMEMB, SIZE)
-#define Mem_Calloc(NMEMB, SIZE) Memory_Calloc(&MemoryMain, NMEMB, SIZE)
-#define Mem_Strdup(CHARS)       Memory_Strdup(&MemoryMain, CHARS)
-
-#define Temp_Reset()             Memory_Reset(&MemoryTemp)
-#define Temp_AddPool(BUF, SIZE)  Memory_AddPool(&MemoryTemp, BUF, SIZE)
-#define Temp_Malloc(NMEMB, SIZE) Memory_Malloc(&MemoryTemp, NMEMB, SIZE)
-#define Temp_Calloc(NMEMB, SIZE) Memory_Calloc(&MemoryTemp, NMEMB, SIZE)
-#define Temp_Strdup(CHARS)       Memory_Strdup(&MemoryTemp, CHARS)
-```
-
-The Mem_-functions are for persistent allocations, the Temp_-functions are for
-temporary allocations. Those allocations are reset by `Temp_Reset` in the `Service_Loop`.
-
 ### OOP
 
 We use the `my` macro defined in `macros.h` as a shortcut for `(*self)`.

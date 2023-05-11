@@ -79,11 +79,6 @@ static void parse_opts(int argc, char* const argv[]) {
 
 int main(int argc, char* const argv[])
 {
-  char stack_buffer[16000];
-  char temp_buffer[16000];
-
-  Mem_AddPool(stack_buffer, sizeof(stack_buffer));
-  Temp_AddPool(temp_buffer, sizeof(temp_buffer));
   setlocale(LC_NUMERIC, "C"); // for json floats
   signal(SIGINT, sig_handler);
   signal(SIGTERM, sig_handler);
@@ -105,12 +100,9 @@ int main(int argc, char* const argv[])
   }
 
   while (!quit) {
-    Temp_Reset();
     Service_Error(Service_Loop());
   }
 
-  // Important! We dont *return* from main, because atexit(Service_Cleanup)
-  // needs access to `stack_buffer`.
-  exit(0);
+  return 0;
 }
 

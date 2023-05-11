@@ -80,3 +80,28 @@ typedef struct ServiceConfig ServiceConfig;
 declare_array_of(ServiceConfig);
 Error* ServiceConfig_FromJson(ServiceConfig*, const nx_json*);
 
+struct FanInfo {
+	const char*     name;
+	Boolean         automode;
+	Boolean         critical;
+	float           current_speed;
+	float           target_speed;
+	int             speed_steps;
+};
+
+typedef struct FanInfo FanInfo;
+declare_array_of(FanInfo);
+Error* FanInfo_FromJson(FanInfo*, const nx_json*);
+
+struct ServiceInfo {
+	int             pid;
+	const char*     config;
+	Boolean         readonly;
+	float           temperature;
+	array_of(FanInfo) fans;
+};
+
+typedef struct ServiceInfo ServiceInfo;
+declare_array_of(ServiceInfo);
+Error* ServiceInfo_FromJson(ServiceInfo*, const nx_json*);
+

@@ -392,3 +392,113 @@ Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 	return err_success();
 }
 
+struct FanInfo FanInfo_Unset = {
+	str_Unset,
+	Boolean_Unset,
+	Boolean_Unset,
+	float_Unset,
+	float_Unset,
+	int_Unset,
+};
+
+Error* FanInfo_ValidateFields(FanInfo* self) {
+	if (self->name == str_Unset)
+		return err_string(0, "name: Missing option");
+
+	if (self->automode == Boolean_Unset)
+		return err_string(0, "automode: Missing option");
+
+	if (self->critical == Boolean_Unset)
+		return err_string(0, "critical: Missing option");
+
+	if (self->current_speed == float_Unset)
+		return err_string(0, "current_speed: Missing option");
+
+	if (self->target_speed == float_Unset)
+		return err_string(0, "target_speed: Missing option");
+
+	if (self->speed_steps == int_Unset)
+		return err_string(0, "speed_steps: Missing option");
+	return err_success();
+}
+
+Error* FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
+	Error* e = NULL;
+	*obj = FanInfo_Unset;
+
+	if (!json || json->type != NX_JSON_OBJECT)
+		return err_string(0, "not a JSON object");
+
+	nx_json_for_each(c, json) {
+		if (0);
+		else if (!strcmp(c->key, "name"))
+			e = str_FromJson(&obj->name, c);
+		else if (!strcmp(c->key, "automode"))
+			e = Boolean_FromJson(&obj->automode, c);
+		else if (!strcmp(c->key, "critical"))
+			e = Boolean_FromJson(&obj->critical, c);
+		else if (!strcmp(c->key, "current_speed"))
+			e = float_FromJson(&obj->current_speed, c);
+		else if (!strcmp(c->key, "target_speed"))
+			e = float_FromJson(&obj->target_speed, c);
+		else if (!strcmp(c->key, "speed_steps"))
+			e = int_FromJson(&obj->speed_steps, c);
+		else
+			e = err_string(0, "Unknown option");
+		if (e) return err_string(e, c->key);
+	}
+	return err_success();
+}
+
+struct ServiceInfo ServiceInfo_Unset = {
+	int_Unset,
+	str_Unset,
+	Boolean_Unset,
+	float_Unset,
+	{NULL, 0},
+};
+
+Error* ServiceInfo_ValidateFields(ServiceInfo* self) {
+	if (self->pid == int_Unset)
+		return err_string(0, "pid: Missing option");
+
+	if (self->config == str_Unset)
+		return err_string(0, "config: Missing option");
+
+	if (self->readonly == Boolean_Unset)
+		return err_string(0, "readonly: Missing option");
+
+	if (self->temperature == float_Unset)
+		return err_string(0, "temperature: Missing option");
+
+	if (self->fans.data == NULL)
+		return err_string(0, "fans: Missing option");
+	return err_success();
+}
+
+Error* ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
+	Error* e = NULL;
+	*obj = ServiceInfo_Unset;
+
+	if (!json || json->type != NX_JSON_OBJECT)
+		return err_string(0, "not a JSON object");
+
+	nx_json_for_each(c, json) {
+		if (0);
+		else if (!strcmp(c->key, "pid"))
+			e = int_FromJson(&obj->pid, c);
+		else if (!strcmp(c->key, "config"))
+			e = str_FromJson(&obj->config, c);
+		else if (!strcmp(c->key, "readonly"))
+			e = Boolean_FromJson(&obj->readonly, c);
+		else if (!strcmp(c->key, "temperature"))
+			e = float_FromJson(&obj->temperature, c);
+		else if (!strcmp(c->key, "fans"))
+			e = array_of_FanInfo_FromJson(&obj->fans, c);
+		else
+			e = err_string(0, "Unknown option");
+		if (e) return err_string(e, c->key);
+	}
+	return err_success();
+}
+

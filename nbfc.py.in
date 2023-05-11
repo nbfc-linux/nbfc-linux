@@ -184,13 +184,15 @@ def set(opts):
     if 'TargetFanSpeeds' not in cfg:
         cfg['TargetFanSpeeds'] = []
     targetFanSpeeds = cfg['TargetFanSpeeds']
-    while True:
-        try:
-            targetFanSpeeds[opts.fan] = opts.speed
-            break
-        except IndexError:
-            targetFanSpeeds.append(-1)
 
+    newTargetFanSpeeds = [-1 for i in range(max(len(targetFanSpeeds), opts.fan))]
+
+    for i, speed in enumerate(targetFanSpeeds):
+        newTargetFanSpeeds[i] = speed
+
+    newTargetFanSpeeds[opts.fan] = opts.speed
+
+    cfg['TargetFanSpeeds'] = newTargetFanSpeeds
     service.set_config(cfg)
     service.restart()
 

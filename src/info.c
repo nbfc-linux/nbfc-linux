@@ -1,13 +1,12 @@
 #include "info.h"
 
 #include "nbfc.h"
-#include "memory.h"
 #include "error.h"
 #include "stringbuf.h"
 #include "macros.h"
 
 #include <unistd.h>   // getpid
-#include <sys/stat.h> // chmod
+#include <sys/stat.h> // chmod, open
 
 static const char* Info_File;
 
@@ -22,27 +21,36 @@ Error* Info_Init(const char* file) {
 
   close(fd);
   chmod(Info_File, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+
+  fd = open(NBFC_PID_FILE, O_CREAT|O_WRONLY|O_TRUNC|O_EXCL, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+  if (fd < 0) {
+    if (errno == EEXIST) {
+      Error* e = err_string(0, "Failed to acquire lock file");
+      return err_string(e, NBFC_PID_FILE);
+    }
+
+    return err_stdlib(0, NBFC_PID_FILE);
+  }
+
+  char buf[256];
+  int len = snprintf(buf, sizeof(buf), "%d", getpid());
+  write(fd, buf, len);
+  close(fd);
+
   return err_success();
 }
 
 void Info_Close() {
   unlink(NBFC_PID_FILE);
+  unlink(NBFC_STATE_FILE);
 }
 
 Error* Info_Write(ModelConfig* cfg, float temperature, bool readonly, array_of(Fan)* fans) {
   static const char Bool_ToStr[2][6] = {"false","true"};
-  const pid_t pid = getpid();
   char buf[256];
-  char result[4096];
+  char result[NBFC_MAX_FILE_SIZE];
   StringBuf  S = {result, 0, sizeof(result) - 1};
   StringBuf* s = &S;
-
-  int fd = open(NBFC_PID_FILE, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-  if (fd >= 0) {
-    const int len = snprintf(buf, sizeof(buf), "%d", pid);
-    write(fd, buf, len);
-    close(fd);
-  }
 
   StringBuf_Printf(s, "{\n"
     "\t\"pid\":         %d,\n"
@@ -50,7 +58,7 @@ Error* Info_Write(ModelConfig* cfg, float temperature, bool readonly, array_of(F
     "\t\"readonly\":    %s,\n"
     "\t\"temperature\": %.2f,\n"
     "\t\"fans\": [\n",
-    pid,
+    getpid(),
     Json_EscapeString(buf, sizeof(buf), cfg->NotebookModel),
     Bool_ToStr[readonly],
     temperature);
@@ -76,10 +84,10 @@ Error* Info_Write(ModelConfig* cfg, float temperature, bool readonly, array_of(F
   }
 
   StringBuf_Printf(s, "\t\t]\n}\n");
-  if (! s->capacity)
+  if (s->size + 1 == s->capacity)
     return (errno = ENOBUFS), err_stdlib(0, Info_File);
 
-  fd = open(Info_File, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+  int fd = open(Info_File, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
   if (fd < 0)
     return err_stdlib(0, Info_File);
 

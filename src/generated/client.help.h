@@ -24,7 +24,15 @@
   ""
 
 #define CLIENT_START_HELP_TEXT                                                 \
-  "usage: nbfc stop [-h]\n"                                                    \
+  "usage: nbfc start [-h] [-r]\n"                                              \
+  "\n"                                                                         \
+  "optional arguments:\n"                                                      \
+  "  -r, --readonly        Start in read-only mode\n"                          \
+  "  -h, --help            Shows this message\n"                               \
+  ""
+
+#define CLIENT_RESTART_HELP_TEXT                                               \
+  "usage: nbfc restart [-h] [-r]\n"                                            \
   "\n"                                                                         \
   "optional arguments:\n"                                                      \
   "  -r, --readonly        Restart in read-only mode\n"                        \
@@ -51,7 +59,7 @@
   "  -h, --help            show this help message and exit\n"                  \
   "  -a, --all             Show service and fan status (default)\n"            \
   "  -s, --service         Show service status\n"                              \
-  "  -f FAN INDEX, --fan FAN INDEX\n"                                          \
+  "  -f FAN INDEX, --fan FAN INDEX (zero based)\n"                             \
   "                        Show fan status\n"                                  \
   "  -w SECONDS, --watch SECONDS\n"                                            \
   "                        Show status periodically\n"                         \

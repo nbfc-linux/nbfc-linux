@@ -34,15 +34,15 @@ static inline Error* nx_json_get_object(const nx_json* node) {
   return err_success();
 }
 
-static inline Error* nx_json_parse_file(const nx_json** out, const char* file) {
-  char buf[16384];
-  int len = slurp_file(buf, sizeof(buf) - 1, file);
-  if (len < 0)
+static inline Error* nx_json_parse_file(const nx_json** out, char* buf, size_t bufsize, const char* file) {
+  int len = slurp_file(buf, bufsize, file);
+  if (len < 0) {
+    if (errno == ENOBUFS)
+      errno = EFBIG;
     return err_stdlib(0, NULL);
+  }
 
-  char* tmp = Temp_Strdup(buf);
-
-  *out = nx_json_parse_utf8(tmp);
+  *out = nx_json_parse_utf8(buf);
   if (! *out)
     return err_nxjson(0, NULL);
 

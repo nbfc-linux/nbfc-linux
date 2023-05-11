@@ -24,18 +24,17 @@ static const char* const LinuxTempSensorNames[] = {
 
 static const char* const LinuxTempSensorFile = "temp%d_input";
 
-typedef struct FS_TemperatureSource FS_TemperatureSource;
 struct FS_TemperatureSource {
   const char* file;
   float multiplier;
 };
-
+typedef struct FS_TemperatureSource FS_TemperatureSource;
 declare_array_of(FS_TemperatureSource);
 
 static array_of(FS_TemperatureSource) FS_Sensors_Sources;
 
 static Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
-  char buf[32];
+  static char buf[32];
   int nread = slurp_file(buf, sizeof(buf) - 1, my.file);
   if (nread < 0)  return err_stdlib(0, my.file);
   if (nread == 0) return (errno = EINVAL), err_stdlib(0, my.file);
@@ -47,7 +46,7 @@ static Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, fl
   if (end == buf)
     errno = EINVAL;
   if (errno)
-    return err_stdlib(0, Temp_Strdup(buf));
+    return err_stdlib(0, buf);
 
   return err_success();
 }
@@ -73,20 +72,20 @@ Error* FS_Sensors_GetTemperature(float* out) {
 
 Error* FS_Sensors_Init() {
   Error* e;
-  char dir[PATH_MAX];
-  char file[PATH_MAX * 2];
   FS_TemperatureSource sources[32];
   FS_TemperatureSource *source = sources;
-  FS_TemperatureSource *const sources_end = &sources[32];
+  FS_TemperatureSource *const sources_end = &sources[ARRAY_SIZE(sources)];
+  char dir[PATH_MAX];
+  char file[PATH_MAX];
   int n_sources;
 
   for (const char* const* hwmonDir = LinuxHwmonDirs; *hwmonDir; ++hwmonDir) {
     for (int i = 0; i < 10; i++) {
       snprintf(dir,  sizeof(dir), *hwmonDir, i);
-      snprintf(file, sizeof(file), "%s/%s", dir, "name");
+      snprintf(file, sizeof(file), "%s/name", dir);
 
-      char sourceName[256];
-      int nread = slurp_file(sourceName, sizeof(sourceName), file);
+      char source_name[256];
+      int nread = slurp_file(source_name, sizeof(source_name), file);
       if (nread < 0) {
         if (errno != ENOENT) {
           e = err_stdlib(0, file);
@@ -95,16 +94,17 @@ Error* FS_Sensors_Init() {
         continue;
       }
 
-      while (nread && sourceName[nread] < 32)
-        sourceName[nread--] = '\0'; /* strip whitespace */
+      while (nread && source_name[nread] < 32)
+        source_name[nread--] = '\0'; /* strip whitespace */
 
       for (const char* const* n = LinuxTempSensorNames; *n; ++n) {
-        if (strcmp(sourceName, *n))
+        if (strcmp(source_name, *n))
           continue;
 
         for (int j = 0; j < 10; j++) {
-          snprintf(dir, sizeof(dir), "%s/%s", *hwmonDir, LinuxTempSensorFile);
-          snprintf(file, sizeof(file), dir, i, j);
+          char filename[PATH_MAX];
+          snprintf(filename, sizeof(filename), LinuxTempSensorFile, j);
+          snprintf(file, sizeof(file), "%s/%s", dir, filename);
 
           source->file = file;
           source->multiplier = 0.001;
@@ -131,13 +131,17 @@ end:
     return err_string(0, "No temperature sources found");
 
   FS_Sensors_Sources.size = n_sources;
-  FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Malloc(n_sources, sizeof(FS_TemperatureSource));
+  FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Malloc(n_sources * sizeof(FS_TemperatureSource));
   memcpy(FS_Sensors_Sources.data, sources, n_sources * sizeof(FS_TemperatureSource));
   return err_success();
 }
 
 void FS_Sensors_Cleanup() {
-
+  if (FS_Sensors_Sources.size) {
+    Mem_Free(FS_Sensors_Sources.data);
+    FS_Sensors_Sources.size = 0;
+    FS_Sensors_Sources.data = NULL;
+  }
 }
 
 Sensor_VTable FS_Sensors_VTable = {

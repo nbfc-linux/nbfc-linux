@@ -3,6 +3,7 @@
 
 #include "nbfc.h"
 #include "macros.h"
+#include "sleep.h"
 #include "ec_linux.h"
 #include "ec_sys_linux.h"
 #include "optparse/optparse.h"
@@ -11,7 +12,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <stdarg.h>
 #include <limits.h>
 #include <signal.h>
 #include <unistd.h>
@@ -77,6 +77,19 @@ enum Command {
   Command_Write,
   Command_Help,
 };
+
+static enum Command Command_From_String(const char* s) {
+  const char* commands[] = {
+    "dump", "monitor", "watch",
+    "read", "write", "help"
+  };
+
+  for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
+    if (!strcmp(commands[i], s))
+      return (enum Command) i;
+
+  return (enum Command) -1;
+}
 
 static const char* HelpTexts[] = {
   EC_PROBE_DUMP_HELP_TEXT,
@@ -152,22 +165,6 @@ static struct {
   int             stress_cpu;
 } options;
 
-static int va_find_string(const char* needle, ...) {
-  va_list va;
-  va_start(va, needle);
-
-  const char* s;
-  for (int i = 0; (s = va_arg(va, const char*)); ++i) {
-    if (! strcmp(s, needle)) {
-      va_end(va);
-      return i;
-    }
-  }
-
-  va_end(va);
-  return -1;
-}
-
 static bool TestEC(EC_VTable* ec) {
   Error* e = ec->Open();
   if (e)
@@ -180,8 +177,6 @@ static bool TestEC(EC_VTable* ec) {
 }
 
 static Error* FindEC() {
-  Error* e;
-
   if (TestEC(&EC_SysLinux_VTable)) {
     ec = &EC_SysLinux_VTable;
     return err_success();
@@ -212,9 +207,7 @@ int main(int argc, char* const argv[]) {
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
     case  'C':
-      // Important: Same order as in `enum Command`
-      cmd = (enum Command)
-        va_find_string(p.optarg, "dump", "monitor", "watch", "read", "write", "help", 0);
+      cmd = Command_From_String(p.optarg);
 
       if (cmd == (enum Command) -1)
         die(NBFC_EXIT_CMDLINE, "%s: Invalid command: %s\n", argv[0], p.optarg);
@@ -305,7 +298,7 @@ int main(int argc, char* const argv[]) {
       for (loops = 0; !quit && loops < max_loops && --size; ++loops) {
         Register_FromEC(regs + loops);
         Register_PrintMonitor(regs, loops);
-        usleep(options.interval * 1000);
+        sleep_ms(options.interval);
       }
 
       if (options.report) {
@@ -328,7 +321,7 @@ int main(int argc, char* const argv[]) {
       for (int loops = 1; !quit && loops < max_loops && --size; ++loops) {
         Register_FromEC(regs + loops);
         Register_PrintWatch(regs , regs + loops, regs + loops - 1);
-        usleep(options.interval * 1000);
+        sleep_ms(options.interval);
       }
     }
     case Command_Help: break;
