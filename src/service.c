@@ -20,11 +20,11 @@
 
 Service_Options options;
 
-static ModelConfig       model_config;
-static Sensor_VTable*    sensor;
-static TemperatureFilter temp_filter;
-static array_of(Fan)     fans;
-static bool              service_initialized;
+static ModelConfig       model_config = {0};
+static Sensor_VTable*    sensor = NULL;
+static TemperatureFilter temp_filter = {0};
+static array_of(Fan)     fans = {0};
+static bool              service_initialized = 0;
 
 static Error* ApplyRegisterWriteConfig(int, uint8_t, RegisterWriteMode);
 static Error* ApplyRegisterWriteConfgurations(bool);
@@ -157,7 +157,7 @@ Error* Service_Loop() {
   return e;
 }
 
-void Service_Error(Error* e) {
+void Service_HandleError(Error* e) {
   static int failures;
 
   if (! e) {
@@ -259,6 +259,8 @@ void Service_Cleanup() {
   Info_Close();
   TemperatureFilter_Close(&temp_filter);
   Mem_Free(fans.data);
+  ModelConfig_Free(&model_config);
+  ServiceConfig_Free(&service_config);
   if (service_initialized)
     if (ec) {
       if (! options.read_only)

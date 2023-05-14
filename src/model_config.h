@@ -62,5 +62,6 @@ typedef char                          Boolean;
 
 Error* ModelConfig_Validate(ModelConfig*);
 Error* ModelConfig_FromFile(ModelConfig*, const char*);
+void   ModelConfig_Free(ModelConfig*);
 
 #endif

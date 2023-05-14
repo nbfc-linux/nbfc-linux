@@ -15,7 +15,7 @@
 static int EC_Linux_FD = -1;
 
 Error* EC_Linux_Open() {
-  EC_Linux_FD = open(EC_Linux_PortFilePath, O_RDWR | O_EXCL);
+  EC_Linux_FD = open(EC_Linux_PortFilePath, O_RDWR);
   if (EC_Linux_FD < 0)
     return err_stdlib(0, EC_Linux_PortFilePath);
   return err_success();

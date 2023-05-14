@@ -94,7 +94,7 @@
       {
         "name": "Description",
         "type": "const char*",
-        "default": "\"\"",
+        "default": "Mem_Strdup(\"\")",
         "help": "A short description of what effect the RegisterWriteConfiguration will have"
       }
     ]
@@ -106,7 +106,7 @@
       {
         "name": "FanDisplayName",
         "type": "const char*",
-        "default": "\"\"",
+        "default": "Mem_Strdup(\"\")",
         "help": "Fan display name"
       },
       {
@@ -194,7 +194,7 @@
       {
         "name": "Author",
         "type": "const char*",
-        "default": "\"\"",
+        "default": "Mem_Strdup(\"\")",
         "help": "The Author of the config file. Enter whatever you want."
       },
       {
@@ -235,7 +235,7 @@
         "name": "RegisterWriteConfigurations",
         "type": "array_of(RegisterWriteConfiguration)",
         "unset": "{NULL, 0}",
-        "is_unset": "parameter.data == NULL",
+        "is_unset": "false",
         "help": "Array of RegisterWriteConfiguration"
       }
     ]

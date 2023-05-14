@@ -36,9 +36,9 @@ struct Fan {
 Error* Fan_Init(Fan*, FanConfiguration*, int criticalTemperature, bool readWriteWords);
 
 Error* Fan_UpdateCurrentSpeed(Fan*);
-float  Fan_GetCurrentSpeed(Fan*);
+float  Fan_GetCurrentSpeed(const Fan*);
 float  Fan_GetTargetSpeed(const Fan*);
-int    Fan_GetSpeedSteps(Fan*);
+int    Fan_GetSpeedSteps(const Fan*);
 
 void   Fan_SetTemperature(Fan*, float temperature);
 Error* Fan_SetFixedSpeed(Fan*, float speed);

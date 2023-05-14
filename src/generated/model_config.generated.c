@@ -126,7 +126,7 @@ Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* sel
 		self->ResetWriteMode = RegisterWriteMode_Set;
 
 	if (self->Description == str_Unset)
-		self->Description = "";
+		self->Description = Mem_Strdup("");
 	return err_success();
 }
 
@@ -179,7 +179,7 @@ struct FanConfiguration FanConfiguration_Unset = {
 
 Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (self->FanDisplayName == str_Unset)
-		self->FanDisplayName = "";
+		self->FanDisplayName = Mem_Strdup("");
 
 	if (self->ReadRegister == short_Unset)
 		return err_string(0, "ReadRegister: Missing option");
@@ -286,7 +286,7 @@ Error* ModelConfig_ValidateFields(ModelConfig* self) {
 		return err_string(0, "NotebookModel: Missing option");
 
 	if (self->Author == str_Unset)
-		self->Author = "";
+		self->Author = Mem_Strdup("");
 
 	if (self->EcPollInterval == short_Unset)
 		self->EcPollInterval = 3000;
@@ -309,7 +309,7 @@ Error* ModelConfig_ValidateFields(ModelConfig* self) {
 	else if (! (self->FanConfigurations.size > 0))
 		return err_string(0, "FanConfigurations: requires: parameter.size > 0");
 
-	if (self->RegisterWriteConfigurations.data == NULL)
+	if (false)
 		return err_string(0, "RegisterWriteConfigurations: Missing option");
 	return err_success();
 }

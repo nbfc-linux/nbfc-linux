@@ -165,6 +165,51 @@ static array_of(FanSpeedPercentageOverride) Config_DefaultFanSpeedPercentageOver
 
 #include "generated/model_config.generated.c"
 
+void ModelConfig_Free(ModelConfig* c) {
+  Mem_Free((char*) c->NotebookModel);
+  Mem_Free((char*) c->Author);
+
+  for_each_array(FanConfiguration*, f, c->FanConfigurations) {
+    Mem_Free((char*) f->FanDisplayName);
+    Mem_Free(f->TemperatureThresholds.data);
+    Mem_Free(f->FanSpeedPercentageOverrides.data);
+  }
+
+  Mem_Free(c->FanConfigurations.data);
+
+  for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
+    Mem_Free((char*) r->Description);
+  }
+
+  Mem_Free(c->RegisterWriteConfigurations.data);
+
+  memset(c, 0, sizeof(*c));
+}
+
+struct Trace;
+struct Trace {
+  char text[128];
+  struct Trace* next;
+};
+typedef struct Trace Trace;
+
+static void Trace_PrintBuf(const Trace* trace, char* buf, size_t size) {
+  int buf_written = 0;
+  while (trace) {
+    if (trace->text[0]) {
+      const int written = snprintf(buf + buf_written, size - buf_written, "%s: ", trace->text);
+      if (written >= size - buf_written)
+        return;
+      buf_written += written;
+    }
+
+    trace = trace->next;
+  }
+
+  if (buf_written)
+    buf[buf_written - 2] = '\0'; // strip ": "
+}
+
 // ============================================================================
 // Validation code
 // ============================================================================
@@ -174,31 +219,45 @@ static array_of(FanSpeedPercentageOverride) Config_DefaultFanSpeedPercentageOver
 
 Error* ModelConfig_Validate(ModelConfig* c) {
   Error* e = NULL;
+  Trace trace = {0};
   static char buf[128];
-  StringBuf s = { buf, 0, sizeof(buf) - 1 };
-  RegisterWriteConfiguration* r = NULL;
-  FanConfiguration*           f = NULL;
-  FanSpeedPercentageOverride* o = NULL;
-  TemperatureThreshold*       t = NULL;
 
   e = ModelConfig_ValidateFields(c);
   e_goto(err);
 
-  for_each_array(, r, c->RegisterWriteConfigurations) {
+  for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
+    snprintf(trace.text, sizeof(trace.text), "RegisterWriteConfigurations[%td]", r - c->RegisterWriteConfigurations.data);
+
+    // Don't make the validation fail if `ResetRequired` is false and `ResetValue` was not set
+    if (r->ResetRequired == Boolean_False || r->ResetRequired == Boolean_Unset)
+      r->ResetValue = 0;
+
     e = RegisterWriteConfiguration_ValidateFields(r);
     e_goto(err);
-  }
-  r = NULL;
 
-  for_each_array(, f, c->FanConfigurations) {
+    trace.text[0] = 0;
+  }
+
+  for_each_array(FanConfiguration*, f, c->FanConfigurations) {
+    snprintf(trace.text, sizeof(trace.text), "FanConfigurations[%td]", f - c->FanConfigurations.data);
+
+    // Don't make the validation fail if `ResetRequired` is false and `FanSpeedResetValue` was not set
+    if (f->ResetRequired == Boolean_False || f->ResetRequired == Boolean_Unset)
+      f->FanSpeedResetValue = 0;
+
     e = FanConfiguration_ValidateFields(f);
     e_goto(err);
 
-    for_each_array(, o, f->FanSpeedPercentageOverrides) {
+    for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
+      Trace trace1 = {0};
+      snprintf(trace1.text, sizeof(trace1.text), "FanSpeedPercentageOverrides[%td]", o - f->FanSpeedPercentageOverrides.data);
+      trace.next = &trace1;
+
       e = FanSpeedPercentageOverride_ValidateFields(o);
       e_goto(err);
+
+      trace.next = NULL;
     }
-    o = NULL;
 
     // TODO #1: How to handle empty TemperatureThresholds? [see fan.c]
     if (! f->TemperatureThresholds.size)
@@ -206,7 +265,12 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
     bool has_0_FanSpeed   = false;
     bool has_100_FanSpeed = false;
-    for_each_array(, t, f->TemperatureThresholds) {
+
+    for_each_array(TemperatureThreshold*, t, f->TemperatureThresholds) {
+      Trace trace1 = {0};
+      snprintf(trace1.text, sizeof(trace1.text), "TemperatureThresholds[%td]", t - f->TemperatureThresholds.data);
+      trace.next = &trace1;
+
       e = TemperatureThreshold_ValidateFields(t);
       e_goto(err);
 
@@ -219,8 +283,11 @@ Error* ModelConfig_Validate(ModelConfig* c) {
       }
 
       if (t->UpThreshold > c->CriticalTemperature) {
+        Trace_PrintBuf(&trace, buf, sizeof(buf));
         e = err_string(0, "UpThreshold cannot be greater than CriticalTemperature");
-        goto err;
+        e = err_string(e, buf);
+        e_warn();
+        e = NULL;
       }
 
       for_each_array(TemperatureThreshold*, t1, f->TemperatureThresholds) {
@@ -229,42 +296,32 @@ Error* ModelConfig_Validate(ModelConfig* c) {
           goto err;
         }
       }
-    }
-    t = NULL;
 
-    /* TODO: print a warning
+      trace.next = NULL;
+    }
+
     if (! has_0_FanSpeed) {
+      Trace_PrintBuf(&trace, buf, sizeof(buf));
       e = err_string(0, "No threshold with FanSpeed == 0 found");
-      goto err;
+      e = err_string(e, buf);
+      e_warn();
+      e = NULL;
     }
 
     if (! has_100_FanSpeed) {
+      Trace_PrintBuf(&trace, buf, sizeof(buf));
       e = err_string(0, "No threshold with FanSpeed == 100 found");
-      goto err;
+      e = err_string(e, buf);
+      e_warn();
+      e = NULL;
     }
-    */
   }
 
 err:
   if (! e)
     return e;
 
-  if (r) {
-    StringBuf_Printf(&s, "RegisterWriteConfigurations[%td]",
-        r - c->RegisterWriteConfigurations.data);
-  }
-  else if (f) {
-    StringBuf_Printf(&s, "FanConfigurations[%td]",
-        f - c->FanConfigurations.data);
-
-    if (o)
-      StringBuf_Printf(&s, ": FanSpeedPercentageOverrides[%td]",
-        o - f->FanSpeedPercentageOverrides.data);
-    else if (t)
-      StringBuf_Printf(&s, ": TemperatureThresholds[%td]",
-        t - f->TemperatureThresholds.data);
-  }
-
+  Trace_PrintBuf(&trace, buf, sizeof(buf));
   return err_string(e, buf);
 }
 

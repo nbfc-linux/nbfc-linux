@@ -7,12 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-ServiceConfig service_config = {
-  "",                                /* SelectedConfigId */
-  Boolean_False,                     /* ReadOnly */
-  EmbeddedControllerType_Unset,      /* EmbeddedControllerType */
-  {NULL, 0}                          /* TargetFanSpeeds */
-};
+ServiceConfig service_config = {0};
 
 Error* ServiceConfig_Init(const char* file) {
   char buf[NBFC_MAX_FILE_SIZE];
@@ -48,4 +43,10 @@ Error* ServiceConfig_Init(const char* file) {
   }
 
   return err_success();
+}
+
+void ServiceConfig_Free(ServiceConfig* c) {
+  Mem_Free((char*) c->SelectedConfigId);
+  Mem_Free(c->TargetFanSpeeds.data);
+  memset(c, 0, sizeof(*c));
 }

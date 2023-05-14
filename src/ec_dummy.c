@@ -2,7 +2,7 @@
 
 #include "memory.h"
 
-static uint16_t* EC_Dummy_FakeRegisters;
+static uint16_t* EC_Dummy_FakeRegisters = NULL;
 #define          EC_Dummy_FakeRegistersSize 256
 
 Error* EC_Dummy_Open() {
@@ -12,6 +12,8 @@ Error* EC_Dummy_Open() {
 }
 
 void EC_Dummy_Close() {
+  Mem_Free(EC_Dummy_FakeRegisters);
+  EC_Dummy_FakeRegisters = NULL;
 }
 
 Error* EC_Dummy_WriteByte(int register_, uint8_t value) {

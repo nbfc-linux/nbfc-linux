@@ -18,14 +18,14 @@ static inline Error* EC_SysLinux_LoadKernelModule();
 static inline Error* EC_SysLinux_LoadACPIKernelModule();
 
 Error* EC_SysLinux_Open() {
-  EC_SysLinux_FD = open(EC_SysLinux_EC0_IO_Path, O_RDWR | O_EXCL);
+  EC_SysLinux_FD = open(EC_SysLinux_EC0_IO_Path, O_RDWR);
   if (EC_SysLinux_FD != -1)
     return err_success();
 
   Error* e = EC_SysLinux_LoadKernelModule();
   e_check();
 
-  EC_SysLinux_FD = open(EC_SysLinux_EC0_IO_Path, O_RDWR | O_EXCL);
+  EC_SysLinux_FD = open(EC_SysLinux_EC0_IO_Path, O_RDWR);
   if (EC_SysLinux_FD == -1)
     return err_stdlib(0, EC_SysLinux_EC0_IO_Path);
   else
@@ -33,14 +33,14 @@ Error* EC_SysLinux_Open() {
 }
 
 Error* EC_SysLinux_ACPI_Open() {
-  EC_SysLinux_FD = open(EC_SysLinux_ACPI_EC_Path, O_RDWR | O_EXCL);
+  EC_SysLinux_FD = open(EC_SysLinux_ACPI_EC_Path, O_RDWR);
   if (EC_SysLinux_FD != -1)
     return err_success();
 
   Error* e = EC_SysLinux_LoadACPIKernelModule();
   e_check();
 
-  EC_SysLinux_FD = open(EC_SysLinux_ACPI_EC_Path, O_RDWR | O_EXCL);
+  EC_SysLinux_FD = open(EC_SysLinux_ACPI_EC_Path, O_RDWR);
   if (EC_SysLinux_FD == -1)
     return err_stdlib(0, EC_SysLinux_ACPI_EC_Path);
   else

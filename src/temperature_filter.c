@@ -33,9 +33,6 @@ float TemperatureFilter_FilterTemperature(TemperatureFilter* self, float tempera
 }
 
 void TemperatureFilter_Close(TemperatureFilter* self) {
-  if (my.ring_buffer.data) {
-    Mem_Free(my.ring_buffer.data);
-    my.ring_buffer.data = NULL;
-    my.ring_buffer.size = 0;
-  }
+  Mem_Free(my.ring_buffer.data);
+  memset(self, 0, sizeof(*self));
 }

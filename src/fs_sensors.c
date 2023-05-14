@@ -25,13 +25,13 @@ static const char* const LinuxTempSensorNames[] = {
 static const char* const LinuxTempSensorFile = "temp%d_input";
 
 struct FS_TemperatureSource {
-  const char* file;
+  char* file;
   float multiplier;
 };
 typedef struct FS_TemperatureSource FS_TemperatureSource;
 declare_array_of(FS_TemperatureSource);
 
-static array_of(FS_TemperatureSource) FS_Sensors_Sources;
+static array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
 static Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
   static char buf[32];
@@ -138,6 +138,8 @@ end:
 
 void FS_Sensors_Cleanup() {
   if (FS_Sensors_Sources.size) {
+    for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources)
+      Mem_Free(s->file);
     Mem_Free(FS_Sensors_Sources.data);
     FS_Sensors_Sources.size = 0;
     FS_Sensors_Sources.data = NULL;

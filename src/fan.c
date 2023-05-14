@@ -147,7 +147,7 @@ void Fan_SetAutoSpeed(Fan* self) {
     my.targetFanSpeed = my.threshMan.current->FanSpeed;
 }
 
-float Fan_GetCurrentSpeed(Fan* self) {
+float Fan_GetCurrentSpeed(const Fan* self) {
   return my.currentSpeed;
 }
 
@@ -170,7 +170,7 @@ Error* Fan_UpdateCurrentSpeed(Fan* self) {
   return err_success();
 }
 
-int Fan_GetSpeedSteps(Fan* self) {
+int Fan_GetSpeedSteps(const Fan* self) {
   return my.fanSpeedSteps;
 }
 

@@ -24,6 +24,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#include <locale.h>
 
 #define DmiIdDirectoryPath "/sys/devices/virtual/dmi/id"
 
@@ -46,13 +47,15 @@ static const char* get_system_product() {
 
   buf[strcspn(buf, "\n")] = '\0';
 
-  if (!*buf)
+  if (!*buf) {
+    errno = ENODATA;
     goto error;
+  }
 
   return buf;
 
 error:
-  fprintf(stderr, "Could not get product name. Failed to read " DmiIdDirectoryPath "/product_name\n");
+  fprintf(stderr, "Could not get product name. Failed to read " DmiIdDirectoryPath "/product_name: %s\n", strerror(errno));
   exit(NBFC_EXIT_FAILURE);
 }
 
@@ -66,13 +69,15 @@ static const char* get_system_vendor() {
 
   buf[strcspn(buf, "\n")] = '\0';
 
-  if (!*buf)
+  if (!*buf) {
+    errno = ENODATA;
     goto error;
+  }
 
   return buf;
 
 error:
-  fprintf(stderr, "Could not get system vendor. Failed to read " DmiIdDirectoryPath "/sys_vendor\n");
+  fprintf(stderr, "Could not get system vendor. Failed to read " DmiIdDirectoryPath "/sys_vendor: %s\n", strerror(errno));
   exit(NBFC_EXIT_FAILURE);
 }
 
@@ -254,6 +259,15 @@ static void ServiceInfo_Load() {
     goto error;
 
   e = ServiceInfo_ValidateFields(&service_info);
+  if (e)
+    goto error;
+
+  for_each_array(FanInfo*, f, service_info.fans) {
+    e = FanInfo_ValidateFields(f);
+    if (e)
+      goto error;
+  }
+
   if (e) {
 error:
     e = err_string(e, NBFC_STATE_FILE);
@@ -413,7 +427,6 @@ static struct {
   const char *config;
   int l;     // list
   int r;     // recommend/readonly
-  int help;  // help
   int s;     // set
   int watch; // watch time
 } options;
@@ -521,7 +534,7 @@ static int Status() {
           vis[fan_index] = 1;
         }
       }
-      free(vis);
+      Mem_Free(vis);
     }
 
     if (!options.watch)
@@ -647,7 +660,9 @@ int main(int argc, char *const argv[]) {
     return NBFC_EXIT_SUCCESS;
   }
 
+  setlocale(LC_NUMERIC, "C"); // for json floats
   mkdir(NBFC_CONFIG_DIR, 0755);
+
   enum Command cmd = Command_Help;
   cli99 p;
   char o;
