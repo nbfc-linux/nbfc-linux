@@ -8,6 +8,7 @@
 
 #include "error.h"
 #include "memory.h"
+#include "model_config.h"
 #include "optparse/optparse.h"
 #include "generated/nbfc_service.help.h"
 
@@ -35,10 +36,28 @@ static cli99_option cli_options[] = {
   {"-s|--state-file",          's',  1},
   {"-c|--config-file",         'c',  1},
   {"--critical-temperature",   '!',  1|cli99_type(float)},
+  {"--check-model-config",     'C',  1},
   cli99_options_end()
 #undef G1
 #undef G2
 };
+
+static void check_model_config(const char* file) {
+  char path[PATH_MAX];
+
+  if (strchr(file, '/')) {
+    snprintf(path, PATH_MAX, "%s", file);
+  }
+  else {
+    snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, file);
+  }
+
+  Error* e = ModelConfig_FromFile(&model_config, path);
+  e_die();
+
+  e = ModelConfig_Validate(&model_config);
+  e_die();
+}
 
 static void parse_opts(int argc, char* const argv[]) {
   cli99 p;
@@ -65,6 +84,7 @@ static void parse_opts(int argc, char* const argv[]) {
     case 's':  options.state_file     = p.optarg;                  break;
     case 'c':  options.service_config = p.optarg;                  break;
     case '!':  options.critical_temperature = p.optval.d;          break;
+    case 'C':  check_model_config(p.optarg); exit(0);              break;
     default:
       cli99_ExplainError(&p);
       exit(NBFC_EXIT_CMDLINE);
