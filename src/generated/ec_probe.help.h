@@ -35,6 +35,7 @@
  "\n"\
  "optional arguments:\n"\
  "  -h, --help  show this help message and exit\n"\
+ "  -w, --word  read two registers as one word\n"\
  ""
 
 #define EC_PROBE_WRITE_HELP_TEXT "usage: %s [-h] REGISTER VALUE\n"\
@@ -47,6 +48,7 @@
  "\n"\
  "optional arguments:\n"\
  "  -h, --help  show this help message and exit\n"\
+ "  -w, --word  write VALUE to two registers\n"\
  ""
 
 #define EC_PROBE_MONITOR_HELP_TEXT "usage: %s [-h] [-i seconds] [-t seconds] [-r REPORT] [-c] [-d]\n"\

@@ -128,14 +128,16 @@ static const cli99_option watch_command_options[] = {
 
 static const cli99_option read_command_options[] = {
   cli99_include_options(&main_options),
-  {"register",                  'R',  1|cli99_type(uint16_t)|cli99_required_option},
+  {"register",                  'R',  1|cli99_type(uint8_t)|cli99_required_option},
+  {"-w|--word",                -'w',  0},
   cli99_options_end()
 };
 
 static const cli99_option write_command_options[] = {
   cli99_include_options(&main_options),
-  {"register",                  'R',  1|cli99_type(uint16_t)|cli99_required_option},
+  {"register",                  'R',  1|cli99_type(uint8_t)|cli99_required_option},
   {"value",                     'V',  1|cli99_type(uint16_t)|cli99_required_option},
+  {"-w|--word",                -'w',  0},
   cli99_options_end()
 };
 
@@ -160,10 +162,11 @@ static struct {
   bool            clearly;
   bool            decimal;
   bool            verbose;
-  uint16_t        register_;
+  uint8_t         register_;
   uint16_t        value;
+  bool            use_word;
   int             stress_cpu;
-} options;
+} options = {0};
 
 static bool TestEC(EC_VTable* ec) {
   Error* e = ec->Open();
@@ -225,6 +228,7 @@ int main(int argc, char* const argv[]) {
     case -'c':  options.clearly  = 1;                    break;
     case -'d':  options.decimal  = 1;                    break;
     case -'v':  options.verbose  = 1;                    break;
+    case -'w':  options.use_word = 1;                    break;
     case -'e':  if (!strcmp("ec_sys_linux", p.optarg))   ec = &EC_SysLinux_VTable;
                 else if (!strcmp("ec_acpi", p.optarg))   ec = &EC_SysLinux_ACPI_VTable;
                 else if (!strcmp("ec_linux", p.optarg))  ec = &EC_Linux_VTable;
@@ -274,15 +278,29 @@ int main(int argc, char* const argv[]) {
       break;
     }
     case Command_Read: {
-      uint8_t byte;
-      e = ec->ReadByte(options.register_, &byte);
-      printf("%d (%.2X)\n", byte, byte);
-      e_die();
+      if (options.use_word) {
+        uint16_t word;
+        e = ec->ReadWord(options.register_, &word);
+        printf("%d (%.2X)\n", word, word);
+        e_die();
+      }
+      else {
+        uint8_t byte;
+        e = ec->ReadByte(options.register_, &byte);
+        printf("%d (%.2X)\n", byte, byte);
+        e_die();
+      }
       break;
     }
     case Command_Write: {
-      e = ec->WriteByte(options.register_, options.value);
-      e_die();
+      if (options.use_word) {
+        e = ec->WriteWord(options.register_, options.value);
+        e_die();
+      }
+      else {
+        e = ec->WriteByte(options.register_, options.value);
+        e_die();
+      }
       break;
     }
     case Command_Monitor: {
