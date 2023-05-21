@@ -20,6 +20,21 @@ static inline void StringBuf_AddCh(StringBuf* s, int c) {
   }
 }
 
+static inline int StringBuf_LastCh(StringBuf* s) {
+  return s->size ? s->s[s->size -1] : -1;
+}
+
+static inline int StringBuf_PopCh(StringBuf* s) {
+  if (s->size) {
+    s->size--;
+    int ret = s->s[s->size];
+    s->s[s->size] = 0;
+    return ret;
+  }
+
+  return -1;
+}
+
 static inline void StringBuf_Increment(StringBuf* s, int len) {
   if (len < 0) {
     return; // -1 from printf

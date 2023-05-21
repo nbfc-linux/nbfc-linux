@@ -17,12 +17,10 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <time.h>
 #include <unistd.h>
 #include <locale.h>
 
@@ -299,8 +297,8 @@ error:
 
 static void ServiceConfig_Write() {
   check_root();
-  FILE *state_file = fopen(NBFC_SERVICE_CONFIG, "w");
-  if (state_file == NULL) {
+  int fd = open(NBFC_SERVICE_CONFIG, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+  if (fd == -1) {
     fprintf(stderr, "Could not open " NBFC_SERVICE_CONFIG ": %s\n", strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }
@@ -309,7 +307,7 @@ static void ServiceConfig_Write() {
   StringBuf S = { buf, 0, sizeof(buf) };
   StringBuf*s = &S;
 
-  StringBuf_Printf(s, "{");
+  StringBuf_AddCh(s, '{');
   if (service_config.SelectedConfigId != NULL)
     StringBuf_Printf(s, "\n\t\"SelectedConfigId\": \"%s\",", service_config.SelectedConfigId);
 
@@ -336,13 +334,14 @@ static void ServiceConfig_Write() {
     StringBuf_Printf(s, "],");
   }
 
-  if (s->s[s->size - 1] == ',')
-    s->s[s->size - 1] = ' ';
+  if (StringBuf_LastCh(s) == ',') {
+    StringBuf_PopCh(s);
+  }
 
-  StringBuf_Printf(s, "\n}");
+  StringBuf_Printf(s, "\n}\n");
 
-  fprintf(state_file, "%s\n", buf);
-  fclose(state_file);
+  write(fd, S.s, S.size);
+  close(fd);
 }
 
 static const cli99_option main_options[] = {
