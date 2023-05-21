@@ -173,7 +173,7 @@ def parse_xml_file(file):
     tree = etree.parse(file)
     root = tree.getroot()
     xml_remove_comments(root)
-    return handle_xml_node(root, structs['Config'])
+    return handle_xml_node(root, structs['ModelConfig'])
 
 
 def write_header(fh):
