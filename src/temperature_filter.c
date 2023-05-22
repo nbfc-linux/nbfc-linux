@@ -1,9 +1,8 @@
 #include "temperature_filter.h"
 
-#include "nbfc.h"
 #include "memory.h"
 
-#include <math.h>
+#include <string.h>
 
 Error* TemperatureFilter_Init(TemperatureFilter* self, int poll_interval, int timespan) {
   if (poll_interval <= 0)

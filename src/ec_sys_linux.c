@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <endian.h>
-#include <limits.h>
 #include <fcntl.h>
-#include <sys/stat.h>
 
 #define EC_SysLinux_ACPI_EC_Path    "/dev/ec"
 #define EC_SysLinux_EC0_IO_Path     "/sys/kernel/debug/ec/ec0/io"

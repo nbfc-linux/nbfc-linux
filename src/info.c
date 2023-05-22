@@ -6,7 +6,8 @@
 #include "macros.h"
 
 #include <unistd.h>   // getpid
-#include <sys/stat.h> // chmod, open
+#include <fcntl.h>    // open
+#include <sys/stat.h> // chmod
 
 static const char* Info_File;
 

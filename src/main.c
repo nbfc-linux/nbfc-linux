@@ -1,13 +1,8 @@
 #include "nbfc.h"
 #include "service.h"
 
-#include "ec_linux.h"
-#include "ec_sys_linux.h"
-#include "ec_dummy.h"
-#include "ec_debug.h"
-
 #include "error.h"
-#include "memory.h"
+#include "ec.h"
 #include "model_config.h"
 #include "optparse/optparse.h"
 #include "generated/nbfc_service.help.h"
@@ -15,9 +10,9 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <limits.h>
 
 EC_VTable* ec;
 
@@ -44,6 +39,7 @@ static cli99_option cli_options[] = {
 
 static void check_model_config(const char* file) {
   char path[PATH_MAX];
+  ModelConfig model_config = {0};
 
   if (strchr(file, '/')) {
     snprintf(path, PATH_MAX, "%s", file);

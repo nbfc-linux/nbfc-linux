@@ -1,8 +1,11 @@
 #include "model_config.h"
+
+#include "nbfc.h"
 #include "memory.h"
-#include "stringbuf.h"
 #include "nxjson_utils.h"
 
+#include <string.h>
+#include <stdbool.h>
 #include <limits.h>
 #include <math.h>
 
@@ -186,7 +189,6 @@ void ModelConfig_Free(ModelConfig* c) {
   memset(c, 0, sizeof(*c));
 }
 
-struct Trace;
 struct Trace {
   char text[128];
   struct Trace* next;

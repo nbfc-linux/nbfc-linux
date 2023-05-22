@@ -45,7 +45,7 @@ Error* Fan_SetFixedSpeed(Fan*, float speed);
 void   Fan_SetAutoSpeed(Fan*);
 
 Error* Fan_ECReset(Fan*);
-Error* Fan_ECWrite(Fan*);
+Error* Fan_ECFlush(Fan*);
 
 declare_array_of(Fan);
 

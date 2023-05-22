@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <endian.h>
 #include <fcntl.h>
-#include <sys/stat.h>
 
 /* ========================================================================== *
  *            Core/Plugins/StagWare.Plugins.ECLinux/ECLinux.cs                *

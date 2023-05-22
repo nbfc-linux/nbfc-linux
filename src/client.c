@@ -10,6 +10,7 @@
 #include "slurp_file.h"
 #include "model_config.h"
 #include "model_config.c"
+#include "stringbuf.h"
 #include "error.c"
 #include "memory.c"
 #include <ctype.h>
@@ -20,9 +21,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
 #include <unistd.h>
 #include <locale.h>
+#include <limits.h>
+#include <math.h>
+#include <fcntl.h>
+
 
 #define DmiIdDirectoryPath "/sys/devices/virtual/dmi/id"
 

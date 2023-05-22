@@ -189,6 +189,7 @@ def write_header(fh):
         p(f'typedef struct {name} {name};')
         p(f'declare_array_of({name});')
         p(f'Error* {struct.name}_FromJson({struct.name}*, const nx_json*);')
+        p(f'Error* {struct.name}_ValidateFields({struct.name}*);')
         p('')
 
 def write_source(fh):

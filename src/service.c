@@ -1,5 +1,10 @@
 #include "service.h"
 
+#include "ec.h"
+#include "ec_linux.h"
+#include "ec_sys_linux.h"
+#include "ec_debug.h"
+#include "ec_dummy.h"
 #include "fan.h"
 #ifdef HAVE_SENSORS
 #include "lm_sensors.h"
@@ -7,6 +12,7 @@
 #include "fs_sensors.h"
 #include "temperature_filter.h"
 #include "service_config.h"
+#include "nbfc.h"
 #include "memory.h"
 #include "macros.h"
 #include "info.h"
@@ -14,11 +20,14 @@
 #include "model_config.h"
 
 #include <assert.h>
-#include <string.h> // memcpy
+#include <stdio.h>
 #include <math.h>   // fabs
-#include <linux/limits.h>
+#include <limits.h>
+#include <unistd.h>
 
 Service_Options options;
+
+extern EC_VTable* ec;
 
 static ModelConfig       model_config = {0};
 static Sensor_VTable*    sensor = NULL;

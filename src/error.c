@@ -4,7 +4,6 @@
 #include "nxjson.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #ifdef HAVE_SENSORS
 #include <sensors/error.h>

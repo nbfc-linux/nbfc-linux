@@ -1,7 +1,5 @@
 #include "nxjson.h"
-#include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #define ADD_KEY_NOT_NULL()                                                     \
   if (nx->key != NULL) {                                                       \

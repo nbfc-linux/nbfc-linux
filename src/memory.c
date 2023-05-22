@@ -6,6 +6,7 @@
 #include <errno.h>  // errno
 #include <stdlib.h> // malloc
 #include <string.h> // strerror
+#include <stdio.h>
 
 static inline void Memory_FatalError(const char* cause) {
   fprintf(stderr, "%s: %s\n", cause, strerror(errno));

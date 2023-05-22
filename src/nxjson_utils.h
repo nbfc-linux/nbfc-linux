@@ -3,11 +3,8 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <limits.h>
-#include <stdbool.h>
 
 #include "error.h"
-#include "memory.h"
 #include "nxjson.h"
 #include "slurp_file.h"
 

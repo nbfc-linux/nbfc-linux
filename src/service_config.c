@@ -1,11 +1,14 @@
 #include "service_config.h"
 
+#include "nbfc.h"
 #include "error.h"
 #include "memory.h"
+#include "model_config.h"
 #include "nxjson_utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 ServiceConfig service_config = {0};
 

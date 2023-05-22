@@ -4,6 +4,8 @@
 #include "error.h"
 #include "model_config.h"
 
+#include <stdbool.h>
+
 typedef struct Service_Options Service_Options;
 struct Service_Options {
   bool                    fork;
@@ -19,7 +21,7 @@ extern Service_Options options;
 
 Error* Service_Init();
 Error* Service_Loop();
-void   Service_Error(Error*);
+void   Service_HandleError(Error*);
 void   Service_Cleanup();
 
 #endif

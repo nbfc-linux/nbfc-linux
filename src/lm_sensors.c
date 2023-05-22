@@ -40,13 +40,13 @@ static void LM_Sensors_fatal_error(const char* proc, const char* err) {
   exit(NBFC_EXIT_FATAL);
 }
 
-Error* LM_Sensors_Init(FILE* fh) {
+Error* LM_Sensors_Init() {
   sensors_fatal_error     = LM_Sensors_fatal_error;
   sensors_parse_error     = LM_Sensors_parse_error;
   sensors_parse_error_wfn = LM_Sensors_parse_error_wfn;
 
   LM_Sensors_Error = NULL;
-  const int err = sensors_init(fh);
+  const int err = sensors_init(NULL);
   if (LM_Sensors_Error)
     return LM_Sensors_Error;
   if (err)

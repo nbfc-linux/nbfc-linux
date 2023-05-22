@@ -1,5 +1,7 @@
 ﻿#include "temperature_threshold_manager.h"
 
+#include <stddef.h>
+
 Error* ThresholdManager_Init(ThresholdManager* self, array_of(TemperatureThreshold)* thresholds) {
   my.current = NULL;
   my.thresholds = *thresholds;
