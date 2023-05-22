@@ -2,8 +2,6 @@
 #include "generated/client.help.h"
 #include "macros.h"
 #include "nbfc.h"
-#include "nxjson.c"
-#include "nxjson.h"
 #include "nxjson_utils.h"
 #include "optparse/optparse.h"
 #include "optparse/optparse.c"
@@ -13,6 +11,12 @@
 #include "stringbuf.h"
 #include "error.c"
 #include "memory.c"
+
+#define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
+#define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
+#include "nxjson.c"
+#include "nxjson.h"
+
 #include <ctype.h>
 #include <dirent.h>
 #include <signal.h>
