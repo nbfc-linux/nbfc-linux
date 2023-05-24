@@ -37,6 +37,7 @@ Installation
 
 - In general:
   - `make PREFIX=/usr confdir=/etc && sudo make PREFIX=/usr confdir=/etc install`
+  - With openrc support (`make PREFIX=/usr confdir=/etc && sudo make PREFIX=/usr confdir=/etc install install-openrc`)
 
 Getting started
 ---------------
