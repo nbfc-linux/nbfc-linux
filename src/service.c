@@ -129,16 +129,17 @@ Error* Service_Loop() {
   Error* e;
   float current_temperature;
 
-  if ((e = sensor->GetTemperature(&current_temperature))) {
-    e_warn();
-    current_temperature = 1000;
-  }
+  e = sensor->GetTemperature(&current_temperature);
+  if (e)
+    return e;
+
   current_temperature = TemperatureFilter_FilterTemperature(&temp_filter, current_temperature);
 
   bool re_init_required = false;
   for_each_array(Fan*, f, fans) {
-    if ((e = Fan_UpdateCurrentSpeed(f)))
-      e_warn();
+    e = Fan_UpdateCurrentSpeed(f);
+    if (e)
+      return e;
 
     // Re-init if current fan speeds are off by more than 15%
     if (fabs(Fan_GetCurrentSpeed(f) - Fan_GetTargetSpeed(f)) > 15) {
@@ -151,14 +152,16 @@ Error* Service_Loop() {
 
   if (! options.read_only) {
     e = ApplyRegisterWriteConfgurations(re_init_required);
-    e_warn();
+    if (e)
+      return e;
   }
 
   for_each_array(Fan*, f, fans) {
     Fan_SetTemperature(f, current_temperature);
     if (! options.read_only) {
       e = Fan_ECFlush(f);
-      e_warn();
+      if (e)
+        return e;
     }
   }
 
