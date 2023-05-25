@@ -320,27 +320,19 @@ static char *parse_value(nx_json *parent, const char *key, char *p, nx_json_unic
 		case '9': {
 			js = create_json (NX_JSON_INTEGER, key, parent);
 			char *pe;
-			if (*p == '-') {
-				js->val.i = (nxjson_s64) strtoll (p, &pe, 0);
-			} else {
-				js->val.u = (nxjson_u64) strtoull (p, &pe, 0);
-			}
+			errno = 0;
+			js->val.i = (nxjson_s64) strtoll (p, &pe, 0);
 			if (pe == p || errno == ERANGE) {
 				NX_JSON_REPORT_ERROR(INVALID_NUMBER, p);
 				return 0; // error
 			}
 			if (*pe == '.' || *pe == 'e' || *pe == 'E') { // double value
+				errno = 0;
 				js->type = NX_JSON_DOUBLE;
 				js->val.dbl = strtod (p, &pe);
 				if (pe == p || errno == ERANGE) {
 					NX_JSON_REPORT_ERROR(INVALID_NUMBER, p);
 					return 0; // error
-				}
-			} else {
-				if (*p == '-') {
-					//js->val.dbl = js->val.i;
-				} else {
-					//js->val.dbl = js->val.u;
 				}
 			}
 			return pe;
