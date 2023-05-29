@@ -14,7 +14,7 @@
         rec {
           packages =
             let
-              buildFlags = [ "PREFIX=$out" "confdir=/etc" ];
+              buildFlags = [ "PREFIX=$(out)" "confdir=/etc" ];
             in
             rec {
               nbfc = pkgs.stdenv.mkDerivation {
