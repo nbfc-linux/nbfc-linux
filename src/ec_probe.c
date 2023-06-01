@@ -143,18 +143,13 @@ static const cli99_option write_command_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option dump_command_options[] = {
-  cli99_include_options(&main_options),
-  cli99_options_end()
-};
-
 static const cli99_option* Options[] = {
-  dump_command_options,
+  main_options, // dump
   monitor_command_options,
   watch_command_options,
   read_command_options,
   write_command_options,
-  dump_command_options, // help
+  main_options, // help
 };
 
 static struct {
