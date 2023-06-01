@@ -353,51 +353,53 @@ static void ServiceConfig_Write() {
 }
 
 static const cli99_option main_options[] = {
-    {"-v|--version", -'v', 0},
-    {"-h|--help", -'h', 0},
-    {"command", 'C', 1 | cli99_required_option},
-    cli99_options_end()};
+  {"-v|--version",  -'v', 0},
+  {"-h|--help",     -'h', 0},
+  {"command",        'C', 1 | cli99_required_option},
+  cli99_options_end()
+};
 
 static const cli99_option status_command_options[] = {
-    cli99_include_options(&main_options),
-    {"-a|--all", -'a', 0},
-    {"-s|--status", -'s', 0},
-    {"-f|--fan", -'f', 1 | cli99_type_int},
-    {"-w|--watch", -'w', 1 | cli99_type_int},
-    cli99_options_end()};
+  cli99_include_options(&main_options),
+  {"-a|--all",      -'a', 0},
+  {"-s|--status",   -'s', 0},
+  {"-f|--fan",      -'f', 1},
+  {"-w|--watch",    -'w', 1},
+  cli99_options_end()
+};
 
 static const cli99_option config_command_options[] = {
-    cli99_include_options(&main_options),
-    {"-l|--list", -'l', 0},
-    {"-s|--set", -'s', 1 | cli99_required_option},
-    {"-a|--apply", -'a', 1 | cli99_required_option},
-    {"-r|--recommend", -'r', 0},
-    cli99_options_end()};
+  cli99_include_options(&main_options),
+  {"-l|--list",       -'l', 0},
+  {"-s|--set",        -'s', 1},
+  {"-a|--apply",      -'a', 1},
+  {"-r|--recommend",  -'r', 0},
+  cli99_options_end()
+};
 
 static const cli99_option set_command_options[] = {
-    cli99_include_options(&main_options),
-    {"-a|--auto", -'a', 0},
-    {"-s|--speed", -'s', 1 | cli99_type_float},
-    {"-f|--fan", -'f', 1 | cli99_type_int},
-    cli99_options_end()};
+  cli99_include_options(&main_options),
+  {"-a|--auto",       -'a', 0},
+  {"-s|--speed",      -'s', 1},
+  {"-f|--fan",        -'f', 1},
+  cli99_options_end()
+};
 
 static const cli99_option start_command_options[] = {
-    cli99_include_options(&main_options),
-    {"-r|--readonly", -'r', 0},
-    cli99_options_end()};
-
-static const cli99_option dump_command_options[] = {
-    cli99_include_options(&main_options), cli99_options_end()};
+  cli99_include_options(&main_options),
+  {"-r|--readonly",   -'r', 0},
+  cli99_options_end()
+};
 
 static const cli99_option *Options[] = {
-    start_command_options,
-    dump_command_options,
-    start_command_options, // restart
-    status_command_options,
-    config_command_options,
-    set_command_options,
-    dump_command_options,
-    dump_command_options,
+  start_command_options,
+  main_options,
+  start_command_options, // restart
+  status_command_options,
+  config_command_options,
+  set_command_options,
+  main_options,
+  main_options,
 };
 
 enum Command {
@@ -661,6 +663,44 @@ static int Set() {
   return Service_Restart(0);
 }
 
+static int64_t parse_number(const char* s, int64_t min, int64_t max, char** errmsg) {
+  errno = 0;
+  char* end;
+  int64_t val = strtoll(s, &end, 0);
+
+  if (errno)
+    *errmsg = strerror(errno);
+  else if (!*s || *end)
+    *errmsg = strerror(EINVAL);
+  else if (val < min)
+    *errmsg = "value too small";
+  else if (val > max)
+    *errmsg = "value too large";
+  else
+    *errmsg = NULL;
+
+  return val;
+}
+
+static double parse_double(const char* s, double min, double max, char** errmsg) {
+  errno = 0;
+  char* end;
+  double val = strtold(s, &end);
+
+  if (errno)
+    *errmsg = strerror(errno);
+  else if (!*s || *end)
+    *errmsg = strerror(EINVAL);
+  else if (val < min)
+    *errmsg = "value too small";
+  else if (val > max)
+    *errmsg = "value too large";
+  else
+    *errmsg = NULL;
+
+  return val;
+}
+
 int main(int argc, char *const argv[]) {
   if (argc == 1) {
     printf(CLIENT_HELP_TEXT);
@@ -673,6 +713,7 @@ int main(int argc, char *const argv[]) {
   enum Command cmd = Command_Help;
   cli99 p;
   char o;
+  char* err;
   options.fans = NULL;
   options.speeds = NULL;
   cli99_Init(&p, argc, argv, main_options, cli99_options_python);
@@ -709,35 +750,36 @@ int main(int argc, char *const argv[]) {
       options.r = 1;
       break;
     case -'w':
-      options.watch = p.optval.i;
+      options.watch = parse_number(p.optarg, 1, INT64_MAX, &err);
+      if (err) {
+        fprintf(stderr, "%s: -w: %s\n", argv[0], err);
+        return NBFC_EXIT_FAILURE;
+      }
       break;
     case -'f':
       if (cmd == Command_Set || cmd == Command_Status) {
-        if (p.optval.i < 0) {
-          fprintf(stderr, "The fan number can't be less than 0\n");
+        int fan = parse_number(p.optarg, 0, INT64_MAX, &err);
+        if (err) {
+          fprintf(stderr, "%s: -f: %s\n", argv[0], err);
           return NBFC_EXIT_FAILURE;
         }
 
         options.fancount++;
         options.fans = Mem_Realloc(options.fans, options.fancount * sizeof(int));
-        options.fans[options.fancount - 1] = p.optval.i;
+        options.fans[options.fancount - 1] = fan;
       }
       break;
     case -'s':
       if (cmd == Command_Set) {
-        if (p.optval.f > 100) {
-          fprintf(stderr, "The value of the speed percentage cannot exceed 100\n");
-          return NBFC_EXIT_FAILURE;
-        }
-
-        if (p.optval.f < 0) {
-          fprintf(stderr, "The value of the speed percentage cannot be negative\n");
+        float speed = parse_double(p.optarg, 0, 100, &err);
+        if (err) {
+          fprintf(stderr, "%s: -s: %s\n", argv[0], err);
           return NBFC_EXIT_FAILURE;
         }
 
         options.speedcount++;
         options.speeds = Mem_Realloc(options.speeds, options.speedcount * sizeof(float));
-        options.speeds[options.speedcount - 1] = p.optval.f;
+        options.speeds[options.speedcount - 1] = speed;
       } else {
         options.s = 1;
         if (cmd == Command_Config && options.a) {

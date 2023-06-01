@@ -107,12 +107,18 @@ static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* v, const n
   const char* s = NULL;
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
-  else if (!strcmp(s, "ec_sys_linux")) *v = EmbeddedControllerType_ECSysLinux;
-  else if (!strcmp(s, "ec_acpi"))      *v = EmbeddedControllerType_ECSysLinuxACPI;
-  else if (!strcmp(s, "ec_linux"))     *v = EmbeddedControllerType_ECLinux;
-  else if (!strcmp(s, "dummy"))        *v = EmbeddedControllerType_ECDummy;
-  else return err_string(0, "Invalid value for EmbeddedControllerType");
+  EmbeddedControllerType t = EmbeddedControllerType_FromString(s);
+  if (t == EmbeddedControllerType_Unset)
+    return err_string(0, "Invalid value for EmbeddedControllerType");
   return e;
+}
+
+EmbeddedControllerType EmbeddedControllerType_FromString(const char* s) {
+  if (!strcmp(s, "ec_sys_linux")) return EmbeddedControllerType_ECSysLinux;
+  if (!strcmp(s, "ec_acpi"))      return EmbeddedControllerType_ECSysLinuxACPI;
+  if (!strcmp(s, "ec_linux"))     return EmbeddedControllerType_ECLinux;
+  if (!strcmp(s, "dummy"))        return EmbeddedControllerType_ECDummy;
+  return EmbeddedControllerType_Unset;
 }
 
 typedef Error* (FromJson_Callback)(void*, const nx_json*);

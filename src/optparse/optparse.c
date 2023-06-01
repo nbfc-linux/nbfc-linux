@@ -33,7 +33,6 @@
 static const char* const cli99_ErrorMessages[cli99_Err_Count] = {
   "Success",
   "Mutual exclusion conflict",
-  "Type conversion of argument failed",
   "Unknown option",
   "Argument required",
   "Too many arguments",
@@ -131,58 +130,6 @@ static void cli99_SetOptions_Impl(cli99* self, const cli99_option* options, int*
     }
 }
 
-/**
- * Convert an argument
- */
-bool cli99_ConvertOptarg(cli99* self, uint64_t flags) {
-  const uint64_t type = cli99_FilterFlags(flags) & cli99_base_type_mask;
-  const uint64_t size = (cli99_FilterFlags(flags) & cli99_type_size_mask) >> 8;
-
-  if (!type) return true;
-  if (!my.optarg || !my.optarg[0]) return false;
-
-  errno = 0;
-  char* end;
-
-  switch (type) {
-  case cli99_type_int_base:
-    my.optval.i = strtoll(my.optarg, &end, 0);
-    return !errno && !*end && cli99_int_fits(my.optval.i, size);
-
-  case cli99_type_uint_base:
-    my.optval.u = strtoull(my.optarg, &end, 0);
-    return !errno && !*end && cli99_uint_fits(my.optval.u, size);
-
-  case cli99_type_float_base:
-    my.optval.ld = strtold(my.optarg, &end);
-    return !errno && !*end && cli99_float_fits(my.optval.ld, size);
-
-  case cli99_type_char:
-    return (my.optval.c = my.optarg[0]), !my.optarg[1];
-
-  case cli99_type_bool:
-    if (((unsigned char) my.optarg[0] | 0x20U) == 'f' &&
-        ((unsigned char) my.optarg[1] | 0x20U) == 'a' &&
-        ((unsigned char) my.optarg[2] | 0x20U) == 'l' &&
-        ((unsigned char) my.optarg[3] | 0x20U) == 's' &&
-        ((unsigned char) my.optarg[4] | 0x20U) == 'e')
-      return (my.optval.b = 0), !my.optarg[5];
-    else if (
-        ((unsigned char) my.optarg[0] | 0x20U) == 't' &&
-        ((unsigned char) my.optarg[1] | 0x20U) == 'r' &&
-        ((unsigned char) my.optarg[2] | 0x20U) == 'u' &&
-        ((unsigned char) my.optarg[3] | 0x20U) == 'e')
-      return (my.optval.b = 1), !my.optarg[4];
-    else {
-      my.optval.u = my.optarg[0] - '0';
-      return my.optval.u <= 1 && !my.optarg[1];
-    }
-
-  default:
-    return false; /* Unknown type */
-  }
-}
-
 static inline bool cli99_OptionExclusiveCheck(const cli99* self, const cli99_option_internal* o) {
   return (! o->group) || (! (my._groups & (1ULL << (o->group - 1)))) || o->count;
 }
@@ -222,15 +169,13 @@ static inline uint64_t cli99_GetNextState(const char* s) {
  *   cli99_op_next, 0
  *     Advance parsing position and change state
  *
- *   cli99_op_getarg,  <type> | cli99_argument_mask
- *     Read the current argument into `self->optarg` and do type
- *     conversion as wished.
+ *   cli99_op_getarg,  cli99_argument_mask
+ *     Read the current argument into `self->optarg`.
  *
  *     Will fail if the current argument is not a positional.
  *
- *   cli99_op_getoptarg, <type> | cli99_argument_mask
- *     Read the current argument into `self->optarg` and do type
- *     conversion as wished.
+ *   cli99_op_getoptarg, cli99_argument_mask
+ *     Read the current argument into `self->optarg`.
  *
  *     Will fail if the current argument is not considered
  *     to be an argument as specified in `self->flags`.
@@ -432,32 +377,18 @@ static cli99_option_internal* cli99_MatchOptions(cli99* self) {
     break;
 
   case cli99_state_long_opt:
-    // Try first long option (without parsing `optstring`)
     for (int i = 0; i < my._options_size; ++i) {
       option = &my._options[i];
       optstring = option->option->optstring;
-      if ((my._arg_l == option->long_opt_len) &&
-          (*my._arg_s == optstring[option->long_opt_start]) &&
-           !strncmp(&optstring[option->long_opt_start], my._arg_s, my._arg_l))
-        return option;
-    }
-
-    for (int i = 0; i < my._options_size; ++i) {
-      option = &my._options[i];
-      if (! option->long_opt_start)
-        continue;
-
-      // Skip first option
-      optstring = option->option->optstring + option->long_opt_start + option->long_opt_len;
 
       while (*optstring) {
+        for (; *optstring && cli99_IsDelimiter(*optstring); ++optstring);
         const int ndashes = ((optstring[0]=='-') + (optstring[1]=='-'));
         optstring += ndashes;
         const char* o = optstring;
         for (; *optstring && !cli99_IsDelimiter(*optstring); ++optstring);
-        for (; *optstring &&  cli99_IsDelimiter(*optstring); ++optstring);
         if (ndashes == 2) {
-          int option_len = o - optstring;
+          int option_len = optstring - o;
           if (my._arg_l == option_len && !strncmp(o, my._arg_s, my._arg_l))
             return option;
         }
@@ -475,7 +406,6 @@ static cli99_option_internal* cli99_MatchOptions(cli99* self) {
  * On success:
  *   - `self->optopt` will hold the option name
  *   - `self->optarg` will hold the option argument (if any)
- *   - `self->optval` will hold the result of the converted `optarg`.
  *   - `cli99_option->value` is returned.
  *
  * On failure:
@@ -539,9 +469,6 @@ bool cli99_GetArg(cli99* self, uint64_t flags) {
   if (! cli99_StateCtl(self, cli99_op_getarg, my.flags | flags))
     return !(my.error = cli99_ErrArgumentRequired);
 
-  if (my.optarg)
-    if (! cli99_ConvertOptarg(self, flags))
-      return !(my.error = cli99_ErrTypeConversionFailed);
   return true;
 }
 
@@ -549,14 +476,11 @@ bool cli99_GetArg(cli99* self, uint64_t flags) {
  * Try to parse an option argument (-o arg, --option=arg, ...).
  *
  * If the argument has been parsed successfully, it is stored in self->optarg.
- * The result of the type conversion is available in the self->optval.
  *
  * The following errors may be set on failure:
  *    - cli99_ErrArgumentRequired
- *    - cli99_ErrTypeConversionFailed
  *
  * @param cli99_optional_argument   Don't treat a missing argument as an error.
- * @param cli99_type(...)           Convert argument to TYPE.
  *
  * @return @true on success, @false on failure
  */
@@ -564,9 +488,6 @@ bool cli99_GetOptarg(cli99* self, uint64_t flags) {
   if (! cli99_StateCtl(self, cli99_op_getoptarg, my.flags | flags))
     return !(my.error = cli99_ErrArgumentRequired);
 
-  if (my.optarg)
-    if (! cli99_ConvertOptarg(self, flags))
-      return !(my.error = cli99_ErrTypeConversionFailed);
   return true;
 }
 

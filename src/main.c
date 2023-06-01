@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <limits.h>
+#include <float.h>
 
 EC_VTable* ec;
 
@@ -20,8 +21,6 @@ static volatile int quit;
 static void sig_handler(int i) { quit = i; }
 
 static cli99_option cli_options[] = {
-#define G1 cli99_exclusive_group(1) // readonly <or> fork
-#define G2 cli99_exclusive_group(2) // debug    <or> fork
   {"-h|--help",                'h',  0},
   {"-v|--version",             'v',  0},
   {"-e|--embedded-controller", 'e',  1},
@@ -30,11 +29,8 @@ static cli99_option cli_options[] = {
   {"-d|--debug",               'd',  0},
   {"-s|--state-file",          's',  1},
   {"-c|--config-file",         'c',  1},
-  {"--critical-temperature",   '!',  1|cli99_type(float)},
   {"--check-model-config",     'C',  1},
   cli99_options_end()
-#undef G1
-#undef G2
 };
 
 static void check_model_config(const char* file) {
@@ -60,14 +56,12 @@ static void parse_opts(int argc, char* const argv[]) {
   cli99_Init(&p, argc, argv, cli_options, cli99_options_python);
 
   int o;
+  char* err;
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
     case 'e':
-      /**/ if (! strcmp(p.optarg, "dummy"))        options.embedded_controller_type = EmbeddedControllerType_ECDummy;
-      else if (! strcmp(p.optarg, "ec_linux"))     options.embedded_controller_type = EmbeddedControllerType_ECLinux;
-      else if (! strcmp(p.optarg, "ec_sys_linux")) options.embedded_controller_type = EmbeddedControllerType_ECSysLinux;
-      else if (! strcmp(p.optarg, "ec_acpi"))      options.embedded_controller_type = EmbeddedControllerType_ECSysLinuxACPI;
-      else {
+      options.embedded_controller_type = EmbeddedControllerType_FromString(p.optarg);
+      if (options.embedded_controller_type == EmbeddedControllerType_Unset) {
         fprintf(stderr, "Invalid value for %s: %s\n", p.optopt, p.optarg);
         exit(NBFC_EXIT_CMDLINE);
       }
@@ -79,7 +73,6 @@ static void parse_opts(int argc, char* const argv[]) {
     case 'd':  options.debug          = 1;                         break;
     case 's':  options.state_file     = p.optarg;                  break;
     case 'c':  options.service_config = p.optarg;                  break;
-    case '!':  options.critical_temperature = p.optval.d;          break;
     case 'C':  check_model_config(p.optarg); exit(0);              break;
     default:
       cli99_ExplainError(&p);
@@ -96,6 +89,7 @@ static void parse_opts(int argc, char* const argv[]) {
 int main(int argc, char* const argv[])
 {
   setlocale(LC_NUMERIC, "C"); // for json floats
+
   signal(SIGINT, sig_handler);
   signal(SIGTERM, sig_handler);
 
