@@ -9,7 +9,7 @@ ifeq ($(BUILD), debug)
 	CFLAGS   = -Og -g
 else
 	CPPFLAGS = -DNDEBUG
-	CFLAGS   = -Os
+	CFLAGS   = -Os -flto
 	LDFLAGS  = -s
 endif
 
