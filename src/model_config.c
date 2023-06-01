@@ -52,64 +52,65 @@ static inline Error* double_FromJson(double* out, const nx_json* node) {
   return err_string(0, "Not a double");
 }
 
-static inline Error* float_FromJson(float* v, const nx_json* json) {
+static inline Error* float_FromJson(float* out, const nx_json* json) {
   double d = 0;
   Error* e = double_FromJson(&d, json);
+  if (! e)
+    *out = d;
+  return e;
+}
+
+static inline Error* Boolean_FromJson(Boolean* out, const nx_json* json) {
+  return bool_FromJson((bool*) out, json);
+}
+
+static inline Error* str_FromJson(const char** out, const nx_json* json) {
+  Error* e = nx_json_get_str(out, json);
   e_check();
-  *v = d;
+  *out = Mem_Strdup(*out);
   return err_success();
 }
 
-static inline Error* Boolean_FromJson(Boolean* v, const nx_json* json) {
-  return bool_FromJson((bool*) v, json);
-}
-
-static inline Error* str_FromJson(const char** v, const nx_json* json) {
-  Error* e = nx_json_get_str(v, json);
-  e_check();
-  *v = Mem_Strdup(*v);
-  return err_success();
-}
-
-static Error* RegisterWriteMode_FromJson(RegisterWriteMode* v, const nx_json* json) {
+static Error* RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* json) {
   const char* s = NULL;
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
-  else if (!strcmp(s, "Set")) *v = RegisterWriteMode_Set;
-  else if (!strcmp(s, "And")) *v = RegisterWriteMode_And;
-  else if (!strcmp(s, "Or"))  *v = RegisterWriteMode_Or;
+  else if (!strcmp(s, "Set")) *out = RegisterWriteMode_Set;
+  else if (!strcmp(s, "And")) *out = RegisterWriteMode_And;
+  else if (!strcmp(s, "Or"))  *out = RegisterWriteMode_Or;
   else return err_string(0, "Invalid value for RegisterWriteMode");
   return e;
 }
 
-static Error* RegisterWriteOccasion_FromJson(RegisterWriteOccasion* v, const nx_json* json) {
+static Error* RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const nx_json* json) {
   const char* s = NULL;
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
-  else if (!strcmp(s, "OnWriteFanSpeed"))  *v = RegisterWriteOccasion_OnWriteFanSpeed;
-  else if (!strcmp(s, "OnInitialization")) *v = RegisterWriteOccasion_OnInitialization;
+  else if (!strcmp(s, "OnWriteFanSpeed"))  *out = RegisterWriteOccasion_OnWriteFanSpeed;
+  else if (!strcmp(s, "OnInitialization")) *out = RegisterWriteOccasion_OnInitialization;
   else return err_string(0, "Invalid value for RegisterWriteOccasion");
   return e;
 }
 
-static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* v, const nx_json* json) {
+static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* out, const nx_json* json) {
   const char* s = NULL;
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
-  else if (!strcmp(s, "Read"))       *v = OverrideTargetOperation_Read;
-  else if (!strcmp(s, "Write"))      *v = OverrideTargetOperation_Write;
-  else if (!strcmp(s, "ReadWrite"))  *v = OverrideTargetOperation_ReadWrite;
+  else if (!strcmp(s, "Read"))       *out = OverrideTargetOperation_Read;
+  else if (!strcmp(s, "Write"))      *out = OverrideTargetOperation_Write;
+  else if (!strcmp(s, "ReadWrite"))  *out = OverrideTargetOperation_ReadWrite;
   else return err_string(0, "Invalid value for OverrideTargetOperation");
   return e;
 }
 
-static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* v, const nx_json* json) {
+static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const nx_json* json) {
   const char* s = NULL;
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
   EmbeddedControllerType t = EmbeddedControllerType_FromString(s);
   if (t == EmbeddedControllerType_Unset)
     return err_string(0, "Invalid value for EmbeddedControllerType");
+  *out = t;
   return e;
 }
 
