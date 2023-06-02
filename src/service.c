@@ -104,8 +104,6 @@ Error* Service_Init() {
 #endif
   e_check();
 
-  e = Info_Init(options.state_file);
-  e_check();
   e = TemperatureFilter_Init(&temp_filter, model_config.EcPollInterval, NBFC_TEMPERATURE_FILTER_TIMESPAN);
   e_check();
 
@@ -120,6 +118,9 @@ Error* Service_Init() {
     case 0:  break;
     default: _exit(0);
     }
+
+  e = Info_Init(options.state_file);
+  e_check();
 
   service_initialized = 1;
   return err_success();
