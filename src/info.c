@@ -4,17 +4,18 @@
 #include "error.h"
 #include "stringbuf.h"
 #include "macros.h"
+#include "memory.h"
 
 #include <unistd.h>   // getpid
 #include <fcntl.h>    // open
 #include <sys/stat.h> // chmod
 
-static const char* Info_File;
+static char* Info_File;
 
 static const char* Json_EscapeString(char*, size_t, const char*);
 
 Error* Info_Init(const char* file) {
-  Info_File = file;
+  Info_File = Mem_Strdup(file);
 
   int fd = open(Info_File, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
   if (fd < 0)
@@ -43,7 +44,11 @@ Error* Info_Init(const char* file) {
 
 void Info_Close() {
   unlink(NBFC_PID_FILE);
-  unlink(NBFC_STATE_FILE);
+  if (Info_File) {
+    unlink(Info_File);
+    Mem_Free(Info_File);
+    Info_File = NULL;
+  }
 }
 
 Error* Info_Write(ModelConfig* cfg, float temperature, bool readonly, array_of(Fan)* fans) {
