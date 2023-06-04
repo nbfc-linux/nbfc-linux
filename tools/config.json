@@ -259,7 +259,7 @@
         "name": "EmbeddedControllerType",
         "type": "EmbeddedControllerType",
         "help": "Either `ECSysLinux` for using the `ec_sys` kernel module, or `ECLinux` for an alternative implementation using `/dev/port` without depending on kernel modules.",
-        "default": "EmbeddedControllerType_ECSysLinux"
+        "is_unset": "false"
       },
       {
         "name": "TargetFanSpeeds",

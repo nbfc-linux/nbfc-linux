@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "nxjson_utils.h"
 
+#include <assert.h>
 #include <string.h>
 #include <stdbool.h>
 #include <limits.h>
@@ -120,6 +121,17 @@ EmbeddedControllerType EmbeddedControllerType_FromString(const char* s) {
   if (!strcmp(s, "ec_linux"))     return EmbeddedControllerType_ECLinux;
   if (!strcmp(s, "dummy"))        return EmbeddedControllerType_ECDummy;
   return EmbeddedControllerType_Unset;
+}
+
+const char* EmbeddedControllerType_ToString(EmbeddedControllerType t) {
+  switch (t) {
+  case EmbeddedControllerType_ECSysLinux:     return "ec_sys_linux";
+  case EmbeddedControllerType_ECSysLinuxACPI: return "ec_acpi";
+  case EmbeddedControllerType_ECLinux:        return "ec_linux";
+  case EmbeddedControllerType_ECDummy:        return "dummy";
+  default: assert(!"Invalid value for EmbeddedControllerType");
+  }
+  return NULL;
 }
 
 typedef Error* (FromJson_Callback)(void*, const nx_json*);

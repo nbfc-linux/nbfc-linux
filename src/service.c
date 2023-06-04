@@ -29,39 +29,64 @@ Service_Options options;
 
 extern EC_VTable* ec;
 
-static ModelConfig       model_config = {0};
-static Sensor_VTable*    sensor = NULL;
-static TemperatureFilter temp_filter = {0};
-static array_of(Fan)     fans = {0};
-static bool              service_initialized = 0;
+enum Service_Initialization {
+  Initialized_0_None,
+  Initialized_1_Service_Config,
+  Initialized_2_Model_Config,
+  Initialized_3_Fans,
+  Initialized_4_Embedded_Controller,
+  Initialized_5_Sensors,
+  Initialized_6_Temperature_Filter,
+  Initialized_7_Info,
+};
+
+static ModelConfig       model_config;
+static Sensor_VTable*    sensor;
+static TemperatureFilter temp_filter;
+static array_of(Fan)     fans;
+static enum Service_Initialization Service_State;
 
 static Error* ApplyRegisterWriteConfig(int, uint8_t, RegisterWriteMode);
 static Error* ApplyRegisterWriteConfgurations(bool);
 static Error* ResetRegisterWriteConfigs();
 static Error* ResetEC();
-static Error* SetupEC(EmbeddedControllerType);
+static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable*);
+static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
 Error* Service_Init() {
   Error* e;
+  static char path[PATH_MAX];
+  Service_State = Initialized_0_None;
 
+  // Service config ===========================================================
   e = ServiceConfig_Init(options.service_config);
-  if (e)
-    return err_string(e, options.service_config);
+  if (e) {
+    e = err_string(e, options.service_config);
+    goto error;
+  }
+  Service_State = Initialized_1_Service_Config;
 
+  // Model config =============================================================
   fprintf(stderr, "Using '%s' as model config\n", service_config.SelectedConfigId);
 
-  static char path[PATH_MAX];
   snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, service_config.SelectedConfigId);
   e = ModelConfig_FromFile(&model_config, path);
-  if (e)
-    return err_string(e, path);
+  if (e) {
+    e = err_string(e, path);
+    goto error;
+  }
+  Service_State = Initialized_2_Model_Config;
 
   e = ModelConfig_Validate(&model_config);
-  if (e)
-    return err_string(e, path);
+  if (e) {
+    e = err_string(e, path);
+    goto error;
+  }
 
+  // Fans =====================================================================
   fans.size = model_config.FanConfigurations.size;
   fans.data = (Fan*) Mem_Calloc(fans.size, sizeof(Fan));
+  Service_State = Initialized_3_Fans;
 
   for_enumerate_array(size_t, i, fans) {
     e = Fan_Init(
@@ -70,7 +95,8 @@ Error* Service_Init() {
         model_config.CriticalTemperature,
         model_config.ReadWriteWords
     );
-    e_check();
+    if (e)
+      goto error;
   }
 
   for_enumerate_array(size_t, i, service_config.TargetFanSpeeds) {
@@ -82,57 +108,89 @@ Error* Service_Init() {
       Fan_SetAutoSpeed(&fans.data[i]);
   }
 
-  if (options.embedded_controller_type != EmbeddedControllerType_Unset)
-    e = SetupEC(options.embedded_controller_type); // --embedded-controller given
-  else if (service_config.EmbeddedControllerType != EmbeddedControllerType_Unset)
-    e = SetupEC(service_config.EmbeddedControllerType);
+  // Embedded controller ======================================================
+  if (options.embedded_controller_type != EmbeddedControllerType_Unset) {
+    // --embedded-controller given
+    ec = EC_By_EmbeddedControllerType(options.embedded_controller_type);;
+  }
+  else if (service_config.EmbeddedControllerType != EmbeddedControllerType_Unset) {
+    ec = EC_By_EmbeddedControllerType(service_config.EmbeddedControllerType);
+  }
   else {
-    e = SetupEC(EmbeddedControllerType_ECSysLinux);
-    if (e) {
-      e = SetupEC(EmbeddedControllerType_ECSysLinuxACPI);
-      if (e)
-        e = SetupEC(EmbeddedControllerType_ECLinux);
-    }
+    e = EC_FindWorking(&ec);
+    if (e)
+      goto error;
   }
 
-  e_check();
+  EmbeddedControllerType t = EmbeddedControllerType_By_EC(ec);
+  fprintf(stderr, "Using '%s' as EmbeddedControllerType\n", EmbeddedControllerType_ToString(t));
+  e = ec->Open();
+  if (e)
+    goto error;
 
+  if (options.debug) {
+    EC_Debug_Controller = ec;
+    ec = &EC_Debug_VTable;
+  }
+
+  Service_State = Initialized_4_Embedded_Controller;
+
+  // Register Write configurations ============================================
+  if (! options.read_only) {
+    e = ApplyRegisterWriteConfgurations(true);
+    if (e)
+      goto error;
+  }
+
+  // Sensor ===================================================================
   e = (sensor = &FS_Sensors_VTable)->Init();
 #ifdef HAVE_SENSORS
   if (e)
     e = (sensor = &LM_Sensors_VTable)->Init();
 #endif
-  e_check();
+  if (e)
+    goto error;
+  Service_State = Initialized_5_Sensors;
 
+  // Temperature Filter =======================================================
   e = TemperatureFilter_Init(&temp_filter, model_config.EcPollInterval, NBFC_TEMPERATURE_FILTER_TIMESPAN);
-  e_check();
+  if (e)
+    goto error;
+  Service_State = Initialized_6_Temperature_Filter;
 
-  if (! options.read_only) {
-    e = ApplyRegisterWriteConfgurations(true);
-    e_check();
-  }
-
+  // Fork =====================================================================
   if (options.fork)
     switch (fork()) {
-    case -1: return err_stdlib(0, "fork");
-    case 0:  break;
-    default: _exit(0);
+    case -1:
+      e = err_stdlib(0, "fork");
+      goto error;
+    case 0:
+      break;
+    default:
+      _exit(0);
     }
 
+  // Info =====================================================================
   e = Info_Init(options.state_file);
-  e_check();
+  if (e)
+    goto error;
+  Service_State = Initialized_7_Info;
 
-  service_initialized = 1;
   return err_success();
+
+error:
+  Service_Cleanup();
+  return e;
 }
 
 Error* Service_Loop() {
   Error* e;
   float current_temperature;
+  static int failures = 0;
 
   e = sensor->GetTemperature(&current_temperature);
   if (e)
-    return e;
+    goto error;
 
   current_temperature = TemperatureFilter_FilterTemperature(&temp_filter, current_temperature);
 
@@ -140,7 +198,7 @@ Error* Service_Loop() {
   for_each_array(Fan*, f, fans) {
     e = Fan_UpdateCurrentSpeed(f);
     if (e)
-      return e;
+      goto error;
 
     // Re-init if current fan speeds are off by more than 15%
     if (fabs(Fan_GetCurrentSpeed(f) - Fan_GetTargetSpeed(f)) > 15) {
@@ -154,7 +212,7 @@ Error* Service_Loop() {
   if (! options.read_only) {
     e = ApplyRegisterWriteConfgurations(re_init_required);
     if (e)
-      return e;
+      goto error;
   }
 
   for_each_array(Fan*, f, fans) {
@@ -162,60 +220,44 @@ Error* Service_Loop() {
     if (! options.read_only) {
       e = Fan_ECFlush(f);
       if (e)
-        return e;
+        goto error;
     }
   }
 
   e = Info_Write(&model_config, current_temperature, options.read_only, &fans);
-  return e;
-}
 
-void Service_HandleError(Error* e) {
-  static int failures;
-
+error:
   if (! e) {
     sleep_ms(model_config.EcPollInterval);
     failures = 0;
-    return;
   }
+  else {
+    if (++failures >= 100) {
+      e_warn();
+      fprintf(stderr, "We tried %d times, exiting now...\n", failures);
+      exit(NBFC_EXIT_FAILURE);
+    }
 
-  if (++failures >= 100) {
-    e_warn();
-    fprintf(stderr, "We tried %d times, exiting now...\n", failures);
-    exit(NBFC_EXIT_FAILURE);
+    sleep_ms(10);
   }
-
-  sleep_ms(10);
 }
 
-static Error* SetupEC(EmbeddedControllerType ec_type) {
-  switch (ec_type) {
-    case EmbeddedControllerType_ECSysLinuxACPI:
-      ec = &EC_SysLinux_ACPI_VTable;
-      fprintf(stderr, "Using 'ec_acpi' as EmbeddedControllerType\n");
-      break;
-    case EmbeddedControllerType_ECSysLinux:
-      ec = &EC_SysLinux_VTable;
-      fprintf(stderr, "Using 'ec_sys_linux' as EmbeddedControllerType\n");
-      break;
-    case EmbeddedControllerType_ECLinux:
-      ec = &EC_Linux_VTable;
-      fprintf(stderr, "Using 'ec_linux' as EmbeddedControllerType\n");
-      break;
-    case EmbeddedControllerType_ECDummy:
-      ec = &EC_Dummy_VTable;
-      fprintf(stderr, "Using 'dummy' as EmbeddedControllerType\n");
-      break;
-    case EmbeddedControllerType_Unset:
-      assert(!"Invalid value for ec_type");
-  }
+static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable* ec) {
+  if (ec == &EC_SysLinux_VTable)       return EmbeddedControllerType_ECSysLinux;
+  if (ec == &EC_SysLinux_ACPI_VTable)  return EmbeddedControllerType_ECSysLinuxACPI;
+  if (ec == &EC_Linux_VTable)          return EmbeddedControllerType_ECLinux;
+  if (ec == &EC_Dummy_VTable)          return EmbeddedControllerType_ECDummy;
+  return EmbeddedControllerType_Unset;
+}
 
-  if (options.debug) {
-    EC_Debug_Controller = ec;
-    ec = &EC_Debug_VTable;
+static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
+  switch (t) {
+  case EmbeddedControllerType_ECSysLinux: return &EC_SysLinux_VTable;
+  case EmbeddedControllerType_ECSysLinuxACPI: return &EC_SysLinux_ACPI_VTable;
+  case EmbeddedControllerType_ECLinux: return &EC_Linux_VTable;
+  case EmbeddedControllerType_ECDummy: return &EC_Dummy_VTable;
+  default: return NULL;
   }
-
-  return ec->Open();
 }
 
 static Error* ResetEC() {
@@ -269,18 +311,25 @@ static Error* ApplyRegisterWriteConfgurations(bool initializing) {
 }
 
 void Service_Cleanup() {
-  Info_Close();
-  TemperatureFilter_Close(&temp_filter);
-  Mem_Free(fans.data);
-  ModelConfig_Free(&model_config);
-  ServiceConfig_Free(&service_config);
-  if (service_initialized)
-    if (ec) {
+  switch (Service_State) {
+    case Initialized_7_Info:
+      Info_Close();
+    case Initialized_6_Temperature_Filter:
+      TemperatureFilter_Close(&temp_filter);
+    case Initialized_5_Sensors:
+      sensor->Cleanup();
+    case Initialized_4_Embedded_Controller:
       if (! options.read_only)
         ResetEC();
       ec->Close();
-    }
-  if (sensor)
-    sensor->Cleanup();
+    case Initialized_3_Fans:
+      Mem_Free(fans.data);
+    case Initialized_2_Model_Config:
+      ModelConfig_Free(&model_config);
+    case Initialized_1_Service_Config:
+      ServiceConfig_Free(&service_config);
+  }
+
+  Service_State = Initialized_0_None;
 }
 

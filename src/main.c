@@ -110,7 +110,7 @@ int main(int argc, char* const argv[])
   }
 
   while (!quit) {
-    Service_HandleError(Service_Loop());
+    Service_Loop();
   }
 
   return 0;

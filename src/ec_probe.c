@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "error.c"             // src
+#include "ec.c"                // src
 #include "ec_linux.c"          // src
 #include "ec_sys_linux.c"      // src
 #include "optparse/optparse.c" // src
@@ -165,36 +166,6 @@ static struct {
   int             stress_cpu;
 } options = {0};
 
-static bool TestEC(EC_VTable* ec) {
-  Error* e = ec->Open();
-  if (e)
-    return false;
-
-  uint8_t byte;
-  e = ec->ReadByte(0, &byte);
-  ec->Close();
-  return !e;
-}
-
-static Error* FindEC() {
-  if (TestEC(&EC_SysLinux_VTable)) {
-    ec = &EC_SysLinux_VTable;
-    return err_success();
-  }
-
-  if (TestEC(&EC_SysLinux_ACPI_VTable)) {
-    ec = &EC_SysLinux_ACPI_VTable;
-    return err_success();
-  }
-
-  if (TestEC(&EC_Linux_VTable)) {
-    ec = &EC_Linux_VTable;
-    return err_success();
-  }
-
-  return err_string(0, "No working implementation found for reading the embedded controller");
-}
-
 static int64_t parse_number(const char* s, int64_t min, int64_t max, char** errmsg) {
   errno = 0;
   char* end;
@@ -298,7 +269,7 @@ int main(int argc, char* const argv[]) {
   signal(SIGTERM, Handle_Signal);
 
   if (ec == NULL) {
-    e = FindEC();
+    e = EC_FindWorking(&ec);
     e_die();
   }
 

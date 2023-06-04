@@ -360,8 +360,8 @@ Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
 	if (self->ReadOnly == Boolean_Unset)
 		self->ReadOnly = Boolean_False;
 
-	if (self->EmbeddedControllerType == EmbeddedControllerType_Unset)
-		self->EmbeddedControllerType = EmbeddedControllerType_ECSysLinux;
+	if (false)
+		return err_string(0, "EmbeddedControllerType: Missing option");
 
 	if (false)
 		return err_string(0, "TargetFanSpeeds: Missing option");
