@@ -67,7 +67,7 @@ Error* Service_Init() {
   Service_State = Initialized_1_Service_Config;
 
   // Model config =============================================================
-  fprintf(stderr, "Using '%s' as model config\n", service_config.SelectedConfigId);
+  Log_Info("Using '%s' as model config\n", service_config.SelectedConfigId);
 
   snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, service_config.SelectedConfigId);
   e = ModelConfig_FromFile(&model_config, path);
@@ -123,7 +123,7 @@ Error* Service_Init() {
   }
 
   EmbeddedControllerType t = EmbeddedControllerType_By_EC(ec);
-  fprintf(stderr, "Using '%s' as EmbeddedControllerType\n", EmbeddedControllerType_ToString(t));
+  Log_Info("Using '%s' as EmbeddedControllerType\n", EmbeddedControllerType_ToString(t));
   e = ec->Open();
   if (e)
     goto error;
@@ -205,7 +205,7 @@ Error* Service_Loop() {
       re_init_required = true;
 
       if (options.debug)
-        fprintf(stderr, "re_init_required = 1;\n");
+        Log_Debug("re_init_required = 1;\n");
     }
   }
 
@@ -233,8 +233,8 @@ error:
   }
   else {
     if (++failures >= 100) {
-      e_warn();
-      fprintf(stderr, "We tried %d times, exiting now...\n", failures);
+      Log_Error("%s\n", err_print_all(e));
+      Log_Error("We tried %d times, exiting now...\n", failures);
       exit(NBFC_EXIT_FAILURE);
     }
 

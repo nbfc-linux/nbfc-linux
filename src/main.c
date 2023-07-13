@@ -2,6 +2,7 @@
 #include "service.h"
 
 #include "error.h"
+#include "log.h"
 #include "ec.h"
 #include "model_config.h"
 #include "optparse/optparse.h"
@@ -62,7 +63,7 @@ static void parse_opts(int argc, char* const argv[]) {
     case 'e':
       options.embedded_controller_type = EmbeddedControllerType_FromString(p.optarg);
       if (options.embedded_controller_type == EmbeddedControllerType_Unset) {
-        fprintf(stderr, "Invalid value for %s: %s\n", p.optopt, p.optarg);
+        Log_Error("Invalid value for %s: %s\n", p.optopt, p.optarg);
         exit(NBFC_EXIT_CMDLINE);
       }
       break;
@@ -81,13 +82,16 @@ static void parse_opts(int argc, char* const argv[]) {
   }
 
   if (!cli99_End(&p)) {
-    fprintf(stderr, "Too much arguments\n");
+    Log_Error("Too much arguments\n");
     exit(NBFC_EXIT_CMDLINE);
   }
 }
 
 int main(int argc, char* const argv[])
 {
+  Program_Name_Set(argv[0]);
+  Log_Info("Running version " NBFC_VERSION "\n");
+
   setlocale(LC_NUMERIC, "C"); // for json floats
 
   signal(SIGINT, sig_handler);
@@ -99,13 +103,13 @@ int main(int argc, char* const argv[])
   parse_opts(argc, argv);
 
   if (options.read_only)
-    fprintf(stderr, "readonly mode enabled\n");
+    Log_Info("readonly mode enabled\n");
 
   atexit(Service_Cleanup);
 
   Error* e = Service_Init();
   if (e) {
-    err_print_all(e);
+    Log_Error("%s\n", err_print_all(e));
     exit(NBFC_EXIT_INIT);
   }
 

@@ -11,6 +11,8 @@
 #include "stringbuf.h"
 #include "error.c"
 #include "memory.c"
+#include "program_name.c"
+#include "log.h"
 
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
@@ -61,7 +63,7 @@ static const char* get_system_product() {
   return buf;
 
 error:
-  fprintf(stderr, "Could not get product name. Failed to read " DmiIdDirectoryPath "/product_name: %s\n", strerror(errno));
+  Log_Error("Could not get product name. Failed to read " DmiIdDirectoryPath "/product_name: %s\n", strerror(errno));
   exit(NBFC_EXIT_FAILURE);
 }
 
@@ -83,7 +85,7 @@ static const char* get_system_vendor() {
   return buf;
 
 error:
-  fprintf(stderr, "Could not get system vendor. Failed to read " DmiIdDirectoryPath "/sys_vendor: %s\n", strerror(errno));
+  Log_Error("Could not get system vendor. Failed to read " DmiIdDirectoryPath "/sys_vendor: %s\n", strerror(errno));
   exit(NBFC_EXIT_FAILURE);
 }
 
@@ -119,7 +121,7 @@ static const char* get_model_name() {
 
 static void check_root() {
   if (geteuid()) {
-    fprintf(stderr, "This operation must be run as root\n");
+    Log_Error("This operation must be run as root\n");
     exit(NBFC_EXIT_FAILURE);
   }
 }
@@ -134,7 +136,7 @@ static int get_service_pid() {
   int pid = strtol(buf, &endptr, 10);
 
   if (errno || endptr == buf) {
-    fprintf(stderr, "Failed to read the pid file: " NBFC_PID_FILE "\n");
+    Log_Error("Failed to read the pid file: " NBFC_PID_FILE "\n");
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -145,18 +147,18 @@ static int Service_Start(int readonly) {
   check_root();
   int pid = get_service_pid();
   if (pid != -1)
-    fprintf(stderr, "Service already running (pid: %d)\n", pid);
+    Log_Info("Service already running (pid: %d)\n", pid);
   else {
     char cmd[32] = "nbfc_service -f";
     if (readonly)
       strcat(cmd, " -r");
     int ret = system(cmd);
     if (ret == -1) {
-      fprintf(stderr, "Failed to start process: %s\n", strerror(errno));
+      Log_Error("Failed to start process: %s\n", strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
     if (WEXITSTATUS(ret) == 127) {
-      fprintf(stderr, "Can't run nbfc_service, make sure the binary is installed\n");
+      Log_Error("Can't run nbfc_service, make sure the binary is installed\n");
       return NBFC_EXIT_FAILURE;
     }
     return WEXITSTATUS(ret);
@@ -168,13 +170,13 @@ static int Service_Stop() {
   check_root();
   int pid = get_service_pid();
   if (pid == -1) {
-    fprintf(stderr, "Service not running\n");
+    Log_Error("Service not running\n");
     return NBFC_EXIT_SUCCESS;
   }
   remove(NBFC_STATE_FILE);
   remove(NBFC_PID_FILE);
   if (kill(pid, SIGINT) == -1) {
-    fprintf(stderr, "Failed to kill nbfc_service process (%d): %s\n", pid, strerror(errno));
+    Log_Error("Failed to kill nbfc_service process (%d): %s\n", pid, strerror(errno));
     return NBFC_EXIT_FAILURE;
   }
   return NBFC_EXIT_SUCCESS;
@@ -203,7 +205,7 @@ static array_of(ConfigFile) get_configs() {
 
   DIR* directory = opendir(NBFC_CONFIGS_DIR);
   if (directory == NULL) {
-    fprintf(stderr, "Failed to open directory `" NBFC_CONFIGS_DIR "': %s\n", strerror(errno));
+    Log_Error("Failed to open directory `" NBFC_CONFIGS_DIR "': %s\n", strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -307,7 +309,7 @@ static void ServiceConfig_Write() {
   check_root();
   int fd = open(NBFC_SERVICE_CONFIG, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
   if (fd == -1) {
-    fprintf(stderr, "Could not open " NBFC_SERVICE_CONFIG ": %s\n", strerror(errno));
+    Log_Error("Could not open " NBFC_SERVICE_CONFIG ": %s\n", strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -513,7 +515,7 @@ static void print_service_status() {
 static int Status() {
   if (!options.s && !options.a && !options.fancount) {
     printf(CLIENT_STATUS_HELP_TEXT);
-    return NBFC_EXIT_SUCCESS;
+    return NBFC_EXIT_CMDLINE;
   }
 
   while (true) {
@@ -534,7 +536,7 @@ static int Status() {
       for (int i = 0; i < options.fancount; i++) {
         const int fan_index = options.fans[i];
         if (fan_index > fan_count - 1) {
-          fprintf(stderr, "Fan number %d not found! (Fan indexes count from zero!)\n", fan_index);
+          Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", fan_index);
           return NBFC_EXIT_FAILURE;
         }
         if (!vis[fan_index]) {
@@ -583,7 +585,7 @@ static int Config() {
       if (files.size && !strcmp(files.data[0].config_name, get_model_name())) {
         model = files.data[0].config_name;
       } else {
-        fprintf(stderr, "No recommended config found to apply automatically\n");
+        Log_Error("No recommended config found to apply automatically\n");
         return NBFC_EXIT_FAILURE;
       }
     }
@@ -592,7 +594,7 @@ static int Config() {
       char file[PATH_MAX];
       snprintf(file, sizeof(file), NBFC_CONFIGS_DIR "/%s.json", model);
       if (access(file, F_OK)) {
-        fprintf(stderr, "No such config file found: %s\n", file);
+        Log_Error("No such config file found: %s\n", file);
         return NBFC_EXIT_FAILURE;
       }
     }
@@ -618,12 +620,12 @@ static int Set() {
   }
 
   if (options.speedcount > 1) {
-    fprintf(stderr, "Multiple -s not supported\n");
+    Log_Error("Multiple -s not supported\n");
     return NBFC_EXIT_CMDLINE;
   }
 
   if (options.fancount > 1) {
-    fprintf(stderr, "Multiple -f not supported\n");
+    Log_Error("Multiple -f not supported\n");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -634,7 +636,7 @@ static int Set() {
   }
 
   if (get_service_pid() == -1) {
-    fprintf(stderr, "Service not running\n");
+    Log_Error("Service not running\n");
     return NBFC_EXIT_FAILURE;
   }
 
@@ -651,7 +653,7 @@ static int Set() {
 
   const int fan_index = options.fans[0];
   if (fan_index >= fancount) {
-    fprintf(stderr, "Fan number %d not found! (Fan indexes count from zero!)\n", fan_index);
+    Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", fan_index);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -707,6 +709,7 @@ int main(int argc, char *const argv[]) {
     return NBFC_EXIT_SUCCESS;
   }
 
+  Program_Name_Set(argv[0]);
   setlocale(LC_NUMERIC, "C"); // for json floats
   mkdir(NBFC_CONFIG_DIR, 0755);
 
@@ -752,7 +755,7 @@ int main(int argc, char *const argv[]) {
     case -'w':
       options.watch = parse_number(p.optarg, 1, INT64_MAX, &err);
       if (err) {
-        fprintf(stderr, "%s: -w: %s\n", argv[0], err);
+        Log_Error("-w: %s\n", err);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -760,7 +763,7 @@ int main(int argc, char *const argv[]) {
       if (cmd == Command_Set || cmd == Command_Status) {
         int fan = parse_number(p.optarg, 0, INT64_MAX, &err);
         if (err) {
-          fprintf(stderr, "%s: -f: %s\n", argv[0], err);
+          Log_Error("-f: %s\n", err);
           return NBFC_EXIT_FAILURE;
         }
 
@@ -773,7 +776,7 @@ int main(int argc, char *const argv[]) {
       if (cmd == Command_Set) {
         float speed = parse_double(p.optarg, 0, 100, &err);
         if (err) {
-          fprintf(stderr, "%s: -s: %s\n", argv[0], err);
+          Log_Error("-s: %s\n", err);
           return NBFC_EXIT_FAILURE;
         }
 
@@ -783,7 +786,7 @@ int main(int argc, char *const argv[]) {
       } else {
         options.s = 1;
         if (cmd == Command_Config && options.a) {
-          fprintf(stderr, "You cannot use --apply and --set at the same time\n");
+          Log_Error("You cannot use --apply and --set at the same time\n");
           return NBFC_EXIT_FAILURE;
         }
         options.config = p.optarg;

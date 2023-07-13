@@ -9,6 +9,8 @@
 #include "model_config.h"
 #include "optparse/optparse.h"
 #include "generated/ec_probe.help.h"
+#include "program_name.c"
+#include "log.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -186,6 +188,8 @@ static int64_t parse_number(const char* s, int64_t min, int64_t max, char** errm
 }
 
 int main(int argc, char* const argv[]) {
+  Program_Name_Set(argv[0]);
+
   options.interval = 500;
   ec = NULL;
   enum Command cmd = Command_Help;
@@ -200,8 +204,10 @@ int main(int argc, char* const argv[]) {
     case  'C':
       cmd = Command_From_String(p.optarg);
 
-      if (cmd == (enum Command) -1)
-        die(NBFC_EXIT_CMDLINE, "%s: Invalid command: %s\n", argv[0], p.optarg);
+      if (cmd == (enum Command) -1) {
+        Log_Error("Invalid command: %s\n", p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
 
       if (cmd == Command_Help) {
         printf(EC_PROBE_HELP_TEXT, argv[0]);
@@ -210,12 +216,16 @@ int main(int argc, char* const argv[]) {
       cli99_SetOptions(&p, Options[cmd], false);
       break;
     case  'R':  options.register_ = parse_number(p.optarg, 0, 255, &err);
-                if (err)
-                  die(NBFC_EXIT_CMDLINE, "%s: register: %s\n", argv[0], err);
+                if (err) {
+                  Log_Error("register: %s: %s\n", p.optarg, err);
+                  return NBFC_EXIT_CMDLINE;
+                }
                 break;
     case  'V':  options.value = parse_number(p.optarg, 0, 65535, &err);
-                if (err)
-                  die(NBFC_EXIT_CMDLINE, "%s: value: %s\n", argv[0], err);
+                if (err) {
+                  Log_Error("value: %s: %s\n", p.optarg, err);
+                  return NBFC_EXIT_CMDLINE;
+                }
                 break;
     case -'h':  printf(HelpTexts[cmd], argv[0]);         return 0;
     case -'V':  printf("ec_probe " NBFC_VERSION "\n");   return 0;
@@ -227,19 +237,25 @@ int main(int argc, char* const argv[]) {
                   case EmbeddedControllerType_ECSysLinux:     ec = &EC_SysLinux_VTable; break;
                   case EmbeddedControllerType_ECSysLinuxACPI: ec = &EC_SysLinux_ACPI_VTable; break;
                   case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable; break;
-                  default: die(NBFC_EXIT_CMDLINE, "%s: -e|--embedded-controller: Invalid value: %s\n", argv[0], p.optarg);
+                  default:
+                    Log_Error("-e|--embedded-controller: Invalid value: %s\n", p.optarg);
+                    return NBFC_EXIT_CMDLINE;
                 }
                 break;
     case -'r':  options.report   = p.optarg;             break;
     case -'t':  options.timespan = parse_number(p.optarg, 1, INT64_MAX, &err);
                 options.timespan *= 1000;
-                if (err)
-                  die(NBFC_EXIT_CMDLINE, "%s: -t|--timespan: %s\n", argv[0], err);
+                if (err) {
+                  Log_Error("-t|--timespan: %s: %s\n", p.optarg, err);
+                  return NBFC_EXIT_CMDLINE;
+                }
                 break;
     case -'i':  options.interval = parse_number(p.optarg, 1, INT64_MAX, &err);
                 options.interval *= 1000;
-                if (err)
-                  die(NBFC_EXIT_CMDLINE, "%s: -i|--interval: %s\n", argv[0], err);
+                if (err) {
+                  Log_Error("-i|--interval: %s: %s\n", p.optarg, err);
+                  return NBFC_EXIT_CMDLINE;
+                }
                 break;
     default:
       cli99_ExplainError(&p);
@@ -252,16 +268,19 @@ int main(int argc, char* const argv[]) {
     return 1;
   }
 
-  if (! cli99_End(&p))
-    die(NBFC_EXIT_CMDLINE, "Too much arguments\n");
+  if (! cli99_End(&p)) {
+    Log_Error("Too much arguments\n");
+    return NBFC_EXIT_CMDLINE;
+  }
 
   if (! cli99_CheckRequired(&p)) {
     cli99_ExplainError(&p);
-    exit(NBFC_EXIT_CMDLINE);
+    return NBFC_EXIT_CMDLINE;
   }
 
   if (geteuid()) {
-    die(NBFC_EXIT_FAILURE, "This program must be run as root\n");
+    Log_Error("This program must be run as root\n");
+    return NBFC_EXIT_FAILURE;
   }
 
   Error* e = NULL;

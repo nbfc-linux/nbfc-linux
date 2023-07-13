@@ -3,6 +3,7 @@
 #include "macros.h"
 #include "memory.h"
 #include "slurp_file.h"
+#include "log.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -114,7 +115,7 @@ Error* FS_Sensors_Init() {
           e_warn();
 #endif
           if (! e) {
-            fprintf(stderr, "Using '%s' as temperature source\n", file);
+            Log_Info("Using '%s' as temperature source\n", file);
             source->file = Mem_Strdup(file);
             if (++source == sources_end)
               goto end;

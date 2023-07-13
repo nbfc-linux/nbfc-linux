@@ -26,25 +26,24 @@ static void err_print(Error* e, StringBuf* s) {
   }
 }
 
-static void err_print_all_buf(Error* e, StringBuf* s) {
+const char* err_print_all(Error* e) {
+  static char buf[4096];
+  StringBuf s = { buf, 0, sizeof(buf) - 1 };
+
+  buf[0] = '\0';
+
   if (! e)
-    return;
+    return buf;
 
   for (; e > error_stack; --e) {
-    err_print(e, s);
-    StringBuf_AddCh(s, ':');
-    StringBuf_AddCh(s, ' ');
+    err_print(e, &s);
+    StringBuf_AddCh(&s, ':');
+    StringBuf_AddCh(&s, ' ');
   }
 
-  err_print(e, s);
-  StringBuf_AddCh(s, '\n');
-}
+  err_print(e, &s);
 
-void err_print_all(Error* e) {
-  char buf[4096];
-  StringBuf s = { buf, 0, sizeof(buf) - 1 };
-  err_print_all_buf(e, &s);
-  fprintf(stderr, "%s", s.s);
+  return buf;
 }
 
 Error* err_integer(Error* e, int i) {

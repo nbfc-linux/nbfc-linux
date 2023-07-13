@@ -1,4 +1,5 @@
 #include "ec_debug.h"
+#include "log.h"
 
 #include <stdio.h>
 
@@ -14,28 +15,28 @@ void EC_Debug_Close() {
 
 Error* EC_Debug_WriteByte(int register_, uint8_t value) {
   Error* e = EC_Debug_Controller->WriteByte(register_, value);
-  fprintf(stderr, "WriteByte(%X, %X);\n", register_, value);
+  Log_Debug("WriteByte(%X, %X);\n", register_, value);
   e_warn();
   return e;
 }
 
 Error* EC_Debug_WriteWord(int register_, uint16_t value) {
   Error* e = EC_Debug_Controller->WriteWord(register_, value);
-  fprintf(stderr, "WriteWord(%X, %X);\n", register_, value);
+  Log_Debug("WriteWord(%X, %X);\n", register_, value);
   e_warn();
   return e;
 }
 
 Error* EC_Debug_ReadByte(int register_, uint8_t* out) {
   Error* e = EC_Debug_Controller->ReadByte(register_, out);
-  fprintf(stderr, "ReadByte(%X, out = %X);\n", register_, *out);
+  Log_Debug("ReadByte(%X, out = %X);\n", register_, *out);
   e_warn();
   return e;
 }
 
 Error* EC_Debug_ReadWord(int register_, uint16_t* out) {
   Error* e = EC_Debug_Controller->ReadWord(register_, out);
-  fprintf(stderr, "ReadWord(%X, out = %X);\n", register_, *out);
+  Log_Debug("ReadWord(%X, out = %X);\n", register_, *out);
   e_warn();
   return e;
 }
