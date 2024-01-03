@@ -1,0 +1,131 @@
+{
+ "NotebookModel": "Gigabyte Aero 15x v8",
+ "Author": "maximmaxim345",
+ "EcPollInterval": 500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 176,
+	 "WriteRegister": 176,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 229,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 19,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 55
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 55,
+	   "FanSpeed": 80.35
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 55,
+	   "FanSpeed": 100
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 176,
+	 "WriteRegister": 177,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 229,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 19,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "GPU fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 55
+	  },
+	  {
+	   "UpThreshold": 85,
+	   "DownThreshold": 55,
+	   "FanSpeed": 80.35
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 55,
+	   "FanSpeed": 100
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 6,
+	 "Value": 27,
+	 "ResetRequired": true,
+	 "ResetValue": 11,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set custom fan mode type to 'fixed speed'"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 8,
+	 "Value": 0,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Disable quiet mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 12,
+	 "Value": 161,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Disable gaming mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 13,
+	 "Value": 128,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set custom mode on"
+	}
+ ]
+}
