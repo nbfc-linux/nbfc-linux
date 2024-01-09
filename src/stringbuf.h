@@ -13,6 +13,15 @@ struct StringBuf {
 #define StringBuf_Printf(S, ...) \
   StringBuf_Increment((S), snprintf((S)->s + (S)->size, (S)->capacity - (S)->size, __VA_ARGS__))
 
+static inline void StringBuf_AddStr(StringBuf* s, const char* str) {
+  const int len = strlen(str);
+  if (s->size + len + 1 < s->capacity) {
+    strcpy(s->s + s->size, str);
+    s->size += len;
+    s->capacity -= len;
+  }
+}
+
 static inline void StringBuf_AddCh(StringBuf* s, int c) {
   if (s->size + 2 < s->capacity) {
     s->s[s->size++] = c;

@@ -1,55 +1,63 @@
+#include "stringbuf.h"
 #include "nxjson.h"
 #include <stdio.h>
 #include <string.h>
+
 #define ADD_KEY_NOT_NULL()                                                     \
   if (nx->key != NULL) {                                                       \
-    strcat(s, "\"");                                                           \
-    strcat(s, nx->key);                                                        \
-    strcat(s, "\": ");                                                         \
+    StringBuf_AddCh(s, '"');                                                 \
+    StringBuf_Printf(s, "%s", nx->key);                                       \
+    StringBuf_Printf(s, "%s", "\": ");                                               \
   }
 
+#define ADD_INDENTION(N) \
+    StringBuf_Printf(s, "\n%0*s", N, " ")
 
-char *nx_json_to_string(const nx_json *nx) {
-  char s[128*1024];
-  s[0] = 0;
+char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
   while (nx != NULL) {
     if (nx->type == NX_JSON_OBJECT) {
+      ADD_INDENTION(indent);
       ADD_KEY_NOT_NULL();
-      strcat(s, "{");
-      strcat(s, nx_json_to_string(nx->val.children.first));
-      strcat(s, "}");
+      StringBuf_AddCh(s, '{');
+      nx_json_to_string(nx->val.children.first, s, indent + 3);
+      ADD_INDENTION(indent);
+      StringBuf_AddCh(s, '}');
     } else if (nx->type == NX_JSON_ARRAY) {
+      ADD_INDENTION(indent);
       ADD_KEY_NOT_NULL();
-      strcat(s, "[");
-      strcat(s, nx_json_to_string(nx->val.children.first));
-      strcat(s, "]");
+      StringBuf_AddCh(s, '[');
+      nx_json_to_string(nx->val.children.first, s, indent + 3);
+      ADD_INDENTION(indent);
+      StringBuf_AddCh(s, ']');
     } else {
       if (nx->type == NX_JSON_STRING) {
+        ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
-        strcat(s, "\"");
-        strcat(s, nx->val.text);
-        strcat(s, "\"");
+        StringBuf_AddCh(s, '"');
+        StringBuf_Printf(s, "%s", nx->val.text);
+        StringBuf_AddCh(s, '"');
       } else if (nx->type == NX_JSON_BOOL) {
+        ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
-        strcat(s, nx->val.u ? "true" : "false");
+        StringBuf_Printf(s, "%s", nx->val.u ? "true" : "false");
       } else if (nx->type == NX_JSON_INTEGER) {
+        ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
-        char i[snprintf(NULL, 0, "%ld", nx->val.i) + 1];
-        sprintf(i, "%ld", nx->val.i);
-        strcat(s, i);
+        StringBuf_Printf(s, "%ld", nx->val.i);
       } else if (nx->type == NX_JSON_DOUBLE) {
+        ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
-        char dbl[snprintf(NULL, 0, "%lf", nx->val.dbl) + 1];
-        sprintf(dbl, "%lf", nx->val.dbl);
-        strcat(s, dbl);
+        StringBuf_Printf(s, "%lf", nx->val.dbl);
       } else {
+        ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
-        strcat(s, "null");
-      }
+        StringBuf_Printf(s, "%s", nx->val.dbl);
+      };
     }
     nx = nx->next;
     if (nx != NULL)
-      strcat(s, ", ");
+      StringBuf_AddCh(s, ',');
   }
-  return strdup(s);
+
+  return s->s;
 }

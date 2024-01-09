@@ -18,6 +18,7 @@
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 #include "nxjson.c"
 #include "nxjson.h"
+#include "reverse_nxjson.c"
 
 #include <ctype.h>
 #include <dirent.h>
@@ -175,6 +176,7 @@ static int Service_Stop() {
   }
   remove(NBFC_STATE_FILE);
   remove(NBFC_PID_FILE);
+  Log_Info("Killing nbfc_service (%d)\n", pid);
   if (kill(pid, SIGINT) == -1) {
     Log_Error("Failed to kill nbfc_service process (%d): %s\n", pid, strerror(errno));
     return NBFC_EXIT_FAILURE;
@@ -313,44 +315,39 @@ static void ServiceConfig_Write() {
     exit(NBFC_EXIT_FAILURE);
   }
 
-  char buf[NBFC_MAX_FILE_SIZE];
-  StringBuf S = { buf, 0, sizeof(buf) };
-  StringBuf*s = &S;
+  nx_json root = {0};
+  nx_json *o = create_json(NX_JSON_OBJECT, NULL, &root);
 
-  StringBuf_AddCh(s, '{');
-  if (service_config.SelectedConfigId != NULL)
-    StringBuf_Printf(s, "\n\t\"SelectedConfigId\": \"%s\",", service_config.SelectedConfigId);
+  if (service_config.SelectedConfigId != NULL) {
+    nx_json *o1 = create_json(NX_JSON_STRING, "SelectedConfigId", o);
+    o1->val.text = service_config.SelectedConfigId;
+  }
 
   if (service_config.ReadOnly != Boolean_Unset) {
-    StringBuf_Printf(s, "\n\t\"ReadOnly:\" %s,", service_config.ReadOnly ? "true" : "false");
+    nx_json *o1 = create_json(NX_JSON_BOOL, "ReadOnly", o);
+    o1->val.u = service_config.ReadOnly;
   }
 
   if (service_config.EmbeddedControllerType != EmbeddedControllerType_Unset) {
-    StringBuf_Printf(s, "\n\t\"EmbeddedControllerType\": \"");
-    switch (service_config.EmbeddedControllerType) {
-      case EmbeddedControllerType_ECDummy:        StringBuf_Printf(s, "dummy");        break;
-      case EmbeddedControllerType_ECLinux:        StringBuf_Printf(s, "ec_linux");     break;
-      case EmbeddedControllerType_ECSysLinux:     StringBuf_Printf(s, "ec_sys_linux"); break;
-      case EmbeddedControllerType_ECSysLinuxACPI: StringBuf_Printf(s, "ec_acpi");      break;
-      default: break;
-    }
-    StringBuf_Printf(s, "\",");
+    nx_json *o1 = create_json(NX_JSON_STRING, "EmbeddedControllerType", o);
+    o1->val.text = EmbeddedControllerType_ToString(service_config.EmbeddedControllerType);
   }
 
   if (service_config.TargetFanSpeeds.size) {
-    StringBuf_Printf(s, "\n\t\"TargetFanSpeeds\": [%f", service_config.TargetFanSpeeds.data[0]);
-    for (size_t i = 1; i < service_config.TargetFanSpeeds.size; ++i)
-      StringBuf_Printf(s, ", %f", service_config.TargetFanSpeeds.data[i]);
-    StringBuf_Printf(s, "],");
+    nx_json *o1  = create_json(NX_JSON_ARRAY, "TargetFanSpeeds", o);
+
+    for_each_array(float*, f, service_config.TargetFanSpeeds) {
+      nx_json *o2 = create_json(NX_JSON_DOUBLE, NULL, o1);
+      o2->val.dbl = *f;
+    }
   }
 
-  if (StringBuf_LastCh(s) == ',') {
-    StringBuf_PopCh(s);
-  }
+  char buf[NBFC_MAX_FILE_SIZE];
+  StringBuf s = { buf, 0, sizeof(buf) };
+  buf[0] = 0;
 
-  StringBuf_Printf(s, "\n}\n");
-
-  write(fd, S.s, S.size);
+  nx_json_to_string(o, &s, 0);
+  write(fd, s.s, s.size);
   close(fd);
 }
 
