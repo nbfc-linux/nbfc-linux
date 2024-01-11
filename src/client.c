@@ -399,6 +399,7 @@ static const cli99_option *Options[] = {
   set_command_options,
   main_options,
   main_options,
+  main_options,
 };
 
 enum Command {
@@ -409,6 +410,7 @@ enum Command {
   Command_Config,
   Command_Set,
   Command_Wait_For_Hwmon,
+  Command_Get_Model_Name,
   Command_Help,
 };
 
@@ -416,7 +418,7 @@ static enum Command Command_From_String(const char* s) {
   const char* commands[] = {
     "start", "stop", "restart",
     "status", "config", "set",
-    "wait-for-hwmon", "help"
+    "wait-for-hwmon", "get-model-name", "help"
   };
 
   for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
@@ -447,6 +449,7 @@ static const char *HelpTexts[] = {
     CLIENT_CONFIG_HELP_TEXT,
     CLIENT_SET_HELP_TEXT,
     CLIENT_DEFAULT_HELP("wait-for-hwmon"),
+    CLIENT_DEFAULT_HELP("get-model-name"),
     CLIENT_HELP_TEXT
 };
 
@@ -483,6 +486,11 @@ static int Wait_For_Hwmon() {
     sleep(1);
   }
   return NBFC_EXIT_FAILURE;
+}
+
+static int Get_Model_Name() {
+  printf("%s\n", get_model_name());
+  return NBFC_EXIT_SUCCESS;
 }
 
 static void print_fan_status(const FanInfo* fan) {
@@ -810,6 +818,8 @@ int main(int argc, char *const argv[]) {
     return Status();
   case Command_Wait_For_Hwmon:
     return Wait_For_Hwmon();
+  case Command_Get_Model_Name:
+    return Get_Model_Name();
   default:
     break;
   }

@@ -20,6 +20,7 @@
   "    config              List or apply configs\n"                            \
   "    set                 Control fan speed\n"                                \
   "    wait-for-hwmon      Wait for /sys/class/hwmon/hwmon* files\n"           \
+  "    get-model-name      Print out model name\n"                             \
   "    help                Show help\n"                                        \
   ""
 
@@ -77,8 +78,8 @@
   "                        Fan index (zero based)\n"                           \
   ""
 
-#define CLIENT_DEFAULT_HELP(X)                                                 \
-  "usage: nbfc " X " [-h]\n"                                                   \
+#define CLIENT_DEFAULT_HELP(COMMAND)                                           \
+  "usage: nbfc " COMMAND " [-h]\n"                                             \
   "\n"                                                                         \
   "optional arguments:\n"                                                      \
   "  -h, --help            Shows this message\n"                               \
