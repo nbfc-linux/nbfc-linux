@@ -90,7 +90,6 @@ static void parse_opts(int argc, char* const argv[]) {
 int main(int argc, char* const argv[])
 {
   Program_Name_Set(argv[0]);
-  Log_Info("Running version " NBFC_VERSION "\n");
 
   setlocale(LC_NUMERIC, "C"); // for json floats
 
@@ -102,8 +101,10 @@ int main(int argc, char* const argv[])
   options.embedded_controller_type = EmbeddedControllerType_Unset;
   parse_opts(argc, argv);
 
+  Log_Info("Running version " NBFC_VERSION "\n");
+
   if (options.read_only)
-    Log_Info("readonly mode enabled\n");
+    Log_Info("Read-only mode enabled\n");
 
   atexit(Service_Cleanup);
 
