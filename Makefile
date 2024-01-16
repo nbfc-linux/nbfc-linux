@@ -1,9 +1,10 @@
 PREFIX   = /usr/local
 
-bindir   = $(PREFIX)/bin
-confdir  = $(PREFIX)/etc
-sharedir = $(PREFIX)/share
-sysddir  = $(PREFIX)/lib/systemd/system
+bindir			= $(PREFIX)/bin
+confdir 		= $(PREFIX)/etc
+sharedir		= $(PREFIX)/share
+sysddir 		= $(PREFIX)/lib/systemd/system
+runstatedir	= /var/run
 
 ifeq ($(BUILD), debug)
 	CFLAGS   = -Og -g
@@ -14,7 +15,7 @@ else
 endif
 
 override LDLIBS   += -lm
-override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(sharedir)\"
+override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(sharedir)\" -DRUNSTATEDIR=\"$(runstatedir)\"
 
 CORE  = src/nbfc_service src/ec_probe
 PROGS = $(CORE) src/nbfc
@@ -27,7 +28,7 @@ install-core: $(CORE)
 	install -Dm 755 src/nbfc          $(DESTDIR)$(bindir)/nbfc
 
 nbfc.py: nbfc.py.in
-	sed 's:@CONFDIR@:'$(confdir)':; s:@DATADIR@:'$(sharedir)':' < $< >$@
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(sharedir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< >$@
 
 install-configs:
 	# /usr/local/etc/nbfc
@@ -38,7 +39,7 @@ install-configs:
 	cp -r share/nbfc/configs/* $(DESTDIR)$(sharedir)/nbfc/configs
 
 nbfc_service.service: etc/systemd/system/nbfc_service.service.in
-	sed 's:@BINDIR@:'$(bindir)':' < $< >$@
+	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< >$@
 
 install-systemd:    nbfc_service.service
 	# /usr/local/lib/systemd/system

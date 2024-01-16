@@ -9,8 +9,8 @@
 #define NBFC_CONFIGS_DIR                 DATADIR "/nbfc/configs"
 #define NBFC_CONFIG_DIR                  CONFDIR "/nbfc"
 #define NBFC_SERVICE_CONFIG              CONFDIR "/nbfc/nbfc.json"
-#define NBFC_PID_FILE                    "/var/run/nbfc_service.pid"
-#define NBFC_STATE_FILE                  "/var/run/nbfc_service.state.json"
+#define NBFC_PID_FILE                    RUNSTATEDIR "/nbfc_service.pid"
+#define NBFC_STATE_FILE                  RUNSTATEDIR "/nbfc_service.state.json"
 
 #define NBFC_EXIT_SUCCESS EXIT_SUCCESS
 #define NBFC_EXIT_FAILURE EXIT_FAILURE

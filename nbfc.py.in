@@ -64,8 +64,8 @@ class NbfcService:
     CONFIG_DIR  = '@CONFDIR@/nbfc'
     CONFIG_FILE = '@CONFDIR@/nbfc/nbfc.json'
     CONFIGS_DIR = '@DATADIR@/nbfc/configs'
-    STATE_FILE  = '/var/run/nbfc_service.state.json'
-    PID_FILE    = '/var/run/nbfc_service.pid'
+    STATE_FILE  = '@RUNSTATEDIR@/nbfc_service.state.json'
+    PID_FILE    = '@RUNSTATEDIR@/nbfc_service.pid'
 
     def get_service_pid(self):
         with open(self.PID_FILE) as fh:

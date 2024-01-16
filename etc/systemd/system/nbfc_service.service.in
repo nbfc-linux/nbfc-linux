@@ -6,7 +6,7 @@ ExecStartPre=@BINDIR@/nbfc wait-for-hwmon
 ExecStart=@BINDIR@/nbfc start
 ExecStop=@BINDIR@/nbfc stop
 Type=forking
-PIDFile=/var/run/nbfc_service.pid
+PIDFile=@RUNSTATEDIR@/nbfc_service.pid
 TimeoutStopSec=20
 Restart=on-failure
 
