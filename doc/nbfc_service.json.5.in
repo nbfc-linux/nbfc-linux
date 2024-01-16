@@ -1,0 +1,387 @@
+.nh
+.TH NBFC_SERVICE 5 "MARCH 2021" Notebook FanControl
+.SH NAME
+.PP
+nbfc_service.json \- Notebook FanControl service configuration
+
+.SH CONFIGURATION
+
+.SS ServiceConfig
+.PP
+Main configuration file of nbfc_service
+.RI ( @CONFDIR@/nbfc.json )
+
+.PP
+.BR SelectedConfigId :
+.I String
+.RS
+The selected config model. This equals the basename of a notebook model configuration file.
+
+.PP
+.BR EmbeddedControllerType :
+.I String
+.RS
+.IP \(bu 2
+.BR ec_sys_linux :
+Use the ec_sys kernel module for writing to the embedded controller.
+.IP \(bu 2
+.BR ec_acpi :
+Use the acpi_ec kernel module for writing to the embedded controller.
+.IP \(bu 2
+.BR ec_linux :
+Write to the embedded controller using /dev/port.
+.IP \(bu 2
+.BR dummy :
+Don't write to the embedded controller at all.
+
+.RE
+If not given, the embedded controller type will be automatically selected.
+.RE
+
+
+.PP
+.BR TargetFanSpeeds :
+.I Array of Floats
+.RS
+This holds the fixed speed of the fans. A value of
+.B \-1
+means the fan should be left in auto mode.
+.RE
+
+.SS ModelConfig
+.PP
+.BR NotebookModel :
+.I String
+.RS
+The Notebook Model as described in your BIOS. See
+.B nbfc get\-model\-name.
+.RE
+
+.PP
+.BR Author :
+.I String
+.RS
+The Author of the config file. Enter whatever you want.
+.RE
+
+.PP
+.BR EcPollInterval :
+.IR Integer " > 0"
+.RS
+Defines how often NBFC polls the EC for changes (in milliseconds).
+.RE
+
+.PP
+.BR CriticalTemperature :
+.I Integer
+.RS
+If the temperature exceeds this threshold, NBFC will ignore all Temperature threshold elements and set the fan to 100% speed until the temperature drops below
+.RB ( CriticalTemperature \- CriticalTemperatureOffset ).
+.RE
+
+.PP
+.BR CriticalTemperatureOffset :
+.IR Integer " > 0"
+.RS
+See
+.B CriticalTemperature
+.RE
+
+.PP
+.BR ReadWriteWords :
+.I Boolean
+.RS
+If
+.BR true ,
+NBFC will combine two 8 bit registers to one 16\-bit register when reading from or writing to the EC registers.
+.RE
+
+.PP
+.BR FanConfigurations :
+.I Array of FanConfigurations
+.RS
+Array of at least one FanConfiguration
+.RE
+
+.PP
+.BR RegisterWriteConfigurations :
+.I Array of RegisterWriteConfiguration
+.RS
+Array of RegisterWriteConfiguration
+.RE
+
+.SS FanConfiguration
+.PP
+Defines how NBFC controls a fan
+
+.PP
+.BR FanDisplayName :
+.I String
+.RS
+Fan display name
+.RE
+
+.PP
+.BR ReadRegister :
+.IR Integer " >= 0 && " Integer " <= 255"
+.RS
+The register from which NBFC reads the fan speed.
+.RE
+
+.PP
+.BR WriteRegister :
+.IR Integer " >= 0 && " Integer " <= 255"
+.RS
+The register which NBFC uses to control the fan.
+.RE
+
+.PP
+.BR MinSpeedValue :
+.I Integer
+.RS
+The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if
+.B ReadWriteWords
+is
+.BR true .
+Note:
+.B MinSpeedValue
+does not necessarily have to be smaller than
+.B MaxSpeedValue.
+.RE
+
+.PP
+.BR MaxSpeedValue :
+.I Integer
+.RS
+The value which puts the fan to the highest possible fan speed.
+.RE
+
+.PP
+.BR MinSpeedValueRead :
+.I Integer
+.RS
+The value which corresponds to the lowest possible fan speed. Will be ignored if
+.B IndependentReadMinMaxValues
+is
+.BR false .
+.RE
+
+.PP
+.BR MaxSpeedValueRead :
+.I Integer
+.RS
+The value which corresponds to the highest possible fan speed. Will be ignored if
+.B IndependentReadMinMaxValues
+is
+.BR false .
+.RE
+
+.PP
+.BR IndependentReadMinMaxValues :
+.I Boolean
+.RS
+Defines if independent minimum/maximum values should be applied for read operations.
+.RE
+
+.PP
+.BR ResetRequired :
+.I Boolean
+.RS
+Defines if the EC should be reset before the service is shut down.
+.RE
+
+.PP
+.BR FanSpeedResetValue :
+.I Integer
+.RS
+Defines the value which will be written to
+.B WriteRegister
+to reset the EC.
+.RE
+
+.PP
+.BR TemperatureThresholds :
+.I Array of TemperatureThresholds
+
+.PP
+.BR FanSpeedPercentageOverrides :
+.I Array of FanSpeedPercentageOverride
+
+.SS RegisterWriteConfiguration
+.PP
+Allows to write to any EC register
+
+.PP
+.BR WriteMode :
+.I String
+.RS
+Defines how the value will be written:
+
+.IP \(bu 2
+.BR And :
+performs a binary AND operation (register = register & value)
+.IP \(bu 2
+.BR Or :
+performs a binary OR operation (register = register | value)
+.IP \(bu 2
+.BR Set :
+overwrites the register with the specified value (register = value)
+.RE
+
+.PP
+.BR WriteOccasion :
+.I String
+.RS
+Defines when the value should be written:
+
+.IP \(bu 2
+.BR OnInitialization :
+writes the value once upon initialization (everytimee the fan control service is enabled or a config is applied)
+.IP \(bu 2
+.BR OnWriteFanSpeed :
+writes the value everytimee the fan speed is set.
+.RE
+
+.PP
+.BR Register :
+.IR Integer " >= 0 && " Integer " <= 255"
+.RS
+The register which will be manipulated.
+.RE
+
+.PP
+.BR Value :
+.I Integer
+.RS
+The Value which will be written
+.RE
+
+.PP
+.BR ResetRequired :
+.I Boolean
+.RS
+Defines if the register should be reset before the service is shut down.
+.RE
+
+.PP
+.BR ResetValue :
+.I Integer
+.RS
+The value which will be written upon reset.
+.RE
+
+.PP
+.BR ResetWriteMode :
+.I String
+.RS
+See
+.BR WriteMode .
+Will only be applied on reset.
+.RE
+
+.PP
+.BR Description :
+.I String
+.RS
+A short description of what effect the
+.B RegisterWriteConfiguration
+will have.
+.RE
+
+.SS FanSpeedPercentageOverride
+.PP
+Overrides the default algorithm to calculate fan speeds.
+
+.PP
+.BR FanSpeedPercentage :
+.IR Float " >= 0.0 && " Float " <= 100.0"
+.RS
+The fan speed in percent.
+.RE
+
+.PP
+.BR FanSpeedValue :
+.I Integer
+.RS
+The fan speed value which will be written to
+.BR WriteRegister .
+.RE
+
+.PP
+.BR TargetOperation :
+.I String
+.RS
+Defines for which operations the speeds should be overridden:
+
+.RS
+.IP \(bu 2
+.BR Read :
+if the value in the EC's ReadRegister is equal to FanSpeedValue, the corresponding percentage will not be calculated, but instead be set to FanSpeedPercentage.
+.IP \(bu 2
+.BR Write :
+if the target fan speed percentage is equal to FanSpeedPercentage, the corresponding value will not be calculated, but instead be set to FanSpeedValue.
+.IP \(bu 2
+.BR ReadWrite :
+applies to both, read and write operations.
+
+.RE
+
+.SS TemperatureThreshold
+.PP
+Defines how fast the fan runs at different temperatures.
+
+.PP
+.BR UpThreshold :
+.I Integer
+.RS
+NBFC will select the next upper threshold as soon as the temperature exceeds
+.IR UpThreshold "(in celsius)."
+.RE
+
+.PP
+.BR DownThreshold :
+.I Integer
+.RS
+NBFC will select the next lower threshold as soon as the temperature falls below the
+.IR DownThreshold "(in celsius)."
+.RE
+
+.PP
+.BR FanSpeed :
+.IR Float " >= 0.0 && " Float " <= 100.0"
+.RS
+The fan speed in percent.
+.RE
+
+.SH FILES
+.PP
+.I @RUNSTATEDIR@/nbfc_service.state.json
+.RS
+State file of nbfc_service. Updated every
+.B EcPollInterval
+milliseconds.
+.RE
+
+.PP
+.I @CONFDIR@/nbfc.json
+.RS
+The system wide configuration file.
+.RE
+
+.PP
+.I @DATADIR@/configs/*.json
+.RS
+Configuration files for various notebook models.
+.RE
+
+.SH AUTHOR
+.PP
+Benjamin Abendroth (braph93@gmx.de)
+
+.SH SEE ALSO
+.PP
+.BR nbfc (1),
+.BR nbfc_service (1),
+.BR ec_probe (1),
+.BR fancontrol (1),
+.BR sensors (1)

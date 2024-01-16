@@ -1,0 +1,76 @@
+<h1>NAME</h1>
+<p>nbfc_service - Notebook FanControl service</p>
+<h1>DESCRIPTION</h1>
+<p>NoteBook FanControl service</p>
+<h1>SYNOPSIS</h1>
+<p><strong>nbfc_service</strong> [<em>OPTIONS</em>]</p>
+<h1>OPTIONS</h1>
+<p><strong>-h</strong>, <strong>--help</strong></p>
+<blockquote>
+<p>Show this help message and exit.</p>
+</blockquote>
+<p><strong>--version</strong></p>
+<blockquote>
+<p>Show program's version number and exit.</p>
+</blockquote>
+<p><strong>-r</strong>, <strong>--readonly</strong></p>
+<blockquote>
+<p>Start in read-only mode.</p>
+</blockquote>
+<p><strong>-f</strong>, <strong>--fork</strong></p>
+<blockquote>
+<p>Switch process to background after sucessfully started.</p>
+</blockquote>
+<p><strong>-d</strong>, <strong>--debug</strong></p>
+<blockquote>
+<p>Enable tracing of reads and writes of the embedded controller.</p>
+</blockquote>
+<p><strong>-c</strong>, <strong>--config-file</strong>
+<em>CONFIG</em></p>
+<blockquote>
+<p>Use alternative config file (default @CONFIDR@/nbfc/nbfc.json).</p>
+</blockquote>
+<p><strong>-s</strong>, <strong>--state-file</strong> <em>STATE
+FILE</em></p>
+<blockquote>
+<p>Write state to an alternative file (default
+/var/run/nbfc_service.state.json).</p>
+</blockquote>
+<p><strong>-e, --embedded-controller</strong> [<em>dummy</em>,
+<em>ec_linux</em>, <em>ec_sys_linux</em>, <em>ec_acpi</em>]</p>
+<blockquote>
+<p>Specify embedded controller to use.</p>
+</blockquote>
+<h1>FILES</h1>
+<p><em>/var/run/nbfc_service.pid</em></p>
+<blockquote>
+<p>File containing the PID of current running nbfc_service.</p>
+</blockquote>
+<p><em>/var/run/nbfc_service.state.json</em></p>
+<blockquote>
+<p>State file of nbfc_service. Updated every
+<strong>EcPollInterval</strong> milliseconds. See
+<strong>nbfc_service.json</strong>(5) for further details.</p>
+</blockquote>
+<p><em>/usr/share/configs/*.json</em></p>
+<blockquote>
+<p>Configuration files for various notebook models. See
+<strong>nbfc_service.json</strong>(5) for further details.</p>
+</blockquote>
+<h1>EXIT STATUS</h1>
+<blockquote>
+<ul>
+<li><p>0 Everything fine</p></li>
+<li><p>1 Generic error</p></li>
+<li><p>2 Command line error</p></li>
+<li><p>3 Initialization error</p></li>
+<li><p>5 Fatal error</p></li>
+</ul>
+</blockquote>
+<h1>BUGS</h1>
+<p>Bugs to https://github.com/nbfc-linux/nbfc-linux</p>
+<h1>AUTHOR</h1>
+<p>Benjamin Abendroth (braph93@gmx.de)</p>
+<h1>SEE ALSO</h1>
+<p><strong>nbfc</strong>(1), <strong>nbfc_service.json</strong>(5),
+<strong>ec_probe</strong>(1), <strong>fancontrol</strong>(1)</p>

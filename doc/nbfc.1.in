@@ -1,0 +1,188 @@
+.nh
+.TH NBFC_SERVICE 1 "MARCH 2021" Notebook FanControl
+.SH NAME
+.PP
+nbfc \- Notebook FanControl client
+
+.SH DESCRIPTION
+.PP
+This program is used to control the NoteBook FanControl service.
+
+.SH SYNOPSIS
+.PP
+.B nbfc
+.RB { start " | " stop " | " restart " | " status " | " config " | "  set " | "  help }
+.RI [ OPTIONS ]
+
+.SH OPTIONS
+.PP
+.BR \-h ", " \-\-help
+.RS
+Show this help message and exit.
+.RE
+
+.PP
+.B \-\-version
+.RS
+Show program's version number and exit.
+.RE
+
+.SH COMMANDS
+.PP
+
+.B start
+.RI [ OPTIONS ]
+.RS
+Start the service.
+
+.BR \-r ", " \-\-readonly
+.RS
+Start in read\-only mode.
+.RE
+.RE
+
+.B stop
+.RI [ OPTIONS ]
+.RS
+Stop the service.
+.RE
+
+.B restart
+.RI [ OPTIONS ]
+.RS
+Restart the service.
+
+.BR \-r ", " \-\-readonly
+.RS
+Start in read\-only mode.
+.RE
+.RE
+
+.B status
+.RI [ OPTIONS ]
+.RS
+Show the service status.
+
+.BR \-a ", " \-\-all
+.RS
+Show service and fan status (default).
+.RE
+
+.BR \-s ", " \-\-service
+.RS
+Show service status.
+.RE
+
+.BR \-f ", " \-\-fan
+.I FAN INDEX
+.RS
+Show fan status.
+.RE
+
+.BR \-w ", " \-\-watch
+.I SECONDS
+.RS
+Show status periodically.
+.RE
+.RE
+
+.B config
+.RI [ OPTIONS ]
+.RS
+List or apply configs.
+
+.BR \-l ", " \-\-list
+.RS
+List all available configs (default).
+.RE
+
+.BR \-r ", " \-\-recommend
+.RS
+List configs which may work for your device.
+.RE
+
+.BR \-s ", " \-\-set
+.I CONFIG
+.RS
+Set a config.
+.RE
+
+.BR \-a ", " \-\-apply
+.I CONFIG
+.RS
+Set a config and enable fan control.
+.RE
+.RE
+
+.B set
+.RI [ OPTIONS ]
+.RS
+Control fan speed.
+
+.BR \-a ", " \-\-auto
+.RS
+Set fan speed to 'auto'.
+.RE
+
+.BR \-s ", " \-\-speed
+.I PERCENT
+.RS
+Set fan speed to PERCENT.
+.RE
+
+.BR \-f ", " \-\-fan
+.I FAN INDEX
+.RS
+Fan index (zero based).
+.RE
+.RE
+
+.B help
+.RS
+Show help.
+.RE
+
+.SH FILES
+.PP
+.I @RUNSTATEDIR@/nbfc_service.pid
+.RS
+File containing the PID of current running nbfc_service.
+.RE
+
+.I @RUNSTATEDIR@/nbfc_service.state.json
+.RS
+State file of nbfc_service. Updated every
+.B EcPollInterval
+milliseconds. See
+.BR nbfc_service.json (5)
+for further details.
+.RE
+
+.I @CONFDIR@/nbfc.json
+.RS
+The system wide configuration file. See
+.BR nbfc_service.json (5)
+for further details.
+.RE
+
+.I @DATADIR@/configs/*.json
+.RS
+Configuration files for various notebook models. See
+.BR nbfc_service.json (5)
+for further details.
+.RE
+
+.SH BUGS
+.PP
+Bugs to https://github.com/nbfc\-/nbfc\-linux
+
+.SH AUTHOR
+.PP
+Benjamin Abendroth (braph93@gmx.de)
+
+.SH SEE ALSO
+.PP
+.BR nbfc_service (1),
+.BR nbfc_service.json (5),
+.BR ec_probe (1),
+.BR fancontrol (1)

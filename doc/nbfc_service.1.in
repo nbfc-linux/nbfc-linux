@@ -1,0 +1,121 @@
+.nh
+.TH NBFC_SERVICE 1 "MARCH 2021" Notebook FanControl
+.SH NAME
+.PP
+nbfc_service \- Notebook FanControl service
+
+.SH DESCRIPTION
+.PP
+NoteBook FanControl service
+
+.SH SYNOPSIS
+.PP
+.BR nbfc_service
+.RI [ OPTIONS ]
+
+.SH OPTIONS
+.PP
+.BR \-h ", " \-\-help
+.RS
+Show this help message and exit.
+.RE
+
+.PP
+.B \-\-version
+.RS
+Show program's version number and exit.
+.RE
+
+.PP
+.BR \-r ", " \-\-readonly
+.RS
+Start in read\-only mode.
+.RE
+
+.PP
+.BR \-f ", " \-\-fork
+.RS
+Switch process to background after sucessfully started.
+.RE
+
+.PP
+.BR \-d ", " \-\-debug
+.RS
+Enable tracing of reads and writes of the embedded controller.
+.RE
+
+.PP
+.BR \-c ", " \-\-config\-file
+.I CONFIG
+.RS
+Use alternative config file (default @CONFIDR@/nbfc/nbfc.json).
+.RE
+
+.PP
+.BR \-s ", " \-\-state\-file
+.I STATE FILE
+.RS
+Write state to an alternative file (default @RUNSTATEDIR@/nbfc_service.state.json).
+.RE
+
+.PP
+.B \-e, \-\-embedded\-controller
+.RI [ dummy ", " ec_linux ", " ec_sys_linux ", " ec_acpi ]
+.RS
+Specify embedded controller to use.
+.RI
+
+.SH FILES
+.PP
+.I @RUNSTATEDIR@/nbfc_service.pid
+.RS
+File containing the PID of current running nbfc_service.
+.RE
+
+.PP
+.I @RUNSTATEDIR@/nbfc_service.state.json
+.RS
+State file of nbfc_service. Updated every
+.B EcPollInterval
+milliseconds. See
+.BR nbfc_service.json (5)
+for further details.
+.RE
+
+.PP
+.I @DATADIR@/configs/*.json
+.RS
+Configuration files for various notebook models. See
+.BR nbfc_service.json (5)
+for further details.
+.RE
+
+.SH EXIT STATUS
+.RS
+.IP \(bu 2
+0    Everything fine
+.IP \(bu 2
+1    Generic error
+.IP \(bu 2
+2    Command line error
+.IP \(bu 2
+3    Initialization error
+.IP \(bu 2
+5    Fatal error
+
+.RE
+
+.SH BUGS
+.PP
+Bugs to https://github.com/nbfc\-linux/nbfc\-linux
+
+.SH AUTHOR
+.PP
+Benjamin Abendroth (braph93@gmx.de)
+
+.SH SEE ALSO
+.PP
+.BR nbfc (1),
+.BR nbfc_service.json (5),
+.BR ec_probe (1),
+.BR fancontrol (1)

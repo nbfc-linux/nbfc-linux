@@ -19,8 +19,9 @@ override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(sharedir)\" -DRUNSTA
 
 CORE  = src/nbfc_service src/ec_probe
 PROGS = $(CORE) src/nbfc
+DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
 
-all: $(PROGS)
+all: $(PROGS) $(DOC)
 
 install-core: $(CORE)
 	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
@@ -28,6 +29,18 @@ install-core: $(CORE)
 	install -Dm 755 src/nbfc          $(DESTDIR)$(bindir)/nbfc
 
 nbfc.py: nbfc.py.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(sharedir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< >$@
+
+doc/ec_probe.1: doc/ec_probe.1.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(sharedir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< >$@
+
+doc/nbfc.1: doc/nbfc.1.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(sharedir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< >$@
+
+doc/nbfc_service.1: doc/nbfc_service.1.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(sharedir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< >$@
+
+doc/nbfc_service.json.5: doc/nbfc_service.json.5.in
 	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(sharedir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< >$@
 
 install-configs:
@@ -105,6 +118,7 @@ uninstall:
 clean:
 	rm -rf __pycache__ tools/argparse-tool/__pycache__
 	rm -f $(PROGS) src/*.o nbfc_service.service nbfc.py
+	rm -f doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.5
 
 # =============================================================================
 # Binaries ====================================================================

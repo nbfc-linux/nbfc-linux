@@ -1,0 +1,84 @@
+<h1>NAME</h1>
+<p>ec_probe - probing tool for the embedded controller</p>
+<h1>DESCRIPTION</h1>
+<p>Probing tool for embedded controllers</p>
+<h1>SYNOPSIS</h1>
+<p><strong>ec_probe</strong> {<strong>read</strong> |
+<strong>write</strong> | <strong>dump</strong> |
+<strong>monitor</strong>} [<em>OPTIONS</em>]</p>
+<h1>OPTIONS</h1>
+<p><strong>-h</strong>, <strong>--help</strong></p>
+<blockquote>
+<p>Show the help message and exit</p>
+</blockquote>
+<p><strong>--version</strong></p>
+<blockquote>
+<p>Show program's version number and exit</p>
+</blockquote>
+<p><strong>-e</strong>,
+<strong>--embedded-controller</strong>=[<strong>ec_linux</strong>,<strong>ec_sys_linux</strong>,<strong>ec_acpi</strong>,<strong>dummy</strong>]</p>
+<blockquote>
+<p>Specify embedded controller to use</p>
+</blockquote>
+<h1>COMMANDS</h1>
+<p><strong>dump</strong> [<em>OPTIONS</em>]</p>
+<blockquote>
+<p>Dump all EC registers</p>
+</blockquote>
+<p><strong>read</strong> [<em>OPTIONS</em>] <em>REGISTER</em></p>
+<blockquote>
+<p>Reads <em>REGISTER</em> from the embedded controller and prints out
+the value.</p>
+<p><strong>-w</strong>, <strong>--word</strong></p>
+<blockquote>
+<p>If given, the value of <em>REGISTER</em> and the value of
+<em>REGISTER + 1</em> is read and combined into a single value.</p>
+</blockquote>
+</blockquote>
+<p><strong>write</strong> [<em>OPTIONS</em>] <em>REGISTER</em>
+<em>VALUE</em></p>
+<blockquote>
+<p>Writes <em>VALUE</em> to <em>REGISTER</em> of the embedded
+controller.</p>
+<p><strong>-w</strong>, <strong>--word</strong></p>
+<blockquote>
+<p>If given, <em>VALUE</em> is written into a combined register of
+<em>REGISTER</em> and <em>REGISTER + 1</em>.</p>
+</blockquote>
+</blockquote>
+<p><strong>monitor</strong> [<em>OPTIONS</em>]</p>
+<blockquote>
+<p>Monitor all embedded controller registers for changes.</p>
+<p><strong>-i</strong>, <strong>--interval</strong> <em>SECONDS</em></p>
+<blockquote>
+<p>Sets the update interval in seconds.</p>
+</blockquote>
+<p><strong>-t</strong>, <strong>--timespan</strong> <em>SECONDS</em></p>
+<blockquote>
+<p>Sets how many seconds the program will run.</p>
+</blockquote>
+<p><strong>-r</strong>, <strong>--report</strong> <em>FILE</em></p>
+<blockquote>
+<p>Save the monitored results to a CSV file.</p>
+</blockquote>
+<p><strong>-c</strong>, <strong>--clearly</strong></p>
+<blockquote>
+<p>With <strong>-r</strong>|<strong>--report</strong>: Blanks out
+consecutive duplicate readings when writing to the CSV file.</p>
+</blockquote>
+<p><strong>-d</strong>, <strong>--decimal</strong></p>
+<blockquote>
+<p>With <strong>-r</strong>|<strong>--report</strong>: Output results in
+decimal format instead of hexadecimal format</p>
+</blockquote>
+</blockquote>
+<p>All input values are interpreted as decimal numbers by default.
+Hexadecimal values may be entered by prefixing them with "0x".</p>
+<h1>BUGS</h1>
+<p>Bugs to https://github.com/nbfc-/nbfc-linux</p>
+<h1>AUTHOR</h1>
+<p>Benjamin Abendroth (braph93@gmx.de)</p>
+<h1>SEE ALSO</h1>
+<p><strong>nbfc</strong>(1), <strong>nbfc_service</strong>(1),
+<strong>nbfc_service.json</strong>(5),
+<strong>fancontrol</strong>(1)</p>

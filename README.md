@@ -19,9 +19,7 @@ Comparison of NBFC C# and NBFC Linux
 |IPC Concept                      | TCP/IP                                | Files                                       |
 |IPC Protocol                     | Binary                                | JSON                                        |
 
-The [service](doc/nbfc_service.md) and the [probing tool](doc/ec_probe.md) are written in C.
-The [client](doc/nbfc.md) is written in Python.
-Another [client](doc/nbfc.md) has also been [written in C](src/client.c).
+All programs, the [service](doc/nbfc_service.html), the [client](doc/nbfc.html) and the [probing tool](doc/ec_probe.html) are written in C.
 
 Installation
 ------------
@@ -110,4 +108,4 @@ status   -- Show the service status
 stop     -- Stop the service
 ```
 
-See also the documentation about the [nbfc configuration](doc/nbfc_service.json.md).
+See also the documentation about the [nbfc configuration](doc/nbfc_service.json.html).

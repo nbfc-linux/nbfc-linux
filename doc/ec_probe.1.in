@@ -1,0 +1,146 @@
+.nh
+.TH "NBFC_SERVICE" 1 "MARCH 2021" "Notebook FanControl"
+.SH NAME
+.PP
+ec_probe \- probing tool for the embedded controller
+
+.SH DESCRIPTION
+.PP
+Probing tool for embedded controllers
+
+.SH SYNOPSIS
+.PP
+.B ec_probe
+.RB { read
+|
+.B write
+|
+.B dump
+|
+.BR monitor }
+.RI [ OPTIONS ]
+
+.SH OPTIONS
+.PP
+.BR -h ", " \-\-help
+.RS
+Show the help message and exit
+.RE
+
+.PP
+.B \-\-version
+.RS
+Show program's version number and exit
+.RE
+
+.PP
+.BR \-e ", " \-\-embedded\-controller "=[" ec_linux , ec_sys_linux , ec_acpi , dummy ]
+.RS
+Specify embedded controller to use
+.RE
+
+.SH COMMANDS
+.PP
+.B dump
+.RI [ OPTIONS ]
+.RS
+Dump all EC registers
+.RE
+
+.PP
+.B read
+.RI [ OPTIONS ]
+.I REGISTER
+.RS
+Reads 
+.I REGISTER
+from the embedded controller and prints out the value.
+
+.BR \-w ", " \-\-word
+.RS
+If given, the value of
+.I REGISTER
+and the value of
+.I REGISTER + 1
+is read and combined into a single value.
+.RE
+.RE
+
+.PP
+.B write
+.RI [ OPTIONS ]
+.I REGISTER
+.I VALUE
+.RS
+Writes
+.I VALUE
+to
+.I REGISTER
+of the embedded controller.
+
+.BR \-w ", " \-\-word
+.RS
+If given,
+.I VALUE
+is written into a combined register of 
+.I REGISTER
+and
+.IR "REGISTER + 1" .
+.RE
+.RE
+
+.PP
+.B monitor
+.RI [ OPTIONS ]
+.RS
+Monitor all embedded controller registers for changes.
+
+.BR \-i ", " \-\-interval
+.I SECONDS
+.RS
+Sets the update interval in seconds.
+.RE
+
+.BR \-t ", " \-\-timespan
+.I SECONDS
+.RS
+Sets how many seconds the program will run.
+.RE
+
+.BR \-r ", " \-\-report
+.I FILE
+.RS
+Save the monitored results to a CSV file.
+.RE
+
+.BR \-c ", " \-\-clearly
+.RS
+With
+.BR \-r | \-\-report :
+Blanks out consecutive duplicate readings when writing to the CSV file.
+.RE
+
+.BR \-d ", " \-\-decimal
+.RS
+With
+.BR \-r | \-\-report :
+Output results in decimal format instead of hexadecimal format
+.RE
+.RE
+
+All input values are interpreted as decimal numbers by default.
+Hexadecimal values may be entered by prefixing them with "0x".
+
+.SH BUGS
+.PP
+Bugs to https://github.com/nbfc\-/nbfc\-linux
+
+.SH AUTHOR
+.PP
+Benjamin Abendroth (braph93@gmx.de)
+
+.SH SEE ALSO
+.BR nbfc (1),
+.BR nbfc_service (1),
+.BR nbfc_service.json (5),
+.BR fancontrol (1)

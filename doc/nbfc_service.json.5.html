@@ -1,0 +1,249 @@
+<h1>NAME</h1>
+<p>nbfc_service.json - Notebook FanControl service configuration</p>
+<h1>CONFIGURATION</h1>
+<h2>ServiceConfig</h2>
+<p>Main configuration file of nbfc_service (<em>/etc/nbfc.json</em>)</p>
+<p><strong>SelectedConfigId</strong>: <em>String</em></p>
+<blockquote>
+<p>The selected config model. This equals the basename of a notebook
+model configuration file.</p>
+<p><strong>EmbeddedControllerType</strong>: <em>String</em></p>
+<blockquote>
+<ul>
+<li><p><strong>ec_sys_linux</strong>: Use the ec_sys kernel module for
+writing to the embedded controller.</p></li>
+<li><p><strong>ec_acpi</strong>: Use the acpi_ec kernel module for
+writing to the embedded controller.</p></li>
+<li><p><strong>ec_linux</strong>: Write to the embedded controller using
+/dev/port.</p></li>
+<li><p><strong>dummy</strong>: Don't write to the embedded controller at
+all.</p></li>
+</ul>
+</blockquote>
+<p>If not given, the embedded controller type will be automatically
+selected.</p>
+</blockquote>
+<p><strong>TargetFanSpeeds</strong>: <em>Array of Floats</em></p>
+<blockquote>
+<p>This holds the fixed speed of the fans. A value of
+<strong>-1</strong> means the fan should be left in auto mode.</p>
+</blockquote>
+<h2>ModelConfig</h2>
+<p><strong>NotebookModel</strong>: <em>String</em></p>
+<blockquote>
+<p>The Notebook Model as described in your BIOS. See <strong>nbfc
+get-model-name.</strong></p>
+</blockquote>
+<p><strong>Author</strong>: <em>String</em></p>
+<blockquote>
+<p>The Author of the config file. Enter whatever you want.</p>
+</blockquote>
+<p><strong>EcPollInterval</strong>: <em>Integer</em> &gt; 0</p>
+<blockquote>
+<p>Defines how often NBFC polls the EC for changes (in
+milliseconds).</p>
+</blockquote>
+<p><strong>CriticalTemperature</strong>: <em>Integer</em></p>
+<blockquote>
+<p>If the temperature exceeds this threshold, NBFC will ignore all
+Temperature threshold elements and set the fan to 100% speed until the
+temperature drops below
+(<strong>CriticalTemperature</strong>-<strong>CriticalTemperatureOffset</strong>).</p>
+</blockquote>
+<p><strong>CriticalTemperatureOffset</strong>: <em>Integer</em> &gt;
+0</p>
+<blockquote>
+<p>See <strong>CriticalTemperature</strong></p>
+</blockquote>
+<p><strong>ReadWriteWords</strong>: <em>Boolean</em></p>
+<blockquote>
+<p>If <strong>true</strong>, NBFC will combine two 8 bit registers to
+one 16-bit register when reading from or writing to the EC
+registers.</p>
+</blockquote>
+<p><strong>FanConfigurations</strong>: <em>Array of
+FanConfigurations</em></p>
+<blockquote>
+<p>Array of at least one FanConfiguration</p>
+</blockquote>
+<p><strong>RegisterWriteConfigurations</strong>: <em>Array of
+RegisterWriteConfiguration</em></p>
+<blockquote>
+<p>Array of RegisterWriteConfiguration</p>
+</blockquote>
+<h2>FanConfiguration</h2>
+<p>Defines how NBFC controls a fan</p>
+<p><strong>FanDisplayName</strong>: <em>String</em></p>
+<blockquote>
+<p>Fan display name</p>
+</blockquote>
+<p><strong>ReadRegister</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 255</p>
+<blockquote>
+<p>The register from which NBFC reads the fan speed.</p>
+</blockquote>
+<p><strong>WriteRegister</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 255</p>
+<blockquote>
+<p>The register which NBFC uses to control the fan.</p>
+</blockquote>
+<p><strong>MinSpeedValue</strong>: <em>Integer</em></p>
+<blockquote>
+<p>The value which puts the fan to the lowest possible speed (usually
+this stops the fan). Must be an integer between 0 and 255 or 0 and 65535
+if <strong>ReadWriteWords</strong> is <strong>true</strong>. Note:
+<strong>MinSpeedValue</strong> does not necessarily have to be smaller
+than <strong>MaxSpeedValue.</strong></p>
+</blockquote>
+<p><strong>MaxSpeedValue</strong>: <em>Integer</em></p>
+<blockquote>
+<p>The value which puts the fan to the highest possible fan speed.</p>
+</blockquote>
+<p><strong>MinSpeedValueRead</strong>: <em>Integer</em></p>
+<blockquote>
+<p>The value which corresponds to the lowest possible fan speed. Will be
+ignored if <strong>IndependentReadMinMaxValues</strong> is
+<strong>false</strong>.</p>
+</blockquote>
+<p><strong>MaxSpeedValueRead</strong>: <em>Integer</em></p>
+<blockquote>
+<p>The value which corresponds to the highest possible fan speed. Will
+be ignored if <strong>IndependentReadMinMaxValues</strong> is
+<strong>false</strong>.</p>
+</blockquote>
+<p><strong>IndependentReadMinMaxValues</strong>: <em>Boolean</em></p>
+<blockquote>
+<p>Defines if independent minimum/maximum values should be applied for
+read operations.</p>
+</blockquote>
+<p><strong>ResetRequired</strong>: <em>Boolean</em></p>
+<blockquote>
+<p>Defines if the EC should be reset before the service is shut
+down.</p>
+</blockquote>
+<p><strong>FanSpeedResetValue</strong>: <em>Integer</em></p>
+<blockquote>
+<p>Defines the value which will be written to
+<strong>WriteRegister</strong> to reset the EC.</p>
+</blockquote>
+<p><strong>TemperatureThresholds</strong>: <em>Array of
+TemperatureThresholds</em></p>
+<p><strong>FanSpeedPercentageOverrides</strong>: <em>Array of
+FanSpeedPercentageOverride</em></p>
+<h2>RegisterWriteConfiguration</h2>
+<p>Allows to write to any EC register</p>
+<p><strong>WriteMode</strong>: <em>String</em></p>
+<blockquote>
+<p>Defines how the value will be written:</p>
+<ul>
+<li><p><strong>And</strong>: performs a binary AND operation (register =
+register &amp; value)</p></li>
+<li><p><strong>Or</strong>: performs a binary OR operation (register =
+register | value)</p></li>
+<li><p><strong>Set</strong>: overwrites the register with the specified
+value (register = value)</p></li>
+</ul>
+</blockquote>
+<p><strong>WriteOccasion</strong>: <em>String</em></p>
+<blockquote>
+<p>Defines when the value should be written:</p>
+<ul>
+<li><p><strong>OnInitialization</strong>: writes the value once upon
+initialization (everytimee the fan control service is enabled or a
+config is applied)</p></li>
+<li><p><strong>OnWriteFanSpeed</strong>: writes the value everytimee the
+fan speed is set.</p></li>
+</ul>
+</blockquote>
+<p><strong>Register</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 255</p>
+<blockquote>
+<p>The register which will be manipulated.</p>
+</blockquote>
+<p><strong>Value</strong>: <em>Integer</em></p>
+<blockquote>
+<p>The Value which will be written</p>
+</blockquote>
+<p><strong>ResetRequired</strong>: <em>Boolean</em></p>
+<blockquote>
+<p>Defines if the register should be reset before the service is shut
+down.</p>
+</blockquote>
+<p><strong>ResetValue</strong>: <em>Integer</em></p>
+<blockquote>
+<p>The value which will be written upon reset.</p>
+</blockquote>
+<p><strong>ResetWriteMode</strong>: <em>String</em></p>
+<blockquote>
+<p>See <strong>WriteMode</strong>. Will only be applied on reset.</p>
+</blockquote>
+<p><strong>Description</strong>: <em>String</em></p>
+<blockquote>
+<p>A short description of what effect the
+<strong>RegisterWriteConfiguration</strong> will have.</p>
+</blockquote>
+<h2>FanSpeedPercentageOverride</h2>
+<p>Overrides the default algorithm to calculate fan speeds.</p>
+<p><strong>FanSpeedPercentage</strong>: <em>Float</em> &gt;= 0.0
+&amp;&amp; <em>Float</em> &lt;= 100.0</p>
+<blockquote>
+<p>The fan speed in percent.</p>
+</blockquote>
+<p><strong>FanSpeedValue</strong>: <em>Integer</em></p>
+<blockquote>
+<p>The fan speed value which will be written to
+<strong>WriteRegister</strong>.</p>
+</blockquote>
+<p><strong>TargetOperation</strong>: <em>String</em></p>
+<blockquote>
+<p>Defines for which operations the speeds should be overridden:</p>
+<blockquote>
+<ul>
+<li><p><strong>Read</strong>: if the value in the EC's ReadRegister is
+equal to FanSpeedValue, the corresponding percentage will not be
+calculated, but instead be set to FanSpeedPercentage.</p></li>
+<li><p><strong>Write</strong>: if the target fan speed percentage is
+equal to FanSpeedPercentage, the corresponding value will not be
+calculated, but instead be set to FanSpeedValue.</p></li>
+<li><p><strong>ReadWrite</strong>: applies to both, read and write
+operations.</p></li>
+</ul>
+</blockquote>
+</blockquote>
+<h2>TemperatureThreshold</h2>
+<p>Defines how fast the fan runs at different temperatures.</p>
+<p><strong>UpThreshold</strong>: <em>Integer</em></p>
+<blockquote>
+<p>NBFC will select the next upper threshold as soon as the temperature
+exceeds <em>UpThreshold</em>(in celsius).</p>
+</blockquote>
+<p><strong>DownThreshold</strong>: <em>Integer</em></p>
+<blockquote>
+<p>NBFC will select the next lower threshold as soon as the temperature
+falls below the <em>DownThreshold</em>(in celsius).</p>
+</blockquote>
+<p><strong>FanSpeed</strong>: <em>Float</em> &gt;= 0.0 &amp;&amp;
+<em>Float</em> &lt;= 100.0</p>
+<blockquote>
+<p>The fan speed in percent.</p>
+</blockquote>
+<h1>FILES</h1>
+<p><em>/var/run/nbfc_service.state.json</em></p>
+<blockquote>
+<p>State file of nbfc_service. Updated every
+<strong>EcPollInterval</strong> milliseconds.</p>
+</blockquote>
+<p><em>/etc/nbfc.json</em></p>
+<blockquote>
+<p>The system wide configuration file.</p>
+</blockquote>
+<p><em>/usr/share/configs/*.json</em></p>
+<blockquote>
+<p>Configuration files for various notebook models.</p>
+</blockquote>
+<h1>AUTHOR</h1>
+<p>Benjamin Abendroth (braph93@gmx.de)</p>
+<h1>SEE ALSO</h1>
+<p><strong>nbfc</strong>(1), <strong>nbfc_service</strong>(1),
+<strong>ec_probe</strong>(1), <strong>fancontrol</strong>(1),
+<strong>sensors</strong>(1)</p>
