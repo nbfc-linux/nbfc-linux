@@ -3,14 +3,14 @@ complete -c nbfc -l version -d "show program's version number and exit"
 # command start
 complete -c nbfc -f -n 'not __fish_seen_subcommand_from config help restart set start status stop' -d 'Start the service' -a start
 complete -c nbfc -n '__fish_seen_subcommand_from start' -s h -l help -d 'show this help message and exit'
-complete -c nbfc -n '__fish_seen_subcommand_from start' -s r -l readonly -d 'Start in read-only mode'
+complete -c nbfc -n '__fish_seen_subcommand_from start' -s r -l read-only -d 'Start in read-only mode'
 # command stop
 complete -c nbfc -f -n 'not __fish_seen_subcommand_from config help restart set start status stop' -d 'Stop the service' -a stop
 complete -c nbfc -n '__fish_seen_subcommand_from stop' -s h -l help -d 'show this help message and exit'
 # command restart
 complete -c nbfc -f -n 'not __fish_seen_subcommand_from config help restart set start status stop' -d 'Restart the service' -a restart
 complete -c nbfc -n '__fish_seen_subcommand_from restart' -s h -l help -d 'show this help message and exit'
-complete -c nbfc -n '__fish_seen_subcommand_from restart' -s r -l readonly -d 'Restart in read-only mode'
+complete -c nbfc -n '__fish_seen_subcommand_from restart' -s r -l read-only -d 'Restart in read-only mode'
 # command status
 complete -c nbfc -f -n 'not __fish_seen_subcommand_from config help restart set start status stop' -d 'Show the service status' -a status
 complete -c nbfc -n '__fish_seen_subcommand_from status' -s h -l help -d 'show this help message and exit'

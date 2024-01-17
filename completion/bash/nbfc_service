@@ -14,7 +14,7 @@ _nbfc_service() {
        return 0;;
   esac
 
-  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --readonly -f --fork -d --debug -c --config-file -s --state-file -e --embedded-controller' -- "$cur"))
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --read-only -f --fork -d --debug -c --config-file -s --state-file -e --embedded-controller' -- "$cur"))
 
   return 1
 }

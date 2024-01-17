@@ -71,24 +71,24 @@ class NbfcService:
         with open(self.PID_FILE) as fh:
             return int(fh.read())
 
-    def start(self, readonly=False):
+    def start(self, read_only=False):
         try:
             pid = self.get_service_pid()
             print('Service already running:', pid)
             return 0
         except:
-            return os.system('nbfc_service -f%s' % (' -r' if readonly else ''))
+            return os.system('nbfc_service -f%s' % (' -r' if read_only else ''))
 
     def stop(self):
         import signal
         os.kill(self.get_service_pid(), signal.SIGINT)
         os.remove(self.STATE_FILE)
 
-    def restart(self, readonly=False):
+    def restart(self, read_only=False):
         try:     self.stop()
         except:  pass
         time.sleep(1)
-        self.start(readonly)
+        self.start(read_only)
 
     def list_configs(self):
         return os.listdir(self.CONFIGS_DIR)
@@ -199,7 +199,7 @@ def set(opts):
 def status(opts):
     def print_service_status(status):
         #print('Service enabled         :', status['enabled'])
-        print('Read-only               :', status['readonly'])
+        print('Read-only               :', status['read-only'])
         print('Selected config name    :', status['config'])
         print('Temperature             :', status['temperature'])
 
@@ -233,7 +233,7 @@ def status(opts):
 
 def start(opts):
     check_root()
-    service.start(opts.readonly)
+    service.start(opts.read_only)
 
 def stop(opts):
     check_root()
@@ -241,7 +241,7 @@ def stop(opts):
 
 def restart(opts):
     check_root()
-    service.restart(opts.readonly)
+    service.restart(opts.read_only)
 
 def wait_for_hwmon(opts):
     HWMonNameFiles = ["/sys/class/hwmon/hwmon{}/name", "/sys/class/hwmon/hwmon{}/device/name"]
@@ -269,14 +269,14 @@ argp.add_argument('--version', action='version', version='nbfc 0.1.7')
 subp = argp.add_subparsers(description='commands')
 
 cmdp = subp.add_parser('start',       help='Start the service')
-cmdp.add_argument('-r', '--readonly', help='Start in read-only mode',         action='store_true')
+cmdp.add_argument('-r', '--read-only', help='Start in read-only mode',         action='store_true')
 cmdp.set_defaults(cmd=start)
 
 cmdp = subp.add_parser('stop',        help='Stop the service')
 cmdp.set_defaults(cmd=stop)
 
 cmdp = subp.add_parser('restart',     help='Restart the service')
-cmdp.add_argument('-r', '--readonly', help='Restart in read-only mode',         action='store_true')
+cmdp.add_argument('-r', '--read-only', help='Restart in read-only mode',         action='store_true')
 cmdp.set_defaults(cmd=restart)
 
 cmdp = subp.add_parser('status',      help='Show the service status')

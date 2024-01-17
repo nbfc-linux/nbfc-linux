@@ -17,7 +17,7 @@ nbfc\_service - Notebook FanControl service
 '''
 
 argp = argparse.ArgumentParser(prog='nbfc_service', description='NoteBook FanControl service')
-argp.add_argument('-r', '--readonly',            help='Start in read-only mode', action='store_true')
+argp.add_argument('-r', '--read-only',            help='Start in read-only mode', action='store_true')
 argp.add_argument('-f', '--fork',                help='Switch process to background after sucessfully started', action='store_true')
 argp.add_argument('-d', '--debug',               help='Enable tracing of reads and writes of the embedded controller', action='store_true')
 argp.add_argument('-c', '--config-file',         help='Use alternative config file (default /etc/nbfc/nbfc.json)', metavar='config')

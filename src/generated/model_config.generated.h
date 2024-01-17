@@ -76,7 +76,6 @@ Error* ModelConfig_ValidateFields(ModelConfig*);
 
 struct ServiceConfig {
 	const char*     SelectedConfigId;
-	Boolean         ReadOnly;
 	EmbeddedControllerType EmbeddedControllerType;
 	array_of(float) TargetFanSpeeds;
 };
@@ -103,7 +102,7 @@ Error* FanInfo_ValidateFields(FanInfo*);
 struct ServiceInfo {
 	int             pid;
 	const char*     config;
-	Boolean         readonly;
+	Boolean         read_only;
 	float           temperature;
 	array_of(FanInfo) fans;
 };

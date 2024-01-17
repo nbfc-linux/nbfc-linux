@@ -27,7 +27,7 @@ Show program's version number and exit.
 .RE
 
 .PP
-.BR \-r ", " \-\-readonly
+.BR \-r ", " \-\-read\-only
 .RS
 Start in read\-only mode.
 .RE

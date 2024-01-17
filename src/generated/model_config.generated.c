@@ -348,7 +348,6 @@ Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 
 struct ServiceConfig ServiceConfig_Unset = {
 	str_Unset,
-	Boolean_Unset,
 	EmbeddedControllerType_Unset,
 	{NULL, 0},
 };
@@ -356,9 +355,6 @@ struct ServiceConfig ServiceConfig_Unset = {
 Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
 	if (self->SelectedConfigId == str_Unset)
 		return err_string(0, "SelectedConfigId: Missing option");
-
-	if (self->ReadOnly == Boolean_Unset)
-		self->ReadOnly = Boolean_False;
 
 	if (false)
 		return err_string(0, "EmbeddedControllerType: Missing option");
@@ -379,8 +375,6 @@ Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 		if (0);
 		else if (!strcmp(c->key, "SelectedConfigId"))
 			e = str_FromJson(&obj->SelectedConfigId, c);
-		else if (!strcmp(c->key, "ReadOnly"))
-			e = Boolean_FromJson(&obj->ReadOnly, c);
 		else if (!strcmp(c->key, "EmbeddedControllerType"))
 			e = EmbeddedControllerType_FromJson(&obj->EmbeddedControllerType, c);
 		else if (!strcmp(c->key, "TargetFanSpeeds"))
@@ -465,8 +459,8 @@ Error* ServiceInfo_ValidateFields(ServiceInfo* self) {
 	if (self->config == str_Unset)
 		return err_string(0, "config: Missing option");
 
-	if (self->readonly == Boolean_Unset)
-		return err_string(0, "readonly: Missing option");
+	if (self->read_only == Boolean_Unset)
+		return err_string(0, "read-only: Missing option");
 
 	if (self->temperature == float_Unset)
 		return err_string(0, "temperature: Missing option");
@@ -489,8 +483,8 @@ Error* ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
 			e = int_FromJson(&obj->pid, c);
 		else if (!strcmp(c->key, "config"))
 			e = str_FromJson(&obj->config, c);
-		else if (!strcmp(c->key, "readonly"))
-			e = Boolean_FromJson(&obj->readonly, c);
+		else if (!strcmp(c->key, "read-only"))
+			e = Boolean_FromJson(&obj->read_only, c);
 		else if (!strcmp(c->key, "temperature"))
 			e = float_FromJson(&obj->temperature, c);
 		else if (!strcmp(c->key, "fans"))

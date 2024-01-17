@@ -144,14 +144,14 @@ static int get_service_pid() {
   return pid;
 }
 
-static int Service_Start(int readonly) {
+static int Service_Start(int read_only) {
   check_root();
   int pid = get_service_pid();
   if (pid != -1)
     Log_Info("Service already running (pid: %d)\n", pid);
   else {
     char cmd[32] = "nbfc_service -f";
-    if (readonly)
+    if (read_only)
       strcat(cmd, " -r");
     int ret = system(cmd);
     if (ret == -1) {
@@ -184,10 +184,10 @@ static int Service_Stop() {
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Service_Restart(int readonly) {
+static int Service_Restart(int read_only) {
   check_root();
   Service_Stop();
-  return Service_Start(readonly);
+  return Service_Start(read_only);
 }
 
 struct ConfigFile {
@@ -323,11 +323,6 @@ static void ServiceConfig_Write() {
     o1->val.text = service_config.SelectedConfigId;
   }
 
-  if (service_config.ReadOnly != Boolean_Unset) {
-    nx_json *o1 = create_json(NX_JSON_BOOL, "ReadOnly", o);
-    o1->val.u = service_config.ReadOnly;
-  }
-
   if (service_config.EmbeddedControllerType != EmbeddedControllerType_Unset) {
     nx_json *o1 = create_json(NX_JSON_STRING, "EmbeddedControllerType", o);
     o1->val.text = EmbeddedControllerType_ToString(service_config.EmbeddedControllerType);
@@ -386,7 +381,7 @@ static const cli99_option set_command_options[] = {
 
 static const cli99_option start_command_options[] = {
   cli99_include_options(&main_options),
-  {"-r|--readonly",   -'r', 0},
+  {"-r|--read-only",  -'r', 0},
   cli99_options_end()
 };
 
@@ -436,7 +431,7 @@ static struct {
   int a; // all/auto/apply
   const char *config;
   int l;     // list
-  int r;     // recommend/readonly
+  int r;     // recommend/read-only
   int s;     // set
   int watch; // watch time
 } options;
@@ -512,7 +507,7 @@ static void print_service_status() {
   printf("Read-only                : %s\n"
          "Selected Config Name     : %s\n"
          "Temperature              : %.2f\n",
-         service_info.readonly ? "true" : "false",
+         service_info.read_only ? "true" : "false",
          service_info.config,
          service_info.temperature);
 }

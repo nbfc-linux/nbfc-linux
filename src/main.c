@@ -25,7 +25,7 @@ static cli99_option cli_options[] = {
   {"-h|--help",                'h',  0},
   {"-v|--version",             'v',  0},
   {"-e|--embedded-controller", 'e',  1},
-  {"-r|--readonly",            'r',  0},
+  {"-r|--read-only",           'r',  0},
   {"-f|--fork",                'f',  0},
   {"-d|--debug",               'd',  0},
   {"-s|--state-file",          's',  1},

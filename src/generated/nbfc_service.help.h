@@ -4,7 +4,7 @@
  "\n"\
  "optional arguments:\n"\
  "  -h, --help            show this help message and exit\n"\
- "  -r, --readonly        Start in read-only mode\n"\
+ "  -r, --read-only        Start in read-only mode\n"\
  "  -f, --fork            Switch process to background after sucessfully started\n"\
  "  -d, --debug           Enable tracing of reads and writes of the embedded controller\n"\
  "  -c config, --config-file config\n"\

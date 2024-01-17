@@ -36,6 +36,7 @@ class FieldDefinition:
         type           = type.replace(' ', '_')
         type           = type.strip('_')
         self.name      = name_
+        self.var       = optional.get('var', self.name.replace('-', '_'))
         self.type      = type_
         self.help      = optional.get('help', "")
         self.valid     = optional.get('valid', None)
@@ -183,7 +184,7 @@ def write_header(fh):
     for name, struct in structs.items():
         p(f'struct {name} {{')
         for field in struct:
-            p(f'\t{field.type:<15} {field.name};')
+            p(f'\t{field.type:<15} {field.var};')
         p('};')
         p('')
         p(f'typedef struct {name} {name};')
@@ -212,17 +213,17 @@ def write_validate_fields(struct, fh):
     p(f'Error* {struct.name}_ValidateFields({struct.name}* self) {{', end='')
     for field in struct:
         if field.is_unset is not None:
-            is_unset = field.is_unset.replace('parameter', f'self->{field.name}')
+            is_unset = field.is_unset.replace('parameter', f'self->{field.var}')
         else:
-            is_unset = f'self->{field.name} == {field.unset}'
+            is_unset = f'self->{field.var} == {field.unset}'
 
         if field.default is not None:
-            set_or_throw = f'self->{field.name} = {field.default}'
+            set_or_throw = f'self->{field.var} = {field.default}'
         else:
             set_or_throw = f'return err_string(0, "{field.name}: Missing option")'
 
         if field.valid is not None:
-            is_valid = field.valid.replace('parameter', f'self->{field.name}')
+            is_valid = field.valid.replace('parameter', f'self->{field.var}')
 
         p()
         p(f'\tif ({is_unset})')
@@ -249,7 +250,7 @@ def write_parse_struct(struct, fh):
 
     for field in struct:
         p(f'\t\telse if (!strcmp(c->key, "{field.name}"))')
-        p(f'\t\t\te = {field.from_json}(&obj->{field.name}, c);')
+        p(f'\t\t\te = {field.from_json}(&obj->{field.var}, c);')
 
     p( '\t\telse')
     p( '\t\t\te = err_string(0, "Unknown option");')

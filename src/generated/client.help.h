@@ -28,7 +28,7 @@
   "usage: nbfc start [-h] [-r]\n"                                              \
   "\n"                                                                         \
   "optional arguments:\n"                                                      \
-  "  -r, --readonly        Start in read-only mode\n"                          \
+  "  -r, --read-only        Start in read-only mode\n"                         \
   "  -h, --help            Shows this message\n"                               \
   ""
 
@@ -36,7 +36,7 @@
   "usage: nbfc restart [-h] [-r]\n"                                            \
   "\n"                                                                         \
   "optional arguments:\n"                                                      \
-  "  -r, --readonly        Restart in read-only mode\n"                        \
+  "  -r, --read-only        Restart in read-only mode\n"                       \
   "  -h, --help            Shows this message\n"                               \
   ""
 

@@ -27,7 +27,7 @@ _nbfc() {
 }
 
 _nbfc_start() {
-  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --readonly' -- "$cur"))
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --read-only' -- "$cur"))
 
   return 1
 }
@@ -39,7 +39,7 @@ _nbfc_stop() {
 }
 
 _nbfc_restart() {
-  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --readonly' -- "$cur"))
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --read-only' -- "$cur"))
 
   return 1
 }

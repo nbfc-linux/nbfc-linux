@@ -250,12 +250,6 @@
         "help": "The selected config model. This equals the basename of a notebook model configuration file."
       },
       {
-        "name": "ReadOnly",
-        "type": "Boolean",
-        "help": "If `true`, fan speeds will not be written to the embedded controller",
-        "default": "Boolean_False"
-      },
-      {
         "name": "EmbeddedControllerType",
         "type": "EmbeddedControllerType",
         "help": "Either `ECSysLinux` for using the `ec_sys` kernel module, or `ECLinux` for an alternative implementation using `/dev/port` without depending on kernel modules.",
@@ -321,7 +315,7 @@
         "help": ""
       },
       {
-        "name": "readonly",
+        "name": "read-only",
         "type": "Boolean",
         "help": ""
       },

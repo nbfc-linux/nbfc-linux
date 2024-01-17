@@ -3,7 +3,7 @@
 _nbfc_service() {
   _arguments \
     '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
-    '(--readonly -r)'{--readonly,-r}'[Start in read-only mode]'::'()'\
+    '(--read-only -r)'{--read-only,-r}'[Start in read-only mode]'::'()'\
     '(--fork -f)'{--fork,-f}'[Switch process to background after sucessfully started]'::'()'\
     '(--debug -d)'{--debug,-d}'[Enable tracing of reads and writes of the embedded controller]'::'()'\
     '(--config-file -c)'{--config-file=,-c+}'[Use alternative config file (default /etc/nbfc/nbfc.json)]':config:_files\

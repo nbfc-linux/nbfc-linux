@@ -27,7 +27,7 @@ This program is used to control the NoteBook FanControl service.
 
 > Start the service.
 >
-> **-r**, **\--readonly**
+> **-r**, **\--read-only**
 >
 > > Start in read-only mode.
 
@@ -39,7 +39,7 @@ This program is used to control the NoteBook FanControl service.
 
 > Restart the service.
 >
-> **-r**, **\--readonly**
+> **-r**, **\--read-only**
 >
 > > Start in read-only mode.
 

@@ -95,7 +95,7 @@ NBFC-Linux comes with shell completion scripts for bash, fish and zsh.
 --embedded-controller  -e  -- Specify embedded controller to use
 --fork                 -f  -- Switch process to background after sucessfully started
 --help                 -h  -- show this help message and exit
---readonly             -r  -- Start in read-only mode
+--read-only            -r  -- Start in read-only mode
 --state-file           -s  -- Write state to an alternative file (default /var/run/nbfc_service.state.json)
 
 ~ $ nbfc <TAB>

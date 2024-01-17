@@ -20,7 +20,7 @@ NoteBook FanControl service
 
 > Show program\'s version number and exit.
 
-**-r**, **\--readonly**
+**-r**, **\--read-only**
 
 > Start in read-only mode.
 

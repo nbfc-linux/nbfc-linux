@@ -35,7 +35,7 @@ Show program's version number and exit.
 .RS
 Start the service.
 
-.BR \-r ", " \-\-readonly
+.BR \-r ", " \-\-read\-only
 .RS
 Start in read\-only mode.
 .RE
@@ -52,7 +52,7 @@ Stop the service.
 .RS
 Restart the service.
 
-.BR \-r ", " \-\-readonly
+.BR \-r ", " \-\-read\-only
 .RS
 Start in read\-only mode.
 .RE

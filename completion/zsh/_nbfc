@@ -22,7 +22,7 @@ _nbfc() {
 _nbfc_start() {
   _arguments \
     '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
-    '(--readonly -r)'{--readonly,-r}'[Start in read-only mode]'::'()'
+    '(--read-only -r)'{--read-only,-r}'[Start in read-only mode]'::'()'
 }
 
 _nbfc_stop() {
@@ -33,7 +33,7 @@ _nbfc_stop() {
 _nbfc_restart() {
   _arguments \
     '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
-    '(--readonly -r)'{--readonly,-r}'[Restart in read-only mode]'::'()'
+    '(--read-only -r)'{--read-only,-r}'[Restart in read-only mode]'::'()'
 }
 
 _nbfc_status() {

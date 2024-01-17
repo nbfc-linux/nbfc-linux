@@ -51,7 +51,7 @@ void Info_Close() {
   }
 }
 
-Error* Info_Write(ModelConfig* cfg, float temperature, bool readonly, array_of(Fan)* fans) {
+Error* Info_Write(ModelConfig* cfg, float temperature, bool read_only, array_of(Fan)* fans) {
   static const char Bool_ToStr[2][6] = {"false","true"};
   char buf[256];
   char result[NBFC_MAX_FILE_SIZE];
@@ -61,12 +61,12 @@ Error* Info_Write(ModelConfig* cfg, float temperature, bool readonly, array_of(F
   StringBuf_Printf(s, "{\n"
     "\t\"pid\":         %d,\n"
     "\t\"config\":      \"%s\",\n"
-    "\t\"readonly\":    %s,\n"
+    "\t\"read-only\":   %s,\n"
     "\t\"temperature\": %.2f,\n"
     "\t\"fans\": [\n",
     getpid(),
     Json_EscapeString(buf, sizeof(buf), cfg->NotebookModel),
-    Bool_ToStr[readonly],
+    Bool_ToStr[read_only],
     temperature);
 
   size_t i = 0;
