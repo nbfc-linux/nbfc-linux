@@ -11,7 +11,7 @@
   }
 
 #define ADD_INDENTION(N) \
-    StringBuf_Printf(s, "\n%0*s", N, " ")
+    StringBuf_Printf(s, "\n%*s", N, " ")
 
 char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
   while (nx != NULL) {
@@ -48,11 +48,11 @@ char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
         ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
         StringBuf_Printf(s, "%lf", nx->val.dbl);
-      } else {
+      } else if (nx->type == NX_JSON_NULL) {
         ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
-        StringBuf_Printf(s, "%s", nx->val.dbl);
-      };
+        StringBuf_Printf(s, "%s", "null");
+      }
     }
     nx = nx->next;
     if (nx != NULL)
