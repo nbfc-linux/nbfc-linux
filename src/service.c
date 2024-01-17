@@ -183,7 +183,7 @@ error:
   return e;
 }
 
-Error* Service_Loop() {
+void Service_Loop() {
   Error* e;
   float current_temperature;
   static int failures = 0;
@@ -328,6 +328,7 @@ void Service_Cleanup() {
       ModelConfig_Free(&model_config);
     case Initialized_1_Service_Config:
       ServiceConfig_Free(&service_config);
+    case Initialized_0_None:
   }
 
   Service_State = Initialized_0_None;

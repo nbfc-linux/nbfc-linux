@@ -20,7 +20,7 @@ struct Service_Options {
 extern Service_Options options;
 
 Error* Service_Init();
-Error* Service_Loop();
+void   Service_Loop();
 void   Service_HandleError(Error*);
 void   Service_Cleanup();
 

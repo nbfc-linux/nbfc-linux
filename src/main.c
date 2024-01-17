@@ -57,7 +57,6 @@ static void parse_opts(int argc, char* const argv[]) {
   cli99_Init(&p, argc, argv, cli_options, cli99_options_python);
 
   int o;
-  char* err;
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
     case 'e':
