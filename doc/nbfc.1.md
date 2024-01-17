@@ -126,7 +126,7 @@ This program is used to control the NoteBook FanControl service.
 
 # BUGS
 
-Bugs to https://github.com/nbfc-/nbfc-linux
+Report bugs to https://github.com/nbfc-/nbfc-linux
 
 # AUTHOR
 

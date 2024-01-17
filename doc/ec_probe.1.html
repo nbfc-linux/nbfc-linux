@@ -1,7 +1,7 @@
 <h1>NAME</h1>
 <p>ec_probe - probing tool for the embedded controller</p>
 <h1>DESCRIPTION</h1>
-<p>Probing tool for embedded controllers</p>
+<p>Probing tool for the embedded controller</p>
 <h1>SYNOPSIS</h1>
 <p><strong>ec_probe</strong> {<strong>read</strong> |
 <strong>write</strong> | <strong>dump</strong> |
@@ -19,6 +19,16 @@
 <strong>--embedded-controller</strong>=[<strong>ec_linux</strong>,<strong>ec_sys_linux</strong>,<strong>ec_acpi</strong>,<strong>dummy</strong>]</p>
 <blockquote>
 <p>Specify embedded controller to use</p>
+<ul>
+<li><p><strong>ec_sys_linux</strong>: Use the ec_sys kernel module for
+writing to the embedded controller.</p></li>
+<li><p><strong>ec_acpi</strong>: Use the acpi_ec kernel module for
+writing to the embedded controller.</p></li>
+<li><p><strong>ec_linux</strong>: Write to the embedded controller using
+/dev/port.</p></li>
+<li><p><strong>dummy</strong>: Don't write to the embedded controller at
+all.</p></li>
+</ul>
 </blockquote>
 <h1>COMMANDS</h1>
 <p><strong>dump</strong> [<em>OPTIONS</em>]</p>
@@ -75,7 +85,7 @@ decimal format instead of hexadecimal format</p>
 <p>All input values are interpreted as decimal numbers by default.
 Hexadecimal values may be entered by prefixing them with "0x".</p>
 <h1>BUGS</h1>
-<p>Bugs to https://github.com/nbfc-/nbfc-linux</p>
+<p>Report bugs to https://github.com/nbfc-/nbfc-linux</p>
 <h1>AUTHOR</h1>
 <p>Benjamin Abendroth (braph93@gmx.de)</p>
 <h1>SEE ALSO</h1>

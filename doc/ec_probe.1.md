@@ -4,7 +4,7 @@ ec_probe - probing tool for the embedded controller
 
 # DESCRIPTION
 
-Probing tool for embedded controllers
+Probing tool for the embedded controller
 
 # SYNOPSIS
 
@@ -25,6 +25,16 @@ Probing tool for embedded controllers
 **\--embedded-controller**=\[**ec_linux**,**ec_sys_linux**,**ec_acpi**,**dummy**\]
 
 > Specify embedded controller to use
+>
+> -   **ec_sys_linux**: Use the ec_sys kernel module for writing to the
+>     embedded controller.
+>
+> -   **ec_acpi**: Use the acpi_ec kernel module for writing to the
+>     embedded controller.
+>
+> -   **ec_linux**: Write to the embedded controller using /dev/port.
+>
+> -   **dummy**: Don\'t write to the embedded controller at all.
 
 # COMMANDS
 
@@ -82,7 +92,7 @@ Hexadecimal values may be entered by prefixing them with \"0x\".
 
 # BUGS
 
-Bugs to https://github.com/nbfc-/nbfc-linux
+Report bugs to https://github.com/nbfc-/nbfc-linux
 
 # AUTHOR
 

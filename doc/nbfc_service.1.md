@@ -34,7 +34,7 @@ NoteBook FanControl service
 
 **-c**, **\--config-file** *CONFIG*
 
-> Use alternative config file (default \@CONFIDR@/nbfc/nbfc.json).
+> Use alternative config file (default /etc/nbfc/nbfc.json).
 
 **-s**, **\--state-file** *STATE FILE*
 
@@ -45,6 +45,16 @@ NoteBook FanControl service
 *ec_acpi*\]
 
 > Specify embedded controller to use.
+>
+> -   **ec_sys_linux**: Use the ec_sys kernel module for writing to the
+>     embedded controller.
+>
+> -   **ec_acpi**: Use the acpi_ec kernel module for writing to the
+>     embedded controller.
+>
+> -   **ec_linux**: Write to the embedded controller using /dev/port.
+>
+> -   **dummy**: Don\'t write to the embedded controller at all.
 
 # FILES
 
@@ -76,7 +86,7 @@ NoteBook FanControl service
 
 # BUGS
 
-Bugs to https://github.com/nbfc-linux/nbfc-linux
+Report bugs to https://github.com/nbfc-linux/nbfc-linux
 
 # AUTHOR
 

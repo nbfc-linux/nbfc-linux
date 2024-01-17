@@ -28,7 +28,7 @@
 <p><strong>-c</strong>, <strong>--config-file</strong>
 <em>CONFIG</em></p>
 <blockquote>
-<p>Use alternative config file (default @CONFIDR@/nbfc/nbfc.json).</p>
+<p>Use alternative config file (default /etc/nbfc/nbfc.json).</p>
 </blockquote>
 <p><strong>-s</strong>, <strong>--state-file</strong> <em>STATE
 FILE</em></p>
@@ -40,6 +40,16 @@ FILE</em></p>
 <em>ec_linux</em>, <em>ec_sys_linux</em>, <em>ec_acpi</em>]</p>
 <blockquote>
 <p>Specify embedded controller to use.</p>
+<ul>
+<li><p><strong>ec_sys_linux</strong>: Use the ec_sys kernel module for
+writing to the embedded controller.</p></li>
+<li><p><strong>ec_acpi</strong>: Use the acpi_ec kernel module for
+writing to the embedded controller.</p></li>
+<li><p><strong>ec_linux</strong>: Write to the embedded controller using
+/dev/port.</p></li>
+<li><p><strong>dummy</strong>: Don't write to the embedded controller at
+all.</p></li>
+</ul>
 </blockquote>
 <h1>FILES</h1>
 <p><em>/var/run/nbfc_service.pid</em></p>
@@ -68,7 +78,7 @@ FILE</em></p>
 </ul>
 </blockquote>
 <h1>BUGS</h1>
-<p>Bugs to https://github.com/nbfc-linux/nbfc-linux</p>
+<p>Report bugs to https://github.com/nbfc-linux/nbfc-linux</p>
 <h1>AUTHOR</h1>
 <p>Benjamin Abendroth (braph93@gmx.de)</p>
 <h1>SEE ALSO</h1>

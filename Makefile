@@ -183,19 +183,16 @@ src/generated/: .force
 # Documentation ===============================================================
 # =============================================================================
 
-doc: .force
-	mkdir -p doc
+doc: doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
+	pandoc -f man -t markdown doc/ec_probe.1 					> doc/ec_probe.1.md
+	pandoc -f man -t markdown doc/nbfc.1 							> doc/nbfc.1.md
+	pandoc -f man -t markdown doc/nbfc_service.1 			> doc/nbfc_service.1.md
+	pandoc -f man -t markdown doc/nbfc_service.json.5 > doc/nbfc_service.json.5.md
 	
-	$(ARGPARSE_TOOL) markdown ./tools/argparse-tool/ec_probe.py     -o doc/ec_probe.md
-	$(ARGPARSE_TOOL) markdown ./tools/argparse-tool/nbfc_service.py -o doc/nbfc_service.md
-	$(ARGPARSE_TOOL) markdown nbfc.py                               -o doc/nbfc.md
-	
-	./tools/config_to_md.py > doc/nbfc_service.json.md
-	
-	go-md2man < doc/ec_probe.md          > doc/ec_probe.1
-	go-md2man < doc/nbfc.md              > doc/nbfc.1
-	go-md2man < doc/nbfc_service.md      > doc/nbfc_service.1
-	go-md2man < doc/nbfc_service.json.md > doc/nbfc_service.json.5
+	pandoc -f man -t html doc/ec_probe.1 					> doc/ec_probe.1.html
+	pandoc -f man -t html doc/nbfc.1 							> doc/nbfc.1.html
+	pandoc -f man -t html doc/nbfc_service.1 			> doc/nbfc_service.1.html
+	pandoc -f man -t html doc/nbfc_service.json.5 > doc/nbfc_service.json.5.html
 
 .force:
 	# force building targets
