@@ -61,7 +61,7 @@ Differences in detail
 |---------------------------------|---------------------------------------|----------------------------------------------
 |Systemd service file             | nbfc.service                          | nbfc\_service.service                       |
 |EC Probing tool                  | ec-probe                              | ec\_probe                                   |
-|Notebook configuration files     | /opt/nbfc/Configs/*.xml               | /usr/share/nbfc/configs/*.json              |
+|Notebook configuration files     | /opt/nbfc/Configs/\*.xml              | /usr/share/nbfc/configs/\*.json             |
 |Service binary                   | /opt/nbfc/nbfcservice.sh              | /bin/nbfc\_service                          |
 |PID File                         | /run/nbfc.pid                         | /run/nbfc\_service.pid                      |
 |State file                       | -                                     | /run/nbfc\_service.state.json               |
@@ -78,10 +78,10 @@ Differences in detail
 Troubleshooting
 ---------------
 The preferred way of running nbfc is using the `ECSysLinux` implementation, which depends on the `ec_sys` kernel module.
-There is also an alternative implementation which uses `/dev/port`, called `ec_linux`.
-It can be specified on the commandline using `--embedded-controller=ec_linux` and permanently set in `/etc/nbfc/nbfc.json` with `"EmbeddedControllerType": "ec_linux"`.
+There is also an alternative implementation which uses `/dev/port`, called `dev_port`.
+It can be specified on the commandline using `--embedded-controller=dev_port` and permanently set in `/etc/nbfc/nbfc.json` with `"EmbeddedControllerType": "dev_port"`.
 
-Many Linux distributions do not provide the `ec_sys` module, and the module should be compiled manually. Alternatively, the [`acpi_ec`](https://github.com/MusiKid/acpi_ec) module can be used. The `acpi_ec` module comes with a DKMS config script, which automatically rebuilds the `acpi_ec` module when a new kernel is installed and supports running NBFC with Secure Boot and Lockdown Kernel. NBFC-Linux will try to use the `acpi_ec` module if available.
+Many Linux distributions do not provide the `ec_sys` module, and the module should be compiled manually. Alternatively, the [`acpi_ec`](https://github.com/MusiKid/acpi_ec) module can be used. The `acpi_ec` module comes with a DKMS config script, which automatically rebuilds the `acpi_ec` module when a new kernel is installed and supports running NBFC with Secure Boot and Lockdown Kernel. NBFC-Linux will try to use the `acpi_ec` module if available. It can be set with `"EmbeddedControllerType": "acpi_ec"`.
 
 Shell autocompletion
 --------------------

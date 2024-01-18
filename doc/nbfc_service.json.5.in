@@ -22,13 +22,13 @@ The selected config model. This equals the basename of a notebook model configur
 .I String
 .RS
 .IP \(bu 2
-.BR ec_sys_linux :
+.BR ec_sys :
 Use the ec_sys kernel module for writing to the embedded controller.
 .IP \(bu 2
-.BR ec_acpi :
+.BR acpi_ec :
 Use the acpi_ec kernel module for writing to the embedded controller.
 .IP \(bu 2
-.BR ec_linux :
+.BR dev_port :
 Write to the embedded controller using /dev/port.
 .IP \(bu 2
 .BR dummy :

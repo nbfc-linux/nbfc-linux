@@ -34,17 +34,17 @@ Show program's version number and exit
 .RE
 
 .PP
-.BR \-e ", " \-\-embedded\-controller "=[" ec_linux , ec_sys_linux , ec_acpi , dummy ]
+.BR \-e ", " \-\-embedded\-controller "=[" dev_port , ec_sys , acpi_ec , dummy ]
 .RS
 Specify embedded controller to use
 .IP \(bu 2
-.BR ec_sys_linux :
+.BR ec_sys :
 Use the ec_sys kernel module for writing to the embedded controller.
 .IP \(bu 2
-.BR ec_acpi :
+.BR acpi_ec :
 Use the acpi_ec kernel module for writing to the embedded controller.
 .IP \(bu 2
-.BR ec_linux :
+.BR dev_port :
 Write to the embedded controller using /dev/port.
 .IP \(bu 2
 .BR dummy :

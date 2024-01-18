@@ -15,13 +15,13 @@ Main configuration file of nbfc_service (*/etc/nbfc.json*)
 >
 > **EmbeddedControllerType**: *String*
 >
-> > -   **ec_sys_linux**: Use the ec_sys kernel module for writing to
+> > -   **ec_sys**: Use the ec_sys kernel module for writing to
 > >     the embedded controller.
 > >
-> > -   **ec_acpi**: Use the acpi_ec kernel module for writing to the
+> > -   **acpi_ec**: Use the acpi_ec kernel module for writing to the
 > >     embedded controller.
 > >
-> > -   **ec_linux**: Write to the embedded controller using /dev/port.
+> > -   **dev_port**: Write to the embedded controller using /dev/port.
 > >
 > > -   **dummy**: Don\'t write to the embedded controller at all.
 >

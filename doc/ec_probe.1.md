@@ -22,17 +22,17 @@ Probing tool for the embedded controller
 > Show program\'s version number and exit
 
 **-e**,
-**\--embedded-controller**=\[**ec_linux**,**ec_sys_linux**,**ec_acpi**,**dummy**\]
+**\--embedded-controller**=\[**dev_port**,**ec_sys**,**acpi_ec**,**dummy**\]
 
 > Specify embedded controller to use
 >
-> -   **ec_sys_linux**: Use the ec_sys kernel module for writing to the
+> -   **ec_sys**: Use the ec_sys kernel module for writing to the
 >     embedded controller.
 >
-> -   **ec_acpi**: Use the acpi_ec kernel module for writing to the
+> -   **acpi_ec**: Use the acpi_ec kernel module for writing to the
 >     embedded controller.
 >
-> -   **ec_linux**: Write to the embedded controller using /dev/port.
+> -   **dev_port**: Write to the embedded controller using /dev/port.
 >
 > -   **dummy**: Don\'t write to the embedded controller at all.
 

@@ -14,7 +14,7 @@ _ec_probe() {
 
   case "$prev" in
     --embedded-controller|-e)
-       COMPREPLY=($(compgen -W 'ec_linux ec_sys_linux ec_acpi' -- "$cur"))
+       COMPREPLY=($(compgen -W 'dev_port ec_sys acpi_ec' -- "$cur"))
        return 0;;
   esac
 

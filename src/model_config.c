@@ -116,18 +116,23 @@ static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const
 }
 
 EmbeddedControllerType EmbeddedControllerType_FromString(const char* s) {
+  if (!strcmp(s, "ec_sys"))       return EmbeddedControllerType_ECSysLinux;
+  if (!strcmp(s, "acpi_ec"))      return EmbeddedControllerType_ECSysLinuxACPI;
+  if (!strcmp(s, "dev_port"))     return EmbeddedControllerType_ECLinux;
+  if (!strcmp(s, "dummy"))        return EmbeddedControllerType_ECDummy;
+
+  // for older versions of nbfc-linux:
   if (!strcmp(s, "ec_sys_linux")) return EmbeddedControllerType_ECSysLinux;
   if (!strcmp(s, "ec_acpi"))      return EmbeddedControllerType_ECSysLinuxACPI;
   if (!strcmp(s, "ec_linux"))     return EmbeddedControllerType_ECLinux;
-  if (!strcmp(s, "dummy"))        return EmbeddedControllerType_ECDummy;
   return EmbeddedControllerType_Unset;
 }
 
 const char* EmbeddedControllerType_ToString(EmbeddedControllerType t) {
   switch (t) {
-  case EmbeddedControllerType_ECSysLinux:     return "ec_sys_linux";
-  case EmbeddedControllerType_ECSysLinuxACPI: return "ec_acpi";
-  case EmbeddedControllerType_ECLinux:        return "ec_linux";
+  case EmbeddedControllerType_ECSysLinux:     return "ec_sys";
+  case EmbeddedControllerType_ECSysLinuxACPI: return "acpi_ec";
+  case EmbeddedControllerType_ECLinux:        return "dev_port";
   case EmbeddedControllerType_ECDummy:        return "dummy";
   default: assert(!"Invalid value for EmbeddedControllerType");
   }

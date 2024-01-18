@@ -15,7 +15,7 @@ nbfc\_service - Notebook FanControl service
 
 argp = argparse.ArgumentParser(prog='ec_probe', description='Probing tool for embedded controllers')
 argp.add_argument('-e', '--embedded-controller', help='Specify embedded controller to use',
-        metavar='EC', choices=['ec_linux', 'ec_sys_linux'])
+        metavar='EC', choices=['dev_port', 'ec_sys'])
 subp = argp.add_subparsers(description='commands')
 
 cmdp = subp.add_parser('dump',        help='Dump all EC registers')

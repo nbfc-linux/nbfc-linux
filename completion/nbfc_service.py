@@ -22,7 +22,7 @@ argp.add_argument('-f', '--fork',                help='Switch process to backgro
 argp.add_argument('-d', '--debug',               help='Enable tracing of reads and writes of the embedded controller', action='store_true')
 argp.add_argument('-c', '--config-file',         help='Use alternative config file (default /etc/nbfc/nbfc.json)', metavar='config')
 argp.add_argument('-s', '--state-file',          help='Write state to an alternative file (default /var/run/nbfc_service.state.json)', metavar='state.json')
-argp.add_argument('-e', '--embedded-controller', help='Specify embedded controller to use', metavar='EC', choices=['dummy','ec_linux', 'ec_sys_linux'])
+argp.add_argument('-e', '--embedded-controller', help='Specify embedded controller to use', metavar='EC', choices=['dummy','dev_port', 'ec_sys'])
 
 argp.markdown_prolog = PROLOG
 argp.markdown_epilog = '''

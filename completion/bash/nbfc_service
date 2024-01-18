@@ -10,7 +10,7 @@ _nbfc_service() {
        COMPREPLY=($(compgen -f -- "$cur"))
        return 0;;
     --embedded-controller|-e)
-       COMPREPLY=($(compgen -W 'dummy ec_linux ec_sys_linux ec_acpi' -- "$cur"))
+       COMPREPLY=($(compgen -W 'dummy dev_port ec_sys acpi_ec' -- "$cur"))
        return 0;;
   esac
 
