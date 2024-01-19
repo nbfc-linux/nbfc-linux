@@ -12,9 +12,9 @@ Main configuration file of nbfc_service (*/etc/nbfc.json*)
 
 > The selected config model. This equals the basename of a notebook
 > model configuration file.
->
-> **EmbeddedControllerType**: *String*
->
+
+**EmbeddedControllerType**: *String*
+
 > > -   **ec_sys**: Use the ec_sys kernel module for writing to the
 > >     embedded controller.
 > >

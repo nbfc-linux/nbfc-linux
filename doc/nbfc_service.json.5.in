@@ -16,10 +16,12 @@ Main configuration file of nbfc_service
 .I String
 .RS
 The selected config model. This equals the basename of a notebook model configuration file.
+.RE
 
 .PP
 .BR EmbeddedControllerType :
 .I String
+.RS
 .RS
 .IP \(bu 2
 .BR ec_sys :
