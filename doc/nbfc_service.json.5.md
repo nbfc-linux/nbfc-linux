@@ -15,8 +15,8 @@ Main configuration file of nbfc_service (*/etc/nbfc.json*)
 >
 > **EmbeddedControllerType**: *String*
 >
-> > -   **ec_sys**: Use the ec_sys kernel module for writing to
-> >     the embedded controller.
+> > -   **ec_sys**: Use the ec_sys kernel module for writing to the
+> >     embedded controller.
 > >
 > > -   **acpi_ec**: Use the acpi_ec kernel module for writing to the
 > >     embedded controller.
@@ -236,7 +236,7 @@ Defines how fast the fan runs at different temperatures.
 
 > The system wide configuration file.
 
-*/usr/share/configs/\*.json*
+*/usr/share/nbfc/configs/\*.json*
 
 > Configuration files for various notebook models.
 

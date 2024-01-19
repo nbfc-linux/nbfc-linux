@@ -119,7 +119,7 @@ This program is used to control the NoteBook FanControl service.
 > The system wide configuration file. See **nbfc_service.json**(5) for
 > further details.
 
-*/usr/share/configs/\*.json*
+*/usr/share/nbfc/configs/\*.json*
 
 > Configuration files for various notebook models. See
 > **nbfc_service.json**(5) for further details.

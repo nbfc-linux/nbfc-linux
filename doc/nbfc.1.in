@@ -165,7 +165,7 @@ The system wide configuration file. See
 for further details.
 .RE
 
-.I @DATADIR@/configs/*.json
+.I @DATADIR@/nbfc/configs/*.json
 .RS
 Configuration files for various notebook models. See
 .BR nbfc_service.json (5)

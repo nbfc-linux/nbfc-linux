@@ -96,7 +96,7 @@ for further details.
 .RE
 
 .PP
-.I @DATADIR@/configs/*.json
+.I @DATADIR@/nbfc/configs/*.json
 .RS
 Configuration files for various notebook models. See
 .BR nbfc_service.json (5)

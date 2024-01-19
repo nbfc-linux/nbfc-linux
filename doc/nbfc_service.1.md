@@ -67,7 +67,7 @@ NoteBook FanControl service
 > State file of nbfc_service. Updated every **EcPollInterval**
 > milliseconds. See **nbfc_service.json**(5) for further details.
 
-*/usr/share/configs/\*.json*
+*/usr/share/nbfc/configs/\*.json*
 
 > Configuration files for various notebook models. See
 > **nbfc_service.json**(5) for further details.
