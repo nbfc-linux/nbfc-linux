@@ -8,3 +8,12 @@ doc/ec_probe.1
 doc/nbfc.1
 doc/nbfc_service.1
 doc/nbfc_service.json.5
+completion/bash/ec_probe
+completion/bash/nbfc
+completion/bash/nbfc_service
+completion/fish/ec_probe.fish
+completion/fish/nbfc.fish
+completion/fish/nbfc_service.fish
+completion/zsh/_ec_probe
+completion/zsh/_nbfc
+completion/zsh/_nbfc_service
