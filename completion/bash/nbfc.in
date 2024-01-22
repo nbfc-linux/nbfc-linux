@@ -60,12 +60,16 @@ _nbfc_status() {
 }
 
 _nbfc_config() {
+  local MODEL_CONFIGS_DIR="@DATADIR@/nbfc/configs"
+
   case "$prev" in
     --set|-s)
-       COMPREPLY=($(compgen -f -- "$cur"))
+       cd "$MODEL_CONFIGS_DIR"
+       _filedir
        return 0;;
     --apply|-a)
-       COMPREPLY=($(compgen -f -- "$cur"))
+       cd "$MODEL_CONFIGS_DIR"
+       _filedir
        return 0;;
   esac
 

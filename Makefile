@@ -20,8 +20,11 @@ override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(datadir)\" -DRUNSTAT
 CORE  = src/nbfc_service src/nbfc src/ec_probe
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
 EXTRA = etc/systemd/system/nbfc_service.service
+BASH_COMPLETION = completion/bash/ec_probe completion/bash/nbfc completion/bash/nbfc_service
+FISH_COMPLETION = completion/fish/ec_probe.fish completion/fish/nbfc.fish completion/fish/nbfc_service.fish
+ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_nbfc_service
 
-all: $(CORE) $(DOC) $(EXTRA)
+all: $(CORE) $(DOC) $(EXTRA) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
 	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
@@ -31,6 +34,7 @@ install-core: $(CORE)
 nbfc.py: nbfc.py.in
 	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
+# Documentation ###############################################################
 doc/ec_probe.1: doc/ec_probe.1.in
 	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
@@ -43,6 +47,37 @@ doc/nbfc_service.1: doc/nbfc_service.1.in
 doc/nbfc_service.json.5: doc/nbfc_service.json.5.in
 	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
+# BASH completion files #######################################################
+completion/bash/ec_probe: completion/bash/ec_probe.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+completion/bash/nbfc: completion/bash/nbfc.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+completion/bash/nbfc_service: completion/bash/nbfc_service.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+# FISH completion files #######################################################
+completion/fish/ec_probe.fish: completion/fish/ec_probe.fish.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+completion/fish/nbfc.fish: completion/fish/nbfc.fish.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+completion/fish/nbfc_service.fish: completion/fish/nbfc_service.fish.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+# ZSH completion files ########################################################
+completion/zsh/_ec_probe: completion/zsh/_ec_probe.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+completion/zsh/_nbfc: completion/zsh/_nbfc.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+completion/zsh/_nbfc_service: completion/zsh/_nbfc_service.in
+	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
+# Systemd service file ########################################################
 etc/systemd/system/nbfc_service.service: etc/systemd/system/nbfc_service.service.in
 	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
@@ -116,8 +151,9 @@ uninstall:
 	rm -f $(DESTDIR)$(datadir)/fish/completions/ec_probe.fish
 
 clean:
-	rm -rf __pycache__ tools/argparse-tool/__pycache__
+	rm -rf __pycache__
 	rm -f $(CORE) src/*.o nbfc.py
+	rm -f $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 	rm -f etc/systemd/system/nbfc_service.service
 	rm -f doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.5
 
@@ -176,9 +212,6 @@ src/generated/: .force
 	mkdir -p src/generated
 	./tools/config.py source > src/generated/model_config.generated.c
 	./tools/config.py header > src/generated/model_config.generated.h
-	argparse-tool printf ./tools/argparse-tool/nbfc_service.py -o src/generated/nbfc_service.help.h
-	argparse-tool printf ./tools/argparse-tool/ec_probe.py     -o src/generated/ec_probe.help.h
-
 
 # =============================================================================
 # Documentation ===============================================================

@@ -49,8 +49,8 @@ _nbfc_config() {
   _arguments \
     '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
     '(--apply --list --recommend --set -a -l -r -s)'{--list,-l}'[List all available configs (default)]'::'()'\
-    '(--apply --list --recommend --set -a -l -r -s)'{--set=,-s+}'[Set a config]':config:_files\
-    '(--apply --list --recommend --set -a -l -r -s)'{--apply=,-a+}'[Set a config and enable fan control]':config:_files\
+    '(--apply --list --recommend --set -a -l -r -s)'{--set=,-s+}'[Set a config]':config:'_files -W @DATADIR@/nbfc/configs' \
+    '(--apply --list --recommend --set -a -l -r -s)'{--apply=,-a+}'[Set a config and enable fan control]':config:'_files -W @DATADIR@/nbfc/configs' \
     '(--apply --list --recommend --set -a -l -r -s)'{--recommend,-r}'[List configs which may work for your device]'::'()'
 }
 

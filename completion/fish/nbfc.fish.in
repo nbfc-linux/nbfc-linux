@@ -22,8 +22,8 @@ complete -c nbfc -r -n '__fish_seen_subcommand_from status' -s w -l watch -d 'Sh
 complete -c nbfc -f -n 'not __fish_seen_subcommand_from config help restart set start status stop' -d 'List or apply configs' -a config
 complete -c nbfc -n '__fish_seen_subcommand_from config' -s h -l help -d 'show this help message and exit'
 complete -c nbfc -n '__fish_seen_subcommand_from config && not __fish_contains_opt apply recommend set a r s' -s l -l list -d 'List all available configs (default)'
-complete -c nbfc -r -n '__fish_seen_subcommand_from config && not __fish_contains_opt apply list recommend a l r' -s s -l set -d 'Set a config' -F
-complete -c nbfc -r -n '__fish_seen_subcommand_from config && not __fish_contains_opt list recommend set l r s' -s a -l apply -d 'Set a config and enable fan control' -F
+complete -c nbfc -r -n '__fish_seen_subcommand_from config && not __fish_contains_opt apply list recommend a l r' -s s -l set -d 'Set a config' -a '(ls /usr/share/nbfc/configs)'
+complete -c nbfc -r -n '__fish_seen_subcommand_from config && not __fish_contains_opt list recommend set l r s' -s a -l apply -d 'Set a config and enable fan control' -a '(ls /usr/share/nbfc/configs)'
 complete -c nbfc -n '__fish_seen_subcommand_from config && not __fish_contains_opt apply list set a l s' -s r -l recommend -d 'List configs which may work for your device'
 # command set
 complete -c nbfc -f -n 'not __fish_seen_subcommand_from config help restart set start status stop' -d 'Control fan speed' -a set

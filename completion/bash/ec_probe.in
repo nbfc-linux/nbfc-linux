@@ -71,7 +71,7 @@ _ec_probe_monitor() {
        
        return 0;;
     --report|-r)
-       COMPREPLY=($(compgen -f -- "$cur"))
+       _filedir
        return 0;;
   esac
 
