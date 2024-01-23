@@ -69,7 +69,7 @@ Error* Service_Init() {
   // Model config =============================================================
   Log_Info("Using '%s' as model config\n", service_config.SelectedConfigId);
 
-  snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, service_config.SelectedConfigId);
+  snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, service_config.SelectedConfigId);
   e = ModelConfig_FromFile(&model_config, path);
   if (e) {
     e = err_string(e, path);

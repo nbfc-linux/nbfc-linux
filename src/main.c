@@ -42,7 +42,7 @@ static void check_model_config(const char* file) {
     snprintf(path, PATH_MAX, "%s", file);
   }
   else {
-    snprintf(path, PATH_MAX, "%s/%s.json", NBFC_CONFIGS_DIR, file);
+    snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, file);
   }
 
   Error* e = ModelConfig_FromFile(&model_config, path);

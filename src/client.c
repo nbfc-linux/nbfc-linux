@@ -205,9 +205,9 @@ static array_of(ConfigFile) get_configs() {
     .size = 0
   };
 
-  DIR* directory = opendir(NBFC_CONFIGS_DIR);
+  DIR* directory = opendir(NBFC_MODEL_CONFIGS_DIR);
   if (directory == NULL) {
-    Log_Error("Failed to open directory `" NBFC_CONFIGS_DIR "': %s\n", strerror(errno));
+    Log_Error("Failed to open directory `" NBFC_MODEL_CONFIGS_DIR "': %s\n", strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -592,7 +592,7 @@ static int Config() {
     else {
       model = (char *)options.config;
       char file[PATH_MAX];
-      snprintf(file, sizeof(file), NBFC_CONFIGS_DIR "/%s.json", model);
+      snprintf(file, sizeof(file), NBFC_MODEL_CONFIGS_DIR "/%s.json", model);
       if (access(file, F_OK)) {
         Log_Error("No such config file found: %s\n", file);
         return NBFC_EXIT_FAILURE;
