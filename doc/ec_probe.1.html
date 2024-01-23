@@ -5,7 +5,8 @@
 <h1>SYNOPSIS</h1>
 <p><strong>ec_probe</strong> {<strong>read</strong> |
 <strong>write</strong> | <strong>dump</strong> |
-<strong>monitor</strong>} [<em>OPTIONS</em>]</p>
+<strong>monitor</strong> | <strong>watch</strong>}
+[<em>OPTIONS</em>]</p>
 <h1>OPTIONS</h1>
 <p><strong>-h</strong>, <strong>--help</strong></p>
 <blockquote>
@@ -80,6 +81,19 @@ consecutive duplicate readings when writing to the CSV file.</p>
 <blockquote>
 <p>With <strong>-r</strong>|<strong>--report</strong>: Output results in
 decimal format instead of hexadecimal format</p>
+</blockquote>
+</blockquote>
+<p><strong>watch</strong> [<em>OPTIONS</em>]</p>
+<blockquote>
+<p>Monitor all embedded controller registers for changes (alternative
+version).</p>
+<p><strong>-i</strong>, <strong>--interval</strong> <em>SECONDS</em></p>
+<blockquote>
+<p>Sets the update interval in seconds.</p>
+</blockquote>
+<p><strong>-t</strong>, <strong>--timespan</strong> <em>SECONDS</em></p>
+<blockquote>
+<p>Sets how many seconds the program will run.</p>
 </blockquote>
 </blockquote>
 <p>All input values are interpreted as decimal numbers by default.

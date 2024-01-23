@@ -8,8 +8,8 @@ Probing tool for the embedded controller
 
 # SYNOPSIS
 
-**ec_probe** {**read** \| **write** \| **dump** \| **monitor**}
-\[*OPTIONS*\]
+**ec_probe** {**read** \| **write** \| **dump** \| **monitor** \|
+**watch**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -86,6 +86,19 @@ Probing tool for the embedded controller
 >
 > > With **-r**\|**\--report**: Output results in decimal format instead
 > > of hexadecimal format
+
+**watch** \[*OPTIONS*\]
+
+> Monitor all embedded controller registers for changes (alternative
+> version).
+>
+> **-i**, **\--interval** *SECONDS*
+>
+> > Sets the update interval in seconds.
+>
+> **-t**, **\--timespan** *SECONDS*
+>
+> > Sets how many seconds the program will run.
 
 All input values are interpreted as decimal numbers by default.
 Hexadecimal values may be entered by prefixing them with \"0x\".

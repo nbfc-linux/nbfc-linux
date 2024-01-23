@@ -4,7 +4,7 @@ _ec_probe() {
   _arguments \
     '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
     '(--embedded-controller -e)'{--embedded-controller=,-e+}'[Specify embedded controller to use]':EC:'(dev_port ec_sys acpi_ec)'\
-    :command:"(('dump\\:Dump all EC registers' 'read\\:Read a byte from a EC register' 'write\\:Write a byte to a EC register' 'monitor\\:Monitor all EC registers for changes'))"\
+    :command:"(('dump\\:Dump all EC registers' 'read\\:Read a byte from a EC register' 'write\\:Write a byte to a EC register' 'monitor\\:Monitor all EC registers for changes' 'watch\\:Monitor all registers for changes (alternative version)'))"\
     '*::arg:->args'
   for w in $line; do
     case $w in
@@ -12,6 +12,7 @@ _ec_probe() {
       (read) _ec_probe_read; break;;
       (write) _ec_probe_write; break;;
       (monitor) _ec_probe_monitor; break;;
+      (watch) _ec_probe_watch; break;;
     esac
   done
 }
@@ -42,6 +43,13 @@ _ec_probe_monitor() {
     '(--report -r)'{--report=,-r+}'[Save all readings as a CSV file]':report:_files\
     '(--clearly -c)'{--clearly,-c}'[Blanks out consecutive duplicate readings]'::'()'\
     '(--decimal -d)'{--decimal,-d}'[Output readings in decimal format instead of hexadecimal format]'::'()'
+}
+
+_ec_probe_watch() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[Show a help message and exit]'::'()'\
+    '(--interval -i)'{--interval=,-i+}'[Sets the update interval in seconds]':seconds:'()'\
+    '(--timespan -t)'{--timespan=,-t+}'[Sets how many seconds the program will run]':seconds:'()'\
 }
 
 _ec_probe "$@"

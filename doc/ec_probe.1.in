@@ -17,7 +17,9 @@ Probing tool for the embedded controller
 |
 .B dump
 |
-.BR monitor }
+.B monitor
+|
+.BR watch }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -137,6 +139,25 @@ Blanks out consecutive duplicate readings when writing to the CSV file.
 With
 .BR \-r | \-\-report :
 Output results in decimal format instead of hexadecimal format
+.RE
+.RE
+
+.PP
+.B watch 
+.RI [ OPTIONS ]
+.RS
+Monitor all embedded controller registers for changes (alternative version).
+
+.BR \-i ", " \-\-interval
+.I SECONDS
+.RS
+Sets the update interval in seconds.
+.RE
+
+.BR \-t ", " \-\-timespan
+.I SECONDS
+.RS
+Sets how many seconds the program will run.
 .RE
 .RE
 

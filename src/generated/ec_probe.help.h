@@ -13,6 +13,7 @@
  "    read                Read a byte from a EC register\n"                    \
  "    write               Write a byte to a EC register\n"                     \
  "    monitor             Monitor all EC registers for changes\n"              \
+ "    watch               Monitor all EC registers for changes (alternative version)\n"\
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default. Hexadecimal values may be entered by prefixing them with \"0x\".\n"\
  ""
@@ -72,5 +73,18 @@
  "                        Save all readings as a CSV file\n"                   \
  "  -c, --clearly         Blanks out consecutive duplicate readings\n"         \
  "  -d, --decimal         Output readings in decimal format instead of hexadecimal format\n"\
+ ""
+
+#define EC_PROBE_WATCH_HELP_TEXT                                               \
+ "Usage: %s watch [-h] [-i seconds] [-t seconds]\n"                            \
+ "\n"                                                                          \
+ "Monitor all EC registers for changes (alternative version)\n"                \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
+ "  -i seconds, --interval SECONDS\n"                                          \
+ "                        Sets the update interval in seconds\n"               \
+ "  -t seconds, --timespan SECONDS\n"                                          \
+ "                        Sets how many seconds the program will run\n"        \
  ""
 

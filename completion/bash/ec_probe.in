@@ -9,6 +9,7 @@ _ec_probe() {
       read) _ec_probe_read && return 0;;
       write) _ec_probe_write && return 0;;
       monitor) _ec_probe_monitor && return 0;;
+      watch) _ec_probe_watch && return 0;;
     esac
   done
 
@@ -22,7 +23,7 @@ _ec_probe() {
 
   case $args in
     1)
-       COMPREPLY+=($(compgen -W 'dump read write monitor' -- "$cur"))
+       COMPREPLY+=($(compgen -W 'dump read write monitor watch' -- "$cur"))
        return 0;;
   esac
 
@@ -76,6 +77,21 @@ _ec_probe_monitor() {
   esac
 
   [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -i --interval -t --timespan -r --report -c --clearly -d --decimal' -- "$cur"))
+
+  return 1
+}
+
+_ec_probe_watch() {
+  case "$prev" in
+    --interval|-i)
+       
+       return 0;;
+    --timespan|-t)
+       
+       return 0;;
+  esac
+
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -i --interval -t --timespan' -- "$cur"))
 
   return 1
 }

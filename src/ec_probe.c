@@ -99,7 +99,7 @@ static enum Command Command_From_String(const char* s) {
 static const char* HelpTexts[] = {
   EC_PROBE_DUMP_HELP_TEXT,
   EC_PROBE_MONITOR_HELP_TEXT,
-  EC_PROBE_MONITOR_HELP_TEXT,
+  EC_PROBE_WATCH_HELP_TEXT,
   EC_PROBE_READ_HELP_TEXT,
   EC_PROBE_WRITE_HELP_TEXT,
   EC_PROBE_HELP_TEXT,
