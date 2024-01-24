@@ -5,6 +5,8 @@ This is a C port of [Stefan Hirschmann's](https://github.com/hirschmann) [NoteBo
 
 It provides the same utilities with the same interfaces as the original NBFC, although the implementation differs.
 
+If you find my work helpful, you can show your appreciation by [buying me a coffee](https://paypal.me/BenjaminAbendroth).
+
 Comparison of NBFC C# and NBFC Linux
 ------------------------------------
 
