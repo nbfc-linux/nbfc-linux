@@ -12,6 +12,7 @@ _nbfc() {
       config) _nbfc_config && return 0;;
       set) _nbfc_set && return 0;;
       help) _nbfc_help && return 0;;
+      get-model-name) return 0;;
     esac
   done
 
@@ -19,7 +20,7 @@ _nbfc() {
 
   case $args in
     1)
-       COMPREPLY+=($(compgen -W 'start stop restart status config set help' -- "$cur"))
+       COMPREPLY+=($(compgen -W 'start stop restart status config set help get-model-name' -- "$cur"))
        return 0;;
   esac
 

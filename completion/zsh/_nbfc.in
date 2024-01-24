@@ -4,7 +4,7 @@ _nbfc() {
   _arguments \
     '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'\
     '(--version)'--version"[show program's version number and exit]"::'()'\
-    :command:"(('start\\:Start the service' 'stop\\:Stop the service' 'restart\\:Restart the service' 'status\\:Show the service status' 'config\\:List or apply configs' 'set\\:Control fan speed' 'help\\:Show help'))"\
+    :command:"(('start\\:Start the service' 'stop\\:Stop the service' 'restart\\:Restart the service' 'status\\:Show the service status' 'config\\:List or apply configs' 'set\\:Control fan speed' 'help\\:Show help' 'get-model-name\\:Print out model name'))"\
     '*::arg:->args'
   for w in $line; do
     case $w in
@@ -15,6 +15,7 @@ _nbfc() {
       (config) _nbfc_config; break;;
       (set) _nbfc_set; break;;
       (help) _nbfc_help; break;;
+      (get-model-name) _nbfc_get_model_name; break;
     esac
   done
 }
@@ -63,6 +64,11 @@ _nbfc_set() {
 }
 
 _nbfc_help() {
+  _arguments \
+    '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'
+}
+
+_nbfc_get_model_name() {
   _arguments \
     '(--help -h)'{--help,-h}'[show this help message and exit]'::'()'
 }
