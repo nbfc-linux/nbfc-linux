@@ -17,7 +17,7 @@ endif
 override LDLIBS   += -lm
 override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(datadir)\" -DRUNSTATEDIR=\"$(runstatedir)\"
 
-CORE  = src/nbfc_service src/nbfc src/ec_probe
+CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
 EXTRA = etc/systemd/system/nbfc_service.service
 BASH_COMPLETION = completion/bash/ec_probe completion/bash/nbfc completion/bash/nbfc_service
@@ -207,6 +207,15 @@ src/nbfc: \
 	src/nxjson.c src/reverse_nxjson.c src/nxjson.h \
 	src/nbfc.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS) $(LDFLAGS)
+
+src/test_model_config: \
+	src/error.c \
+	src/generated/model_config.generated.h \
+	src/generated/model_config.generated.c \
+	src/memory.c \
+	src/nxjson.c \
+	src/program_name.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/test_model_config.c -o src/test_model_config $(LDLIBS) $(LDFLAGS)
 
 src/generated/: .force
 	mkdir -p src/generated

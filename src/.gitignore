@@ -5,6 +5,7 @@ ec-probe
 ec-probe-debug
 ec_probe
 ec_probe-debug
+test_model_config
 *.o
 a.out
 debug

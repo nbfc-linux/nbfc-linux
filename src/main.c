@@ -5,7 +5,6 @@
 #include "log.h"
 #include "ec.h"
 #include "model_config.h"
-#include "optparse/optparse.h"
 #include "generated/nbfc_service.help.h"
 
 #include <signal.h>
@@ -15,54 +14,36 @@
 #include <locale.h>
 #include <limits.h>
 #include <float.h>
+#include <getopt.h>
 
 EC_VTable* ec;
 
 static volatile int quit;
 static void sig_handler(int i) { quit = i; }
 
-static cli99_option cli_options[] = {
-  {"-h|--help",                'h',  0},
-  {"-v|--version",             'v',  0},
-  {"-e|--embedded-controller", 'e',  1},
-  {"-r|--read-only",           'r',  0},
-  {"-f|--fork",                'f',  0},
-  {"-d|--debug",               'd',  0},
-  {"-s|--state-file",          's',  1},
-  {"-c|--config-file",         'c',  1},
-  {"--check-model-config",     'C',  1},
-  cli99_options_end()
+static struct option cli_options[] = {
+  {"help",                no_argument,       NULL, 'h'},
+  {"version",             no_argument,       NULL, 'v'},
+  {"embedded-controller", required_argument, NULL, 'e'},
+  {"read-only",           no_argument,       NULL, 'r'},
+  {"fork",                no_argument,       NULL, 'f'},
+  {"debug",               no_argument,       NULL, 'd'},
+  {"state-file",          required_argument, NULL, 's'},
+  {"config-file",         required_argument, NULL, 'c'},
+  {0,                     0,                 0,     0 },
 };
 
-static void check_model_config(const char* file) {
-  char path[PATH_MAX];
-  ModelConfig model_config = {0};
-
-  if (strchr(file, '/')) {
-    snprintf(path, PATH_MAX, "%s", file);
-  }
-  else {
-    snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, file);
-  }
-
-  Error* e = ModelConfig_FromFile(&model_config, path);
-  e_die();
-
-  e = ModelConfig_Validate(&model_config);
-  e_die();
-}
+static const char cli_options_str[] = "hve:rfds:c:";
 
 static void parse_opts(int argc, char* const argv[]) {
-  cli99 p;
-  cli99_Init(&p, argc, argv, cli_options, cli99_options_python);
-
   int o;
-  while ((o = cli99_GetOpt(&p))) {
+  int option_index;
+  while ((o = getopt_long(argc, argv, cli_options_str, cli_options, &option_index)) != -1) {
     switch (o) {
     case 'e':
-      options.embedded_controller_type = EmbeddedControllerType_FromString(p.optarg);
+      options.embedded_controller_type = EmbeddedControllerType_FromString(optarg);
       if (options.embedded_controller_type == EmbeddedControllerType_Unset) {
-        Log_Error("Invalid value for %s: %s\n", p.optopt, p.optarg);
+        Log_Error("Invalid value for %s: %s\n", "-e|--embedded-controller", optarg);
         exit(NBFC_EXIT_CMDLINE);
       }
       break;
@@ -71,16 +52,13 @@ static void parse_opts(int argc, char* const argv[]) {
     case 'r':  options.read_only      = 1;                         break;
     case 'f':  options.fork           = 1;                         break;
     case 'd':  options.debug          = 1;                         break;
-    case 's':  options.state_file     = p.optarg;                  break;
-    case 'c':  options.service_config = p.optarg;                  break;
-    case 'C':  check_model_config(p.optarg); exit(0);              break;
-    default:
-      cli99_ExplainError(&p);
-      exit(NBFC_EXIT_CMDLINE);
+    case 's':  options.state_file     = optarg;                    break;
+    case 'c':  options.service_config = optarg;                    break;
+    default:   exit(NBFC_EXIT_CMDLINE);
     }
   }
 
-  if (!cli99_End(&p)) {
+  if (optind < argc) {
     Log_Error("Too much arguments\n");
     exit(NBFC_EXIT_CMDLINE);
   }

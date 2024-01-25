@@ -27,6 +27,4 @@
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 #include "nxjson.c"
 
-#include "optparse/optparse.c"
-
 #include "main.c"
