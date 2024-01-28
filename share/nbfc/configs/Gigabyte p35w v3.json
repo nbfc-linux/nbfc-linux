@@ -2,7 +2,6 @@
  "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Gigabyte p35w v3",
  "ReadWriteWords": false,
- "CriticalTemperature": 75,
  "FanConfigurations": [
 	{
 	 "ReadRegister": 96,

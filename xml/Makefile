@@ -8,6 +8,7 @@ fetch_from_original_nbfc:
 	rm -rf nbfc-revive
 	
 	chmod -x *.xml
+	dos2unix *.xml
 
 transform_to_json:
 	../tools/config_to_json.py --out-dir ../share/nbfc/configs *

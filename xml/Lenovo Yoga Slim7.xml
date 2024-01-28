@@ -13,8 +13,9 @@
       <ResetRequired>true</ResetRequired>
       <FanSpeedResetValue>255</FanSpeedResetValue>
       <FanDisplayName>CPU</FanDisplayName>
+    </FanConfiguration>
       <TemperatureThresholds>
-        <TemperatureThreshold>
+	    <TemperatureThreshold>
           <UpThreshold>80</UpThreshold>
           <DownThreshold>0</DownThreshold>
           <FanSpeed>0</FanSpeed>
@@ -40,6 +41,5 @@
           <FanSpeed>60</FanSpeed>
         </TemperatureThreshold>
       </TemperatureThresholds>
-    </FanConfiguration>
   </FanConfigurations>
 </FanControlConfigV2>

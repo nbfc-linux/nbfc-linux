@@ -2,7 +2,6 @@
 <FanControlConfigV2 xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <NotebookModel>Gigabyte p35w v3</NotebookModel>
   <ReadWriteWords>false</ReadWriteWords>
-  <CriticalTemperature>75</CriticalTemperature>
   <FanConfigurations>
     <FanConfiguration>
       <ReadRegister>96</ReadRegister>
