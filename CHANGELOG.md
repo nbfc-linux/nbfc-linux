@@ -1,5 +1,8 @@
 # Changelog
 
+## nbfc-linux-0.1.12 (2024-01-28)
+- Added `LegacyTemperatureThresholdsBehaviour` option to model config
+
 ## nbfc-linux-0.1.11 (2024-01-23)
 - Added `get_model_name` to NBFC client
 - NBFC client now writes JSON in a beautified format
