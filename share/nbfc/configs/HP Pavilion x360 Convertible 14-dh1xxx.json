@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "HP Pavilion x360 Convertible 14-dh1xxx",
  "Author": "Jakov Gudec",
  "EcPollInterval": 200,
@@ -18,37 +19,37 @@
 	 "FanDisplayName": "CPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 68,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 71,
+	   "UpThreshold": 68,
 	   "DownThreshold": 63,
 	   "FanSpeed": 20.0
 	  },
 	  {
-	   "UpThreshold": 78,
+	   "UpThreshold": 71,
 	   "DownThreshold": 67,
 	   "FanSpeed": 35.0
 	  },
 	  {
-	   "UpThreshold": 82,
+	   "UpThreshold": 78,
 	   "DownThreshold": 71,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 86,
+	   "UpThreshold": 82,
 	   "DownThreshold": 78,
 	   "FanSpeed": 65.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 86,
 	   "DownThreshold": 82,
 	   "FanSpeed": 85.0
 	  },
 	  {
-	   "UpThreshold": 92,
+	   "UpThreshold": 90,
 	   "DownThreshold": 86,
 	   "FanSpeed": 100.0
 	  }

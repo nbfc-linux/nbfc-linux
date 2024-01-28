@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Lenovo ThinkPad L380 Yoga",
  "Author": "amissus@seznam.cz (based on Aspire V3-371)",
  "EcPollInterval": 1500,
@@ -18,32 +19,32 @@
 	 "FanDisplayName": "Fan 1",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 55,
 	   "FanSpeed": 20.1970444
 	  },
 	  {
-	   "UpThreshold": 79,
+	   "UpThreshold": 70,
 	   "DownThreshold": 63,
 	   "FanSpeed": 40.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 79,
 	   "DownThreshold": 68,
 	   "FanSpeed": 60.0000038
 	  },
 	  {
-	   "UpThreshold": 89,
+	   "UpThreshold": 85,
 	   "DownThreshold": 77,
 	   "FanSpeed": 80.0
 	  },
 	  {
-	   "UpThreshold": 92,
+	   "UpThreshold": 89,
 	   "DownThreshold": 79,
 	   "FanSpeed": 100.0
 	  }

@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "HP EliteBook 745 G5",
  "EcPollInterval": 1000,
  "ReadWriteWords": false,
@@ -15,42 +16,42 @@
 	 "FanDisplayName": "CPU Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 60,
 	   "DownThreshold": 50,
 	   "FanSpeed": 5.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 55,
 	   "FanSpeed": 10.0
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 25.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 75,
 	   "DownThreshold": 65,
 	   "FanSpeed": 40.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 70,
 	   "FanSpeed": 55.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 85,
 	   "DownThreshold": 75,
 	   "FanSpeed": 70.0
 	  },
 	  {
-	   "UpThreshold": 95,
+	   "UpThreshold": 90,
 	   "DownThreshold": 80,
 	   "FanSpeed": 100.0
 	  }

@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 
+bool TemperatureThresholdManager_LegacyBehaviour = false;
+
 Error* ThresholdManager_Init(ThresholdManager* self, array_of(TemperatureThreshold)* thresholds) {
   my.current = NULL;
   my.thresholds = *thresholds;
@@ -27,8 +29,14 @@ TemperatureThreshold* ThresholdManager_AutoSelectThreshold(ThresholdManager* sel
     return NULL;
 
   int i = my.current ? my.current - my.thresholds.data : 0;
-  while (i > 0        && temperature <= my.thresholds.data[i].DownThreshold) --i;
-  while (i < size - 1 && temperature >= my.thresholds.data[i].UpThreshold)   ++i;
+  if (TemperatureThresholdManager_LegacyBehaviour) {
+    while (i > 0        && temperature <= my.thresholds.data[i].DownThreshold)   --i;
+    while (i < size - 1 && temperature >= my.thresholds.data[i + 1].UpThreshold) ++i;
+  }
+  else {
+    while (i > 0        && temperature <= my.thresholds.data[i].DownThreshold) --i;
+    while (i < size - 1 && temperature >= my.thresholds.data[i].UpThreshold)   ++i;
+  }
 
   return (my.current = &my.thresholds.data[i]);
 }

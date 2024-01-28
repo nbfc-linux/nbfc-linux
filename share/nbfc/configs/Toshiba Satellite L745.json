@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Toshiba Satellite L745 , Bios v2.60 , EC v2.50",
  "Author": "msafwan",
  "EcPollInterval": 3000,
@@ -18,19 +19,19 @@
 	 "FanDisplayName": "CPU Fan Level",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 35,
-	   "DownThreshold": 20,
-	   "FanSpeed": 0.0
+	   "UpThreshold": 50,
+	   "DownThreshold": 50,
+	   "FanSpeed": 100.0
 	  },
 	  {
-	   "UpThreshold": 50,
+	   "UpThreshold": 35,
 	   "DownThreshold": 35,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 75,
-	   "DownThreshold": 50,
-	   "FanSpeed": 100.0
+	   "UpThreshold": 20,
+	   "DownThreshold": 20,
+	   "FanSpeed": 0.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": []

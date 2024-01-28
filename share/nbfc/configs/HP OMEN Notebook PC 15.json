@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "HP OMEN 5001NG",
  "Author": "Eberh@rd",
  "EcPollInterval": 2222,
@@ -18,32 +19,32 @@
 	 "FanDisplayName": "CPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 70,
 	   "DownThreshold": 56,
 	   "FanSpeed": 10.0
 	  },
 	  {
 	   "UpThreshold": 76,
+	   "DownThreshold": 66,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 75,
 	   "DownThreshold": 65,
 	   "FanSpeed": 20.0
 	  },
 	  {
 	   "UpThreshold": 77,
-	   "DownThreshold": 66,
-	   "FanSpeed": 30.0
-	  },
-	  {
-	   "UpThreshold": 78,
 	   "DownThreshold": 67,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 78,
 	   "DownThreshold": 68,
 	   "FanSpeed": 100.0
 	  }

@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "U41-70",
  "Author": "None",
  "EcPollInterval": 1500,
@@ -18,22 +19,22 @@
 	 "FanDisplayName": "None",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 65,
 	   "DownThreshold": 58,
 	   "FanSpeed": 46.6666679
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 75,
 	   "DownThreshold": 68,
 	   "FanSpeed": 66.6666641
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 85,
 	   "DownThreshold": 78,
 	   "FanSpeed": 100.0
 	  }

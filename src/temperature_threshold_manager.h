@@ -4,6 +4,8 @@
 #include "model_config.h"
 #include "error.h"
 
+#include <stdbool.h>
+
 typedef struct ThresholdManager ThresholdManager;
 struct ThresholdManager {
   array_of(TemperatureThreshold) thresholds;
@@ -13,5 +15,7 @@ struct ThresholdManager {
 Error*                ThresholdManager_Init(ThresholdManager*, array_of(TemperatureThreshold)*);
 void                  ThresholdManager_ResetCurrentThreshold(ThresholdManager*, float temperature);
 TemperatureThreshold* ThresholdManager_AutoSelectThreshold(ThresholdManager*, float temperature);
+
+extern bool TemperatureThresholdManager_LegacyBehaviour;
 
 #endif

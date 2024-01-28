@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Aspire 1810TZ",
  "EcPollInterval": 3000,
  "ReadWriteWords": false,
@@ -13,12 +14,12 @@
 	 "FanSpeedResetValue": 0,
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 56,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 56,
 	   "DownThreshold": 46,
 	   "FanSpeed": 100.0
 	  }

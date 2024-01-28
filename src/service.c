@@ -83,6 +83,8 @@ Error* Service_Init() {
     goto error;
   }
 
+  TemperatureThresholdManager_LegacyBehaviour = model_config.LegacyTemperatureThresholdsBehaviour;
+
   // Fans =====================================================================
   fans.size = model_config.FanConfigurations.size;
   fans.data = (Fan*) Mem_Calloc(fans.size, sizeof(Fan));

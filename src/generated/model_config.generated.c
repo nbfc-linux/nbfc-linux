@@ -222,8 +222,8 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	else if (! (self->FanSpeedResetValue >= 0 && self->FanSpeedResetValue <= 65535))
 		return err_string(0, "FanSpeedResetValue: requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->TemperatureThresholds.data == NULL)
-		self->TemperatureThresholds = Config_DefaultTemperatureThresholds;
+	if (false)
+		return err_string(0, "TemperatureThresholds: Missing option");
 
 	if (self->FanSpeedPercentageOverrides.data == NULL)
 		self->FanSpeedPercentageOverrides = Config_DefaultFanSpeedPercentageOverrides;
@@ -273,6 +273,7 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 struct ModelConfig ModelConfig_Unset = {
 	str_Unset,
 	str_Unset,
+	Boolean_Unset,
 	short_Unset,
 	short_Unset,
 	short_Unset,
@@ -287,6 +288,9 @@ Error* ModelConfig_ValidateFields(ModelConfig* self) {
 
 	if (self->Author == str_Unset)
 		self->Author = Mem_Strdup("");
+
+	if (self->LegacyTemperatureThresholdsBehaviour == Boolean_Unset)
+		self->LegacyTemperatureThresholdsBehaviour = Boolean_False;
 
 	if (self->EcPollInterval == short_Unset)
 		self->EcPollInterval = 3000;
@@ -327,6 +331,8 @@ Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 			e = str_FromJson(&obj->NotebookModel, c);
 		else if (!strcmp(c->key, "Author"))
 			e = str_FromJson(&obj->Author, c);
+		else if (!strcmp(c->key, "LegacyTemperatureThresholdsBehaviour"))
+			e = Boolean_FromJson(&obj->LegacyTemperatureThresholdsBehaviour, c);
 		else if (!strcmp(c->key, "EcPollInterval"))
 			e = short_FromJson(&obj->EcPollInterval, c);
 		else if (!strcmp(c->key, "CriticalTemperature"))

@@ -170,8 +170,7 @@
         "name": "TemperatureThresholds",
         "type": "array_of(TemperatureThreshold)",
         "unset": "{NULL, 0}",
-        "is_unset": "parameter.data == NULL",
-        "default": "Config_DefaultTemperatureThresholds"
+        "is_unset": "false"
       },
       {
         "name": "FanSpeedPercentageOverrides",
@@ -196,6 +195,11 @@
         "type": "const char*",
         "default": "Mem_Strdup(\"\")",
         "help": "The Author of the config file. Enter whatever you want."
+      },
+      {
+        "name": "LegacyTemperatureThresholdsBehaviour",
+        "type": "Boolean",
+        "default": "Boolean_False"
       },
       {
         "name": "EcPollInterval",

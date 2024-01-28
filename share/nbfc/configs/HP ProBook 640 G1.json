@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "HP ProBook 640 G1",
  "Author": "Basmal121",
  "EcPollInterval": 500,
@@ -18,27 +19,27 @@
 	 "FanDisplayName": "CPU Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 55,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 55,
 	   "DownThreshold": 45,
 	   "FanSpeed": 10.0
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 65,
 	   "DownThreshold": 55,
 	   "FanSpeed": 20.0
 	  },
 	  {
-	   "UpThreshold": 84,
+	   "UpThreshold": 75,
 	   "DownThreshold": 65,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 84,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }

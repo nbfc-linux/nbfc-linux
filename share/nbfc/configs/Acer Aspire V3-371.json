@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Aspire V3-371",
  "Author": "h",
  "EcPollInterval": 6000,
@@ -16,32 +17,32 @@
 	 "FanDisplayName": "None",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 66,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 66,
 	   "DownThreshold": 53,
 	   "FanSpeed": 7.058824
 	  },
 	  {
-	   "UpThreshold": 78,
+	   "UpThreshold": 70,
 	   "DownThreshold": 62,
 	   "FanSpeed": 20.0
 	  },
 	  {
-	   "UpThreshold": 83,
+	   "UpThreshold": 78,
 	   "DownThreshold": 72,
 	   "FanSpeed": 29.92126
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 83,
 	   "DownThreshold": 77,
 	   "FanSpeed": 40.0
 	  },
 	  {
-	   "UpThreshold": 94,
+	   "UpThreshold": 90,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }

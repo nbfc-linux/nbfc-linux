@@ -44,6 +44,12 @@ Main configuration file of nbfc_service (*/etc/nbfc.json*)
 
 > The Author of the config file. Enter whatever you want.
 
+**LegacyTemperatureThresholdsBehaviour**: *Boolean*
+
+> This option was introduced for beeing backwards compatible with
+> configuration files from the original NBFC project. The default is
+> **false**. Do not use this option for new configuration files.
+
 **EcPollInterval**: *Integer* \> 0
 
 > Defines how often NBFC polls the EC for changes (in milliseconds).

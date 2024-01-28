@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "LENOVO 20NR001JRT",
  "Author": "Bekliev Parviz",
  "EcPollInterval": 3000,
@@ -18,22 +19,22 @@
 	 "FanDisplayName": "Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 50,
+	   "UpThreshold": 40,
 	   "DownThreshold": 0,
 	   "FanSpeed": 25.0
 	  },
 	  {
-	   "UpThreshold": 68,
+	   "UpThreshold": 50,
 	   "DownThreshold": 40,
 	   "FanSpeed": 55.0
 	  },
 	  {
-	   "UpThreshold": 99,
+	   "UpThreshold": 68,
 	   "DownThreshold": 50,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 100,
+	   "UpThreshold": 99,
 	   "DownThreshold": 90,
 	   "FanSpeed": 100.0
 	  }

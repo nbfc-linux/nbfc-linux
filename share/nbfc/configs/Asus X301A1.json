@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Asus X301A",
  "EcPollInterval": 100,
  "ReadWriteWords": false,
@@ -17,27 +18,27 @@
 	 "FanDisplayName": "FAN",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 75,
 	   "DownThreshold": 65,
 	   "FanSpeed": 25.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 70,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 88,
+	   "UpThreshold": 85,
 	   "DownThreshold": 75,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 88,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }

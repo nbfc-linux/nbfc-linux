@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "HP ZBook Studio G3",
  "Author": "Mahmoud Al-Qudsi",
  "EcPollInterval": 1000,
@@ -18,27 +19,27 @@
 	 "FanDisplayName": "CPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 74,
+	   "UpThreshold": 70,
 	   "DownThreshold": 65,
 	   "FanSpeed": 20.0
 	  },
 	  {
-	   "UpThreshold": 77,
+	   "UpThreshold": 74,
 	   "DownThreshold": 70,
 	   "FanSpeed": 30.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 77,
 	   "DownThreshold": 74,
 	   "FanSpeed": 60.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 76,
 	   "FanSpeed": 100.0
 	  }
@@ -64,27 +65,27 @@
 	 "FanDisplayName": "CPU Fan 2",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 74,
+	   "UpThreshold": 70,
 	   "DownThreshold": 65,
 	   "FanSpeed": 20.0
 	  },
 	  {
-	   "UpThreshold": 77,
+	   "UpThreshold": 74,
 	   "DownThreshold": 70,
 	   "FanSpeed": 30.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 77,
 	   "DownThreshold": 74,
 	   "FanSpeed": 60.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 76,
 	   "FanSpeed": 100.0
 	  }

@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Extensa 5630Z",
  "EcPollInterval": 3000,
  "ReadWriteWords": false,
@@ -16,22 +17,22 @@
 	 "FanSpeedResetValue": 0,
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 50,
+	   "UpThreshold": 33,
 	   "DownThreshold": 10,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 50,
 	   "DownThreshold": 33,
 	   "FanSpeed": 26.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 60,
 	   "DownThreshold": 50,
 	   "FanSpeed": 40.0
 	  },
 	  {
-	   "UpThreshold": 68,
+	   "UpThreshold": 65,
 	   "DownThreshold": 60,
 	   "FanSpeed": 100.0
 	  }

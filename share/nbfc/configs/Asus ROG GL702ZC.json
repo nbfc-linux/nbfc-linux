@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "GL702ZC",
  "Author": "grski",
  "EcPollInterval": 500,
@@ -18,37 +19,37 @@
 	 "FanDisplayName": "CPU",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 45,
+	   "UpThreshold": 30,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 45,
 	   "DownThreshold": 40,
 	   "FanSpeed": 12.5
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 50,
 	   "FanSpeed": 37.5
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 79,
+	   "UpThreshold": 75,
 	   "DownThreshold": 65,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 79,
 	   "DownThreshold": 72,
 	   "FanSpeed": 100.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 85,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }
@@ -68,37 +69,37 @@
 	 "FanDisplayName": "GPU",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 45,
+	   "UpThreshold": 30,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 45,
 	   "DownThreshold": 40,
 	   "FanSpeed": 12.5
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 50,
 	   "FanSpeed": 37.5
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 79,
+	   "UpThreshold": 75,
 	   "DownThreshold": 65,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 79,
 	   "DownThreshold": 72,
 	   "FanSpeed": 100.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 85,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }

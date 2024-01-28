@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "G752VS",
  "Author": "Slartibartfast",
  "EcPollInterval": 150,
@@ -18,27 +19,27 @@
 	 "FanDisplayName": "CPU FAN",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 55,
 	   "FanSpeed": 25.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 65,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 85,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }
@@ -58,27 +59,27 @@
 	 "FanDisplayName": "GPU FAN",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 55,
 	   "FanSpeed": 25.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 65,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 85,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }

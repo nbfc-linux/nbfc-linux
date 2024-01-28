@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "ASUSTeK COMPUTER INC. UX430UA",
  "Author": "sladiri",
  "EcPollInterval": 300,
@@ -17,39 +18,39 @@
 	 "FanSpeedResetValue": 9,
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 62,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 62,
 	   "DownThreshold": 52,
 	   "FanSpeed": 12.5
 	  },
 	  {
-	   "UpThreshold": 74,
+	   "UpThreshold": 70,
 	   "DownThreshold": 66,
 	   "FanSpeed": 25.0
 	  },
 	  {
-	   "UpThreshold": 78,
+	   "UpThreshold": 74,
 	   "DownThreshold": 72,
 	   "FanSpeed": 37.5
 	  },
 	  {
-	   "UpThreshold": 83,
+	   "UpThreshold": 78,
 	   "DownThreshold": 76,
 	   "FanSpeed": 50.0
 	  },
 	  {
 	   "UpThreshold": 85,
-	   "DownThreshold": 81,
-	   "FanSpeed": 75.0
-	  },
-	  {
-	   "UpThreshold": 90,
 	   "DownThreshold": 83,
 	   "FanSpeed": 100.0
+	  },
+	  {
+	   "UpThreshold": 83,
+	   "DownThreshold": 81,
+	   "FanSpeed": 75.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": []

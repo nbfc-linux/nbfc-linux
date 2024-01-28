@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Asus Zenbook UX330UA",
  "EcPollInterval": 150,
  "ReadWriteWords": false,
@@ -14,22 +15,22 @@
 	 "FanSpeedResetValue": 9,
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 47,
+	   "UpThreshold": 36,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 52,
+	   "UpThreshold": 47,
 	   "DownThreshold": 42,
 	   "FanSpeed": 37.5
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 52,
 	   "DownThreshold": 44,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 75,
 	   "DownThreshold": 62,
 	   "FanSpeed": 100.0
 	  }

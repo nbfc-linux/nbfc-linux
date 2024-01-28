@@ -61,6 +61,7 @@ Error* FanConfiguration_ValidateFields(FanConfiguration*);
 struct ModelConfig {
 	const char*     NotebookModel;
 	const char*     Author;
+	Boolean         LegacyTemperatureThresholdsBehaviour;
 	short           EcPollInterval;
 	short           CriticalTemperature;
 	short           CriticalTemperatureOffset;

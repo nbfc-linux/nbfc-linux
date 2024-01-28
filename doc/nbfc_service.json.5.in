@@ -67,6 +67,16 @@ The Author of the config file. Enter whatever you want.
 .RE
 
 .PP
+.BR LegacyTemperatureThresholdsBehaviour :
+.I Boolean
+.RS
+This option was introduced for beeing backwards compatible with configuration files from the original NBFC project.
+The default is
+.BR false .
+Do not use this option for new configuration files.
+.RE
+
+.PP
 .BR EcPollInterval :
 .IR Integer " > 0"
 .RS

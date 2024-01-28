@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Aspire VN7-793G V17 Nitro BE",
  "Author": "Jens Lange",
  "EcPollInterval": 3000,
@@ -18,32 +19,32 @@
 	 "FanDisplayName": "Right fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 67,
+	   "UpThreshold": 60,
 	   "DownThreshold": 50,
 	   "FanSpeed": 7.272727
 	  },
 	  {
-	   "UpThreshold": 69,
+	   "UpThreshold": 67,
 	   "DownThreshold": 57,
 	   "FanSpeed": 16.969698
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 69,
 	   "DownThreshold": 65,
 	   "FanSpeed": 30.3030319
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 80,
 	   "DownThreshold": 67,
 	   "FanSpeed": 52.12121
 	  },
 	  {
-	   "UpThreshold": 92,
+	   "UpThreshold": 90,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }
@@ -63,32 +64,32 @@
 	 "FanDisplayName": "Left fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 64,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
 	   "UpThreshold": 67,
-	   "DownThreshold": 54,
-	   "FanSpeed": 7.64331245
-	  },
-	  {
-	   "UpThreshold": 70,
 	   "DownThreshold": 58,
 	   "FanSpeed": 33.75796
 	  },
 	  {
-	   "UpThreshold": 77,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 50.9554138
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 77,
 	   "DownThreshold": 67,
 	   "FanSpeed": 80.891716
 	  },
 	  {
-	   "UpThreshold": 92,
+	   "UpThreshold": 64,
+	   "DownThreshold": 54,
+	   "FanSpeed": 7.64331245
+	  },
+	  {
+	   "UpThreshold": 90,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }

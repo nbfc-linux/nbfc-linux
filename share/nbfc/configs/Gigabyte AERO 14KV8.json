@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Gigabyte",
  "Author": "Christian Steinert",
  "EcPollInterval": 500,
@@ -18,32 +19,32 @@
 	 "FanDisplayName": "CPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 60,
 	   "FanSpeed": 30.1310024
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 70,
 	   "DownThreshold": 63,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 67,
 	   "FanSpeed": 60.2620049
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 85,
 	   "DownThreshold": 77,
 	   "FanSpeed": 80.34934
 	  },
 	  {
-	   "UpThreshold": 95,
+	   "UpThreshold": 90,
 	   "DownThreshold": 80,
 	   "FanSpeed": 100.0
 	  }
@@ -63,32 +64,32 @@
 	 "FanDisplayName": "GPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 60,
 	   "FanSpeed": 30.1310024
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 70,
 	   "DownThreshold": 63,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 67,
 	   "FanSpeed": 60.2620049
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 85,
 	   "DownThreshold": 77,
 	   "FanSpeed": 80.34934
 	  },
 	  {
-	   "UpThreshold": 95,
+	   "UpThreshold": 90,
 	   "DownThreshold": 80,
 	   "FanSpeed": 100.0
 	  }

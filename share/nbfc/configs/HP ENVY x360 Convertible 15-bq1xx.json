@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "HP ENVY x360 Convertible 15-bq1xx",
  "Author": "Eric Qian (bananium.com)",
  "EcPollInterval": 1000,
@@ -18,32 +19,32 @@
 	 "FanDisplayName": "CPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 63,
+	   "UpThreshold": 60,
 	   "DownThreshold": 48,
 	   "FanSpeed": 10.0
 	  },
 	  {
-	   "UpThreshold": 66,
+	   "UpThreshold": 63,
 	   "DownThreshold": 55,
 	   "FanSpeed": 20.0
 	  },
 	  {
-	   "UpThreshold": 68,
+	   "UpThreshold": 66,
 	   "DownThreshold": 59,
 	   "FanSpeed": 50.0
 	  },
 	  {
-	   "UpThreshold": 71,
+	   "UpThreshold": 68,
 	   "DownThreshold": 63,
 	   "FanSpeed": 70.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 71,
 	   "DownThreshold": 67,
 	   "FanSpeed": 100.0
 	  }

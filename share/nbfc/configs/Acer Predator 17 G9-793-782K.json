@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Acer Predator 17 G9-793-782K",
  "Author": "Maxi",
  "EcPollInterval": 3000,
@@ -16,38 +17,7 @@
 	 "ResetRequired": true,
 	 "FanSpeedResetValue": 0,
 	 "FanDisplayName": "CPU/GPU fan",
-	 "TemperatureThresholds": [
-	  {
-	   "UpThreshold": 60,
-	   "DownThreshold": 0,
-	   "FanSpeed": 0.0
-	  },
-	  {
-	   "UpThreshold": 63,
-	   "DownThreshold": 48,
-	   "FanSpeed": 10.0
-	  },
-	  {
-	   "UpThreshold": 66,
-	   "DownThreshold": 55,
-	   "FanSpeed": 20.0
-	  },
-	  {
-	   "UpThreshold": 68,
-	   "DownThreshold": 59,
-	   "FanSpeed": 50.0
-	  },
-	  {
-	   "UpThreshold": 71,
-	   "DownThreshold": 63,
-	   "FanSpeed": 70.0
-	  },
-	  {
-	   "UpThreshold": 75,
-	   "DownThreshold": 67,
-	   "FanSpeed": 100.0
-	  }
-	 ],
+	 "TemperatureThresholds": [],
 	 "FanSpeedPercentageOverrides": []
 	},
 	{
@@ -61,38 +31,7 @@
 	 "ResetRequired": true,
 	 "FanSpeedResetValue": 0,
 	 "FanDisplayName": "Max. fan speed switch (on/off)",
-	 "TemperatureThresholds": [
-	  {
-	   "UpThreshold": 60,
-	   "DownThreshold": 0,
-	   "FanSpeed": 0.0
-	  },
-	  {
-	   "UpThreshold": 63,
-	   "DownThreshold": 48,
-	   "FanSpeed": 10.0
-	  },
-	  {
-	   "UpThreshold": 66,
-	   "DownThreshold": 55,
-	   "FanSpeed": 20.0
-	  },
-	  {
-	   "UpThreshold": 68,
-	   "DownThreshold": 59,
-	   "FanSpeed": 50.0
-	  },
-	  {
-	   "UpThreshold": 71,
-	   "DownThreshold": 63,
-	   "FanSpeed": 70.0
-	  },
-	  {
-	   "UpThreshold": 75,
-	   "DownThreshold": 67,
-	   "FanSpeed": 100.0
-	  }
-	 ],
+	 "TemperatureThresholds": [],
 	 "FanSpeedPercentageOverrides": [
 	  {
 	   "FanSpeedPercentage": 100.0,

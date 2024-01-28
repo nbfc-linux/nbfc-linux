@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Lenovo Yoga Slim7",
  "Author": "dumprop",
  "ReadWriteWords": false,
@@ -19,22 +20,22 @@
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 80,
 	   "DownThreshold": 85,
 	   "FanSpeed": 15.0
 	  },
 	  {
-	   "UpThreshold": 95,
+	   "UpThreshold": 90,
 	   "DownThreshold": 85,
 	   "FanSpeed": 30.0
 	  },
 	  {
-	   "UpThreshold": 100,
+	   "UpThreshold": 95,
 	   "DownThreshold": 90,
 	   "FanSpeed": 45.0
 	  },
 	  {
-	   "UpThreshold": 96,
+	   "UpThreshold": 100,
 	   "DownThreshold": 95,
 	   "FanSpeed": 60.0
 	  }

@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "HP ZBook Studio x360 G5",
  "Author": "Hanzhong Wang",
  "EcPollInterval": 1000,
@@ -18,27 +19,27 @@
 	 "FanDisplayName": "CPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 60,
 	   "DownThreshold": 45,
 	   "FanSpeed": 40.0
 	  },
 	  {
-	   "UpThreshold": 77,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 80.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 77,
 	   "DownThreshold": 70,
 	   "FanSpeed": 90.47619
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 76,
 	   "FanSpeed": 100.0
 	  }
@@ -64,27 +65,27 @@
 	 "FanDisplayName": "GPU Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 0,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 60,
 	   "DownThreshold": 45,
 	   "FanSpeed": 40.0
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 80.0
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 75,
 	   "DownThreshold": 70,
 	   "FanSpeed": 90.47619
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 75,
 	   "FanSpeed": 100.0
 	  }

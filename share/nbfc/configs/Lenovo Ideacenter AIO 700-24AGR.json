@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Lenovo 700-24AGR",
  "Author": "M. Cahid AYDIN - A10-7800 APU",
  "EcPollInterval": 1000,
@@ -18,27 +19,27 @@
 	 "FanDisplayName": "Main Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 45,
+	   "UpThreshold": 30,
 	   "DownThreshold": 0,
 	   "FanSpeed": 17.0
 	  },
 	  {
-	   "UpThreshold": 55,
+	   "UpThreshold": 45,
 	   "DownThreshold": 30,
 	   "FanSpeed": 35.0
 	  },
 	  {
 	   "UpThreshold": 65,
+	   "DownThreshold": 50,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 55,
 	   "DownThreshold": 40,
 	   "FanSpeed": 60.0
 	  },
 	  {
 	   "UpThreshold": 75,
-	   "DownThreshold": 50,
-	   "FanSpeed": 90.0
-	  },
-	  {
-	   "UpThreshold": 72,
 	   "DownThreshold": 60,
 	   "FanSpeed": 100.0
 	  }

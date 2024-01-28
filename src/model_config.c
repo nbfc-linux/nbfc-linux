@@ -146,6 +146,13 @@ static Error* array_of_FromJson(FromJson_Callback callback, void** v_data, size_
   e_check();
 
   *v_size = 0;
+
+  // Mem_Malloc(0) returns non-NULL value, so we check for empty array here.
+  if (! json->val.children.length) {
+    *v_data = NULL;
+    return err_success();
+  }
+
   *v_data = Mem_Malloc(json->val.children.length * size);
   nx_json_for_each(child, json) {
     e = callback(((char*) *v_data) + size * *v_size, child);
@@ -171,6 +178,15 @@ define_array_of_T_FromJson(FanInfo)
 // Default temperature thresholds
 // ============================================================================
 
+static TemperatureThreshold ___Config_DefaultLegacyTemperatureThresholds[] = {
+  {0,   0,   0},
+  {60, 48,  10},
+  {63, 55,  20},
+  {66, 59,  50},
+  {68, 63,  70},
+  {71, 67, 100},
+};
+
 static TemperatureThreshold ___Config_DefaultTemperatureThresholds[] = {
   {60,  0,   0},
   {63, 48,  10},
@@ -184,6 +200,19 @@ static array_of(TemperatureThreshold) Config_DefaultTemperatureThresholds = {
   ___Config_DefaultTemperatureThresholds,
   ARRAY_SIZE(___Config_DefaultTemperatureThresholds)
 };
+
+static array_of(TemperatureThreshold) Config_DefaultLegacyTemperatureThresholds = {
+  ___Config_DefaultLegacyTemperatureThresholds,
+  ARRAY_SIZE(___Config_DefaultLegacyTemperatureThresholds)
+};
+
+static void copy_array_of_TemperatureThreshold(
+  array_of(TemperatureThreshold)* dest,
+  array_of(TemperatureThreshold)* src) {
+  dest->size = src->size;
+  dest->data = Mem_Malloc(src->size * sizeof(TemperatureThreshold));
+  memcpy(dest->data, src->data, src->size * sizeof(TemperatureThreshold)); 
+}
 
 static array_of(FanSpeedPercentageOverride) Config_DefaultFanSpeedPercentageOverrides = {
   NULL,
@@ -286,8 +315,18 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     }
 
     // TODO #1: How to handle empty TemperatureThresholds? [see fan.c]
-    if (! f->TemperatureThresholds.size)
-      f->TemperatureThresholds = Config_DefaultTemperatureThresholds;
+    if (! f->TemperatureThresholds.size) {
+      if (c->LegacyTemperatureThresholdsBehaviour)
+        copy_array_of_TemperatureThreshold(
+          &f->TemperatureThresholds,
+          &Config_DefaultLegacyTemperatureThresholds
+        );
+      else
+        copy_array_of_TemperatureThreshold(
+          &f->TemperatureThresholds,
+          &Config_DefaultTemperatureThresholds
+        );
+    }
 
     bool has_0_FanSpeed   = false;
     bool has_100_FanSpeed = false;

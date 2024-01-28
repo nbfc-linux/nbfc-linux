@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "HP Pavilion HDX18",
  "EcPollInterval": 3000,
  "ReadWriteWords": false,
@@ -17,32 +18,32 @@
 	 "FanDisplayName": "CPU",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 45,
+	   "UpThreshold": 40,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 50,
+	   "UpThreshold": 45,
 	   "DownThreshold": 40,
 	   "FanSpeed": 10.0
 	  },
 	  {
-	   "UpThreshold": 55,
+	   "UpThreshold": 50,
 	   "DownThreshold": 45,
 	   "FanSpeed": 20.0
 	  },
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 55,
 	   "DownThreshold": 50,
 	   "FanSpeed": 37.5
 	  },
 	  {
-	   "UpThreshold": 71,
+	   "UpThreshold": 60,
 	   "DownThreshold": 55,
 	   "FanSpeed": 62.5
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 71,
 	   "DownThreshold": 67,
 	   "FanSpeed": 100.0
 	  }

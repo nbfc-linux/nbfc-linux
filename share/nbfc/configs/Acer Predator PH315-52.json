@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Acer Predator PH315-52",
  "Author": "R. H. Manoa",
  "EcPollInterval": 100,
@@ -18,17 +19,17 @@
 	 "FanDisplayName": "CPU fan (INTEL i7-9750H)",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 40,
 	   "DownThreshold": 0,
 	   "FanSpeed": 30.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 60,
 	   "DownThreshold": 41,
 	   "FanSpeed": 70.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 70,
 	   "DownThreshold": 61,
 	   "FanSpeed": 95.0
 	  },
@@ -53,17 +54,17 @@
 	 "FanDisplayName": "GPU fan (RTX 2060 Mobile)",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 60,
+	   "UpThreshold": 40,
 	   "DownThreshold": 0,
 	   "FanSpeed": 30.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 60,
 	   "DownThreshold": 41,
 	   "FanSpeed": 70.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 70,
 	   "DownThreshold": 61,
 	   "FanSpeed": 95.0
 	  },

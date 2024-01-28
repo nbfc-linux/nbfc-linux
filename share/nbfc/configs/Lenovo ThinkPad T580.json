@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Lenovo ThinkPad T580",
  "Author": "szenzero",
  "EcPollInterval": 3000,
@@ -18,27 +19,27 @@
 	 "FanDisplayName": "System Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 60,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 70,
+	   "UpThreshold": 65,
 	   "DownThreshold": 57,
 	   "FanSpeed": 14.2857151
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 70,
 	   "DownThreshold": 60,
 	   "FanSpeed": 42.8571434
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 75,
 	   "DownThreshold": 66,
 	   "FanSpeed": 85.71429
 	  },
 	  {
-	   "UpThreshold": 85,
+	   "UpThreshold": 80,
 	   "DownThreshold": 73,
 	   "FanSpeed": 100.0
 	  }

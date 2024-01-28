@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Inspiron 7348",
  "Author": "lembi",
  "EcPollInterval": 1000,
@@ -17,47 +18,47 @@
 	 "FanSpeedResetValue": 14,
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 39,
+	   "UpThreshold": 35,
 	   "DownThreshold": 30,
 	   "FanSpeed": 20.3947372
 	  },
 	  {
-	   "UpThreshold": 43,
+	   "UpThreshold": 39,
 	   "DownThreshold": 36,
 	   "FanSpeed": 28.9473686
 	  },
 	  {
-	   "UpThreshold": 46,
+	   "UpThreshold": 43,
 	   "DownThreshold": 40,
 	   "FanSpeed": 38.81579
 	  },
 	  {
-	   "UpThreshold": 51,
+	   "UpThreshold": 46,
 	   "DownThreshold": 44,
 	   "FanSpeed": 50.6578941
 	  },
 	  {
-	   "UpThreshold": 56,
+	   "UpThreshold": 51,
 	   "DownThreshold": 47,
 	   "FanSpeed": 60.5263176
 	  },
 	  {
-	   "UpThreshold": 61,
+	   "UpThreshold": 56,
 	   "DownThreshold": 52,
 	   "FanSpeed": 70.39474
 	  },
 	  {
-	   "UpThreshold": 65,
+	   "UpThreshold": 61,
 	   "DownThreshold": 57,
 	   "FanSpeed": 80.26316
 	  },
 	  {
-	   "UpThreshold": 75,
+	   "UpThreshold": 65,
 	   "DownThreshold": 62,
 	   "FanSpeed": 90.7894745
 	  },
 	  {
-	   "UpThreshold": 80,
+	   "UpThreshold": 75,
 	   "DownThreshold": 65,
 	   "FanSpeed": 100.0
 	  }

@@ -1,4 +1,5 @@
 {
+ "LegacyTemperatureThresholdsBehaviour": true,
  "NotebookModel": "Lenovo Yoga 510-14 (80S7)",
  "EcPollInterval": 500,
  "ReadWriteWords": false,
@@ -17,49 +18,49 @@
 	 "FanDisplayName": "Fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 52,
+	   "UpThreshold": 50,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-	   "UpThreshold": 55,
-	   "DownThreshold": 47,
-	   "FanSpeed": 15.3846159
-	  },
-	  {
 	   "UpThreshold": 60,
-	   "DownThreshold": 50,
-	   "FanSpeed": 23.0769234
-	  },
-	  {
-	   "UpThreshold": 63,
 	   "DownThreshold": 55,
 	   "FanSpeed": 30.7692318
 	  },
 	  {
 	   "UpThreshold": 65,
-	   "DownThreshold": 58,
-	   "FanSpeed": 40.384613
-	  },
-	  {
-	   "UpThreshold": 68,
 	   "DownThreshold": 60,
 	   "FanSpeed": 50.0
 	  },
 	  {
 	   "UpThreshold": 70,
-	   "DownThreshold": 63,
-	   "FanSpeed": 59.615387
-	  },
-	  {
-	   "UpThreshold": 75,
 	   "DownThreshold": 60,
 	   "FanSpeed": 75.0
 	  },
 	  {
-	   "UpThreshold": 90,
+	   "UpThreshold": 52,
+	   "DownThreshold": 47,
+	   "FanSpeed": 15.3846159
+	  },
+	  {
+	   "UpThreshold": 75,
 	   "DownThreshold": 65,
 	   "FanSpeed": 100.0
+	  },
+	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 50,
+	   "FanSpeed": 23.0769234
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 58,
+	   "FanSpeed": 40.384613
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 63,
+	   "FanSpeed": 59.615387
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": [
