@@ -1,0 +1,122 @@
+{
+	"NotebookModel": "Nitro AN515-58",
+	"Author": "FosRexx",
+	"EcPollInterval": 3000,
+	"CriticalTemperature": 90,
+	"CriticalTemperatureOffset": 5,
+	"ReadWriteWords": true,
+	"FanConfigurations": [
+		{
+			"FanDisplayName": "CPU Fan",
+			"ReadRegister": 19,
+			"WriteRegister": 55,
+			"MinSpeedValue": 0,
+			"MaxSpeedValue": 100,
+			"MinSpeedValueRead": 0,
+			"MaxSpeedValueRead": 7317,
+			"IndependentReadMinMaxValues": true,
+			"ResetRequired": false,
+			"FanSpeedResetValue": 50,
+			"TemperatureThresholds": [
+				{
+					"UpThreshold": 40,
+					"DownThreshold": 0,
+					"FanSpeed": 0.0
+				},
+				{
+					"UpThreshold": 50,
+					"DownThreshold": 40,
+					"FanSpeed": 15.0
+				},
+				{
+					"UpThreshold": 60,
+					"DownThreshold": 50,
+					"FanSpeed": 50.0
+				},
+				{
+					"UpThreshold": 75,
+					"DownThreshold": 60,
+					"FanSpeed": 75.0
+				},
+				{
+					"UpThreshold": 90,
+					"DownThreshold": 75,
+					"FanSpeed": 100.0
+				}
+			],
+			"FanSpeedPercentageOverrides": []
+		},
+		{
+			"FanDisplayName": "GPU Fan",
+			"ReadRegister": 21,
+			"WriteRegister": 58,
+			"MinSpeedValue": 0,
+			"MaxSpeedValue": 100,
+			"MinSpeedValueRead": 0,
+			"MaxSpeedValueRead": 7317,
+			"IndependentReadMinMaxValues": true,
+			"ResetRequired": false,
+			"FanSpeedResetValue": 50,
+			"TemperatureThresholds": [
+				{
+					"UpThreshold": 40,
+					"DownThreshold": 0,
+					"FanSpeed": 0.0
+				},
+				{
+					"UpThreshold": 50,
+					"DownThreshold": 40,
+					"FanSpeed": 15.0
+				},
+				{
+					"UpThreshold": 60,
+					"DownThreshold": 50,
+					"FanSpeed": 50.0
+				},
+				{
+					"UpThreshold": 75,
+					"DownThreshold": 60,
+					"FanSpeed": 75.0
+				},
+				{
+					"UpThreshold": 90,
+					"DownThreshold": 75,
+					"FanSpeed": 100.0
+				}
+			],
+			"FanSpeedPercentageOverrides": []
+		}
+	],
+	"RegisterWriteConfigurations": [
+		{
+			"WriteMode": "Set",
+			"WriteOccasion": "OnInitialization",
+			"Register": 3,
+			"Value": 17,
+			"ResetRequired": true,
+			"ResetValue": 1,
+			"ResetWriteMode": "Set",
+			"Description": "The 0x03 register must be set to 17/81 to be able to contorl fan speeds/fan speed + battery limit, setting this to 17 by default since people might not want battery limit"
+		},
+		{
+			"WriteMode": "Set",
+			"WriteOccasion": "OnInitialization",
+			"Register": 34,
+			"Value": 12,
+			"ResetRequired": true,
+			"ResetValue": 4,
+			"ResetWriteMode": "Set",
+			"Description": "Setting the CPU Fan to Manual Mode on Initialization and setting it to Auto before the service is shutdown"
+		},
+		{
+			"WriteMode": "Set",
+			"WriteOccasion": "OnInitialization",
+			"Register": 33,
+			"Value": 48,
+			"ResetRequired": true,
+			"ResetValue": 16,
+			"ResetWriteMode": "Set",
+			"Description": "Setting the GPU Fan to Manual Mode on Initialization and setting it to Auto before the service is shutdown"
+		}
+	]
+}
