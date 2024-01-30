@@ -28,89 +28,106 @@
 #include "nxjson.c"            // src
 #include "model_config.c"      // src
 
-#define Console_Black         "\033[0;30m"
-#define Console_Red           "\033[0;31m"
-#define Console_Green         "\033[0;32m"
-#define Console_Yelllow       "\033[0;33m"
-#define Console_Blue          "\033[0;34m"
-#define Console_Magenta       "\033[0;35m"
-#define Console_Cyan          "\033[0;36m"
-#define Console_White         "\033[0;37m"
-#define Console_Gray          "\033[0;38m"
+#define Console_Black       "\033[0;30m"
+#define Console_Red         "\033[0;31m"
+#define Console_Green       "\033[0;32m"
+#define Console_Yelllow     "\033[0;33m"
+#define Console_Blue        "\033[0;34m"
+#define Console_Magenta     "\033[0;35m"
+#define Console_Cyan        "\033[0;36m"
+#define Console_White       "\033[0;37m"
+#define Console_Gray        "\033[0;38m"
 
-#define Console_BoldBlack     "\033[1;30m"
-#define Console_BoldRed       "\033[1;31m"
-#define Console_BoldGreen     "\033[1;32m"
-#define Console_BoldYelllow   "\033[1;33m"
-#define Console_BoldBlue      "\033[1;34m"
-#define Console_BoldMagenta   "\033[1;35m"
-#define Console_BoldCyan      "\033[1;36m"
-#define Console_BoldWhite     "\033[1;37m"
-#define Console_BoldGray      "\033[1;38m"
+#define Console_BoldBlack   "\033[1;30m"
+#define Console_BoldRed     "\033[1;31m"
+#define Console_BoldGreen   "\033[1;32m"
+#define Console_BoldYelllow "\033[1;33m"
+#define Console_BoldBlue    "\033[1;34m"
+#define Console_BoldMagenta "\033[1;35m"
+#define Console_BoldCyan    "\033[1;36m"
+#define Console_BoldWhite   "\033[1;37m"
+#define Console_BoldGray    "\033[1;38m"
 
-#define Console_Reset         "\033[0;0m"
-#define Console_Clear         "\033[1;1H\033[2J"
-
+#define Console_Reset       "\033[0;0m"
+#define Console_Clear       "\033[1;1H\033[2J"
 
 #define               RegistersSize 256
 typedef uint8_t       RegisterBuf[RegistersSize];
 typedef const char*   RegisterColors[RegistersSize];
+static RegisterBuf    Registers_Log[32768];
 
-static inline void    Register_PrintHeader();
 static void           Register_PrintRegister(RegisterBuf*, RegisterColors);
 static inline void    Register_FromEC(RegisterBuf*);
 static void           Register_PrintWatch(RegisterBuf*, RegisterBuf*, RegisterBuf*);
 static void           Register_PrintMonitor(RegisterBuf*, int);
 static void           Register_WriteMonitorReport(RegisterBuf*, int, FILE*);
 static void           Register_PrintDump(RegisterBuf*);
-
+static void           Handle_Signal(int);
 
 EC_VTable* ec;
 static volatile int   quit;
+
+#if 0
 static volatile int   Stress_DummyVar;
-static RegisterBuf    Registers_Log[32768];
 static void           Stress_SetQuit();
 static void           Stress_EndlessTask();
 static void           Stress_CPU(int);
-static void           Handle_Signal(int);
+#endif
+
+static int Read();
+static int Write();
+static int Dump();
+static int Monitor();
+static int Watch();
 
 enum Command {
+  Command_Read,
+  Command_Write,
   Command_Dump,
   Command_Monitor,
   Command_Watch,
-  Command_Read,
-  Command_Write,
   Command_Help,
 };
 
 static enum Command Command_From_String(const char* s) {
-  const char* commands[] = {
-    "dump", "monitor", "watch",
-    "read", "write", "help"
-  };
+  const char* cmds[] = { "read", "write", "dump", "monitor", "watch", "help" };
 
-  for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
-    if (!strcmp(commands[i], s))
+  for (int i = 0; i < ARRAY_SSIZE(cmds); ++i)
+    if (!strcmp(cmds[i], s))
       return (enum Command) i;
 
   return (enum Command) -1;
 }
 
 static const char* HelpTexts[] = {
+  EC_PROBE_READ_HELP_TEXT,
+  EC_PROBE_WRITE_HELP_TEXT,
   EC_PROBE_DUMP_HELP_TEXT,
   EC_PROBE_MONITOR_HELP_TEXT,
   EC_PROBE_WATCH_HELP_TEXT,
-  EC_PROBE_READ_HELP_TEXT,
-  EC_PROBE_WRITE_HELP_TEXT,
   EC_PROBE_HELP_TEXT,
 };
 
 static const cli99_option main_options[] = {
-  {"-v|--verbose",             -'v',  0},
   {"-e|--embedded-controller", -'e',  1},
   {"-h|--help",                -'h',  0},
   {"--version",                -'V',  0},
   {"command",                   'C',  1|cli99_required_option},
+  cli99_options_end()
+};
+
+static const cli99_option read_command_options[] = {
+  cli99_include_options(&main_options),
+  {"register",                  'R',  1|cli99_required_option},
+  {"-w|--word",                -'w',  0},
+  cli99_options_end()
+};
+
+static const cli99_option write_command_options[] = {
+  cli99_include_options(&main_options),
+  {"register",                  'R',  1|cli99_required_option},
+  {"value",                     'V',  1|cli99_required_option},
+  {"-w|--word",                -'w',  0},
   cli99_options_end()
 };
 
@@ -131,41 +148,25 @@ static const cli99_option watch_command_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option read_command_options[] = {
-  cli99_include_options(&main_options),
-  {"register",                  'R',  1|cli99_required_option},
-  {"-w|--word",                -'w',  0},
-  cli99_options_end()
-};
-
-static const cli99_option write_command_options[] = {
-  cli99_include_options(&main_options),
-  {"register",                  'R',  1|cli99_required_option},
-  {"value",                     'V',  1|cli99_required_option},
-  {"-w|--word",                -'w',  0},
-  cli99_options_end()
-};
-
 static const cli99_option* Options[] = {
+  read_command_options,
+  write_command_options,
   main_options, // dump
   monitor_command_options,
   watch_command_options,
-  read_command_options,
-  write_command_options,
   main_options, // help
 };
 
 static struct {
-  int             timespan;
-  int             interval;
-  const char*     report;
-  bool            clearly;
-  bool            decimal;
-  bool            verbose;
-  uint8_t         register_;
-  uint16_t        value;
-  bool            use_word;
-  int             stress_cpu;
+  int         timespan;
+  int         interval;
+  const char* report;
+  bool        clearly;
+  bool        decimal;
+  uint8_t     register_;
+  uint16_t    value;
+  bool        use_word;
+  int         stress_cpu;
 } options = {0};
 
 static int64_t parse_number(const char* s, int64_t min, int64_t max, char** errmsg) {
@@ -201,7 +202,7 @@ int main(int argc, char* const argv[]) {
   char* err;
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
-    case  'C':
+    case 'C':
       cmd = Command_From_String(p.optarg);
 
       if (cmd == (enum Command) -1) {
@@ -213,59 +214,64 @@ int main(int argc, char* const argv[]) {
         printf(EC_PROBE_HELP_TEXT, argv[0]);
         return 0;
       }
+
       cli99_SetOptions(&p, Options[cmd], false);
       break;
-    case  'R':  options.register_ = parse_number(p.optarg, 0, 255, &err);
-                if (err) {
-                  Log_Error("register: %s: %s\n", p.optarg, err);
-                  return NBFC_EXIT_CMDLINE;
-                }
-                break;
-    case  'V':  options.value = parse_number(p.optarg, 0, 65535, &err);
-                if (err) {
-                  Log_Error("value: %s: %s\n", p.optarg, err);
-                  return NBFC_EXIT_CMDLINE;
-                }
-                break;
+    case 'R':
+      options.register_ = parse_number(p.optarg, 0, 255, &err);
+      if (err) {
+        Log_Error("Register: %s: %s\n", p.optarg, err);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+    case 'V':
+      options.value = parse_number(p.optarg, 0, 65535, &err);
+      if (err) {
+        Log_Error("Value: %s: %s\n", p.optarg, err);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
     case -'h':  printf(HelpTexts[cmd], argv[0]);         return 0;
     case -'V':  printf("ec_probe " NBFC_VERSION "\n");   return 0;
     case -'c':  options.clearly  = 1;                    break;
     case -'d':  options.decimal  = 1;                    break;
-    case -'v':  options.verbose  = 1;                    break;
     case -'w':  options.use_word = 1;                    break;
-    case -'e':  switch(EmbeddedControllerType_FromString(p.optarg)) {
-                  case EmbeddedControllerType_ECSysLinux:     ec = &EC_SysLinux_VTable; break;
-                  case EmbeddedControllerType_ECSysLinuxACPI: ec = &EC_SysLinux_ACPI_VTable; break;
-                  case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable; break;
-                  default:
-                    Log_Error("-e|--embedded-controller: Invalid value: %s\n", p.optarg);
-                    return NBFC_EXIT_CMDLINE;
-                }
-                break;
     case -'r':  options.report   = p.optarg;             break;
-    case -'t':  options.timespan = parse_number(p.optarg, 1, INT64_MAX, &err);
-                options.timespan *= 1000;
-                if (err) {
-                  Log_Error("-t|--timespan: %s: %s\n", p.optarg, err);
-                  return NBFC_EXIT_CMDLINE;
-                }
-                break;
-    case -'i':  options.interval = parse_number(p.optarg, 1, INT64_MAX, &err);
-                options.interval *= 1000;
-                if (err) {
-                  Log_Error("-i|--interval: %s: %s\n", p.optarg, err);
-                  return NBFC_EXIT_CMDLINE;
-                }
-                break;
+    case -'e':
+      switch(EmbeddedControllerType_FromString(p.optarg)) {
+        case EmbeddedControllerType_ECSysLinux:     ec = &EC_SysLinux_VTable;      break;
+        case EmbeddedControllerType_ECSysLinuxACPI: ec = &EC_SysLinux_ACPI_VTable; break;
+        case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable;         break;
+        default:
+          Log_Error("-e|--embedded-controller: Invalid value: %s\n", p.optarg);
+          return NBFC_EXIT_CMDLINE;
+      }
+      break;
+    case -'t':
+      options.timespan = parse_number(p.optarg, 1, INT64_MAX, &err);
+      options.timespan *= 1000;
+      if (err) {
+        Log_Error("-t|--timespan: %s: %s\n", p.optarg, err);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+    case -'i':
+      options.interval = parse_number(p.optarg, 1, INT64_MAX, &err);
+      options.interval *= 1000;
+      if (err) {
+        Log_Error("-i|--interval: %s: %s\n", p.optarg, err);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
     default:
       cli99_ExplainError(&p);
-      exit(NBFC_EXIT_CMDLINE);
+      return NBFC_EXIT_CMDLINE;
     }
   }
 
   if (cmd == Command_Help) {
     printf(EC_PROBE_HELP_TEXT, argv[0]);
-    return 1;
+    return 0;
   }
 
   if (! cli99_End(&p)) {
@@ -283,112 +289,129 @@ int main(int argc, char* const argv[]) {
     return NBFC_EXIT_FAILURE;
   }
 
-  Error* e = NULL;
   signal(SIGINT,  Handle_Signal);
   signal(SIGTERM, Handle_Signal);
 
   if (ec == NULL) {
-    e = EC_FindWorking(&ec);
+    Error* e = EC_FindWorking(&ec);
     e_die();
   }
 
-  e = ec->Open();
+  Error* e = ec->Open();
   e_die();
 
   switch (cmd) {
-    case Command_Dump: {
-      Register_FromEC(Registers_Log);
-      Register_PrintDump(Registers_Log);
-      break;
-    }
-    case Command_Read: {
-      if (options.use_word) {
-        uint16_t word;
-        e = ec->ReadWord(options.register_, &word);
-        printf("%d (%.2X)\n", word, word);
-        e_die();
-      }
-      else {
-        uint8_t byte;
-        e = ec->ReadByte(options.register_, &byte);
-        printf("%d (%.2X)\n", byte, byte);
-        e_die();
-      }
-      break;
-    }
-    case Command_Write: {
-      if (options.use_word) {
-        e = ec->WriteWord(options.register_, options.value);
-        e_die();
-      }
-      else {
-        e = ec->WriteByte(options.register_, options.value);
-        e_die();
-      }
-      break;
-    }
-    case Command_Monitor: {
-      if (options.stress_cpu)
-        Stress_CPU(options.stress_cpu);
+    case Command_Dump:    return Dump();
+    case Command_Read:    return Read();
+    case Command_Write:   return Write();
+    case Command_Monitor: return Monitor();
+    case Command_Watch:   return Watch();
+    case Command_Help:    return 0;
+  }
+}
 
-      const int max_loops = (!options.timespan) ? INT_MAX :
-        options.timespan / options.interval;
-
-      RegisterBuf* regs = Registers_Log;
-      int size = ARRAY_SSIZE(Registers_Log);
-      int loops;
-      for (loops = 0; !quit && loops < max_loops && --size; ++loops) {
-        Register_FromEC(regs + loops);
-        Register_PrintMonitor(regs, loops);
-        sleep_ms(options.interval);
-      }
-
-      if (options.report) {
-        FILE* fh = fopen(options.report, "w");
-        if (! fh)
-          die(NBFC_EXIT_FAILURE, "%s: %s\n", options.report, strerror(errno));
-        Register_WriteMonitorReport(regs, loops, fh);
-        fclose(fh);
-      }
-      break;
-    }
-    case Command_Watch: {
-      const int max_loops = (!options.timespan) ? INT_MAX :
-        options.timespan / options.interval;
-
-      int size = ARRAY_SSIZE(Registers_Log);
-      RegisterBuf* regs = Registers_Log;
-      Register_FromEC(regs);
-      Register_PrintRegister(regs, NULL);
-      for (int loops = 1; !quit && loops < max_loops && --size; ++loops) {
-        Register_FromEC(regs + loops);
-        Register_PrintWatch(regs , regs + loops, regs + loops - 1);
-        sleep_ms(options.interval);
-      }
-    }
-    case Command_Help: break;
+static int Read() {
+  if (options.use_word) {
+    uint16_t word;
+    Error* e = ec->ReadWord(options.register_, &word);
+    e_die();
+    printf("%d (%.2X)\n", word, word);
+  }
+  else {
+    uint8_t byte;
+    Error* e = ec->ReadByte(options.register_, &byte);
+    e_die();
+    printf("%d (%.2X)\n", byte, byte);
   }
 
   return 0;
 }
 
-static void Handle_Signal(int s) {
-  quit = s;
+static int Write() {
+  if (options.use_word) {
+    Error* e = ec->WriteWord(options.register_, options.value);
+    e_die();
+  }
+  else {
+    if (options.value > 255) {
+      Log_Error("write: Value too big: %d\n", options.value);
+      return NBFC_EXIT_CMDLINE;
+    }
+    Error* e = ec->WriteByte(options.register_, options.value);
+    e_die();
+  }
+
+  return 0;
+}
+
+static int Dump() {
+  RegisterBuf register_buf;
+  Register_FromEC(&register_buf);
+  Register_PrintDump(&register_buf);
+  return 0;
+}
+
+static int Monitor() {
+#if 0
+  if (options.stress_cpu)
+    Stress_CPU(options.stress_cpu);
+#endif
+
+  const int max_loops = (!options.timespan) ? INT_MAX :
+    (options.timespan / options.interval);
+
+  RegisterBuf* regs = Registers_Log;
+  int size = ARRAY_SSIZE(Registers_Log);
+  int loops;
+  for (loops = 0; !quit && loops < max_loops && --size; ++loops) {
+    Register_FromEC(regs + loops);
+    Register_PrintMonitor(regs, loops);
+    sleep_ms(options.interval);
+  }
+
+  if (options.report) {
+    FILE* fh = fopen(options.report, "w");
+    if (! fh) {
+      Log_Error("%s: %s\n", options.report, strerror(errno));
+      return NBFC_EXIT_FAILURE;
+    }
+    Register_WriteMonitorReport(regs, loops, fh);
+    fclose(fh);
+  }
+
+  return 0;
+}
+
+static int Watch() {
+  const int max_loops = (!options.timespan) ? INT_MAX :
+    (options.timespan / options.interval);
+
+  int size = ARRAY_SSIZE(Registers_Log);
+  RegisterBuf* regs = Registers_Log;
+  Register_FromEC(regs);
+  for (int loops = 1; !quit && loops < max_loops && --size; ++loops) {
+    Register_FromEC(regs + loops);
+    Register_PrintWatch(regs , regs + loops, regs + loops - 1);
+    sleep_ms(options.interval);
+  }
+
+  return 0;
+}
+
+static void Handle_Signal(int sig) {
+  quit = sig;
 }
 
 // ============================================================================
 // Registers code
 // ============================================================================
 
-static inline void Register_PrintHeader() {
+static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
   printf(Console_Reset
     "---|------------------------------------------------\n"
     "   | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"
     "---|------------------------------------------------\n");
-}
 
-static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
-  Register_PrintHeader();
   for (int i = 0; i <= 0xF0; i += 0x10) {
     printf(Console_Reset "%.2X |", i);
     if (color)
@@ -396,7 +419,7 @@ static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
         printf("%s %.2X", color[i + j], my[i + j]);
     else
       for (int j = 0; j <= 0xF; ++j)
-        printf("%.2X", my[i + j]);
+        printf(" %.2X", my[i + j]);
     printf("\n");
   }
 }
@@ -406,7 +429,7 @@ static inline void Register_FromEC(RegisterBuf* self) {
     ec->ReadByte(i, &my[i]);
 }
 
-static void Register_PrintWatch(RegisterBuf* self, RegisterBuf* a, RegisterBuf* b) {
+static void Register_PrintWatch(RegisterBuf* all_readings, RegisterBuf* a, RegisterBuf* b) {
   RegisterColors colors;
 
   for (int i = 0; i < RegistersSize; ++i) {
@@ -415,7 +438,7 @@ static void Register_PrintWatch(RegisterBuf* self, RegisterBuf* a, RegisterBuf* 
     bool has_changed = false;
 
     uint8_t save = byte;
-    for (range(RegisterBuf*, r, self, b)) {
+    for (range(RegisterBuf*, r, all_readings, b)) {
       if (save != (*r)[i]) {
         has_changed = true;
         break;
@@ -426,32 +449,32 @@ static void Register_PrintWatch(RegisterBuf* self, RegisterBuf* a, RegisterBuf* 
     else if (has_changed)   colors[i] = Console_BoldBlue;
     else if (byte == 0xFF)  colors[i] = Console_White;
     else if (byte)          colors[i] = Console_BoldWhite;
-    else                    colors[i] = Console_Black;
+    else                    colors[i] = Console_BoldBlack;
   }
 
   Register_PrintRegister(a, colors);
 }
 
-static void Register_PrintMonitor(RegisterBuf* self, int size) {
+static void Register_PrintMonitor(RegisterBuf* readings, int size) {
   printf(Console_Clear);
 
-  for (int i = 0; i < RegistersSize; ++i) {
-    bool was_touched = false;
-    for (range(int, j, 0, size)) {
-      if (my[i] != (*(self + j))[i]) {
-        was_touched = true;
+  for (int register_ = 0; register_ < RegistersSize; ++register_) {
+    bool register_has_changed = false;
+    for (range(int, i, 0, size)) {
+      if (readings[0][register_] != readings[i][register_]) {
+        register_has_changed = true;
         break;
       }
     }
 
-    if (! was_touched)
+    if (! register_has_changed)
       continue;
 
-    printf(Console_Green "0x%.2X:", i);
-    uint8_t byte = my[i];
-    for (range(int, j, max(size - 24, 0), size)) {
-      const uint8_t diff = byte - (*(self + j))[i];
-      byte = (*(self + j))[i];
+    printf(Console_Green "0x%.2X:", register_);
+    uint8_t byte = readings[0][register_];
+    for (range(int, i, max(size - 24, 0), size)) {
+      const uint8_t diff = byte - readings[i][register_];
+      byte = readings[i][register_];
       if (diff)
         printf(Console_BoldBlue " %.2X", byte);
       else
@@ -461,35 +484,42 @@ static void Register_PrintMonitor(RegisterBuf* self, int size) {
   }
 }
 
-static void Register_WriteMonitorReport(RegisterBuf* self, int size, FILE* fh) {
-  for (int i = 0; i < RegistersSize; ++i) {
-    bool was_touched = false;
-    for (range(int, j, 0, size)) {
-      if (my[i] != (*(self + j))[i]) {
-        was_touched = true;
+static void Register_WriteMonitorReport(RegisterBuf* readings, int size, FILE* fh) {
+  for (int register_ = 0; register_ < RegistersSize; ++register_) {
+    bool register_has_changed = false;
+    for (range(int, i, 0, size)) {
+      if (readings[0][register_] != readings[i][register_]) {
+        register_has_changed = true;
         break;
       }
     }
 
-    if (! was_touched)
+    if (! register_has_changed)
       continue;
 
-    fprintf(fh, "%.2X", i);
-    for (range(int, j, 0, size))
-      fprintf(fh, ",%.2X", (*(self + j)[i]));
+    fprintf(fh, "%.2X", register_);
+    for (range(int, i, 0, size)) {
+      if (options.clearly && i > 0 && readings[i][register_] == readings[i - 1][register_])
+        continue;
+
+      if (options.decimal)
+        fprintf(fh, ",%d", readings[i][register_]);
+      else
+        fprintf(fh, ",%.2X", readings[i][register_]);
+    }
     fprintf(fh, "\n");
   }
 }
 
 static void Register_PrintDump(RegisterBuf* self) {
-  RegisterColors c;
+  RegisterColors colors;
 
   for (int i = 0; i < RegistersSize; ++i)
-    c[i] = (my[i] == 0x00 ? Console_BoldBlack :
-            my[i] == 0xFF ? Console_Green     :
-                            Console_Red);
+    colors[i] = (my[i] == 0x00 ? Console_BoldBlack :
+                 my[i] == 0xFF ? Console_BoldGreen :
+                                 Console_BoldBlue);
 
-  Register_PrintRegister(self, c);
+  Register_PrintRegister(self, colors);
   printf("%s", Console_Reset);
 }
 
@@ -497,6 +527,7 @@ static void Register_PrintDump(RegisterBuf* self) {
 // Stress code
 // ============================================================================
 
+#if 0
 static void Stress_SetQuit() {
   quit = 1;
 }
@@ -513,31 +544,5 @@ static void Stress_CPU(int forks) {
     case 0:  Stress_EndlessTask(); _exit(0);
     default: break;
     }
-}
-
-#if 0
-static inline void Show_Help(const char* prog) {
-    "NoteBook FanControl EC probing tool\n"
-    "\n"
-    "usage: %s [--version] [--help] <command> [<args>]\n"
-    "\n"
-    "commands:\n"
-    "  dump                         Dump all EC registers\n"
-    "\n"
-    "  read <register>              Read a byte from a EC register\n"
-    "\n"
-    "  write <register> <value> [options]\n"
-    "                               Write a byte to a EC register\n"
-    "    -v, --verbose                Be verbose\n"
-    "\n"
-    "  monitor [options]            Monitor all EC registers for changes\n"
-    "    -t, --timespan <seconds>     Monitored timespan (default: infinite)\n"
-    "    -i, --interval <seconds>     Set poll interval (default: 5)\n"
-    "    -r, --report <path>          Save all readings as CSV file\n"
-    "    -c, --clearly                Blanks out consecutive duplicate readings\n"
-    "    -d, --decimal                Output readings in decimal format instead of hexadecimal format\n"
-    "\n"
-    "All input values are interpreted as decimal numbers by default.\n"
-    "Hexadecimal values may be entered by prefixing them with \"0x\".\n",
 }
 #endif

@@ -1,7 +1,7 @@
 #define EC_PROBE_HELP_TEXT                                                     \
  "Usage: %s [-h] [-e EC] COMMAND [...]\n"                                      \
  "\n"                                                                          \
- "Probing tool for embedded controllers\n"                                     \
+ "Probing tool for the embedded controller\n"                                  \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
@@ -9,11 +9,11 @@
  "                        Specify embedded controller to use\n"                \
  "\n"                                                                          \
  "Commands:\n"                                                                 \
- "    dump                Dump all EC registers\n"                             \
- "    read                Read a byte from a EC register\n"                    \
- "    write               Write a byte to a EC register\n"                     \
- "    monitor             Monitor all EC registers for changes\n"              \
- "    watch               Monitor all EC registers for changes (alternative version)\n"\
+ "  dump                  Dump all EC registers\n"                             \
+ "  read                  Read a byte from a EC register\n"                    \
+ "  write                 Write a byte to a EC register\n"                     \
+ "  monitor               Monitor all EC registers for changes\n"              \
+ "  watch                 Monitor all EC registers for changes (alternative version)\n"\
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default. Hexadecimal values may be entered by prefixing them with \"0x\".\n"\
  ""
