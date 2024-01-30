@@ -1,0 +1,41 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:           nbfc_service
+# Required-Start:
+# Required-Stop:
+# Should-Start:
+# Should-Stop:
+# Default-Start:      2 3 4 5
+# Default-Stop:       0 1 6
+# Short-Description:  Start the nbfc_service
+# Description:        Notebook Fan Control service for controlling the fan
+#                     speed of notebooks.
+
+case "$1" in
+  start)
+    log_daemon_msg "Starting nbfc_service"
+    @BINDIR@/nbfc wait-for-hwmon && @BINDIR@/nbfc start
+    log_end_msg $?
+    ;;
+
+  stop)
+    log_daemon_msg "Stopping nbfc_service"
+    @BINDIR@/nbfc stop
+    log_end_msg $?
+    ;;
+
+  restart)
+    log_daemon_msg "Restarting nbfc_service"
+    @BINDIR@/nbfc restart
+    log_end_msg $?
+    ;;
+
+  status)
+    @BINDIR@/nbfc status -a
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|restart|status}" >&2
+    exit 1
+    ;;
+esac

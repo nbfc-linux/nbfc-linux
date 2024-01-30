@@ -41,6 +41,9 @@ Installation
 - For systems with OpenRC (gentoo):
   - `make PREFIX=/usr confdir=/etc INIT_SYSTEM=openrc && sudo make PREFIX=/usr confdir=/etc INIT_SYSTEM=openrc install`
 
+- For systems with System-V-Init:
+  - `make PREFIX=/usr confdir=/etc INIT_SYSTEM=systemv && sudo make PREFIX=/usr confdir=/etc INIT_SYSTEM=systemv install`
+
 Getting started
 ---------------
 

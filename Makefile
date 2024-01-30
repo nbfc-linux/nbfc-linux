@@ -9,6 +9,7 @@ man1dir     = $(mandir)/man1
 man5dir     = $(mandir)/man5
 runstatedir	= /var/run
 orcdir   		= $(confdir)/init.d
+systemvdir  = $(confdir)/init.d
 
 INIT_SYSTEM = systemd # systemd, openrc
 
@@ -27,11 +28,12 @@ CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
 SYSTEMD = etc/systemd/system/nbfc_service.service
 OPEN_RC = etc/init.d/nbfc_service.openrc
+SYSTEMV = etc/init.d/nbfc_service.systemv
 BASH_COMPLETION = completion/bash/ec_probe completion/bash/nbfc completion/bash/nbfc_service
 FISH_COMPLETION = completion/fish/ec_probe.fish completion/fish/nbfc.fish completion/fish/nbfc_service.fish
 ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_nbfc_service
 
-all: $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
+all: $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(SYSTEMV) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
 	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
@@ -92,6 +94,10 @@ etc/systemd/system/nbfc_service.service: etc/systemd/system/nbfc_service.service
 etc/init.d/nbfc_service.openrc: etc/init.d/nbfc_service.openrc.in
 	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
+# SystemV service file ########################################################
+etc/init.d/nbfc_service.systemv: etc/init.d/nbfc_service.systemv.in
+	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
 install-configs:
 	# /usr/local/etc/nbfc
 	mkdir -p $(DESTDIR)$(confdir)/nbfc
@@ -107,6 +113,10 @@ install-systemd: etc/systemd/system/nbfc_service.service
 install-openrc: etc/init.d/nbfc_service.openrc
 	# /usr/local/etc/init.d
 	install -Dm 755 etc/init.d/nbfc_service.openrc		 $(DESTDIR)$(orcdir)/nbfc_service
+
+install-systemv: etc/init.d/nbfc_service.systemv
+	# /usr/local/etc/init.d
+	install -Dm 755 etc/init.d/nbfc_service.systemv	 $(DESTDIR)$(systemvdir)/nbfc_service
 
 install-docs:
 	install -Dm 644 doc/ec_probe.1           $(DESTDIR)$(man1dir)/ec_probe.1
