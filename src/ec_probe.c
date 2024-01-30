@@ -429,30 +429,30 @@ static inline void Register_FromEC(RegisterBuf* self) {
     ec->ReadByte(i, &my[i]);
 }
 
-static void Register_PrintWatch(RegisterBuf* all_readings, RegisterBuf* a, RegisterBuf* b) {
+static void Register_PrintWatch(RegisterBuf* all_readings, RegisterBuf* current, RegisterBuf* previous) {
   RegisterColors colors;
 
-  for (int i = 0; i < RegistersSize; ++i) {
-    const uint8_t byte = (*a)[i];
-    const uint8_t diff = byte - (*b)[i];
+  for (int register_ = 0; register_ < RegistersSize; ++register_) {
+    const uint8_t byte = (*current)[register_];
+    const uint8_t diff = byte - (*previous)[register_];
     bool has_changed = false;
 
     uint8_t save = byte;
-    for (range(RegisterBuf*, r, all_readings, b)) {
-      if (save != (*r)[i]) {
+    for (range(RegisterBuf*, r, all_readings, previous)) {
+      if (save != (*r)[register_]) {
         has_changed = true;
         break;
       }
     }
 
-    /**/ if (diff)          colors[i] = Console_Yelllow;
-    else if (has_changed)   colors[i] = Console_BoldBlue;
-    else if (byte == 0xFF)  colors[i] = Console_White;
-    else if (byte)          colors[i] = Console_BoldWhite;
-    else                    colors[i] = Console_BoldBlack;
+    /**/ if (diff)          colors[register_] = Console_Yelllow;
+    else if (has_changed)   colors[register_] = Console_BoldBlue;
+    else if (byte == 0xFF)  colors[register_] = Console_White;
+    else if (byte)          colors[register_] = Console_BoldWhite;
+    else                    colors[register_] = Console_BoldBlack;
   }
 
-  Register_PrintRegister(a, colors);
+  Register_PrintRegister(current, colors);
 }
 
 static void Register_PrintMonitor(RegisterBuf* readings, int size) {
