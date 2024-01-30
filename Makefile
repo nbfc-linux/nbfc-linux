@@ -4,6 +4,9 @@ bindir			= $(PREFIX)/bin
 confdir 		= $(PREFIX)/etc
 datadir			= $(PREFIX)/share
 sysddir 		= $(PREFIX)/lib/systemd/system
+mandir 			= $(PREFIX)/share/man
+man1dir     = $(mandir)/man1
+man5dir     = $(mandir)/man5
 runstatedir	= /var/run
 
 ifeq ($(BUILD), debug)
@@ -19,12 +22,12 @@ override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(datadir)\" -DRUNSTAT
 
 CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
-EXTRA = etc/systemd/system/nbfc_service.service
+SYSTEMD = etc/systemd/system/nbfc_service.service
 BASH_COMPLETION = completion/bash/ec_probe completion/bash/nbfc completion/bash/nbfc_service
 FISH_COMPLETION = completion/fish/ec_probe.fish completion/fish/nbfc.fish completion/fish/nbfc_service.fish
 ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_nbfc_service
 
-all: $(CORE) $(DOC) $(EXTRA) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
+all: $(CORE) $(DOC) $(SYSTEMD) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
 	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
@@ -84,7 +87,7 @@ etc/systemd/system/nbfc_service.service: etc/systemd/system/nbfc_service.service
 install-configs:
 	# /usr/local/etc/nbfc
 	mkdir -p $(DESTDIR)$(confdir)/nbfc
-
+	
 	# /usr/local/share/nbfc/configs
 	mkdir -p $(DESTDIR)$(datadir)/nbfc/configs
 	cp -r share/nbfc/configs/* $(DESTDIR)$(datadir)/nbfc/configs
@@ -94,24 +97,24 @@ install-systemd: etc/systemd/system/nbfc_service.service
 	install -Dm 644 etc/systemd/system/nbfc_service.service $(DESTDIR)$(sysddir)/nbfc_service.service
 
 install-docs:
-	install -Dm 644 doc/ec_probe.1           $(DESTDIR)$(datadir)/man/man1/ec_probe.1
-	install -Dm 644 doc/nbfc.1               $(DESTDIR)$(datadir)/man/man1/nbfc.1
-	install -Dm 644 doc/nbfc_service.1       $(DESTDIR)$(datadir)/man/man1/nbfc_service.1
-	install -Dm 644 doc/nbfc_service.json.5  $(DESTDIR)$(datadir)/man/man5/nbfc_service.json.5
+	install -Dm 644 doc/ec_probe.1           $(DESTDIR)$(man1dir)/ec_probe.1
+	install -Dm 644 doc/nbfc.1               $(DESTDIR)$(man1dir)/nbfc.1
+	install -Dm 644 doc/nbfc_service.1       $(DESTDIR)$(man1dir)/nbfc_service.1
+	install -Dm 644 doc/nbfc_service.json.5  $(DESTDIR)$(man5dir)/nbfc_service.json.5
 
 install-completion:
-	mkdir -p $(DESTDIR)$(datadir)/zsh/site-functions
-	cp completion/zsh/_nbfc               $(DESTDIR)$(datadir)/zsh/site-functions/
-	cp completion/zsh/_nbfc_service       $(DESTDIR)$(datadir)/zsh/site-functions/
-	cp completion/zsh/_ec_probe           $(DESTDIR)$(datadir)/zsh/site-functions/
-	mkdir -p $(DESTDIR)$(datadir)/bash-completion/completions
-	cp completion/bash/nbfc               $(DESTDIR)$(datadir)/bash-completion/completions/
-	cp completion/bash/nbfc_service       $(DESTDIR)$(datadir)/bash-completion/completions/
-	cp completion/bash/ec_probe           $(DESTDIR)$(datadir)/bash-completion/completions/
-	mkdir -p $(DESTDIR)$(datadir)/fish/completions
-	cp completion/fish/nbfc.fish          $(DESTDIR)$(datadir)/fish/completions/
-	cp completion/fish/nbfc_service.fish  $(DESTDIR)$(datadir)/fish/completions/
-	cp completion/fish/ec_probe.fish      $(DESTDIR)$(datadir)/fish/completions/
+	# ZSH
+	install -Dm 644 completion/zsh/_nbfc               $(DESTDIR)$(datadir)/zsh/site-functions/_nbfc
+	install -Dm 644 completion/zsh/_nbfc_service       $(DESTDIR)$(datadir)/zsh/site-functions/_nbfc_service
+	install -Dm 644 completion/zsh/_ec_probe           $(DESTDIR)$(datadir)/zsh/site-functions/_ec_probe
+	# BASH	
+	install -Dm 644 completion/bash/nbfc               $(DESTDIR)$(datadir)/bash-completion/completions/nbfc
+	install -Dm 644 completion/bash/nbfc_service       $(DESTDIR)$(datadir)/bash-completion/completions/nbfc_service
+	install -Dm 644 completion/bash/ec_probe           $(DESTDIR)$(datadir)/bash-completion/completions/ec_probe
+	# FISH	
+	install -Dm 644 completion/fish/nbfc.fish          $(DESTDIR)$(datadir)/fish/completions/nbfc.fish
+	install -Dm 644 completion/fish/nbfc_service.fish  $(DESTDIR)$(datadir)/fish/completions/nbfc_service.fish
+	install -Dm 644 completion/fish/ec_probe.fish      $(DESTDIR)$(datadir)/fish/completions/ec_probe.fish
 
 install: install-core install-configs install-systemd install-docs install-completion
 
@@ -132,10 +135,10 @@ uninstall:
 	rm -rf $(DESTDIR)$(confdir)/nbfc
 	
 	# Documentation
-	rm -f $(DESTDIR)$(datadir)/man/man1/ec_probe.1
-	rm -f $(DESTDIR)$(datadir)/man/man1/nbfc.1
-	rm -f $(DESTDIR)$(datadir)/man/man1/nbfc_service.1
-	rm -f $(DESTDIR)$(datadir)/man/man5/nbfc_service.json.5
+	rm -f $(DESTDIR)$(man1dir)/ec_probe.1
+	rm -f $(DESTDIR)$(man1dir)/nbfc.1
+	rm -f $(DESTDIR)$(man1dir)/nbfc_service.1
+	rm -f $(DESTDIR)$(man5dir)/nbfc_service.json.5
 	
 	# Completion
 	rm -f $(DESTDIR)$(datadir)/zsh/site-functions/_nbfc
@@ -152,10 +155,10 @@ uninstall:
 
 clean:
 	rm -rf __pycache__
-	rm -f $(CORE) src/*.o nbfc.py
+	rm -f $(CORE) nbfc.py src/*.o
 	rm -f $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
-	rm -f etc/systemd/system/nbfc_service.service
-	rm -f doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.5
+	rm -f $(SYSTEMD)
+	rm -f $(DOC)
 
 # =============================================================================
 # Binaries ====================================================================
