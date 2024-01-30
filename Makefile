@@ -8,6 +8,9 @@ mandir 			= $(PREFIX)/share/man
 man1dir     = $(mandir)/man1
 man5dir     = $(mandir)/man5
 runstatedir	= /var/run
+orcdir   		= $(confdir)/init.d
+
+INIT_SYSTEM = systemd # systemd, openrc
 
 ifeq ($(BUILD), debug)
 	CFLAGS   = -Og -g
@@ -23,11 +26,12 @@ override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(datadir)\" -DRUNSTAT
 CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
 SYSTEMD = etc/systemd/system/nbfc_service.service
+OPEN_RC = etc/init.d/nbfc_service.openrc
 BASH_COMPLETION = completion/bash/ec_probe completion/bash/nbfc completion/bash/nbfc_service
 FISH_COMPLETION = completion/fish/ec_probe.fish completion/fish/nbfc.fish completion/fish/nbfc_service.fish
 ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_nbfc_service
 
-all: $(CORE) $(DOC) $(SYSTEMD) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
+all: $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
 	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
@@ -84,6 +88,10 @@ completion/zsh/_nbfc_service: completion/zsh/_nbfc_service.in
 etc/systemd/system/nbfc_service.service: etc/systemd/system/nbfc_service.service.in
 	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
+# OpenRC service file #########################################################
+etc/init.d/nbfc_service.openrc: etc/init.d/nbfc_service.openrc.in
+	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+
 install-configs:
 	# /usr/local/etc/nbfc
 	mkdir -p $(DESTDIR)$(confdir)/nbfc
@@ -95,6 +103,10 @@ install-configs:
 install-systemd: etc/systemd/system/nbfc_service.service
 	# /usr/local/lib/systemd/system
 	install -Dm 644 etc/systemd/system/nbfc_service.service $(DESTDIR)$(sysddir)/nbfc_service.service
+
+install-openrc: etc/init.d/nbfc_service.openrc
+	# /usr/local/etc/init.d
+	install -Dm 755 etc/init.d/nbfc_service.openrc		 $(DESTDIR)$(orcdir)/nbfc_service
 
 install-docs:
 	install -Dm 644 doc/ec_probe.1           $(DESTDIR)$(man1dir)/ec_probe.1
@@ -116,7 +128,7 @@ install-completion:
 	install -Dm 644 completion/fish/nbfc_service.fish  $(DESTDIR)$(datadir)/fish/completions/nbfc_service.fish
 	install -Dm 644 completion/fish/ec_probe.fish      $(DESTDIR)$(datadir)/fish/completions/ec_probe.fish
 
-install: install-core install-configs install-systemd install-docs install-completion
+install: install-core install-configs install-$(INIT_SYSTEM) install-docs install-completion
 
 uninstall:
 	# Binaries
@@ -127,6 +139,9 @@ uninstall:
 	
 	# /usr/local/lib/systemd/system
 	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service
+
+	# /usr/local/etc/init.d
+	rm -f $(DESTDIR)$(orcdir)/nbfc_service
 	
 	# /usr/local/share/nbfc/configs
 	rm -rf $(DESTDIR)$(datadir)/nbfc
@@ -157,7 +172,7 @@ clean:
 	rm -rf __pycache__
 	rm -f $(CORE) nbfc.py src/*.o
 	rm -f $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
-	rm -f $(SYSTEMD)
+	rm -f $(SYSTEMD) $(OPEN_RC)
 	rm -f $(DOC)
 
 # =============================================================================

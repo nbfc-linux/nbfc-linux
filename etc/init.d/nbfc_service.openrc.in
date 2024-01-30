@@ -1,0 +1,30 @@
+#!/sbin/openrc-run
+# Copyright 2023 Avishek Sen
+# Distributed under the terms of the GNU General Public License v3
+
+command="@BINDIR@/nbfc"
+pidfile="/run/${RC_SVCNAME}.pid"
+description="NoteBook FanControl service"
+
+depend() {
+	need localmount
+	after modules
+}
+
+start() {
+	ebegin "Starting nbfc service"
+	${command} start
+	eend $? "Failed to start!"
+}
+
+stop() {
+	ebegin "Stopping nbfc service"
+	${command} stop
+	eend $? "Failed to stop!"
+}
+
+start_pre() {
+	ebegin "Waiting for /sys/class/hwmon/hwmon* files"
+	${command} wait-for-hwmon
+	eend $? "Failed to look for required files!"
+}
