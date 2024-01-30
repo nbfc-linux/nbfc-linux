@@ -38,6 +38,9 @@ Installation
 - In general:
   - `make PREFIX=/usr confdir=/etc && sudo make PREFIX=/usr confdir=/etc install`
 
+- For systems with OpenRC (gentoo):
+  - `make PREFIX=/usr confdir=/etc INIT_SYSTEM=openrc && sudo make PREFIX=/usr confdir=/etc INIT_SYSTEM=openrc install`
+
 Getting started
 ---------------
 
