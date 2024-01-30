@@ -182,7 +182,7 @@ clean:
 	rm -rf __pycache__
 	rm -f $(CORE) nbfc.py src/*.o
 	rm -f $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
-	rm -f $(SYSTEMD) $(OPEN_RC)
+	rm -f $(SYSTEMD) $(OPEN_RC) $(SYSTEMV)
 	rm -f $(DOC)
 
 # =============================================================================
