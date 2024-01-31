@@ -22,7 +22,7 @@ else
 endif
 
 override LDLIBS   += -lm
-override CPPFLAGS += -DCONFDIR=\"$(confdir)\" -DDATADIR=\"$(datadir)\" -DRUNSTATEDIR=\"$(runstatedir)\"
+override CPPFLAGS += -DSYSCONFDIR=\"$(confdir)\" -DDATADIR=\"$(datadir)\" -DRUNSTATEDIR=\"$(runstatedir)\"
 
 CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
@@ -41,50 +41,50 @@ install-core: $(CORE)
 	install -Dm 755 src/nbfc          $(DESTDIR)$(bindir)/nbfc
 
 nbfc.py: nbfc.py.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 # Documentation ###############################################################
 doc/ec_probe.1: doc/ec_probe.1.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 doc/nbfc.1: doc/nbfc.1.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 doc/nbfc_service.1: doc/nbfc_service.1.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 doc/nbfc_service.json.5: doc/nbfc_service.json.5.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 # BASH completion files #######################################################
 completion/bash/ec_probe: completion/bash/ec_probe.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 completion/bash/nbfc: completion/bash/nbfc.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 completion/bash/nbfc_service: completion/bash/nbfc_service.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 # FISH completion files #######################################################
 completion/fish/ec_probe.fish: completion/fish/ec_probe.fish.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 completion/fish/nbfc.fish: completion/fish/nbfc.fish.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 completion/fish/nbfc_service.fish: completion/fish/nbfc_service.fish.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 # ZSH completion files ########################################################
 completion/zsh/_ec_probe: completion/zsh/_ec_probe.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 completion/zsh/_nbfc: completion/zsh/_nbfc.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 completion/zsh/_nbfc_service: completion/zsh/_nbfc_service.in
-	sed 's|@CONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
 
 # Systemd service file ########################################################
 etc/systemd/system/nbfc_service.service: etc/systemd/system/nbfc_service.service.in

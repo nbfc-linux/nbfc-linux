@@ -158,7 +158,7 @@ milliseconds. See
 for further details.
 .RE
 
-.I @CONFDIR@/nbfc.json
+.I @SYSCONFDIR@/nbfc.json
 .RS
 The system wide configuration file. See
 .BR nbfc_service.json (5)

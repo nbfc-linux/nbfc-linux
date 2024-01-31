@@ -79,7 +79,7 @@ int main(int argc, char* const argv[])
   parse_opts(argc, argv);
 
   Log_Info("Running version " NBFC_VERSION "\n");
-  Log_Info("CONFDIR is '%s'\n", CONFDIR);
+  Log_Info("SYSCONFDIR is '%s'\n", SYSCONFDIR);
   Log_Info("DATADIR is '%s'\n", DATADIR);
   Log_Info("RUNSTATEDIR is '%s'\n", RUNSTATEDIR);
 

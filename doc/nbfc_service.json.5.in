@@ -9,7 +9,7 @@ nbfc_service.json \- Notebook FanControl service configuration
 .SS ServiceConfig
 .PP
 Main configuration file of nbfc_service
-.RI ( @CONFDIR@/nbfc.json )
+.RI ( @SYSCONFDIR@/nbfc.json )
 
 .PP
 .BR SelectedConfigId :
@@ -375,7 +375,7 @@ milliseconds.
 .RE
 
 .PP
-.I @CONFDIR@/nbfc.json
+.I @SYSCONFDIR@/nbfc.json
 .RS
 The system wide configuration file.
 .RE

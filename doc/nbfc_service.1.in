@@ -48,7 +48,7 @@ Enable tracing of reads and writes of the embedded controller.
 .BR \-c ", " \-\-config\-file
 .I CONFIG
 .RS
-Use alternative config file (default @CONFDIR@/nbfc/nbfc.json).
+Use alternative config file (default @SYSCONFDIR@/nbfc/nbfc.json).
 .RE
 
 .PP
