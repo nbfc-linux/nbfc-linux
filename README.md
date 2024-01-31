@@ -36,13 +36,13 @@ Installation
   - [On NixOS](nixos-installation.md)
 
 - In general:
-  - `make PREFIX=/usr confdir=/etc && sudo make PREFIX=/usr confdir=/etc install`
+  - `./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc && make && sudo make install`
 
 - For systems with OpenRC (gentoo):
-  - `make PREFIX=/usr confdir=/etc INIT_SYSTEM=openrc && sudo make PREFIX=/usr confdir=/etc INIT_SYSTEM=openrc install`
+  - `./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --with-init-system=openrc && make && sudo make install`
 
 - For systems with System-V-Init:
-  - `make PREFIX=/usr confdir=/etc INIT_SYSTEM=systemv && sudo make PREFIX=/usr confdir=/etc INIT_SYSTEM=systemv install`
+  - `./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --with-init-system=systemv && make && sudo make install`
 
 Getting started
 ---------------

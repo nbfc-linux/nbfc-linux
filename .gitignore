@@ -1,4 +1,5 @@
 __pycache__
+autom4te.cache
 ccls-cache/
 nbfc.py
 nbfc_service.service
@@ -17,3 +18,11 @@ completion/fish/nbfc_service.fish
 completion/zsh/_ec_probe
 completion/zsh/_nbfc
 completion/zsh/_nbfc_service
+config.log
+config.status
+config.sub
+config.guess
+configure~
+install-sh
+configure
+Makefile
