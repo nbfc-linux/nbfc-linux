@@ -103,7 +103,7 @@ etc/init.d/nbfc_service.systemv: etc/init.d/nbfc_service.systemv.in
 
 install-configs:
 	# /usr/local/etc/nbfc
-	mkdir -p $(DESTDIR)$(confdir)/nbfc
+	mkdir -p $(DESTDIR)$(sysconfdir)/nbfc
 	
 	# /usr/local/share/nbfc/configs
 	mkdir -p $(DESTDIR)$(datadir)/nbfc/configs
@@ -163,7 +163,7 @@ uninstall:
 	rm -rf $(DESTDIR)$(datadir)/nbfc
 	
 	# /usr/local/etc/nbfc
-	rm -rf $(DESTDIR)$(confdir)/nbfc
+	rm -rf $(DESTDIR)$(sysconfdir)/nbfc
 	
 	# Documentation
 	rm -f $(DESTDIR)$(man1dir)/ec_probe.1
