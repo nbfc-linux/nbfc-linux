@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#define NBFC_VERSION                     "0.1.12"
+#define NBFC_VERSION                     "0.1.13"
 #define NBFC_MAX_FILE_SIZE               32768
 #define NBFC_TEMPERATURE_FILTER_TIMESPAN 6000  /*ms*/
 #define NBFC_MODEL_CONFIGS_DIR           DATADIR "/nbfc/configs"

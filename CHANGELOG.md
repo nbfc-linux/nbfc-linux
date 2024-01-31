@@ -1,5 +1,8 @@
 # Changelog
 
+## nbfc-linux-0.1.13 (2024-01-30)
+- Added support for OpenRC and System-V-Init
+
 ## nbfc-linux-0.1.12 (2024-01-28)
 - Added `LegacyTemperatureThresholdsBehaviour` option to model config
 

@@ -153,6 +153,9 @@ uninstall:
 	# /usr/local/etc/init.d
 	rm -f $(DESTDIR)$(orcdir)/nbfc_service
 	
+	# /usr/local/etc/init.d
+	rm -f $(DESTDIR)$(systemvdir)/nbfc_service
+
 	# /usr/local/share/nbfc/configs
 	rm -rf $(DESTDIR)$(datadir)/nbfc
 	
