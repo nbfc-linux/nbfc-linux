@@ -43,6 +43,7 @@ AC_MSG_CHECKING([which Init-System should be used])
 AC_MSG_RESULT([$with_init_system])
 
 AC_SUBST([INIT_SYSTEM], [$init_system])
+AC_SUBST([PACKAGE_VERSION])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

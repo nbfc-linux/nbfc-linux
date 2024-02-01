@@ -1,5 +1,5 @@
 .nh
-.TH NBFC_SERVICE 5 "MARCH 2021" Notebook FanControl
+.TH "NBFC-SERVICE.JSON" 5 "FEBRUARY 2024" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 nbfc_service.json \- Notebook FanControl service configuration

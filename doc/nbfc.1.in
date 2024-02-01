@@ -1,5 +1,5 @@
 .nh
-.TH NBFC_SERVICE 1 "MARCH 2021" Notebook FanControl
+.TH "NBFC" "1" "FEBRUARY 2024" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 nbfc \- Notebook FanControl client

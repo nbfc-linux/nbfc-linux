@@ -1,4 +1,6 @@
-PREFIX   = /usr/local
+version     = 0.1.14
+
+PREFIX      = /usr/local
 
 bindir			= $(PREFIX)/bin
 confdir 		= $(PREFIX)/etc
@@ -22,7 +24,11 @@ else
 endif
 
 override LDLIBS   += -lm
-override CPPFLAGS += -DSYSCONFDIR=\"$(confdir)\" -DDATADIR=\"$(datadir)\" -DRUNSTATEDIR=\"$(runstatedir)\"
+override CPPFLAGS += \
+	-DSYSCONFDIR=\"$(confdir)\"      \
+	-DDATADIR=\"$(datadir)\"         \
+	-DRUNSTATEDIR=\"$(runstatedir)\" \
+	-DVERSION=\"$(version)\"
 
 CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
@@ -40,63 +46,70 @@ install-core: $(CORE)
 	install -Dm 755 src/ec_probe      $(DESTDIR)$(bindir)/ec_probe
 	install -Dm 755 src/nbfc          $(DESTDIR)$(bindir)/nbfc
 
+REPLACE_VARS = sed \
+	-e 's|@BINDIR@|$(bindir)|g'           \
+	-e 's|@DATADIR@|$(datadir)|g'         \
+	-e 's|@SYSCONFDIR@|$(sysconfdir)|g'   \
+	-e 's|@RUNSTATEDIR@|$(runstatedir)|g' \
+	-e 's|@VERSION@|$(version)|g'
+
 nbfc.py: nbfc.py.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 # Documentation ###############################################################
 doc/ec_probe.1: doc/ec_probe.1.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 doc/nbfc.1: doc/nbfc.1.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 doc/nbfc_service.1: doc/nbfc_service.1.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 doc/nbfc_service.json.5: doc/nbfc_service.json.5.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 # BASH completion files #######################################################
 completion/bash/ec_probe: completion/bash/ec_probe.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 completion/bash/nbfc: completion/bash/nbfc.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 completion/bash/nbfc_service: completion/bash/nbfc_service.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 # FISH completion files #######################################################
 completion/fish/ec_probe.fish: completion/fish/ec_probe.fish.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 completion/fish/nbfc.fish: completion/fish/nbfc.fish.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 completion/fish/nbfc_service.fish: completion/fish/nbfc_service.fish.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 # ZSH completion files ########################################################
 completion/zsh/_ec_probe: completion/zsh/_ec_probe.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 completion/zsh/_nbfc: completion/zsh/_nbfc.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 completion/zsh/_nbfc_service: completion/zsh/_nbfc_service.in
-	sed 's|@SYSCONFDIR@|$(confdir)|g; s|@DATADIR@|$(datadir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 # Systemd service file ########################################################
 etc/systemd/system/nbfc_service.service: etc/systemd/system/nbfc_service.service.in
-	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 # OpenRC service file #########################################################
 etc/init.d/nbfc_service.openrc: etc/init.d/nbfc_service.openrc.in
-	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 # SystemV service file ########################################################
 etc/init.d/nbfc_service.systemv: etc/init.d/nbfc_service.systemv.in
-	sed 's|@BINDIR@|$(bindir)|g; s|@RUNSTATEDIR@|$(runstatedir)|g;' < $< > $@
+	$(REPLACE_VARS) < $< > $@
 
 install-configs:
 	# /usr/local/etc/nbfc
@@ -149,13 +162,13 @@ uninstall:
 	
 	# /usr/local/lib/systemd/system
 	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service
-
+	
 	# /usr/local/etc/init.d
 	rm -f $(DESTDIR)$(orcdir)/nbfc_service
 	
 	# /usr/local/etc/init.d
 	rm -f $(DESTDIR)$(systemvdir)/nbfc_service
-
+	
 	# /usr/local/share/nbfc/configs
 	rm -rf $(DESTDIR)$(datadir)/nbfc
 	
