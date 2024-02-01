@@ -49,7 +49,7 @@ install-core: $(CORE)
 REPLACE_VARS = sed \
 	-e 's|@BINDIR@|$(bindir)|g'           \
 	-e 's|@DATADIR@|$(datadir)|g'         \
-	-e 's|@SYSCONFDIR@|$(sysconfdir)|g'   \
+	-e 's|@SYSCONFDIR@|$(confdir)|g'      \
 	-e 's|@RUNSTATEDIR@|$(runstatedir)|g' \
 	-e 's|@VERSION@|$(version)|g'
 
