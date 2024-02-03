@@ -697,6 +697,7 @@ static int Config() {
   else if (options.s || options.a) {
     check_root();
     char *model;
+    char path[PATH_MAX];
 
     if (!strcmp(options.config, "auto")) {
       array_of(ConfigFile) files = recommended_configs();
@@ -708,7 +709,31 @@ static int Config() {
       }
     }
     else {
-      model = (char *)options.config;
+      if (strrchr(options.config, '/')) {
+        if (! realpath(options.config, path)) {
+          Log_Error("Failed to resolve path '%s': %s\n", options.config, strerror(errno));
+          return NBFC_EXIT_FAILURE;
+        }
+
+        char* slash = strrchr(path, '/');
+        *slash = '\0';
+        model = slash + 1;
+
+        if (strcmp(path, NBFC_MODEL_CONFIGS_DIR)) {
+          Log_Error("File does not reside in model configs dir (%s): %s\n",
+            NBFC_MODEL_CONFIGS_DIR, options.config);
+          return NBFC_EXIT_FAILURE;
+        }
+      }
+      else {
+        snprintf(path, sizeof(path), "%s", options.config);
+        model = path;
+      }
+
+      char* dot = strrchr(model, '.');
+      if (dot)
+        *dot = '\0';
+
       char file[PATH_MAX];
       snprintf(file, sizeof(file), NBFC_MODEL_CONFIGS_DIR "/%s.json", model);
       if (access(file, F_OK)) {
