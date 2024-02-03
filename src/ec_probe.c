@@ -51,28 +51,21 @@
 #define Console_Reset       "\033[0;0m"
 #define Console_Clear       "\033[1;1H\033[2J"
 
-#define               RegistersSize 256
-typedef uint8_t       RegisterBuf[RegistersSize];
-typedef const char*   RegisterColors[RegistersSize];
-static RegisterBuf    Registers_Log[32768];
+#define             RegistersSize 256
+typedef uint8_t     RegisterBuf[RegistersSize];
+typedef const char* RegisterColors[RegistersSize];
+static RegisterBuf  Registers_Log[32768];
 
-static void           Register_PrintRegister(RegisterBuf*, RegisterColors);
-static inline void    Register_FromEC(RegisterBuf*);
-static void           Register_PrintWatch(RegisterBuf*, RegisterBuf*, RegisterBuf*);
-static void           Register_PrintMonitor(RegisterBuf*, int);
-static void           Register_WriteMonitorReport(RegisterBuf*, int, FILE*);
-static void           Register_PrintDump(RegisterBuf*);
-static void           Handle_Signal(int);
+static void         Register_PrintRegister(RegisterBuf*, RegisterColors);
+static inline void  Register_FromEC(RegisterBuf*);
+static void         Register_PrintWatch(RegisterBuf*, RegisterBuf*, RegisterBuf*);
+static void         Register_PrintMonitor(RegisterBuf*, int);
+static void         Register_WriteMonitorReport(RegisterBuf*, int, FILE*);
+static void         Register_PrintDump(RegisterBuf*);
+static void         Handle_Signal(int);
 
-EC_VTable* ec;
-static volatile int   quit;
-
-#if 0
-static volatile int   Stress_DummyVar;
-static void           Stress_SetQuit();
-static void           Stress_EndlessTask();
-static void           Stress_CPU(int);
-#endif
+static EC_VTable*   ec;
+static volatile int quit;
 
 static int Read();
 static int Write();
@@ -166,7 +159,6 @@ static struct {
   uint8_t     register_;
   uint16_t    value;
   bool        use_word;
-  int         stress_cpu;
 } options = {0};
 
 static int64_t parse_number(const char* s, int64_t min, int64_t max, char** errmsg) {
@@ -306,8 +298,10 @@ int main(int argc, char* const argv[]) {
     case Command_Write:   return Write();
     case Command_Monitor: return Monitor();
     case Command_Watch:   return Watch();
-    case Command_Help:    return 0;
+    default: break;
   }
+
+  return 0;
 }
 
 static int Read() {
@@ -352,11 +346,6 @@ static int Dump() {
 }
 
 static int Monitor() {
-#if 0
-  if (options.stress_cpu)
-    Stress_CPU(options.stress_cpu);
-#endif
-
   const int max_loops = (!options.timespan) ? INT_MAX :
     (options.timespan / options.interval);
 
@@ -523,26 +512,3 @@ static void Register_PrintDump(RegisterBuf* self) {
   printf("%s", Console_Reset);
 }
 
-// ============================================================================
-// Stress code
-// ============================================================================
-
-#if 0
-static void Stress_SetQuit() {
-  quit = 1;
-}
-
-static void Stress_EndlessTask() {
-  for (; !quit; ++Stress_DummyVar);
-}
-
-static void Stress_CPU(int forks) {
-  atexit(Stress_SetQuit);
-  for (range(int, i, 0, forks))
-    switch (fork()) {
-    case -1: die(NBFC_EXIT_FATAL, "fork: %s\n", strerror(errno));
-    case 0:  Stress_EndlessTask(); _exit(0);
-    default: break;
-    }
-}
-#endif

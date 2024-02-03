@@ -2,6 +2,7 @@
 #define NBFC_STRINGBUF_H_
 
 #include <stdio.h>
+#include <string.h>
 
 typedef struct StringBuf StringBuf;
 struct StringBuf {

@@ -52,7 +52,7 @@ void Info_Close() {
 }
 
 Error* Info_Write(ModelConfig* cfg, float temperature, bool read_only, array_of(Fan)* fans) {
-  static const char Bool_ToStr[2][6] = {"false","true"};
+  static const char Bool_ToStr[2][6] = {"false", "true"};
   char buf[256];
   char result[NBFC_MAX_FILE_SIZE];
   StringBuf  S = {result, 0, sizeof(result) - 1};

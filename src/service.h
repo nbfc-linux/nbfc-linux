@@ -8,13 +8,12 @@
 
 typedef struct Service_Options Service_Options;
 struct Service_Options {
-  bool                    fork;
-  bool                    read_only;
-  int                     debug;
-  const char*             service_config;
-  const char*             state_file;
-  float                   critical_temperature;
-  EmbeddedControllerType  embedded_controller_type;
+  EmbeddedControllerType embedded_controller_type;
+  bool                   fork;
+  bool                   read_only;
+  int                    debug;
+  const char*            service_config;
+  const char*            state_file;
 };
 
 extern Service_Options options;

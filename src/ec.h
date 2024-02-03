@@ -8,12 +8,12 @@
 
 typedef struct EC_VTable EC_VTable;
 struct EC_VTable {
-  Error*   (*Open)();
-  void     (*Close)();
-  Error*   (*ReadByte)(int, uint8_t*);
-  Error*   (*ReadWord)(int, uint16_t*);
-  Error*   (*WriteByte)(int, uint8_t);
-  Error*   (*WriteWord)(int, uint16_t);
+  Error* (*Open)();
+  void   (*Close)();
+  Error* (*ReadByte)(int, uint8_t*);
+  Error* (*ReadWord)(int, uint16_t*);
+  Error* (*WriteByte)(int, uint8_t);
+  Error* (*WriteWord)(int, uint16_t);
 };
 
 bool   EC_CheckWorking(EC_VTable*);

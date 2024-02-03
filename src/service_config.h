@@ -6,6 +6,6 @@
 extern ServiceConfig service_config;
 
 Error* ServiceConfig_Init(const char*);
-void ServiceConfig_Free(ServiceConfig*);
+void   ServiceConfig_Free(ServiceConfig*);
 
 #endif

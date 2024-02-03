@@ -16,10 +16,7 @@ static const char* const LinuxHwmonDirs[] = {
 };
 
 static const char* const LinuxTempSensorNames[] = {
-  "coretemp",
-  "k10temp",
-  "zenpower",
-  NULL
+  "coretemp", "k10temp", "zenpower", NULL
 };
 
 static const char* const LinuxTempSensorFile = "temp%d_input";

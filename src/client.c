@@ -1,27 +1,15 @@
-#include "error.h"
-#include "generated/client.help.h"
-#include "macros.h"
-#include "nbfc.h"
-#include "nxjson_utils.h"
-#include "optparse/optparse.h"
-#include "optparse/optparse.c"
-#include "slurp_file.h"
-#include "model_config.h"
-#include "model_config.c"
-#include "stringbuf.h"
-#include "error.c"
-#include "memory.c"
-#include "program_name.c"
-#include "log.h"
+#define _XOPEN_SOURCE 500 /* unistd.h: export pwrite()/pread(), string.h: export strdup */
+#define _DEFAULT_SOURCE   /* endian.h: */
 
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
-#include "nxjson.c"
-#include "nxjson.h"
-#include "reverse_nxjson.c"
 
 #include <ctype.h>
 #include <dirent.h>
+#include <fcntl.h>
+#include <locale.h>
+#include <limits.h>
+#include <math.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -29,22 +17,255 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <locale.h>
-#include <limits.h>
-#include <math.h>
-#include <fcntl.h>
 
+#include "generated/client.help.h"
+#include "log.h"
+#include "macros.h"
+#include "nbfc.h"
+#include "nxjson_utils.h"
+#include "slurp_file.h"
+#include "stringbuf.h"
+
+#include "error.c"
+#include "optparse/optparse.c"
+#include "model_config.c"
+#include "memory.c"
+#include "program_name.c"
+#include "nxjson.c"
+#include "reverse_nxjson.c"
 
 #define DmiIdDirectoryPath "/sys/devices/virtual/dmi/id"
 
 static ServiceInfo service_info;
 static ServiceConfig service_config;
 
-static char *to_lower(const char *a);
-static bool str_starts_with_ignorecase(const char* string, const char* prefix);
-static char** get_longest_common_substrings(const char* str1, const char* str2);
-static char* get_longest_common_substring(const char* str1, const char* str2);
-static float get_similarity_index(const char* model_name1, const char* model_name2);
+static const cli99_option main_options[] = {
+  {"-v|--version",  -'v', 0},
+  {"-h|--help",     -'h', 0},
+  {"command",        'C', 1 | cli99_required_option},
+  cli99_options_end()
+};
+
+static const cli99_option status_command_options[] = {
+  cli99_include_options(&main_options),
+  {"-a|--all",      -'a', 0},
+  {"-s|--service",  -'s', 0},
+  {"-f|--fan",      -'f', 1},
+  {"-w|--watch",    -'w', 1},
+  cli99_options_end()
+};
+
+static const cli99_option config_command_options[] = {
+  cli99_include_options(&main_options),
+  {"-l|--list",       -'l', 0},
+  {"-s|--set",        -'s', 1},
+  {"-a|--apply",      -'a', 1},
+  {"-r|--recommend",  -'r', 0},
+  cli99_options_end()
+};
+
+static const cli99_option set_command_options[] = {
+  cli99_include_options(&main_options),
+  {"-a|--auto",       -'a', 0},
+  {"-s|--speed",      -'s', 1},
+  {"-f|--fan",        -'f', 1},
+  cli99_options_end()
+};
+
+static const cli99_option start_command_options[] = {
+  cli99_include_options(&main_options),
+  {"-r|--read-only",  -'r', 0},
+  cli99_options_end()
+};
+
+static const cli99_option *Options[] = {
+  start_command_options,
+  main_options,
+  start_command_options, // restart
+  status_command_options,
+  config_command_options,
+  set_command_options,
+  main_options,
+  main_options,
+  main_options,
+};
+
+static const char *HelpTexts[] = {
+  CLIENT_START_HELP_TEXT,
+  CLIENT_DEFAULT_HELP("stop"),
+  CLIENT_RESTART_HELP_TEXT,
+  CLIENT_STATUS_HELP_TEXT,
+  CLIENT_CONFIG_HELP_TEXT,
+  CLIENT_SET_HELP_TEXT,
+  CLIENT_DEFAULT_HELP("wait-for-hwmon"),
+  CLIENT_DEFAULT_HELP("get-model-name"),
+  CLIENT_HELP_TEXT
+};
+
+enum Command {
+  Command_Start,
+  Command_Stop,
+  Command_Restart,
+  Command_Status,
+  Command_Config,
+  Command_Set,
+  Command_Wait_For_Hwmon,
+  Command_Get_Model_Name,
+  Command_Help,
+};
+
+static enum Command Command_From_String(const char* s) {
+  const char* commands[] = {
+    "start", "stop", "restart", "status", "config", "set",
+    "wait-for-hwmon", "get-model-name", "help"
+  };
+
+  for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
+    if (!strcmp(commands[i], s))
+      return (enum Command) i;
+
+  return (enum Command) -1;
+}
+
+static struct {
+  int fancount;
+  int speedcount;
+  int *fans;
+  float *speeds;
+  int a; // all/auto/apply
+  const char *config;
+  int l;     // list
+  int r;     // recommend/read-only
+  int s;     // set
+  int watch; // watch time
+} options = {0};
+
+static int Service_Start(bool);
+static int Service_Stop();
+static int Service_Restart(bool);
+static int Config();
+static int Set();
+static int Status();
+static int Wait_For_Hwmon();
+static int Get_Model_Name();
+
+static int64_t parse_number(const char*, int64_t, int64_t, char**);
+static double  parse_double(const char*, double, double, char**);
+
+int main(int argc, char *const argv[]) {
+  if (argc == 1) {
+    printf(CLIENT_HELP_TEXT);
+    return NBFC_EXIT_CMDLINE;
+  }
+
+  Program_Name_Set(argv[0]);
+  setlocale(LC_NUMERIC, "C"); // for json floats
+  mkdir(NBFC_CONFIG_DIR, 0755);
+
+  int o;
+  char* err;
+  enum Command cmd = Command_Help;
+  cli99 p;
+  cli99_Init(&p, argc, argv, main_options, cli99_options_python);
+  while ((o = cli99_GetOpt(&p))) {
+    switch (o) {
+    case 'C':
+      cmd = Command_From_String(p.optarg);
+      if (cmd == (enum Command) -1) {
+        Log_Error("Invalid command: %s\n", p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      if (cmd == Command_Help) {
+        printf("%s", HelpTexts[Command_Help]);
+        return NBFC_EXIT_SUCCESS;
+      }
+      cli99_SetOptions(&p, Options[cmd], false);
+      break;
+
+    case -'h':
+      printf("%s", HelpTexts[cmd]);
+      return NBFC_EXIT_SUCCESS;
+    case -'v':
+      printf("nbfc v" NBFC_VERSION "\n");
+      return NBFC_EXIT_SUCCESS;
+    case -'a':
+      options.a = 1;
+      if (cmd == Command_Config)
+        options.config = p.optarg;
+      break;
+    case -'l':
+      options.l = 1;
+      break;
+    case -'r':
+      options.r = 1;
+      break;
+    case -'w':
+      options.watch = parse_number(p.optarg, 1, INT64_MAX, &err);
+      if (err) {
+        Log_Error("-w|--watch: %s\n", err);
+        return NBFC_EXIT_FAILURE;
+      }
+      break;
+    case -'f':
+      if (cmd == Command_Set || cmd == Command_Status) {
+        int fan = parse_number(p.optarg, 0, INT64_MAX, &err);
+        if (err) {
+          Log_Error("-f|--fan: %s\n", err);
+          return NBFC_EXIT_FAILURE;
+        }
+
+        options.fancount++;
+        options.fans = Mem_Realloc(options.fans, options.fancount * sizeof(int));
+        options.fans[options.fancount - 1] = fan;
+      }
+      break;
+    case -'s':
+      if (cmd == Command_Set) {
+        float speed = parse_double(p.optarg, 0, 100, &err);
+        if (err) {
+          Log_Error("-s: %s\n", err);
+          return NBFC_EXIT_FAILURE;
+        }
+
+        options.speedcount++;
+        options.speeds = Mem_Realloc(options.speeds, options.speedcount * sizeof(float));
+        options.speeds[options.speedcount - 1] = speed;
+      } else {
+        options.s = 1;
+        if (cmd == Command_Config && options.a) {
+          Log_Error("You cannot use --apply and --set at the same time\n");
+          return NBFC_EXIT_FAILURE;
+        }
+        options.config = p.optarg;
+      }
+      break;
+    default:
+      cli99_ExplainError(&p);
+      return NBFC_EXIT_CMDLINE;
+    }
+  }
+
+  switch (cmd) {
+  case Command_Start:          return Service_Start(options.r);
+  case Command_Stop:           return Service_Stop();
+  case Command_Restart:        return Service_Restart(options.r);
+  case Command_Config:         return Config();
+  case Command_Set:            return Set();
+  case Command_Status:         return Status();
+  case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
+  case Command_Get_Model_Name: return Get_Model_Name();
+  default: break;
+  }
+
+  return NBFC_EXIT_SUCCESS;
+}
+
+static char*  to_lower(const char*);
+static bool   str_starts_with_ignorecase(const char*, const char*);
+static char** get_longest_common_substrings(const char*, const char*);
+static char*  get_longest_common_substring(const char*, const char*);
+static float  get_similarity_index(const char*, const char*);
 
 static const char* get_system_product() {
   static char buf[512] = {0};
@@ -144,7 +365,7 @@ static int get_service_pid() {
   return pid;
 }
 
-static int Service_Start(int read_only) {
+static int Service_Start(bool read_only) {
   check_root();
   int pid = get_service_pid();
   if (pid != -1)
@@ -184,7 +405,7 @@ static int Service_Stop() {
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Service_Restart(int read_only) {
+static int Service_Restart(bool read_only) {
   check_root();
   Service_Stop();
   return Service_Start(read_only);
@@ -206,7 +427,7 @@ static array_of(ConfigFile) get_configs() {
   };
 
   DIR* directory = opendir(NBFC_MODEL_CONFIGS_DIR);
-  if (directory == NULL) {
+  if (!directory) {
     Log_Error("Failed to open directory `" NBFC_MODEL_CONFIGS_DIR "': %s\n", strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }
@@ -217,7 +438,7 @@ static array_of(ConfigFile) get_configs() {
       continue;
 
     // remove .json extension
-    char* dot = strchr(file->d_name, '.');
+    char* dot = strrchr(file->d_name, '.');
     if (dot)
       *dot = '\0';
 
@@ -346,108 +567,6 @@ static void ServiceConfig_Write() {
   close(fd);
 }
 
-static const cli99_option main_options[] = {
-  {"-v|--version",  -'v', 0},
-  {"-h|--help",     -'h', 0},
-  {"command",        'C', 1 | cli99_required_option},
-  cli99_options_end()
-};
-
-static const cli99_option status_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-a|--all",      -'a', 0},
-  {"-s|--status",   -'s', 0},
-  {"-f|--fan",      -'f', 1},
-  {"-w|--watch",    -'w', 1},
-  cli99_options_end()
-};
-
-static const cli99_option config_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-l|--list",       -'l', 0},
-  {"-s|--set",        -'s', 1},
-  {"-a|--apply",      -'a', 1},
-  {"-r|--recommend",  -'r', 0},
-  cli99_options_end()
-};
-
-static const cli99_option set_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-a|--auto",       -'a', 0},
-  {"-s|--speed",      -'s', 1},
-  {"-f|--fan",        -'f', 1},
-  cli99_options_end()
-};
-
-static const cli99_option start_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-r|--read-only",  -'r', 0},
-  cli99_options_end()
-};
-
-static const cli99_option *Options[] = {
-  start_command_options,
-  main_options,
-  start_command_options, // restart
-  status_command_options,
-  config_command_options,
-  set_command_options,
-  main_options,
-  main_options,
-  main_options,
-};
-
-enum Command {
-  Command_Start,
-  Command_Stop,
-  Command_Restart,
-  Command_Status,
-  Command_Config,
-  Command_Set,
-  Command_Wait_For_Hwmon,
-  Command_Get_Model_Name,
-  Command_Help,
-};
-
-static enum Command Command_From_String(const char* s) {
-  const char* commands[] = {
-    "start", "stop", "restart",
-    "status", "config", "set",
-    "wait-for-hwmon", "get-model-name", "help"
-  };
-
-  for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
-    if (!strcmp(commands[i], s))
-      return (enum Command) i;
-
-  return (enum Command) -1;
-}
-
-static struct {
-  int fancount;
-  int speedcount;
-  int *fans;
-  float *speeds;
-  int a; // all/auto/apply
-  const char *config;
-  int l;     // list
-  int r;     // recommend/read-only
-  int s;     // set
-  int watch; // watch time
-} options;
-
-static const char *HelpTexts[] = {
-    CLIENT_START_HELP_TEXT,
-    CLIENT_DEFAULT_HELP("stop"),
-    CLIENT_RESTART_HELP_TEXT, // same optional args for restart for restart
-    CLIENT_STATUS_HELP_TEXT,
-    CLIENT_CONFIG_HELP_TEXT,
-    CLIENT_SET_HELP_TEXT,
-    CLIENT_DEFAULT_HELP("wait-for-hwmon"),
-    CLIENT_DEFAULT_HELP("get-model-name"),
-    CLIENT_HELP_TEXT
-};
-
 static int Wait_For_Hwmon() {
   const char *hwmon_file_names[] = {
     "/sys/class/hwmon/hwmon%d/name",
@@ -480,6 +599,7 @@ static int Wait_For_Hwmon() {
     }
     sleep(1);
   }
+
   return NBFC_EXIT_FAILURE;
 }
 
@@ -513,10 +633,8 @@ static void print_service_status() {
 }
 
 static int Status() {
-  if (!options.s && !options.a && !options.fancount) {
-    printf(CLIENT_STATUS_HELP_TEXT);
-    return NBFC_EXIT_CMDLINE;
-  }
+  if (!options.s && !options.a && !options.fancount)
+    options.a = 1;
 
   while (true) {
     ServiceInfo_Load();
@@ -701,125 +819,6 @@ static double parse_double(const char* s, double min, double max, char** errmsg)
     *errmsg = NULL;
 
   return val;
-}
-
-int main(int argc, char *const argv[]) {
-  if (argc == 1) {
-    printf(CLIENT_HELP_TEXT);
-    return NBFC_EXIT_SUCCESS;
-  }
-
-  Program_Name_Set(argv[0]);
-  setlocale(LC_NUMERIC, "C"); // for json floats
-  mkdir(NBFC_CONFIG_DIR, 0755);
-
-  enum Command cmd = Command_Help;
-  cli99 p;
-  char o;
-  char* err;
-  options.fans = NULL;
-  options.speeds = NULL;
-  cli99_Init(&p, argc, argv, main_options, cli99_options_python);
-  while ((o = cli99_GetOpt(&p))) {
-    switch (o) {
-    case 'C':
-      cmd = Command_From_String(p.optarg);
-      if (cmd == (enum Command) -1)
-        die(NBFC_EXIT_CMDLINE, "%s: Invalid command: %s\n", argv[0], p.optarg);
-
-      if (cmd == Command_Help) {
-        printf("%s", HelpTexts[Command_Help]);
-        return NBFC_EXIT_SUCCESS;
-      }
-      cli99_SetOptions(&p, Options[cmd], false);
-      break;
-
-    case -'h':
-      printf("%s", HelpTexts[cmd]);
-      return NBFC_EXIT_SUCCESS;
-    case -'v':
-      printf("nbfc v" NBFC_VERSION "\n");
-      return NBFC_EXIT_SUCCESS;
-    case -'a':
-      options.a = 1;
-      if (cmd == Command_Config) {
-        options.config = p.optarg;
-      }
-      break;
-    case -'l':
-      options.l = 1;
-      break;
-    case -'r':
-      options.r = 1;
-      break;
-    case -'w':
-      options.watch = parse_number(p.optarg, 1, INT64_MAX, &err);
-      if (err) {
-        Log_Error("-w: %s\n", err);
-        return NBFC_EXIT_FAILURE;
-      }
-      break;
-    case -'f':
-      if (cmd == Command_Set || cmd == Command_Status) {
-        int fan = parse_number(p.optarg, 0, INT64_MAX, &err);
-        if (err) {
-          Log_Error("-f: %s\n", err);
-          return NBFC_EXIT_FAILURE;
-        }
-
-        options.fancount++;
-        options.fans = Mem_Realloc(options.fans, options.fancount * sizeof(int));
-        options.fans[options.fancount - 1] = fan;
-      }
-      break;
-    case -'s':
-      if (cmd == Command_Set) {
-        float speed = parse_double(p.optarg, 0, 100, &err);
-        if (err) {
-          Log_Error("-s: %s\n", err);
-          return NBFC_EXIT_FAILURE;
-        }
-
-        options.speedcount++;
-        options.speeds = Mem_Realloc(options.speeds, options.speedcount * sizeof(float));
-        options.speeds[options.speedcount - 1] = speed;
-      } else {
-        options.s = 1;
-        if (cmd == Command_Config && options.a) {
-          Log_Error("You cannot use --apply and --set at the same time\n");
-          return NBFC_EXIT_FAILURE;
-        }
-        options.config = p.optarg;
-      }
-      break;
-    default:
-      cli99_ExplainError(&p);
-      return NBFC_EXIT_CMDLINE;
-    }
-  }
-
-  switch (cmd) {
-  case Command_Start:
-    return Service_Start(options.r);
-  case Command_Stop:
-    return Service_Stop();
-  case Command_Restart:
-    return Service_Restart(options.r);
-  case Command_Config:
-    return Config();
-  case Command_Set:
-    return Set();
-  case Command_Status:
-    return Status();
-  case Command_Wait_For_Hwmon:
-    return Wait_For_Hwmon();
-  case Command_Get_Model_Name:
-    return Get_Model_Name();
-  default:
-    break;
-  }
-
-  return NBFC_EXIT_SUCCESS;
 }
 
 static char *to_lower(const char *a) {

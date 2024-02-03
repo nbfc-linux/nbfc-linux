@@ -14,16 +14,16 @@ typedef enum {
 
 typedef struct Fan Fan;
 struct Fan {
-  FanConfiguration* fanConfig;     /*const*/
-  bool  readWriteWords;            /*const*/
-  int   criticalTemperature;       /*const*/
-  int   minSpeedValueWrite;        /*const*/
-  int   maxSpeedValueWrite;        /*const*/
-  int   minSpeedValueRead;         /*const*/
-  int   maxSpeedValueRead;         /*const*/
-  int   minSpeedValueReadAbs;      /*const*/
-  int   maxSpeedValueReadAbs;      /*const*/
-  int   fanSpeedSteps;             /*const*/
+  FanConfiguration* fanConfig; /*const*/
+  bool  readWriteWords;        /*const*/
+  int   criticalTemperature;   /*const*/
+  int   minSpeedValueWrite;    /*const*/
+  int   maxSpeedValueWrite;    /*const*/
+  int   minSpeedValueRead;     /*const*/
+  int   maxSpeedValueRead;     /*const*/
+  int   minSpeedValueReadAbs;  /*const*/
+  int   maxSpeedValueReadAbs;  /*const*/
+  int   fanSpeedSteps;         /*const*/
   int   criticalTemperatureOffset;
 
   ThresholdManager threshMan;

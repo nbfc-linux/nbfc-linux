@@ -178,15 +178,6 @@ define_array_of_T_FromJson(FanInfo)
 // Default temperature thresholds
 // ============================================================================
 
-static TemperatureThreshold ___Config_DefaultLegacyTemperatureThresholds[] = {
-  {0,   0,   0},
-  {60, 48,  10},
-  {63, 55,  20},
-  {66, 59,  50},
-  {68, 63,  70},
-  {71, 67, 100},
-};
-
 static TemperatureThreshold ___Config_DefaultTemperatureThresholds[] = {
   {60,  0,   0},
   {63, 48,  10},
@@ -199,6 +190,15 @@ static TemperatureThreshold ___Config_DefaultTemperatureThresholds[] = {
 static array_of(TemperatureThreshold) Config_DefaultTemperatureThresholds = {
   ___Config_DefaultTemperatureThresholds,
   ARRAY_SIZE(___Config_DefaultTemperatureThresholds)
+};
+
+static TemperatureThreshold ___Config_DefaultLegacyTemperatureThresholds[] = {
+  {0,   0,   0},
+  {60, 48,  10},
+  {63, 55,  20},
+  {66, 59,  50},
+  {68, 63,  70},
+  {71, 67, 100},
 };
 
 static array_of(TemperatureThreshold) Config_DefaultLegacyTemperatureThresholds = {
@@ -314,7 +314,6 @@ Error* ModelConfig_Validate(ModelConfig* c) {
       trace.next = NULL;
     }
 
-    // TODO #1: How to handle empty TemperatureThresholds? [see fan.c]
     if (! f->TemperatureThresholds.size) {
       if (c->LegacyTemperatureThresholdsBehaviour)
         copy_array_of_TemperatureThreshold(
@@ -383,11 +382,12 @@ Error* ModelConfig_Validate(ModelConfig* c) {
   }
 
 err:
-  if (! e)
-    return e;
+  if (e) {
+    Trace_PrintBuf(&trace, buf, sizeof(buf));
+    return err_string(e, buf);
+  }
 
-  Trace_PrintBuf(&trace, buf, sizeof(buf));
-  return err_string(e, buf);
+  return err_success();
 }
 
 Error* ModelConfig_FromFile(ModelConfig* config, const char* file) {
