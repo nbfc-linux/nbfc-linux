@@ -647,7 +647,7 @@ static int Status() {
       }
     }
 
-    if (options.fans.size) { // TODO: remove else?
+    if (options.fans.size) {
       const int fan_count = service_info.fans.size;
       bool *vis = Mem_Calloc(sizeof(bool), fan_count);
       for_each_array(int*, fan_index, options.fans) {
