@@ -233,7 +233,7 @@ Defines how fast the fan runs at different temperatures.
 
 # FILES
 
-*/var/run/nbfc_service.state.json*
+*/run/nbfc_service.state.json*
 
 > State file of nbfc_service. Updated every **EcPollInterval**
 > milliseconds.

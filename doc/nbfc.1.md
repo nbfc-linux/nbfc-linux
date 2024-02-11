@@ -97,7 +97,8 @@ This program is used to control the NoteBook FanControl service.
 >
 > **-f**, **\--fan** *FAN INDEX*
 >
-> > Fan index (zero based).
+> > Fan index (zero based). If not given, all available fans are set to
+> > speed.
 
 **help**
 
@@ -105,11 +106,11 @@ This program is used to control the NoteBook FanControl service.
 
 # FILES
 
-*/var/run/nbfc_service.pid*
+*/run/nbfc_service.pid*
 
 > File containing the PID of current running nbfc_service.
 
-*/var/run/nbfc_service.state.json*
+*/run/nbfc_service.state.json*
 
 > State file of nbfc_service. Updated every **EcPollInterval**
 > milliseconds. See **nbfc_service.json**(5) for further details.

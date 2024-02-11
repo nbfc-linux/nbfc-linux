@@ -128,10 +128,8 @@ static enum Command Command_From_String(const char* s) {
 }
 
 static struct {
-  int fancount;
-  int speedcount;
-  int *fans;
-  float *speeds;
+  array_of(int) fans;
+  array_of(float) speeds;
   int a; // all/auto/apply
   const char *config;
   int l;     // list
@@ -209,28 +207,28 @@ int main(int argc, char *const argv[]) {
       break;
     case -'f':
       if (cmd == Command_Set || cmd == Command_Status) {
-        int fan = parse_number(p.optarg, 0, INT64_MAX, &err);
+        const int fan = parse_number(p.optarg, 0, INT64_MAX, &err);
         if (err) {
           Log_Error("-f|--fan: %s\n", err);
           return NBFC_EXIT_FAILURE;
         }
 
-        options.fancount++;
-        options.fans = Mem_Realloc(options.fans, options.fancount * sizeof(int));
-        options.fans[options.fancount - 1] = fan;
+        options.fans.size++;
+        options.fans.data = Mem_Realloc(options.fans.data, options.fans.size * sizeof(int));
+        options.fans.data[options.fans.size - 1] = fan;
       }
       break;
     case -'s':
       if (cmd == Command_Set) {
-        float speed = parse_double(p.optarg, 0, 100, &err);
+        const float speed = parse_double(p.optarg, 0, 100, &err);
         if (err) {
-          Log_Error("-s: %s\n", err);
+          Log_Error("-s|--speed: %s\n", err);
           return NBFC_EXIT_FAILURE;
         }
 
-        options.speedcount++;
-        options.speeds = Mem_Realloc(options.speeds, options.speedcount * sizeof(float));
-        options.speeds[options.speedcount - 1] = speed;
+        options.speeds.size++;
+        options.speeds.data = Mem_Realloc(options.speeds.data, options.speeds.size * sizeof(float));
+        options.speeds.data[options.speeds.size - 1] = speed;
       } else {
         options.s = 1;
         if (cmd == Command_Config && options.a) {
@@ -633,7 +631,7 @@ static void print_service_status() {
 }
 
 static int Status() {
-  if (!options.s && !options.a && !options.fancount)
+  if (!options.s && !options.a && !options.fans.size)
     options.a = 1;
 
   while (true) {
@@ -648,19 +646,19 @@ static int Status() {
         }
       }
     }
-    else if (options.fancount) {
+
+    if (options.fans.size) { // TODO: remove else?
       const int fan_count = service_info.fans.size;
       bool *vis = Mem_Calloc(sizeof(bool), fan_count);
-      for (int i = 0; i < options.fancount; i++) {
-        const int fan_index = options.fans[i];
-        if (fan_index > fan_count - 1) {
-          Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", fan_index);
+      for_each_array(int*, fan_index, options.fans) {
+        if (*fan_index > fan_count - 1) {
+          Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", *fan_index);
           return NBFC_EXIT_FAILURE;
         }
-        if (!vis[fan_index]) {
+        if (!vis[*fan_index]) {
           printf("\n");
-          print_fan_status(&service_info.fans.data[fan_index]);
-          vis[fan_index] = 1;
+          print_fan_status(&service_info.fans.data[*fan_index]);
+          vis[*fan_index] = 1;
         }
       }
       Mem_Free(vis);
@@ -757,25 +755,19 @@ static int Config() {
 }
 
 static int Set() {
-  if (!options.a && !options.speedcount) {
+  if (!options.a && !options.speeds.size) {
     printf(CLIENT_SET_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
 
-  if (options.speedcount > 1) {
-    Log_Error("Multiple -s not supported\n");
+  if (options.speeds.size > 1) {
+    Log_Error("Multiple -s|--speed not supported\n");
     return NBFC_EXIT_CMDLINE;
   }
 
-  if (options.fancount > 1) {
-    Log_Error("Multiple -f not supported\n");
+  if (options.fans.size > 1) {
+    Log_Error("Multiple -f|--fan not supported\n");
     return NBFC_EXIT_CMDLINE;
-  }
-
-  if (! options.fancount) {
-    options.fans = Mem_Malloc(sizeof(int));
-    options.fans[0] = 0;
-    options.fancount = 1;
   }
 
   if (get_service_pid() == -1) {
@@ -786,6 +778,13 @@ static int Set() {
   ServiceInfo_Load();
   ServiceConfig_Load();
 
+  if (! options.fans.size) {
+    options.fans.data = Mem_Malloc(sizeof(int) * service_info.fans.size);
+    for (int i = 0; i < service_info.fans.size; ++i)
+      options.fans.data[i] = i;
+    options.fans.size  = service_info.fans.size;
+  }
+
   const int fancount = service_info.fans.size;
   float* speeds = Mem_Malloc(sizeof(float) * fancount);
 
@@ -794,13 +793,15 @@ static int Set() {
   for (int i = 0; i < min(service_config.TargetFanSpeeds.size, fancount); ++i)
     speeds[i] = service_config.TargetFanSpeeds.data[i];
 
-  const int fan_index = options.fans[0];
-  if (fan_index >= fancount) {
-    Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", fan_index);
-    return NBFC_EXIT_FAILURE;
+  for_each_array(int*, fan_index, options.fans) {
+    if (*fan_index > fancount - 1) {
+      Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", *fan_index);
+      return NBFC_EXIT_FAILURE;
+    }
+
+    speeds[*fan_index] = options.a ? -1 : options.speeds.data[0];
   }
 
-  speeds[fan_index] = options.a ? -1 : options.speeds[0];
   service_config.TargetFanSpeeds.data = speeds;
   service_config.TargetFanSpeeds.size = fancount;
 

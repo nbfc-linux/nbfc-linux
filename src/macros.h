@@ -32,6 +32,7 @@
   }
 
 declare_array_of(float);
+declare_array_of(int);
 
 #ifndef NDEBUG
 #define debug(...) fprintf(stderr, __VA_ARGS__)

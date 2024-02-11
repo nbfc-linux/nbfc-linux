@@ -39,7 +39,7 @@ NoteBook FanControl service
 **-s**, **\--state-file** *STATE FILE*
 
 > Write state to an alternative file (default
-> /var/run/nbfc_service.state.json).
+> /run/nbfc_service.state.json).
 
 **-e, \--embedded-controller** \[*dummy*, *dev_port*, *ec_sys*,
 *acpi_ec*\]
@@ -58,11 +58,11 @@ NoteBook FanControl service
 
 # FILES
 
-*/var/run/nbfc_service.pid*
+*/run/nbfc_service.pid*
 
 > File containing the PID of current running nbfc_service.
 
-*/var/run/nbfc_service.state.json*
+*/run/nbfc_service.state.json*
 
 > State file of nbfc_service. Updated every **EcPollInterval**
 > milliseconds. See **nbfc_service.json**(5) for further details.

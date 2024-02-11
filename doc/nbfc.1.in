@@ -133,7 +133,7 @@ Set fan speed to PERCENT.
 .BR \-f ", " \-\-fan
 .I FAN INDEX
 .RS
-Fan index (zero based).
+Fan index (zero based). If not given, all available fans are set to speed.
 .RE
 .RE
 

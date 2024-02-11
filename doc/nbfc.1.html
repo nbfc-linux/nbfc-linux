@@ -90,7 +90,8 @@
 </blockquote>
 <p><strong>-f</strong>, <strong>--fan</strong> <em>FAN INDEX</em></p>
 <blockquote>
-<p>Fan index (zero based).</p>
+<p>Fan index (zero based). If not given, all available fans are set to
+speed.</p>
 </blockquote>
 </blockquote>
 <p><strong>help</strong></p>
@@ -98,11 +99,11 @@
 <p>Show help.</p>
 </blockquote>
 <h1>FILES</h1>
-<p><em>/var/run/nbfc_service.pid</em></p>
+<p><em>/run/nbfc_service.pid</em></p>
 <blockquote>
 <p>File containing the PID of current running nbfc_service.</p>
 </blockquote>
-<p><em>/var/run/nbfc_service.state.json</em></p>
+<p><em>/run/nbfc_service.state.json</em></p>
 <blockquote>
 <p>State file of nbfc_service. Updated every
 <strong>EcPollInterval</strong> milliseconds. See
