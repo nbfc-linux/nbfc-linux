@@ -13,6 +13,7 @@
 #include "program_name.c"
 #include "log.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -62,7 +63,7 @@ static inline void  Register_FromEC(RegisterBuf*);
 static void         Register_PrintWatch(RegisterBuf*, RegisterBuf*, RegisterBuf*);
 static void         Register_PrintMonitor(RegisterBuf*, int);
 static void         Register_WriteMonitorReport(RegisterBuf*, int, FILE*);
-static void         Register_PrintDump(RegisterBuf*);
+static void         Register_PrintDump(RegisterBuf*, bool);
 static void         Handle_Signal(int);
 
 static EC_VTable*   ec;
@@ -323,7 +324,7 @@ static int Write() {
 static int Dump() {
   RegisterBuf register_buf;
   Register_FromEC(&register_buf);
-  Register_PrintDump(&register_buf);
+  Register_PrintDump(&register_buf, isatty(1));
   return 0;
 }
 
@@ -378,19 +379,28 @@ static void Handle_Signal(int sig) {
 // ============================================================================
 
 static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
-  printf(Console_Reset
-    "---|------------------------------------------------\n"
-    "   | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"
-    "---|------------------------------------------------\n");
+  if (color)
+    printf(Console_Reset);
+
+  printf("---|------------------------------------------------\n"
+         "   | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"
+         "---|------------------------------------------------\n");
 
   for (int i = 0; i <= 0xF0; i += 0x10) {
-    printf(Console_Reset "%.2X |", i);
     if (color)
+      printf(Console_Reset);
+
+    printf("%.2X |", i);
+
+    if (color) {
       for (int j = 0; j <= 0xF; ++j)
         printf("%s %.2X", color[i + j], my[i + j]);
-    else
+    }
+    else {
       for (int j = 0; j <= 0xF; ++j)
         printf(" %.2X", my[i + j]);
+    }
+
     printf("\n");
   }
 }
@@ -482,15 +492,20 @@ static void Register_WriteMonitorReport(RegisterBuf* readings, int size, FILE* f
   }
 }
 
-static void Register_PrintDump(RegisterBuf* self) {
+static void Register_PrintDump(RegisterBuf* self, bool use_color) {
   RegisterColors colors;
 
-  for (int i = 0; i < RegistersSize; ++i)
-    colors[i] = (my[i] == 0x00 ? Console_BoldBlack :
-                 my[i] == 0xFF ? Console_BoldGreen :
-                                 Console_BoldBlue);
+  if (use_color) {
+    for (int i = 0; i < RegistersSize; ++i)
+      colors[i] = (my[i] == 0x00 ? Console_BoldBlack :
+                   my[i] == 0xFF ? Console_BoldGreen :
+                                   Console_BoldBlue);
 
-  Register_PrintRegister(self, colors);
-  printf("%s", Console_Reset);
+    Register_PrintRegister(self, colors);
+    printf("%s", Console_Reset);
+  }
+  else {
+    Register_PrintRegister(self, NULL);
+  }
 }
 
