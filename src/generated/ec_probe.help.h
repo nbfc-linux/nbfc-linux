@@ -10,6 +10,7 @@
  "\n"                                                                          \
  "Commands:\n"                                                                 \
  "  dump                  Dump all EC registers\n"                             \
+ "  load                  Load a previously made dump\n"                       \
  "  read                  Read a byte from a EC register\n"                    \
  "  write                 Write a byte to a EC register\n"                     \
  "  monitor               Monitor all EC registers for changes\n"              \
@@ -22,6 +23,18 @@
  "Usage: %s dump [-h]\n"                                                       \
  "\n"                                                                          \
  "Dump all EC registers\n"                                                     \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help  Show this help message and exit\n"                             \
+ ""
+
+#define EC_PROBE_LOAD_HELP_TEXT                                                \
+ "Usage: %s load [-h] FILE\n"                                                  \
+ "\n"                                                                          \
+ "Load a dump and write it to the EC registers\n"                              \
+ "\n"                                                                          \
+ "Positional arguments:\n"                                                     \
+ "  FILE        Dump file\n"                                                   \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help  Show this help message and exit\n"                             \

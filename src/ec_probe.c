@@ -60,10 +60,12 @@ static RegisterBuf  Registers_Log[32768];
 
 static void         Register_PrintRegister(RegisterBuf*, RegisterColors);
 static inline void  Register_FromEC(RegisterBuf*);
+static inline void  Register_ToEC(RegisterBuf*);
 static void         Register_PrintWatch(RegisterBuf*, RegisterBuf*, RegisterBuf*);
 static void         Register_PrintMonitor(RegisterBuf*, int);
 static void         Register_WriteMonitorReport(RegisterBuf*, int, FILE*);
 static void         Register_PrintDump(RegisterBuf*, bool);
+static int          Register_LoadDump(RegisterBuf*, FILE*);
 static void         Handle_Signal(int);
 
 static EC_VTable*   ec;
@@ -72,6 +74,7 @@ static volatile int quit;
 static int Read();
 static int Write();
 static int Dump();
+static int Load();
 static int Monitor();
 static int Watch();
 
@@ -79,13 +82,14 @@ enum Command {
   Command_Read,
   Command_Write,
   Command_Dump,
+  Command_Load,
   Command_Monitor,
   Command_Watch,
   Command_Help,
 };
 
 static enum Command Command_From_String(const char* s) {
-  const char* cmds[] = { "read", "write", "dump", "monitor", "watch", "help" };
+  const char* cmds[] = { "read", "write", "dump", "load", "monitor", "watch", "help" };
 
   for (int i = 0; i < ARRAY_SSIZE(cmds); ++i)
     if (!strcmp(cmds[i], s))
@@ -98,6 +102,7 @@ static const char* HelpTexts[] = {
   EC_PROBE_READ_HELP_TEXT,
   EC_PROBE_WRITE_HELP_TEXT,
   EC_PROBE_DUMP_HELP_TEXT,
+  EC_PROBE_LOAD_HELP_TEXT,
   EC_PROBE_MONITOR_HELP_TEXT,
   EC_PROBE_WATCH_HELP_TEXT,
   EC_PROBE_HELP_TEXT,
@@ -114,6 +119,7 @@ enum Option {
   Option_Value,
   Option_Color,
   Option_NoColor,
+  Option_File,
   Option_Report,
   Option_Clearly,
   Option_Decimal,
@@ -151,6 +157,12 @@ static const cli99_option dump_command_options[] = {
   cli99_options_end()
 };
 
+static const cli99_option load_command_options[] = {
+  cli99_include_options(&main_options),
+  {"file",                     Option_File,                1|cli99_required_option},
+  cli99_options_end()
+};
+
 static const cli99_option monitor_command_options[] = {
   cli99_include_options(&main_options),
   {"-r|--report",              Option_Report,              1},
@@ -172,6 +184,7 @@ static const cli99_option* Options[] = {
   read_command_options,
   write_command_options,
   dump_command_options,
+  load_command_options,
   monitor_command_options,
   watch_command_options,
   main_options, // help
@@ -187,6 +200,7 @@ static struct {
   int           timespan;
   int           interval;
   const char*   report;
+  const char*   file;
   bool          clearly;
   bool          decimal;
   uint8_t       register_;
@@ -246,6 +260,7 @@ int main(int argc, char* const argv[]) {
     case Option_Report:   options.report   = p.optarg;             break;
     case Option_Color:    options.use_color = ColorEnable;         break;
     case Option_NoColor:  options.use_color = ColorDisable;        break;
+    case Option_File:     options.file = p.optarg;                 break;
     case Option_EmbeddedController:
       switch(EmbeddedControllerType_FromString(p.optarg)) {
         case EmbeddedControllerType_ECSysLinux:     ec = &EC_SysLinux_VTable;      break;
@@ -311,6 +326,7 @@ int main(int argc, char* const argv[]) {
 
   switch (cmd) {
     case Command_Dump:    return Dump();
+    case Command_Load:    return Load();
     case Command_Read:    return Read();
     case Command_Write:   return Write();
     case Command_Monitor: return Monitor();
@@ -369,6 +385,30 @@ static int Dump() {
 
   Register_PrintDump(&register_buf, use_color);
   return 0;
+}
+
+static int Load() {
+  FILE* infile;
+
+  if (! strcmp(options.file, "-"))
+    infile = stdin;
+  else {
+    infile = fopen(options.file, "r");
+    if (! infile) {
+      Log_Error("Error opening file: %s: %s\n", options.file, strerror(errno));
+      return NBFC_EXIT_FAILURE;
+    }
+  }
+
+  RegisterBuf register_buf;
+  int ret = Register_LoadDump(&register_buf, infile);
+  fclose(infile);
+
+  if (ret == 0) {
+    Register_ToEC(&register_buf);
+  }
+
+  return ret;
 }
 
 static int Monitor() {
@@ -451,6 +491,11 @@ static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
 static inline void Register_FromEC(RegisterBuf* self) {
   for (int i = 0; i < RegistersSize; i++)
     ec->ReadByte(i, &my[i]);
+}
+
+static inline void Register_ToEC(RegisterBuf* self) {
+  for (int i = 0; i < RegistersSize; ++i)
+    ec->WriteByte(i, my[i]);
 }
 
 static void Register_PrintWatch(RegisterBuf* all_readings, RegisterBuf* current, RegisterBuf* previous) {
@@ -552,3 +597,43 @@ static void Register_PrintDump(RegisterBuf* self, bool use_color) {
   }
 }
 
+static int Register_LoadDump(RegisterBuf* self, FILE* fh) {
+  char* line = NULL;
+  size_t len = 0;
+
+  getline(&line, &len, fh);
+  if (strcmp(line, "---|------------------------------------------------\n"))
+    goto error;
+
+  getline(&line, &len, fh);
+  if (strcmp(line, "   | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"))
+    goto error;
+
+  getline(&line, &len, fh);
+  if (strcmp(line, "---|------------------------------------------------\n"))
+    goto error;
+
+  for (int line_no = 0; line_no < 16; ++line_no) {
+    char prefix[6] = {0};
+    if (fread(prefix, 1, 5, fh) != 5) {
+      goto error;
+    }
+
+    for (int column_no = 0; column_no < 16; ++column_no) {
+      char hex[4] = {0};
+      if (fread(hex, 1, 3, fh) != 3)
+        goto error;
+
+      int register_no = (line_no * 16) + column_no;
+
+      int value = strtoll(hex, NULL, 16);
+      my[register_no] = value;
+    }
+  }
+
+  return NBFC_EXIT_SUCCESS;
+
+error:
+  Log_Error("File is not a valid register dump");
+  return NBFC_EXIT_FAILURE;
+}
