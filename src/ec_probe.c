@@ -8,6 +8,7 @@
 #include "ec_sys_linux.h"
 #include "model_config.h"
 #include "optparse/optparse.h"
+#include "parse_number.h"
 #include "generated/ec_probe.help.h"
 #include "program_name.c"
 #include "log.h"
@@ -160,25 +161,6 @@ static struct {
   uint16_t    value;
   bool        use_word;
 } options = {0};
-
-static int64_t parse_number(const char* s, int64_t min, int64_t max, char** errmsg) {
-  errno = 0;
-  char* end;
-  int64_t val = strtoll(s, &end, 0);
-
-  if (errno)
-    *errmsg = strerror(errno);
-  else if (!*s || *end)
-    *errmsg = strerror(EINVAL);
-  else if (val < min)
-    *errmsg = "value too small";
-  else if (val > max)
-    *errmsg = "value too large";
-  else
-    *errmsg = NULL;
-
-  return val;
-}
 
 int main(int argc, char* const argv[]) {
   Program_Name_Set(argv[0]);

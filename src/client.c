@@ -23,6 +23,8 @@
 #include "macros.h"
 #include "nbfc.h"
 #include "nxjson_utils.h"
+#include "parse_number.h"
+#include "parse_double.h"
 #include "slurp_file.h"
 #include "stringbuf.h"
 
@@ -146,9 +148,6 @@ static int Set();
 static int Status();
 static int Wait_For_Hwmon();
 static int Get_Model_Name();
-
-static int64_t parse_number(const char*, int64_t, int64_t, char**);
-static double  parse_double(const char*, double, double, char**);
 
 int main(int argc, char *const argv[]) {
   if (argc == 1) {
@@ -807,44 +806,6 @@ static int Set() {
 
   ServiceConfig_Write();
   return Service_Restart(0);
-}
-
-static int64_t parse_number(const char* s, int64_t min, int64_t max, char** errmsg) {
-  errno = 0;
-  char* end;
-  int64_t val = strtoll(s, &end, 0);
-
-  if (errno)
-    *errmsg = strerror(errno);
-  else if (!*s || *end)
-    *errmsg = strerror(EINVAL);
-  else if (val < min)
-    *errmsg = "value too small";
-  else if (val > max)
-    *errmsg = "value too large";
-  else
-    *errmsg = NULL;
-
-  return val;
-}
-
-static double parse_double(const char* s, double min, double max, char** errmsg) {
-  errno = 0;
-  char* end;
-  double val = strtold(s, &end);
-
-  if (errno)
-    *errmsg = strerror(errno);
-  else if (!*s || *end)
-    *errmsg = strerror(EINVAL);
-  else if (val < min)
-    *errmsg = "value too small";
-  else if (val > max)
-    *errmsg = "value too large";
-  else
-    *errmsg = NULL;
-
-  return val;
 }
 
 static char *to_lower(const char *a) {
