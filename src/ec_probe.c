@@ -112,6 +112,8 @@ enum Option {
   Option_Word,
   Option_Register,
   Option_Value,
+  Option_Color,
+  Option_NoColor,
   Option_Report,
   Option_Clearly,
   Option_Decimal,
@@ -142,6 +144,13 @@ static const cli99_option write_command_options[] = {
   cli99_options_end()
 };
 
+static const cli99_option dump_command_options[] = {
+  cli99_include_options(&main_options),
+  {"-c|--color",               Option_Color,               0},
+  {"-C|--no-color",            Option_NoColor,             0},
+  cli99_options_end()
+};
+
 static const cli99_option monitor_command_options[] = {
   cli99_include_options(&main_options),
   {"-r|--report",              Option_Report,              1},
@@ -162,21 +171,28 @@ static const cli99_option watch_command_options[] = {
 static const cli99_option* Options[] = {
   read_command_options,
   write_command_options,
-  main_options, // dump
+  dump_command_options,
   monitor_command_options,
   watch_command_options,
   main_options, // help
 };
 
+enum UseColor {
+  ColorAuto,
+  ColorEnable,
+  ColorDisable,
+};
+
 static struct {
-  int         timespan;
-  int         interval;
-  const char* report;
-  bool        clearly;
-  bool        decimal;
-  uint8_t     register_;
-  uint16_t    value;
-  bool        use_word;
+  int           timespan;
+  int           interval;
+  const char*   report;
+  bool          clearly;
+  bool          decimal;
+  uint8_t       register_;
+  uint16_t      value;
+  bool          use_word;
+  enum UseColor use_color;
 } options = {0};
 
 int main(int argc, char* const argv[]) {
@@ -228,6 +244,8 @@ int main(int argc, char* const argv[]) {
     case Option_Decimal:  options.decimal  = 1;                    break;
     case Option_Word:     options.use_word = 1;                    break;
     case Option_Report:   options.report   = p.optarg;             break;
+    case Option_Color:    options.use_color = ColorEnable;         break;
+    case Option_NoColor:  options.use_color = ColorDisable;        break;
     case Option_EmbeddedController:
       switch(EmbeddedControllerType_FromString(p.optarg)) {
         case EmbeddedControllerType_ECSysLinux:     ec = &EC_SysLinux_VTable;      break;
@@ -338,9 +356,18 @@ static int Write() {
 }
 
 static int Dump() {
+  bool use_color;
   RegisterBuf register_buf;
+
   Register_FromEC(&register_buf);
-  Register_PrintDump(&register_buf, isatty(1));
+
+  switch (options.use_color) {
+  case ColorAuto:     use_color = isatty(1); break;
+  case ColorEnable:   use_color = true;      break;
+  case ColorDisable:  use_color = false;     break;
+  }
+
+  Register_PrintDump(&register_buf, use_color);
   return 0;
 }
 
