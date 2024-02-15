@@ -103,43 +103,59 @@ static const char* HelpTexts[] = {
   EC_PROBE_HELP_TEXT,
 };
 
+enum Option {
+  Option_None,
+  Option_Help,
+  Option_Version,
+  Option_EmbeddedController,
+  Option_Command,
+  Option_Word,
+  Option_Register,
+  Option_Value,
+  Option_Report,
+  Option_Clearly,
+  Option_Decimal,
+  Option_Timespan,
+  Option_Interval,
+};
+
 static const cli99_option main_options[] = {
-  {"-e|--embedded-controller", -'e',  1},
-  {"-h|--help",                -'h',  0},
-  {"--version",                -'V',  0},
-  {"command",                   'C',  1|cli99_required_option},
+  {"-e|--embedded-controller", Option_EmbeddedController,  1},
+  {"-h|--help",                Option_Help,                0},
+  {"--version",                Option_Version,             0},
+  {"command",                  Option_Command,             1|cli99_required_option},
   cli99_options_end()
 };
 
 static const cli99_option read_command_options[] = {
   cli99_include_options(&main_options),
-  {"register",                  'R',  1|cli99_required_option},
-  {"-w|--word",                -'w',  0},
+  {"-w|--word",                Option_Word,                0},
+  {"register",                 Option_Register,            1|cli99_required_option},
   cli99_options_end()
 };
 
 static const cli99_option write_command_options[] = {
   cli99_include_options(&main_options),
-  {"register",                  'R',  1|cli99_required_option},
-  {"value",                     'V',  1|cli99_required_option},
-  {"-w|--word",                -'w',  0},
+  {"-w|--word",                Option_Word,                0},
+  {"register",                 Option_Register,            1|cli99_required_option},
+  {"value",                    Option_Value,               1|cli99_required_option},
   cli99_options_end()
 };
 
 static const cli99_option monitor_command_options[] = {
   cli99_include_options(&main_options),
-  {"-r|--report",              -'r',  1},
-  {"-c|--clearly",             -'c',  0},
-  {"-d|--decimal",             -'d',  0},
-  {"-t|--timespan",            -'t',  1},
-  {"-i|--interval",            -'i',  1},
+  {"-r|--report",              Option_Report,              1},
+  {"-c|--clearly",             Option_Clearly,             0},
+  {"-d|--decimal",             Option_Decimal,             0},
+  {"-t|--timespan",            Option_Timespan,            1},
+  {"-i|--interval",            Option_Interval,            1},
   cli99_options_end()
 };
 
 static const cli99_option watch_command_options[] = {
   cli99_include_options(&main_options),
-  {"-t|--timespan",            -'t',  1},
-  {"-i|--interval",            -'i',  1},
+  {"-t|--timespan",            Option_Timespan,            1},
+  {"-i|--interval",            Option_Interval,            1},
   cli99_options_end()
 };
 
@@ -177,7 +193,7 @@ int main(int argc, char* const argv[]) {
   char* err;
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
-    case 'C':
+    case Option_Command:
       cmd = Command_From_String(p.optarg);
 
       if (cmd == (enum Command) -1) {
@@ -192,27 +208,27 @@ int main(int argc, char* const argv[]) {
 
       cli99_SetOptions(&p, Options[cmd], false);
       break;
-    case 'R':
+    case Option_Register:
       options.register_ = parse_number(p.optarg, 0, 255, &err);
       if (err) {
         Log_Error("Register: %s: %s\n", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
-    case 'V':
+    case Option_Value:
       options.value = parse_number(p.optarg, 0, 65535, &err);
       if (err) {
         Log_Error("Value: %s: %s\n", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
-    case -'h':  printf(HelpTexts[cmd], argv[0]);         return 0;
-    case -'V':  printf("ec_probe " NBFC_VERSION "\n");   return 0;
-    case -'c':  options.clearly  = 1;                    break;
-    case -'d':  options.decimal  = 1;                    break;
-    case -'w':  options.use_word = 1;                    break;
-    case -'r':  options.report   = p.optarg;             break;
-    case -'e':
+    case Option_Help:     printf(HelpTexts[cmd], argv[0]);         return 0;
+    case Option_Version:  printf("ec_probe " NBFC_VERSION "\n");   return 0;
+    case Option_Clearly:  options.clearly  = 1;                    break;
+    case Option_Decimal:  options.decimal  = 1;                    break;
+    case Option_Word:     options.use_word = 1;                    break;
+    case Option_Report:   options.report   = p.optarg;             break;
+    case Option_EmbeddedController:
       switch(EmbeddedControllerType_FromString(p.optarg)) {
         case EmbeddedControllerType_ECSysLinux:     ec = &EC_SysLinux_VTable;      break;
         case EmbeddedControllerType_ECSysLinuxACPI: ec = &EC_SysLinux_ACPI_VTable; break;
@@ -222,7 +238,7 @@ int main(int argc, char* const argv[]) {
           return NBFC_EXIT_CMDLINE;
       }
       break;
-    case -'t':
+    case Option_Timespan:
       options.timespan = parse_number(p.optarg, 1, INT64_MAX, &err);
       options.timespan *= 1000;
       if (err) {
@@ -230,7 +246,7 @@ int main(int argc, char* const argv[]) {
         return NBFC_EXIT_CMDLINE;
       }
       break;
-    case -'i':
+    case Option_Interval:
       options.interval = parse_number(p.optarg, 1, INT64_MAX, &err);
       options.interval *= 1000;
       if (err) {
