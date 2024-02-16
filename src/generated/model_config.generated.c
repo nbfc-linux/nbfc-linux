@@ -178,8 +178,8 @@ struct FanConfiguration FanConfiguration_Unset = {
 };
 
 Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
-	if (self->FanDisplayName == str_Unset)
-		self->FanDisplayName = Mem_Strdup("");
+	if (false)
+		return err_string(0, "FanDisplayName: Missing option");
 
 	if (self->ReadRegister == short_Unset)
 		return err_string(0, "ReadRegister: Missing option");

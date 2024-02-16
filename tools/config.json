@@ -106,8 +106,8 @@
       {
         "name": "FanDisplayName",
         "type": "const char*",
-        "default": "Mem_Strdup(\"\")",
-        "help": "Fan display name"
+        "help": "Fan display name",
+        "is_unset": "false"
       },
       {
         "name": "ReadRegister",

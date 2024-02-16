@@ -296,6 +296,12 @@ Error* ModelConfig_Validate(ModelConfig* c) {
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
     snprintf(trace.text, sizeof(trace.text), "FanConfigurations[%td]", f - c->FanConfigurations.data);
 
+    if (f->FanDisplayName == NULL) {
+      char fan_name[32];
+      snprintf(fan_name, sizeof(fan_name), "Fan #%td", f - c->FanConfigurations.data);
+      f->FanDisplayName = Mem_Strdup(fan_name);
+    }
+
     // Don't make the validation fail if `ResetRequired` is false and `FanSpeedResetValue` was not set
     if (f->ResetRequired == Boolean_False || f->ResetRequired == Boolean_Unset)
       f->FanSpeedResetValue = 0;
