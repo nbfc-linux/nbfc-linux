@@ -17,6 +17,8 @@ Probing tool for the embedded controller
 |
 .B dump
 |
+.B load
+|
 .B monitor
 |
 .BR watch }
@@ -36,7 +38,7 @@ Show program's version number and exit
 .RE
 
 .PP
-.BR \-e ", " \-\-embedded\-controller "=[" dev_port , ec_sys , acpi_ec , dummy ]
+.BR \-e ", " \-\-embedded\-controller "=[" dev_port , ec_sys , acpi_ec ]
 .RS
 Specify embedded controller to use
 .IP \(bu 2
@@ -48,9 +50,6 @@ Use the acpi_ec kernel module for writing to the embedded controller.
 .IP \(bu 2
 .BR dev_port :
 Write to the embedded controller using /dev/port.
-.IP \(bu 2
-.BR dummy :
-Don't write to the embedded controller at all.
 .RE
 
 .SH COMMANDS
@@ -59,6 +58,23 @@ Don't write to the embedded controller at all.
 .RI [ OPTIONS ]
 .RS
 Dump all EC registers
+
+.BR \-c ", " \-\-color
+.RS
+Force colored output.
+.RE
+
+.BR \-C ", " \-\-no-color
+.RS
+Disable colored output.
+.RE
+.RE
+
+.PP
+.B load
+.I FILE
+.RS
+Load a previously made dump into the embedded controller.
 .RE
 
 .PP

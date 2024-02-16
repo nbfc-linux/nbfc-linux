@@ -4,7 +4,7 @@
 <p>Probing tool for the embedded controller</p>
 <h1>SYNOPSIS</h1>
 <p><strong>ec_probe</strong> {<strong>read</strong> |
-<strong>write</strong> | <strong>dump</strong> |
+<strong>write</strong> | <strong>dump</strong> | <strong>load</strong> |
 <strong>monitor</strong> | <strong>watch</strong>}
 [<em>OPTIONS</em>]</p>
 <h1>OPTIONS</h1>
@@ -17,7 +17,7 @@
 <p>Show program's version number and exit</p>
 </blockquote>
 <p><strong>-e</strong>,
-<strong>--embedded-controller</strong>=[<strong>dev_port</strong>,<strong>ec_sys</strong>,<strong>acpi_ec</strong>,<strong>dummy</strong>]</p>
+<strong>--embedded-controller</strong>=[<strong>dev_port</strong>,<strong>ec_sys</strong>,<strong>acpi_ec</strong>]</p>
 <blockquote>
 <p>Specify embedded controller to use</p>
 <ul>
@@ -27,14 +27,24 @@ to the embedded controller.</p></li>
 writing to the embedded controller.</p></li>
 <li><p><strong>dev_port</strong>: Write to the embedded controller using
 /dev/port.</p></li>
-<li><p><strong>dummy</strong>: Don't write to the embedded controller at
-all.</p></li>
 </ul>
 </blockquote>
 <h1>COMMANDS</h1>
 <p><strong>dump</strong> [<em>OPTIONS</em>]</p>
 <blockquote>
 <p>Dump all EC registers</p>
+<p><strong>-c</strong>, <strong>--color</strong></p>
+<blockquote>
+<p>Force colored output.</p>
+</blockquote>
+<p><strong>-C</strong>, <strong>--no-color</strong></p>
+<blockquote>
+<p>Disable colored output.</p>
+</blockquote>
+</blockquote>
+<p><strong>load</strong> <em>FILE</em></p>
+<blockquote>
+<p>Load a previously made dump into the embedded controller.</p>
 </blockquote>
 <p><strong>read</strong> [<em>OPTIONS</em>] <em>REGISTER</em></p>
 <blockquote>

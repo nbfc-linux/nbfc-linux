@@ -8,8 +8,8 @@ Probing tool for the embedded controller
 
 # SYNOPSIS
 
-**ec_probe** {**read** \| **write** \| **dump** \| **monitor** \|
-**watch**} \[*OPTIONS*\]
+**ec_probe** {**read** \| **write** \| **dump** \| **load** \|
+**monitor** \| **watch**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -22,7 +22,7 @@ Probing tool for the embedded controller
 > Show program\'s version number and exit
 
 **-e**,
-**\--embedded-controller**=\[**dev_port**,**ec_sys**,**acpi_ec**,**dummy**\]
+**\--embedded-controller**=\[**dev_port**,**ec_sys**,**acpi_ec**\]
 
 > Specify embedded controller to use
 >
@@ -33,14 +33,24 @@ Probing tool for the embedded controller
 >     embedded controller.
 >
 > -   **dev_port**: Write to the embedded controller using /dev/port.
->
-> -   **dummy**: Don\'t write to the embedded controller at all.
 
 # COMMANDS
 
 **dump** \[*OPTIONS*\]
 
 > Dump all EC registers
+>
+> **-c**, **\--color**
+>
+> > Force colored output.
+>
+> **-C**, **\--no-color**
+>
+> > Disable colored output.
+
+**load** *FILE*
+
+> Load a previously made dump into the embedded controller.
 
 **read** \[*OPTIONS*\] *REGISTER*
 
