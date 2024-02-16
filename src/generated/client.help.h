@@ -22,6 +22,8 @@
 #define CLIENT_START_HELP_TEXT                                                 \
  "Usage: nbfc start [-h] [-r]\n"                                               \
  "\n"                                                                          \
+ "Start the NBFC service\n"                                                    \
+ "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -r, --read-only       Start in read-only mode\n"                           \
  "  -h, --help            Shows this message\n"                                \
@@ -30,6 +32,8 @@
 #define CLIENT_RESTART_HELP_TEXT                                               \
  "Usage: nbfc restart [-h] [-r]\n"                                             \
  "\n"                                                                          \
+ "Restart the NBFC service\n"                                                  \
+ "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -r, --read-only       Restart in read-only mode\n"                         \
  "  -h, --help            Shows this message\n"                                \
@@ -37,6 +41,8 @@
 
 #define CLIENT_CONFIG_HELP_TEXT                                                \
  "Usage: nbfc config [-h] (-l | -s config | -a config | -r)\n"                 \
+ "\n"                                                                          \
+ "Set or list configurations for the NBFC service\n"                           \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
@@ -51,6 +57,8 @@
 #define CLIENT_STATUS_HELP_TEXT                                                \
  "Usage: nbfc status [-h] (-a | -s | -f FAN INDEX) [-w SECONDS]\n"             \
  "\n"                                                                          \
+ "Show status about the NBFC service.\n"                                       \
+ "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
  "  -a, --all             Show service and fan status (default)\n"             \
@@ -64,6 +72,9 @@
 #define CLIENT_SET_HELP_TEXT                                                   \
  "Usage: nbfc set [-h] (-a | -s PERCENT) [-f FAN INDEX]\n"                     \
  "\n"                                                                          \
+ "Set the speed of fans.\n"                                                    \
+ "If -f|--fan is not given, apply speed to all available fans.\n"              \
+ "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
  "  -a, --auto            Set fan speed to 'auto'\n"                           \
@@ -73,8 +84,28 @@
  "                        Fan index (zero based)\n"                            \
  ""
 
-#define CLIENT_DEFAULT_HELP(COMMAND)                                           \
- "Usage: nbfc " COMMAND " [-h]\n"                                              \
+#define CLIENT_STOP_HELP_TEXT                                                  \
+ "Usage: nbfc stop [-h]\n"                                                     \
+ "\n"                                                                          \
+ "Stop the NBFC service.\n"                                                    \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
+#define CLIENT_WAIT_FOR_HWMON_HELP_TEXT                                        \
+ "Usage: nbfc wait-for-hwmon [-h]\n"                                           \
+ "\n"                                                                          \
+ "Wait until files in /sys/class/hwmon are populated.\n"                       \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
+#define CLIENT_GET_MODEL_HELP_TEXT                                             \
+ "Usage: nbfc get-model-name [-h]\n"                                           \
+ "\n"                                                                          \
+ "Print out model name.\n"                                                     \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Shows this message and exit\n"                       \
