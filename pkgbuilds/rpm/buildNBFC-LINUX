@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+mkdir -p output
+podman build --security-opt label=disable --rm -v $(pwd)/output:/output -f pkgbuilds/rpm/Dockerfile --output output
+mv output/* pkgbuilds
+rm -rf output
