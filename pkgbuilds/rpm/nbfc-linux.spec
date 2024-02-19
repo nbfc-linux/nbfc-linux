@@ -22,16 +22,22 @@ NoteBook FanControl
 %autosetup
 
 %build
-# ./autogen.sh
-# ./configure
+libtoolize --force
+aclocal
+autoheader || true
+automake --force-missing --add-missing || true
+autoconf
+./configure --prefix=/usr
 %make_build
 
 
 %install
 %make_install
-cp -r %{buildroot}/usr/local/* %{buildroot}/usr
+mkdir -p %{buildroot}/usr/bin/
+cp -r %{buildroot}/bin/* %{buildroot}/usr/bin/
 cp -r %{buildroot}/usr/etc %{buildroot}
 rm -rf %{buildroot}/usr/local
+rm -rf %{buildroot}/bin
 
 %post
 %systemd_post nbfc_service.service
