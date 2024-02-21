@@ -178,7 +178,7 @@ define_array_of_T_FromJson(FanInfo)
 // Default temperature thresholds
 // ============================================================================
 
-static TemperatureThreshold ___Config_DefaultTemperatureThresholds[] = {
+static TemperatureThreshold _Config_DefaultTemperatureThresholds[] = {
   {60,  0,   0},
   {63, 48,  10},
   {66, 55,  20},
@@ -188,11 +188,11 @@ static TemperatureThreshold ___Config_DefaultTemperatureThresholds[] = {
 };
 
 static array_of(TemperatureThreshold) Config_DefaultTemperatureThresholds = {
-  ___Config_DefaultTemperatureThresholds,
-  ARRAY_SIZE(___Config_DefaultTemperatureThresholds)
+  _Config_DefaultTemperatureThresholds,
+  ARRAY_SIZE(_Config_DefaultTemperatureThresholds)
 };
 
-static TemperatureThreshold ___Config_DefaultLegacyTemperatureThresholds[] = {
+static TemperatureThreshold _Config_DefaultLegacyTemperatureThresholds[] = {
   {0,   0,   0},
   {60, 48,  10},
   {63, 55,  20},
@@ -202,8 +202,8 @@ static TemperatureThreshold ___Config_DefaultLegacyTemperatureThresholds[] = {
 };
 
 static array_of(TemperatureThreshold) Config_DefaultLegacyTemperatureThresholds = {
-  ___Config_DefaultLegacyTemperatureThresholds,
-  ARRAY_SIZE(___Config_DefaultLegacyTemperatureThresholds)
+  _Config_DefaultLegacyTemperatureThresholds,
+  ARRAY_SIZE(_Config_DefaultLegacyTemperatureThresholds)
 };
 
 static void copy_array_of_TemperatureThreshold(
