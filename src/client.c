@@ -265,7 +265,7 @@ static char*  get_longest_common_substring(const char*, const char*);
 static float  get_similarity_index(const char*, const char*);
 
 static const char* get_system_product() {
-  static char buf[512] = {0};
+  static char buf[128] = {0};
   if (*buf)
     return buf;
 
@@ -287,7 +287,7 @@ error:
 }
 
 static const char* get_system_vendor() {
-  static char buf[512] = {0};
+  static char buf[128] = {0};
   if (*buf)
     return buf;
 
@@ -309,7 +309,7 @@ error:
 }
 
 static const char* get_model_name() {
-  static char model_name[512] = {0};
+  static char model_name[256] = {0};
   if (*model_name)
     return model_name;
 
@@ -346,7 +346,7 @@ static void check_root() {
 }
 
 static int get_service_pid() {
-  char buf[512];
+  char buf[32];
   if (slurp_file(buf, sizeof(buf), NBFC_PID_FILE) == -1)
     return -1;
 

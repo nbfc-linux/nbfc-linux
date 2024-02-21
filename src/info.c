@@ -34,7 +34,7 @@ Error* Info_Init(const char* file) {
     return err_stdlib(0, NBFC_PID_FILE);
   }
 
-  char buf[256];
+  char buf[32];
   int len = snprintf(buf, sizeof(buf), "%d", getpid());
   write(fd, buf, len);
   close(fd);
