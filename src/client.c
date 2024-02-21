@@ -25,6 +25,7 @@
 #include "nxjson_utils.h"
 #include "parse_number.h"
 #include "parse_double.h"
+#include "sleep.h"
 #include "slurp_file.h"
 #include "stringbuf.h"
 
@@ -473,7 +474,7 @@ static array_of(ConfigFile) recommended_configs() {
   return files;
 }
 
-static void ServiceInfo_Load() {
+static Error* ServiceInfo_TryLoad() {
   char buf[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
   Error* e = nx_json_parse_file(&js, buf, sizeof(buf), NBFC_STATE_FILE);
@@ -499,8 +500,22 @@ static void ServiceInfo_Load() {
   if (e) {
 error:
     e = err_string(e, NBFC_STATE_FILE);
-    e_die();
+    return e;
   }
+
+  return err_success();
+}
+
+static void ServiceInfo_Load() {
+  // The service info file is sometimes not completely written.
+  // That's why we try to load the file multiple times.
+  Error* e;
+  for (int tries = 0; ++tries <= 5;)
+    if ((e = ServiceInfo_TryLoad()) == err_success())
+      break;
+    else
+      sleep_ms(100);
+  e_die();
 }
 
 static void ServiceConfig_Load() {
