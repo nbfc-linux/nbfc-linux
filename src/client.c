@@ -190,8 +190,14 @@ int main(int argc, char *const argv[]) {
       return NBFC_EXIT_SUCCESS;
     case -'a':
       options.a = 1;
-      if (cmd == Command_Config)
+      if (cmd == Command_Config) {
+        if (options.s) {
+          Log_Error("You cannot use --apply and --set at the same time\n");
+          return NBFC_EXIT_CMDLINE;
+        }
+
         options.config = p.optarg;
+      }
       break;
     case -'l':
       options.l = 1;
