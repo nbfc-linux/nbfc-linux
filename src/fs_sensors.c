@@ -94,8 +94,8 @@ Error* FS_Sensors_Init() {
       while (nread && source_name[nread] < 32)
         source_name[nread--] = '\0'; /* strip whitespace */
 
-      for (const char* const* n = LinuxTempSensorNames; *n; ++n) {
-        if (strcmp(source_name, *n))
+      for (const char* const* name = LinuxTempSensorNames; *name; ++name) {
+        if (strcmp(source_name, *name))
           continue;
 
         for (int j = 0; j < 10; j++) {
