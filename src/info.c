@@ -78,14 +78,14 @@ Error* Info_Write(ModelConfig* cfg, float temperature, bool read_only, array_of(
       "\t\t\t\"current_speed\": %.2f,\n"
       "\t\t\t\"target_speed\":  %.2f,\n"
       "\t\t\t\"speed_steps\":   %d\n"
-      "\t\t}%c\n",
+      "\t\t}%s\n",
       Json_EscapeString(buf, sizeof(buf), fan->fanConfig->FanDisplayName),
       Bool_ToStr[fan->mode == Fan_ModeAuto],
       Bool_ToStr[fan->isCritical],
       Fan_GetCurrentSpeed(fan),
       Fan_GetTargetSpeed(fan),
       Fan_GetSpeedSteps(fan),
-      (++i != fans->size ? ',' : ' ')
+      (++i != fans->size ? "," : "")
     );
   }
 
