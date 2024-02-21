@@ -33,11 +33,8 @@ static inline Error* nx_json_get_object(const nx_json* node) {
 
 static inline Error* nx_json_parse_file(const nx_json** out, char* buf, size_t bufsize, const char* file) {
   int len = slurp_file(buf, bufsize, file);
-  if (len < 0) {
-    if (errno == ENOBUFS)
-      errno = EFBIG;
+  if (len < 0)
     return err_stdlib(0, NULL);
-  }
 
   *out = nx_json_parse_utf8(buf);
   if (! *out)

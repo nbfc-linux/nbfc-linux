@@ -12,7 +12,7 @@ static inline ssize_t slurp_file(char* buf, size_t size, const char* file) {
   if (fd >= 0) {
     nread = read(fd, buf, size);
     if (nread == size) {
-      errno = ENOBUFS;
+      errno = EFBIG;
       nread = -1;
     }
     else if (nread >= 0)
