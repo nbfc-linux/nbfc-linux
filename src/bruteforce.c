@@ -48,13 +48,13 @@ static struct {
 } options = {
   -1,
   {NULL, 0},
+  {NULL, 0},
   {NULL, 0}
 };
 
-static int64_t parse_number(const char*, int64_t, int64_t, char**);
-static int     expand_ints(const char*, array_of(int)*);
-static void    reset_embedded_controller();
-static void    bruteforce();
+static int  expand_ints(const char*, array_of(int)*);
+static void reset_embedded_controller();
+static void bruteforce();
 
 int main(int argc, char* const argv[]) {
   Program_Name_Set(argv[0]);
