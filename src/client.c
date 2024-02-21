@@ -184,7 +184,7 @@ int main(int argc, char *const argv[]) {
       printf("%s", HelpTexts[cmd]);
       return NBFC_EXIT_SUCCESS;
     case -'v':
-      printf("nbfc v" NBFC_VERSION "\n");
+      printf("nbfc " NBFC_VERSION "\n");
       return NBFC_EXIT_SUCCESS;
     case -'a':
       options.a = 1;
