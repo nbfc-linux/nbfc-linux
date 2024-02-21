@@ -1,26 +1,35 @@
-# $Id$
-# Maintainer: Benjamin Abendroth <braph93@gmx.de>
+# Maintainer: Francesco Minnocci <ascoli dot minnocci at gmail dot com>
+# Contributor: Benjamin Abendroth <braph93@gmx.de>
 
 pkgname=nbfc-linux-git
-pkgver=0.0.1
+_pkgname=nbfc-linux
+pkgver=0.1.15.r13.ge59a4da
 pkgrel=1
 pkgdesc="Lightweight C port of NoteBook FanControl (no Mono required)"
 arch=('i686' 'x86_64')
 url="https://github.com/nbfc-linux/nbfc-linux"
-optdepends=('dmidecode: for getting recommended notebook configurations')
-makedepends=('lm_sensors')
+makedepends=('git')
 license=('GPL3')
-conflicts=('nbfc' 'nbfc-beta' 'nbfc-linux')
 provides=('nbfc')
-source=(git+git://github.com/braph/nbfc-linux)
-md5sums=('SKIP')
+conflicts=('nbfc')
+source=("${_pkgname}::git+${url}.git")
+sha256sums=('SKIP')
+
+pkgver() {
+	cd "${srcdir}/${_pkgname}"
+
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g' | sed 's/.beta//g'
+}
 
 build() {
-  cd nbfc-linux
-  make
+	cd "${srcdir}/${_pkgname}"
+
+  ./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --bindir=/usr/bin && make
 }
 
 package() {
-  cd nbfc-linux
+	cd "${srcdir}/${_pkgname}"
+
   make DESTDIR="${pkgdir}" install
 }
+# vim:set ts=2 sw=2 et:
