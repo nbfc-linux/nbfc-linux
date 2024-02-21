@@ -20,7 +20,6 @@ extern Service_Options options;
 
 Error* Service_Init();
 void   Service_Loop();
-void   Service_HandleError(Error*);
 void   Service_Cleanup();
 
 #endif
