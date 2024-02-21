@@ -620,13 +620,18 @@ static int Register_LoadDump(RegisterBuf* self, FILE* fh) {
     }
 
     for (int column_no = 0; column_no < 16; ++column_no) {
-      char hex[4] = {0};
-      if (fread(hex, 1, 3, fh) != 3)
+      char hex[3] = {0};
+      if (fread(hex, 1, 2, fh) != 2)
         goto error;
 
-      int register_no = (line_no * 16) + column_no;
+      char* end;
+      const int value = strtoll(hex, &end, 16);
+      if (*end != '\0')
+        goto error;
 
-      int value = strtoll(hex, NULL, 16);
+      fread(hex, 1, 1, fh);
+
+      const int register_no = (line_no * 16) + column_no;
       my[register_no] = value;
     }
   }
