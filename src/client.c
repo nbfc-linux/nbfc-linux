@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <float.h>
 #include <locale.h>
 #include <limits.h>
 #include <math.h>
@@ -138,7 +139,7 @@ static struct {
   int l;     // list
   int r;     // recommend/read-only
   int s;     // set
-  int watch; // watch time
+  float watch; // watch time
 } options = {0};
 
 static int Service_Start(bool);
@@ -199,7 +200,7 @@ int main(int argc, char *const argv[]) {
       options.r = 1;
       break;
     case -'w':
-      options.watch = parse_number(p.optarg, 1, INT64_MAX, &err);
+      options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
         Log_Error("-w|--watch: %s\n", err);
         return NBFC_EXIT_FAILURE;
@@ -680,7 +681,7 @@ static int Status() {
 
     if (!options.watch)
       break;
-    sleep(options.watch);
+    sleep_ms(options.watch * 1000);
     fputs("\033c", stdout);
   }
 
