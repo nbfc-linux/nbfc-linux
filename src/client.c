@@ -549,11 +549,6 @@ error:
 
 static void ServiceConfig_Write() {
   check_root();
-  int fd = open(NBFC_SERVICE_CONFIG, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-  if (fd == -1) {
-    Log_Error("Could not open " NBFC_SERVICE_CONFIG ": %s\n", strerror(errno));
-    exit(NBFC_EXIT_FAILURE);
-  }
 
   nx_json root = {0};
   nx_json *o = create_json(NX_JSON_OBJECT, NULL, &root);
@@ -582,8 +577,11 @@ static void ServiceConfig_Write() {
   buf[0] = 0;
 
   nx_json_to_string(o, &s, 0);
-  write(fd, s.s, s.size);
-  close(fd);
+
+  if (write_file(NBFC_SERVICE_CONFIG, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
+    Log_Error("Could not write to " NBFC_SERVICE_CONFIG ": %s\n", strerror(errno));
+    exit(NBFC_EXIT_FAILURE);
+  }
 }
 
 static int Wait_For_Hwmon() {

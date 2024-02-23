@@ -24,8 +24,10 @@ Error* Info_Init(const char* file) {
   close(fd);
   chmod(Info_File, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 
-  fd = open(NBFC_PID_FILE, O_CREAT|O_WRONLY|O_TRUNC|O_EXCL, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-  if (fd < 0) {
+  char buf[32];
+  int len = snprintf(buf, sizeof(buf), "%d", getpid());
+
+  if (write_file(NBFC_PID_FILE, O_CREAT|O_WRONLY|O_TRUNC|O_EXCL, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, buf, len) == -1) {
     if (errno == EEXIST) {
       Error* e = err_string(0, "Failed to acquire lock file");
       return err_string(e, NBFC_PID_FILE);
@@ -33,11 +35,6 @@ Error* Info_Init(const char* file) {
 
     return err_stdlib(0, NBFC_PID_FILE);
   }
-
-  char buf[32];
-  int len = snprintf(buf, sizeof(buf), "%d", getpid());
-  write(fd, buf, len);
-  close(fd);
 
   return err_success();
 }
@@ -93,13 +90,7 @@ Error* Info_Write(ModelConfig* cfg, float temperature, bool read_only, array_of(
   if (s->size + 1 == s->capacity)
     return (errno = ENOBUFS), err_stdlib(0, Info_File);
 
-  int fd = open(Info_File, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-  if (fd < 0)
-    return err_stdlib(0, Info_File);
-
-  int nwritten = write(fd, s->s, s->size);
-  close(fd);
-  if (nwritten < 0)
+  if (write_file(Info_File, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s->s, s->size) == -1)
     return err_stdlib(0, Info_File);
 
   return err_success();

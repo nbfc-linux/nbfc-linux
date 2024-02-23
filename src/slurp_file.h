@@ -22,4 +22,17 @@ static inline ssize_t slurp_file(char* buf, size_t size, const char* file) {
   return nread;
 }
 
+static inline int write_file(const char* file, int flags, mode_t mode, const char* content, size_t size) {
+  const int fd = open(file, flags, mode);
+  if (fd == -1)
+    return -1;
+
+  ssize_t nwritten = write(fd, content, size);
+  close(fd);
+  if (nwritten == -1)
+    return -1;
+
+  return nwritten;
+}
+
 #endif
