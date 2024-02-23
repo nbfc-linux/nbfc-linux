@@ -209,6 +209,11 @@ static struct {
   enum UseColor use_color;
 } options = {0};
 
+const char RegisterHeader[] =
+  "---|------------------------------------------------\n"
+  "   | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"
+  "---|------------------------------------------------\n";
+
 int main(int argc, char* const argv[]) {
   Program_Name_Set(argv[0]);
 
@@ -465,9 +470,7 @@ static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
   if (color)
     printf(Console_Reset);
 
-  printf("---|------------------------------------------------\n"
-         "   | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"
-         "---|------------------------------------------------\n");
+  printf("%s", RegisterHeader);
 
   for (int i = 0; i <= 0xF0; i += 0x10) {
     if (color)
@@ -598,19 +601,9 @@ static void Register_PrintDump(RegisterBuf* self, bool use_color) {
 }
 
 static int Register_LoadDump(RegisterBuf* self, FILE* fh) {
-  char* line = NULL;
-  size_t len = 0;
-
-  getline(&line, &len, fh);
-  if (strcmp(line, "---|------------------------------------------------\n"))
-    goto error;
-
-  getline(&line, &len, fh);
-  if (strcmp(line, "   | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"))
-    goto error;
-
-  getline(&line, &len, fh);
-  if (strcmp(line, "---|------------------------------------------------\n"))
+  char header[sizeof(RegisterHeader)] = {0};
+  fread(header, 1, sizeof(RegisterHeader) - 1, fh);
+  if (strcmp(header, RegisterHeader))
     goto error;
 
   for (int line_no = 0; line_no < 16; ++line_no) {
