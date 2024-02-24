@@ -34,7 +34,7 @@ static Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, fl
   static char buf[32];
   int nread = slurp_file(buf, sizeof(buf) - 1, my.file);
   if (nread < 0)  return err_stdlib(0, my.file);
-  if (nread == 0) return (errno = EINVAL), err_stdlib(0, my.file);
+  if (nread == 0) return (errno = ENODATA), err_stdlib(0, my.file);
 
   char* end;
   errno = 0;

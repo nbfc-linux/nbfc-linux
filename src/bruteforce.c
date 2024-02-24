@@ -7,6 +7,7 @@
 #include "ec_linux.h"
 #include "ec_sys_linux.h"
 #include "parse_number.h"
+#include "parse_double.h"
 #include "program_name.c"
 #include "log.h"
 
@@ -35,17 +36,20 @@ static const struct option long_options[] = {
   {"fan-values",            required_argument, 0, 'F'},
   {"bruteforce-registers",  required_argument, 0, 'b'},
   {"bruteforce-values",     required_argument, 0, 'v'},
+  {"sleep",                 required_argument, 0, 's'},
   {0,                       0,                 0,  0 }
 };
 
-static const char options_str[] = "e:f:F:b:v:";
+static const char options_str[] = "e:f:F:b:v:s:";
 
 static struct {
+  float         sleep;
   int           fan_register;
   array_of(int) fan_values;
   array_of(int) bruteforce_registers;
   array_of(int) bruteforce_values;
 } options = {
+  0.5,
   -1,
   {NULL, 0},
   {NULL, 0},
@@ -106,6 +110,12 @@ int main(int argc, char* const argv[]) {
         printf("%d,", *i);
       printf("\n");
       break;
+    case 's':
+      options.sleep = parse_double(optarg, 0.1, 100, &err);
+      if (err) {
+        Log_Error("Invalid value for -s|--sleep: %s\n", optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
     default:
       return NBFC_EXIT_CMDLINE;
     }
@@ -190,7 +200,7 @@ static int expand_ints(const char* s, array_of(int)* array) {
       int from_and_to = parse_number(s, 0, 255, &err);
       if (err) {
         Log_Error("Invalid number: %s: %s\n", s, err);
-        return NBFC_EXIT_CMDLINE;
+        return false;
       }
 
       array->size++;
@@ -250,7 +260,7 @@ static void bruteforce() {
 
         printf("Register = %d (%X), Value = %d (%X), FanSpeedValue = %d (%X)\n",
           *register_, *register_, *value, *value, *fan_speed_value, *fan_speed_value);
-        sleep_ms(100);
+        sleep_ms(options.sleep * 1000);
       }
     }
 

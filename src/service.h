@@ -11,7 +11,7 @@ struct Service_Options {
   EmbeddedControllerType embedded_controller_type;
   bool                   fork;
   bool                   read_only;
-  int                    debug;
+  bool                   debug;
   const char*            service_config;
   const char*            state_file;
 };
