@@ -1,9 +1,10 @@
 ﻿#include "ec_linux.h"
 
-#include <unistd.h>
-#include <stdbool.h>
-#include <endian.h>
-#include <fcntl.h>
+#include <errno.h>   // ETIME
+#include <endian.h>  // htole16
+#include <fcntl.h>   // open, close, O_RDWR
+#include <unistd.h>  // pread, pwrite
+#include <stdbool.h> // bool
 
 /* ========================================================================== *
  *            Core/Plugins/StagWare.Plugins.ECLinux/ECLinux.cs                *

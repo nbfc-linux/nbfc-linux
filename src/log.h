@@ -1,5 +1,7 @@
 #include "program_name.h"
 
+#include <stdio.h>
+
 #define Log_Debug(...) do {\
   fprintf(stderr, "%s: DEBUG: ", Program_Name); \
   fprintf(stderr, __VA_ARGS__); \

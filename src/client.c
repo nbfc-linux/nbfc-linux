@@ -4,20 +4,20 @@
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 
-#include <ctype.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <float.h>
-#include <locale.h>
-#include <limits.h>
-#include <math.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <ctype.h>    // tolower
+#include <dirent.h>   // DIR, opendir, closedir
+#include <errno.h>    // ENODATA
+#include <fcntl.h>    // open, O_WRONLY, O_CREAT, O_TRUNC
+#include <float.h>    // FLT_MAX
+#include <locale.h>   // setlocale, LC_NUMERIC
+#include <limits.h>   // INT_MAX, PATH_MAX
+#include <signal.h>   // kill, SIGINT
+#include <stdbool.h>  // bool
+#include <stdio.h>    // printf, snprintf, fputs, remove
+#include <stdlib.h>   // exit, strtol, system, WEXITSTATUS, qsort
+#include <string.h>   // strcmp, strncmp, strncpy, strcat, strcspn, strerror
+#include <sys/stat.h> // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
+#include <unistd.h>   // access, F_OK, geteuid
 
 #include "generated/client.help.h"
 #include "log.h"
@@ -214,7 +214,7 @@ int main(int argc, char *const argv[]) {
       break;
     case -'f':
       if (cmd == Command_Set || cmd == Command_Status) {
-        const int fan = parse_number(p.optarg, 0, INT64_MAX, &err);
+        const int fan = parse_number(p.optarg, 0, INT_MAX, &err);
         if (err) {
           Log_Error("-f|--fan: %s\n", err);
           return NBFC_EXIT_FAILURE;

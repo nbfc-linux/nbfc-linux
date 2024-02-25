@@ -4,9 +4,9 @@
 #include "nbfc.h"
 
 #include <errno.h>  // errno
-#include <stdlib.h> // malloc
+#include <stdlib.h> // malloc, calloc, realloc, free, exit
 #include <string.h> // strerror
-#include <stdio.h>
+#include <stdio.h>  // fprintf
 
 static inline void Memory_FatalError(const char* cause) {
   fprintf(stderr, "%s: %s\n", cause, strerror(errno));

@@ -1,9 +1,9 @@
 #include "ec_sys_linux.h"
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <endian.h>
-#include <fcntl.h>
+#include <endian.h> // htole16, le16toh
+#include <fcntl.h>  // open, close, O_RDWR
+#include <stdlib.h> // system
+#include <unistd.h> // pread, pwrite
 
 #define EC_SysLinux_ACPI_EC_Path    "/dev/ec"
 #define EC_SysLinux_EC0_IO_Path     "/sys/kernel/debug/ec/ec0/io"

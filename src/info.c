@@ -3,12 +3,13 @@
 #include "nbfc.h"
 #include "error.h"
 #include "stringbuf.h"
-#include "macros.h"
+#include "slurp_file.h"
 #include "memory.h"
 
-#include <unistd.h>   // getpid
-#include <fcntl.h>    // open
+#include <stdio.h>    // snprintf
+#include <fcntl.h>    // open, close
 #include <sys/stat.h> // chmod
+#include <unistd.h>   // getpid
 
 static char* Info_File;
 

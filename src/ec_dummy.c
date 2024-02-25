@@ -1,6 +1,6 @@
 #include "ec_dummy.h"
 
-#include <endian.h>
+#include <endian.h> // htole16
 
 #include "memory.h"
 

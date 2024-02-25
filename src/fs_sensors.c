@@ -5,9 +5,12 @@
 #include "slurp_file.h"
 #include "log.h"
 
-#include <string.h>
-#include <stdio.h>
-#include <limits.h> // PATH_MAX
+#include <errno.h>   // ENODATA, EINVAL
+#include <stdio.h>   // snprintf
+#include <string.h>  // strcmp
+#include <limits.h>  // PATH_MAX
+#include <stdbool.h> // bool
+#include <stdlib.h>  // strtold
 
 static const char* const LinuxHwmonDirs[] = {
   "/sys/class/hwmon/hwmon%d",
@@ -48,7 +51,6 @@ static Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, fl
   return err_success();
 }
 
-
 Error* FS_Sensors_GetTemperature(float* out) {
   Error* e = NULL;
   float tmp, sum = 0;
@@ -65,6 +67,13 @@ Error* FS_Sensors_GetTemperature(float* out) {
     return err_string(0, "No temperatures available");
   *out = sum / total;
   return err_success();
+}
+
+static inline int IsLinuxTempSensorName(const char* s) {
+  for (const char* const* name = LinuxTempSensorNames; *name; ++name)
+    if (! strcmp(s, *name))
+      return true;
+  return false;
 }
 
 Error* FS_Sensors_Init() {
@@ -94,29 +103,27 @@ Error* FS_Sensors_Init() {
       while (nread && source_name[nread] < 32)
         source_name[nread--] = '\0'; /* strip whitespace */
 
-      for (const char* const* name = LinuxTempSensorNames; *name; ++name) {
-        if (strcmp(source_name, *name))
-          continue;
+      if (! IsLinuxTempSensorName(source_name))
+        continue;
 
-        for (int j = 0; j < 10; j++) {
-          char filename[PATH_MAX];
-          snprintf(filename, sizeof(filename), LinuxTempSensorFile, j);
-          snprintf(file, sizeof(file), "%s/%s", dir, filename);
+      for (int j = 0; j < 10; j++) {
+        char filename[PATH_MAX];
+        snprintf(filename, sizeof(filename), LinuxTempSensorFile, j);
+        snprintf(file, sizeof(file), "%s/%s", dir, filename);
 
-          source->file = file;
-          source->multiplier = 0.001;
+        source->file = file;
+        source->multiplier = 0.001;
 
-          float t;
-          e = FS_TemperatureSource_GetTemperature(source, &t);
+        float t;
+        e = FS_TemperatureSource_GetTemperature(source, &t);
 #ifndef NDEBUG
-          e_warn();
+        e_warn();
 #endif
-          if (! e) {
-            Log_Info("Using '%s' as temperature source\n", file);
-            source->file = Mem_Strdup(file);
-            if (++source == sources_end)
-              goto end;
-          }
+        if (! e) {
+          Log_Info("Using '%s' as temperature source\n", file);
+          source->file = Mem_Strdup(file);
+          if (++source == sources_end)
+            goto end;
         }
       }
     }

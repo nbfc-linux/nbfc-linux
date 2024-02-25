@@ -1,6 +1,6 @@
 ﻿#include "temperature_threshold_manager.h"
 
-#include <stddef.h>
+#include <stddef.h> // size_t
 
 bool TemperatureThresholdManager_LegacyBehaviour = false;
 

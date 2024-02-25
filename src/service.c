@@ -19,11 +19,12 @@
 #include "sleep.h"
 #include "model_config.h"
 
-#include <assert.h>
-#include <stdio.h>
+#include <assert.h> // assert
+#include <stdio.h>  // snprintf
 #include <math.h>   // fabs
-#include <limits.h>
-#include <unistd.h>
+#include <limits.h> // PATH_MAX
+#include <unistd.h> // fork
+#include <stdlib.h> // exit, _exit
 
 Service_Options options;
 
@@ -254,10 +255,10 @@ static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable* ec) {
 
 static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
   switch (t) {
-  case EmbeddedControllerType_ECSysLinux: return &EC_SysLinux_VTable;
+  case EmbeddedControllerType_ECSysLinux:     return &EC_SysLinux_VTable;
   case EmbeddedControllerType_ECSysLinuxACPI: return &EC_SysLinux_ACPI_VTable;
-  case EmbeddedControllerType_ECLinux: return &EC_Linux_VTable;
-  case EmbeddedControllerType_ECDummy: return &EC_Dummy_VTable;
+  case EmbeddedControllerType_ECLinux:        return &EC_Linux_VTable;
+  case EmbeddedControllerType_ECDummy:        return &EC_Dummy_VTable;
   default: return NULL;
   }
 }

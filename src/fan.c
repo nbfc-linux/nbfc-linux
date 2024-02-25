@@ -3,7 +3,7 @@
 #include "error.h"
 #include "ec.h"
 
-#include <math.h>
+#include <math.h> // fabs, round
 
 extern EC_VTable* ec;
 
