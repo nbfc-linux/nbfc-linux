@@ -35,6 +35,16 @@ Installation
   - With nix flakes (`nix profile install`)
   - [On NixOS](nixos-installation.md)
 
+- Fedora
+  this will not build the current working directory, but downloads a source archive from release and builds an installable rpm
+  - ensure, that podman is installed
+    - docker should work also, but is currently not tested
+  - edit PKGBUILD [rpm/nbfc-linux.spec](pkgbuilds/rpm/nbfc-linux.spec) and 
+    - set wanted Version (e.g. 0.1.15)
+    - set wanted Releasenumber (e.g. 1%{?dist} or 2%{?dist})
+  - ./pkgbuilds/rpm/buildNBFC-LINUX
+  - the resulting rpm is in PKGBUILD directory
+
 - In general:
   - `./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc && make && sudo make install`
 
