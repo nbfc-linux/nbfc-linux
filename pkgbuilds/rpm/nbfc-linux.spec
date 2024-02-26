@@ -27,7 +27,7 @@ aclocal
 autoheader || true
 automake --force-missing --add-missing || true
 autoconf
-./configure --prefix=/usr
+./configure --prefix=/usr --sysconfdir=/etc
 %make_build
 
 
@@ -35,7 +35,6 @@ autoconf
 %make_install
 mkdir -p %{buildroot}/usr/bin/
 cp -r %{buildroot}/bin/* %{buildroot}/usr/bin/
-cp -r %{buildroot}/usr/etc %{buildroot}
 rm -rf %{buildroot}/usr/local
 rm -rf %{buildroot}/bin
 
