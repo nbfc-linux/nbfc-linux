@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$description": "Schema for nbfc-linux for controlling fans of notebooks",
+  "type": "object",
+  "properties": {
+    "SelectedConfigId": {
+      "type": "string",
+      "description": "The selected config model. This equals the basename of a notebook model configuration file.",
+      "default": ""
+    },
+    "LegacyTemperatureThresholdsBehaviour": {
+      "type": "boolean",
+      "description": "Backwards compatibilty with configuration files from the original NBFC project. The default is false. Do not use this option for new configuration files.",
+      "default": false,
+      "enum": [true, false]
+    },
+    "EmbeddedControllerType": {
+      "type": "string",
+      "description": "The preferred way of running nbfc. If not given, the embedded controller type will be automatically selected.",
+      "default": "",
+      "anyOf": [
+        {
+          "const": "ec_sys",
+          "description": "Use the ec_sys kernel module for writing to the embedded controller."
+        },
+        {
+          "const": "acpi_ec",
+          "description": "Use the acpi_ec kernel module for writing to the embedded controller."
+        },
+        {
+          "const": "dev_port",
+          "description": "Write to the embedded controller using /dev/port."
+        },
+        {
+          "const": "dummy",
+          "description": "Don't write to the embedded controller at all."
+        },
+        {
+          "const": "",
+          "description": "The embedded controller type will be automatically selected."
+        }
+      ]
+    },
+    "NotebookModel": {
+      "type": "string",
+      "description": "The Notebook Model as described in your BIOS. See `sudo dmidecode -s system-product-name`."
+    },
+    "Author": {
+      "type": "string",
+      "description": "The Author of the config file. Enter whatever you want.",
+      "default": ""
+    },
+    "EcPollInterval": {
+      "type": "integer",
+      "description": "Defines how often NBFC polls the EC for changes (in miliseconds).",
+      "default": "3000",
+      "minimum": 1,
+      "maximum": 32768
+    },
+    "ReadWriteWords": {
+      "type": "boolean",
+      "description": "If `true`, NBFC will combine two 8 bit registers to one 16-bit register when reading from or writing to the EC registers.",
+      "default": false,
+      "enum": [true, false]
+    },
+    "CriticalTemperature": {
+      "type": "integer",
+      "description": "If the temperature exceeds this threshold, NBFC will ignore all Temperature threshold elements and set the fan to 100% speed until the temperature drops below (`CriticalTemperature` - `CriticalTemperatureOffset`)",
+      "default": 75,
+      "minimum": 0,
+      "maximum": 100
+    },
+    "CriticalTemperatureOffset": {
+      "type": "integer",
+      "description": "See `CriticalTemperature`",
+      "default": 15,
+      "minimum": 32768
+    },
+    "TargetFanSpeeds": {
+      "type": "array",
+      "description": "This holds the fixed speed of the fans. A value of -1 means the fan should be left in auto mode.",
+      "minProperties": 0,
+      "items": [
+        {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 65535
+        }
+      ]
+    },
+    "FanConfigurations": {
+      "type": "array",
+      "description": "Array of at least one FanConfiguration",
+      "minProperties": 1,
+      "items": {
+        "type": "object",
+        "title": "FanConfiguration",
+        "description": "Defines how NBFC controls a fan",
+        "properties": {
+          "ReadRegister": {
+            "$ref": "#/$defs/ubyte",
+            "description": "The register from which NBFC reads the fan speed."
+          },
+          "WriteRegister": {
+            "$ref": "#/$defs/ubyte",
+            "description": "The register which NBFC uses to control the fan"
+          },
+          "MinSpeedValue": {
+            "$ref": "#/$defs/uword",
+            "description": "The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if ReadWriteWords is `true`. Note: MinSpeedValue does not necessarily have to be smaller than MaxSpeedValue"
+          },
+          "MaxSpeedValue": {
+            "$ref": "#/$defs/uword",
+            "description": "The value which puts the fan to the highest possible fan speed."
+          },
+          "IndependentReadMinMaxValues": {
+            "type": "boolean",
+            "default": false,
+            "enum": [true, false],
+            "description": "Defines if independent minimum/maximum values should be applied for read operations"
+          },
+          "MinSpeedValueRead": {
+            "$ref": "#/$defs/uword",
+            "description": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
+          },
+          "MaxSpeedValueRead": {
+            "$ref": "#/$defs/uword",
+            "description": "The value which  corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
+          },
+          "ResetRequired": {
+            "type": "boolean",
+            "default": false,
+            "enum": [true, false],
+            "description": "Defines if the EC should be reset before the service is shut down."
+          },
+          "FanSpeedResetValue": {
+            "$ref": "#/$defs/uword",
+            "description": "Defines the value which will be written to WriteRegister to reset the EC."
+          },
+          "FanDisplayName": {
+            "type": "string",
+            "description": "Fan display name",
+            "default": ""
+          },
+          "TemperatureThresholds": {
+            "type": "array",
+            "description": "Defines how fast the fan runs at different temperatures",
+            "items": {
+              "type": "object",
+              "properties": {
+                "UpThreshold": {
+                  "$ref": "#/$defs/ubyte",
+                  "description": "NBFC will select the next upper threshold as soon as the temperature exceeds *UpThreshold*. in celsius"
+                },
+                "DownThreshold": {
+                  "$ref": "#/$defs/ubyte",
+                  "description": "NBFC will select the next lower threshold as soon as the temperature falls below the *DownThreshold*. in celsius"
+                },
+                "FanSpeed": {
+                  "$ref": "#/$defs/percentage",
+                  "description": "The fan speed in percent"
+                }
+              },
+              "required": ["UpThreshold", "DownThreshold", "FanSpeed"]
+            }
+          },
+          "FanSpeedPercentageOverrides": {
+            "type": "array",
+            "description": "Overrides the default algorithm to calculate fan speeds",
+            "items": {
+              "type": "object",
+              "properties": {
+                "FanSpeedPercentage": {
+                  "$ref": "#/$defs/percentage",
+                  "description": "The fan speed in percent"
+                },
+                "FanSpeedValue": {
+                  "$ref": "#/$defs/uword",
+                  "description": "Fan speed value which will be written to WriteRegister"
+                },
+                "TargetOperation": {
+                  "type": "string",
+                  "default": "ReadWrite",
+                  "anyOf": [
+                    {
+                      "const": "Read",
+                      "description": "Value->Percentage"
+                    },
+                    {
+                      "const": "Write",
+                      "description": "Percentage->Value"
+                    },
+                    {
+                      "const": "ReadWrite",
+                      "description": "both"
+                    }
+                  ],
+                  "description": "Defines for which operations the speeds should be overridden."
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "ReadRegister",
+          "WriteRegister",
+          "MinSpeedValue",
+          "MaxSpeedValue",
+          "IndependentReadMinMaxValues",
+          "MinSpeedValueRead",
+          "MaxSpeedValueRead",
+          "ResetRequired",
+          "FanSpeedResetValue",
+          "FanDisplayName",
+          "TemperatureThresholds",
+          "FanSpeedPercentageOverrides"
+        ]
+      }
+    },
+    "RegisterWriteConfigurations": {
+      "type": "array",
+      "description": "Allows to write to any EC register",
+      "items": {
+        "type": "object",
+        "properties": {
+          "WriteMode": {
+            "$ref": "#/$defs/writeModeDef",
+            "description": "Defines how the value will be written"
+          },
+          "WriteOccasion": {
+            "type": "string",
+            "description": "Defines when the value should be written",
+            "default": "OnInitialization",
+            "anyOf": [
+              {
+                "const": "OnInitialization",
+                "description": "writes the value once upon initialization (everytime the fan control service is enabled or a config is applied)"
+              },
+              {
+                "const": "OnWriteFanSpeed",
+                "description": "writes the value everytime the fan speed is set."
+              }
+            ]
+          },
+          "Register": {
+            "$ref": "#/$defs/ubyte",
+            "description": "The register which will be manipulated."
+          },
+          "Value": {
+            "$ref": "#/$defs/uword",
+            "description": "The Value which will be written"
+          },
+          "ResetRequired": {
+            "type": "boolean",
+            "description": "Defines if the register should be reset before the service is shut down.",
+            "enum": [true, false],
+            "default": false
+          },
+          "ResetValue": {
+            "$ref": "#/$defs/uword",
+            "description": "The value which will be written upon reset."
+          },
+          "ResetWriteMode": {
+            "$ref": "#/$defs/writeModeDef",
+            "description": "See WriteMode. Will only be applied on reset"
+          },
+          "Description": {
+            "type": "string",
+            "description": "A description of what effect the RegisterWriteConfiguration will have",
+            "default": ""
+          }
+        },
+        "required": [
+          "WriteMode",
+          "WriteOccasion",
+          "Register",
+          "Value",
+          "ResetRequired",
+          "ResetValue",
+          "ResetWriteMode",
+          "Description"
+        ]
+      }
+    }
+  },
+  "required": [
+    "NotebookModel",
+    "Author",
+    "EcPollInterval",
+    "ReadWriteWords",
+    "CriticalTemperature",
+    "FanConfigurations",
+    "RegisterWriteConfigurations"
+  ],
+  "$defs": {
+    "writeModeDef": {
+      "type": "string",
+      "default": "Set",
+      "anyOf": [
+        {
+          "const": "And",
+          "description": "register = register bitwise_and value"
+        },
+        {
+          "const": "Or",
+          "description": "register = register bitwise_or value"
+        },
+        {
+          "const": "Set",
+          "description": "register = value"
+        }
+      ]
+    },
+    "ubyte": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "percentage": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 100.0
+    },
+    "uword": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    }
+  }
+}
