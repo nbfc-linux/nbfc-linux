@@ -5,7 +5,7 @@
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 
 #include <ctype.h>    // tolower
-#include <dirent.h>   // DIR, opendir, closedir
+#include <dirent.h>   // DIR, opendir, readdir, closedir
 #include <errno.h>    // ENODATA
 #include <fcntl.h>    // open, O_WRONLY, O_CREAT, O_TRUNC
 #include <float.h>    // FLT_MAX
@@ -13,9 +13,9 @@
 #include <limits.h>   // INT_MAX, PATH_MAX
 #include <signal.h>   // kill, SIGINT
 #include <stdbool.h>  // bool
-#include <stdio.h>    // printf, snprintf, fputs, remove
-#include <stdlib.h>   // exit, strtol, system, WEXITSTATUS, qsort
-#include <string.h>   // strcmp, strncmp, strncpy, strcat, strcspn, strerror
+#include <stdio.h>    // printf, snprintf, remove
+#include <stdlib.h>   // exit, realpath, system, WEXITSTATUS, qsort
+#include <string.h>   // strcmp, strncmp, strncpy, strcat, strcspn, strrchr, strerror
 #include <sys/stat.h> // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
 #include <unistd.h>   // access, F_OK, geteuid
 
@@ -134,11 +134,11 @@ static enum Command Command_From_String(const char* s) {
 static struct {
   array_of(int) fans;
   array_of(float) speeds;
-  int a; // all/auto/apply
   const char *config;
-  int l;     // list
-  int r;     // recommend/read-only
-  int s;     // set
+  bool a;      // all/auto/apply
+  bool l;      // list
+  bool r;      // recommend/read-only
+  bool s;      // set
   float watch; // watch time
 } options = {0};
 
@@ -189,7 +189,7 @@ int main(int argc, char *const argv[]) {
       printf("nbfc " NBFC_VERSION "\n");
       return NBFC_EXIT_SUCCESS;
     case -'a':
-      options.a = 1;
+      options.a = true;
       if (cmd == Command_Config) {
         if (options.s) {
           Log_Error("You cannot use --apply and --set at the same time\n");
@@ -200,10 +200,10 @@ int main(int argc, char *const argv[]) {
       }
       break;
     case -'l':
-      options.l = 1;
+      options.l = true;
       break;
     case -'r':
-      options.r = 1;
+      options.r = true;
       break;
     case -'w':
       options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
@@ -237,7 +237,7 @@ int main(int argc, char *const argv[]) {
         options.speeds.data = Mem_Realloc(options.speeds.data, options.speeds.size * sizeof(float));
         options.speeds.data[options.speeds.size - 1] = speed;
       } else {
-        options.s = 1;
+        options.s = true;
         if (cmd == Command_Config && options.a) {
           Log_Error("You cannot use --apply and --set at the same time\n");
           return NBFC_EXIT_FAILURE;
@@ -354,16 +354,24 @@ static void check_root() {
 }
 
 static int get_service_pid() {
+  char* err;
   char buf[32];
-  if (slurp_file(buf, sizeof(buf), NBFC_PID_FILE) == -1)
-    return -1;
+  if (slurp_file(buf, sizeof(buf), NBFC_PID_FILE) == -1) {
+    if (errno == ENOENT)
+      return -1;
+    else {
+      err = strerror(errno);
+      goto error;
+    }
+  }
 
-  char* endptr;
-  errno = 0;
-  int pid = strtol(buf, &endptr, 10);
+  // trim the newline
+  buf[strcspn(buf, "\n")] = '\0';
 
-  if (errno || endptr == buf) {
-    Log_Error("Failed to read the pid file: " NBFC_PID_FILE "\n");
+  int pid = parse_number(buf, 0, INT_MAX, &err);
+  if (err) {
+error:
+    Log_Error("Failed to read the pid file: " NBFC_PID_FILE ": %s\n", err);
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -651,22 +659,21 @@ static void print_service_status() {
 
 static int Status() {
   if (!options.s && !options.a && !options.fans.size)
-    options.a = 1;
+    options.a = true;
 
   while (true) {
     ServiceInfo_Load();
 
-    if (options.a || options.s) {
+    if (options.a || options.s)
       print_service_status();
-      if (options.a) {
-        for_each_array(const FanInfo*, f, service_info.fans) {
-          printf("\n");
-          print_fan_status(f);
-        }
+
+    if (options.a) {
+      for_each_array(const FanInfo*, f, service_info.fans) {
+        printf("\n");
+        print_fan_status(f);
       }
     }
-
-    if (options.fans.size) {
+    else if (options.fans.size) {
       const int fan_count = service_info.fans.size;
       bool *vis = Mem_Calloc(sizeof(bool), fan_count);
       for_each_array(int*, fan_index, options.fans) {
@@ -686,7 +693,7 @@ static int Status() {
     if (!options.watch)
       break;
     sleep_ms(options.watch * 1000);
-    fputs("\033c", stdout);
+    printf("%s", "\033c");
   }
 
   return NBFC_EXIT_SUCCESS;
