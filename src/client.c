@@ -381,24 +381,24 @@ error:
 static int Service_Start(bool read_only) {
   check_root();
   int pid = get_service_pid();
-  if (pid != -1)
+  if (pid != -1) {
     Log_Info("Service already running (pid: %d)\n", pid);
-  else {
-    char cmd[32] = "nbfc_service -f";
-    if (read_only)
-      strcat(cmd, " -r");
-    int ret = system(cmd);
-    if (ret == -1) {
-      Log_Error("Failed to start process: %s\n", strerror(errno));
-      return NBFC_EXIT_FAILURE;
-    }
-    if (WEXITSTATUS(ret) == 127) {
-      Log_Error("Can't run nbfc_service, make sure the binary is installed\n");
-      return NBFC_EXIT_FAILURE;
-    }
-    return WEXITSTATUS(ret);
+    return NBFC_EXIT_SUCCESS;
   }
-  return NBFC_EXIT_SUCCESS;
+
+  char cmd[32] = "nbfc_service -f";
+  if (read_only)
+    strcat(cmd, " -r");
+  int ret = system(cmd);
+  if (ret == -1) {
+    Log_Error("Failed to start process: %s\n", strerror(errno));
+    return NBFC_EXIT_FAILURE;
+  }
+  if (WEXITSTATUS(ret) == 127) {
+    Log_Error("Can't run nbfc_service, make sure the binary is installed\n");
+    return NBFC_EXIT_FAILURE;
+  }
+  return WEXITSTATUS(ret);
 }
 
 static int Service_Stop() {
