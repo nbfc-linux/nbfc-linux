@@ -20,13 +20,14 @@ AC_TYPE_SSIZE_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
+AC_TYPE_MODE_T
 
 # Checks for library functions.
 AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([atexit memset mkdir setlocale strchr strcspn strdup strerror strtol strtoull])
+AC_CHECK_FUNCS([atexit memset mkdir realpath setlocale strchr strrchr strcspn strdup strerror strtol strtoull])
 
 # Init-System
 AC_ARG_WITH([init-system],
