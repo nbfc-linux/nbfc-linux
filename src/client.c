@@ -7,7 +7,7 @@
 #include <ctype.h>    // tolower
 #include <dirent.h>   // DIR, opendir, readdir, closedir
 #include <errno.h>    // ENODATA
-#include <fcntl.h>    // open, O_WRONLY, O_CREAT, O_TRUNC
+#include <fcntl.h>    // O_WRONLY, O_CREAT, O_TRUNC
 #include <float.h>    // FLT_MAX
 #include <locale.h>   // setlocale, LC_NUMERIC
 #include <limits.h>   // INT_MAX, PATH_MAX
@@ -260,10 +260,8 @@ int main(int argc, char *const argv[]) {
   case Command_Status:         return Status();
   case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
   case Command_Get_Model_Name: return Get_Model_Name();
-  default: break;
+  default:                     return NBFC_EXIT_FAILURE;
   }
-
-  return NBFC_EXIT_SUCCESS;
 }
 
 static char*  to_lower(const char*);

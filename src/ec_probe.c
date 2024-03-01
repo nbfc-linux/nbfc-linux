@@ -9,17 +9,21 @@
 #include "model_config.h"
 #include "optparse/optparse.h"
 #include "parse_number.h"
+#include "parse_double.h"
 #include "generated/ec_probe.help.h"
 #include "program_name.c"
 #include "log.h"
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <limits.h>
-#include <signal.h>
-#include <unistd.h>
+#include <float.h>   // FLT_MAX
+#include <stdbool.h> // bool
+#include <stdio.h>   // printf, fprintf, fopen, fread, fclose
+#include <stdint.h>  // uint8_t, uint16_t
+#include <stdlib.h>  // strtoll
+#include <string.h>  // strcmp
+#include <limits.h>  // INT_MAX
+#include <locale.h>  // setlocale, LC_NUMERIC
+#include <signal.h>  // signal, SIGINT, SIGTERM
+#include <unistd.h>  // geteuid, STDOUT_FILENO
 
 #include "error.c"             // src
 #include "ec.c"                // src
@@ -198,7 +202,7 @@ enum UseColor {
 
 static struct {
   int           timespan;
-  int           interval;
+  float         interval;
   const char*   report;
   const char*   file;
   bool          clearly;
@@ -215,9 +219,15 @@ const char RegisterHeader[] =
   "---|------------------------------------------------\n";
 
 int main(int argc, char* const argv[]) {
-  Program_Name_Set(argv[0]);
+  if (argc == 1) {
+    printf(EC_PROBE_HELP_TEXT, argv[0]);
+    return NBFC_EXIT_CMDLINE;
+  }
 
-  options.interval = 500;
+  Program_Name_Set(argv[0]);
+  setlocale(LC_NUMERIC, "C"); // for parsing floats
+
+  options.interval = 0.5;
   ec = NULL;
   enum Command cmd = Command_Help;
 
@@ -277,16 +287,14 @@ int main(int argc, char* const argv[]) {
       }
       break;
     case Option_Timespan:
-      options.timespan = parse_number(p.optarg, 1, INT64_MAX, &err);
-      options.timespan *= 1000;
+      options.timespan = parse_number(p.optarg, 1, INT_MAX, &err);
       if (err) {
         Log_Error("-t|--timespan: %s: %s\n", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Interval:
-      options.interval = parse_number(p.optarg, 1, INT64_MAX, &err);
-      options.interval *= 1000;
+      options.interval = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
         Log_Error("-i|--interval: %s: %s\n", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
@@ -296,11 +304,6 @@ int main(int argc, char* const argv[]) {
       cli99_ExplainError(&p);
       return NBFC_EXIT_CMDLINE;
     }
-  }
-
-  if (cmd == Command_Help) {
-    printf(EC_PROBE_HELP_TEXT, argv[0]);
-    return 0;
   }
 
   if (! cli99_End(&p)) {
@@ -330,16 +333,14 @@ int main(int argc, char* const argv[]) {
   e_die();
 
   switch (cmd) {
-    case Command_Dump:    return Dump();
-    case Command_Load:    return Load();
-    case Command_Read:    return Read();
-    case Command_Write:   return Write();
-    case Command_Monitor: return Monitor();
-    case Command_Watch:   return Watch();
-    default: break;
+  case Command_Dump:    return Dump();
+  case Command_Load:    return Load();
+  case Command_Read:    return Read();
+  case Command_Write:   return Write();
+  case Command_Monitor: return Monitor();
+  case Command_Watch:   return Watch();
+  default:              return NBFC_EXIT_FAILURE;
   }
-
-  return 0;
 }
 
 static int Read() {
@@ -383,9 +384,9 @@ static int Dump() {
   Register_FromEC(&register_buf);
 
   switch (options.use_color) {
-  case ColorAuto:     use_color = isatty(1); break;
-  case ColorEnable:   use_color = true;      break;
-  case ColorDisable:  use_color = false;     break;
+  case ColorAuto:     use_color = isatty(STDOUT_FILENO); break;
+  case ColorEnable:   use_color = true;                  break;
+  case ColorDisable:  use_color = false;                 break;
   }
 
   Register_PrintDump(&register_buf, use_color);
@@ -426,7 +427,7 @@ static int Monitor() {
   for (loops = 0; !quit && loops < max_loops && --size; ++loops) {
     Register_FromEC(regs + loops);
     Register_PrintMonitor(regs, loops);
-    sleep_ms(options.interval);
+    sleep_ms(options.interval * 1000);
   }
 
   if (options.report) {
@@ -452,7 +453,7 @@ static int Watch() {
   for (int loops = 1; !quit && loops < max_loops && --size; ++loops) {
     Register_FromEC(regs + loops);
     Register_PrintWatch(regs , regs + loops, regs + loops - 1);
-    sleep_ms(options.interval);
+    sleep_ms(options.interval * 1000);
   }
 
   return 0;
