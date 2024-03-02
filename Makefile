@@ -1,9 +1,9 @@
 version     = 0.1.15
 
-PREFIX      = /usr/local
+PREFIX      = /usr
 
 bindir			= $(PREFIX)/bin
-confdir 		= $(PREFIX)/etc
+confdir 		= /etc
 datadir			= $(PREFIX)/share
 sysddir 		= $(PREFIX)/lib/systemd/system
 mandir 			= $(PREFIX)/share/man
