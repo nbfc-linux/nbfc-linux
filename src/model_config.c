@@ -4,11 +4,11 @@
 #include "memory.h"
 #include "nxjson_utils.h"
 
-#include <assert.h>
-#include <string.h>
-#include <stdbool.h>
-#include <limits.h>
-#include <math.h>
+#include <assert.h>  // assert
+#include <string.h>  // strcmp
+#include <stdbool.h> // bool
+#include <limits.h>  // INT_MIN, SHRT_MIN
+#include <math.h>    // NAN
 
 #define str_Unset   NULL
 #define int_Unset   INT_MIN
@@ -296,6 +296,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
     snprintf(trace.text, sizeof(trace.text), "FanConfigurations[%td]", f - c->FanConfigurations.data);
 
+    // Add a default FanDisplayName
     if (f->FanDisplayName == NULL) {
       char fan_name[32];
       snprintf(fan_name, sizeof(fan_name), "Fan #%td", f - c->FanConfigurations.data);

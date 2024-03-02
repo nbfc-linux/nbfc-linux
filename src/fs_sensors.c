@@ -118,13 +118,13 @@ Error* FS_Sensors_Init() {
         e = FS_TemperatureSource_GetTemperature(source, &t);
 #ifndef NDEBUG
         e_warn();
+        if (e)
+          continue;
 #endif
-        if (! e) {
-          Log_Info("Using '%s' as temperature source\n", file);
-          source->file = Mem_Strdup(file);
-          if (++source == sources_end)
-            goto end;
-        }
+        Log_Info("Using '%s' as temperature source\n", file);
+        source->file = Mem_Strdup(file);
+        if (++source == sources_end)
+          goto end;
       }
     }
   }

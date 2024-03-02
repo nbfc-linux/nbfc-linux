@@ -11,13 +11,11 @@
 #include "program_name.c"
 #include "log.h"
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <limits.h>
-#include <unistd.h>
-#include <getopt.h>
+#include <stdbool.h> // bool
+#include <stdio.h>   // printf
+#include <string.h>  // strchr
+#include <stdlib.h>  // atext
+#include <getopt.h>  // getopt_long
 
 #include "error.c"        // src
 #include "ec.c"           // src

@@ -1,20 +1,16 @@
 #include "nbfc.h"
 #include "service.h"
-
 #include "error.h"
 #include "log.h"
 #include "ec.h"
 #include "model_config.h"
 #include "generated/nbfc_service.help.h"
 
-#include <signal.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <locale.h>
-#include <limits.h>
-#include <float.h>
-#include <getopt.h>
+#include <signal.h> // signal, SIGINT, SIGTERM
+#include <stdio.h>  // printf
+#include <stdlib.h> // exit, atexit
+#include <locale.h> // setlocale, LC_NUMERIC
+#include <getopt.h> // getopt_long
 
 EC_VTable* ec;
 
