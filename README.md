@@ -30,10 +30,9 @@ Installation
   - Either via AUR (`yaourt -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
-- With Nix:
-  - With legacy nix (`nix-env -if .`)
-  - With nix flakes (`nix profile install`)
-  - [On NixOS](nixos-installation.md)
+- NixOS:
+  - [Declaratively](nixos-installation-new.md)(with nix flakes)
+  - [Imperatively](nixos-installation.md) (with `nix profile install` or `nix-env -if .`)
 
 - Fedora - this will not build the current working directory, but downloads a source archive from chosen release on github and builds an installable rpm:
   - ensure, that podman is installed
