@@ -62,9 +62,9 @@ static const cli99_option status_command_options[] = {
 static const cli99_option config_command_options[] = {
   cli99_include_options(&main_options),
   {"-l|--list",       -'l', 0},
+  {"-r|--recommend",  -'r', 0},
   {"-s|--set",        -'s', 1},
   {"-a|--apply",      -'a', 1},
-  {"-r|--recommend",  -'r', 0},
   cli99_options_end()
 };
 
@@ -554,8 +554,6 @@ error:
 }
 
 static void ServiceConfig_Write() {
-  check_root();
-
   nx_json root = {0};
   nx_json *o = create_json(NX_JSON_OBJECT, NULL, &root);
 
@@ -580,7 +578,7 @@ static void ServiceConfig_Write() {
 
   char buf[NBFC_MAX_FILE_SIZE];
   StringBuf s = { buf, 0, sizeof(buf) };
-  buf[0] = 0;
+  buf[0] = '\0';
 
   nx_json_to_string(o, &s, 0);
 
@@ -620,7 +618,7 @@ static int Wait_For_Hwmon() {
         }
       }
     }
-    sleep(1);
+    sleep_ms(1000);
   }
 
   return NBFC_EXIT_FAILURE;
@@ -675,7 +673,7 @@ static int Status() {
       const int fan_count = service_info.fans.size;
       bool *vis = Mem_Calloc(sizeof(bool), fan_count);
       for_each_array(int*, fan_index, options.fans) {
-        if (*fan_index > fan_count - 1) {
+        if (*fan_index >= fan_count) {
           Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", *fan_index);
           return NBFC_EXIT_FAILURE;
         }
@@ -779,6 +777,8 @@ static int Config() {
 }
 
 static int Set() {
+  check_root();
+
   if (!options.a && !options.speeds.size) {
     printf(CLIENT_SET_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
@@ -802,14 +802,15 @@ static int Set() {
   ServiceInfo_Load();
   ServiceConfig_Load();
 
+  const int fancount = service_info.fans.size;
+
   if (! options.fans.size) {
-    options.fans.data = Mem_Malloc(sizeof(int) * service_info.fans.size);
-    for (int i = 0; i < service_info.fans.size; ++i)
+    options.fans.data = Mem_Malloc(sizeof(int) * fancount);
+    for (int i = 0; i < fancount; ++i)
       options.fans.data[i] = i;
-    options.fans.size  = service_info.fans.size;
+    options.fans.size = fancount;
   }
 
-  const int fancount = service_info.fans.size;
   float* speeds = Mem_Malloc(sizeof(float) * fancount);
 
   for (int i = 0; i < fancount; ++i)
@@ -818,7 +819,7 @@ static int Set() {
     speeds[i] = service_config.TargetFanSpeeds.data[i];
 
   for_each_array(int*, fan_index, options.fans) {
-    if (*fan_index > fancount - 1) {
+    if (*fan_index >= fancount) {
       Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", *fan_index);
       return NBFC_EXIT_FAILURE;
     }
@@ -834,12 +835,9 @@ static int Set() {
 }
 
 static char *to_lower(const char *a) {
-  char *b = (char *)Mem_Malloc(strlen(a) + 1);
-  int i;
-  for (i = 0; a[i]; i++) {
-    b[i] = tolower(a[i]);
-  }
-  b[i] = '\0';
+  char* b = Mem_Strdup(a);
+  for (char* c = b; *c; ++c)
+    *c = tolower(*c);
   return b;
 }
 
