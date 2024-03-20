@@ -235,7 +235,7 @@ int main(int argc, char* const argv[]) {
   cli99_Init(&p, argc, argv, main_options, cli99_options_python);
 
   int o;
-  char* err;
+  const char* err;
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
     case Option_Command:

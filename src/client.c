@@ -162,7 +162,7 @@ int main(int argc, char *const argv[]) {
   mkdir(NBFC_CONFIG_DIR, 0755);
 
   int o;
-  char* err;
+  const char* err;
   enum Command cmd = Command_Help;
   cli99 p;
   cli99_Init(&p, argc, argv, main_options, cli99_options_python);
@@ -352,7 +352,7 @@ static void check_root() {
 }
 
 static int get_service_pid() {
-  char* err;
+  const char* err;
   char buf[32];
   if (slurp_file(buf, sizeof(buf), NBFC_PID_FILE) == -1) {
     if (errno == ENOENT)

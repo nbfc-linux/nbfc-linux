@@ -8,7 +8,7 @@
 #include <string.h> // strerror
 #include <stdio.h>  // fprintf
 
-static inline void Memory_FatalError(const char* cause) {
+static void Memory_FatalError(const char* cause) {
   fprintf(stderr, "%s: %s\n", cause, strerror(errno));
   exit(NBFC_EXIT_FATAL);
 }

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int64_t parse_number(const char* s, int64_t min, int64_t max, char** errmsg) {
+static int64_t parse_number(const char* s, int64_t min, int64_t max, const char** errmsg) {
   errno = 0;
   char* end;
   int64_t val = strtoll(s, &end, 0);
