@@ -1,0 +1,77 @@
+{
+ "LegacyTemperatureThresholdsBehaviour": true,
+ "NotebookModel": "GPD Win 2 (8100y)",
+ "Author": "Olav Sortland Thoresen",
+ "EcPollInterval": 5000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 52,
+	 "WriteRegister": 52,
+	 "MinSpeedValue": 33,
+	 "MaxSpeedValue": 79,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 127,
+	 "FanDisplayName": "CPU fan",
+	 "TemperatureThresholds": [
+		{
+		 "UpThreshold": 0,
+		 "DownThreshold": 0,
+		 "FanSpeed": 0.0
+		},
+		{
+		 "UpThreshold": 60,
+		 "DownThreshold": 48,
+		 "FanSpeed": 10.0
+		},
+		{
+		 "UpThreshold": 63,
+		 "DownThreshold": 55,
+		 "FanSpeed": 20.0
+		},
+		{
+		 "UpThreshold": 66,
+		 "DownThreshold": 59,
+		 "FanSpeed": 50.0
+		},
+		{
+		 "UpThreshold": 68,
+		 "DownThreshold": 63,
+		 "FanSpeed": 70.0
+		},
+		{
+		 "UpThreshold": 71,
+		 "DownThreshold": 67,
+		 "FanSpeed": 100.0
+		}
+	],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 51,
+	 "Value": 0,
+	 "ResetRequired": true,
+	 "ResetValue": 8,
+	 "ResetWriteMode": "Set",
+	 "Description": "Reset automatic fan control counter high"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 53,
+	 "Value": 0,
+	 "ResetRequired": true,
+	 "ResetValue": 1,
+	 "ResetWriteMode": "Set",
+	 "Description": "Reset automatic fan control counter low"
+	}
+ ]
+}
