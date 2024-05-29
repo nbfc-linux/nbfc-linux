@@ -1,0 +1,55 @@
+{
+ "NotebookModel": "METAPHYUNI MetawillBook 02",
+ "Author": "bilabila",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 100,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 75,
+	 "WriteRegister": 75,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 255,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "CPU Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 50,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 60,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 70,
+	   "FanSpeed": 100.0
+	  },
+	 ],
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 79,
+	 "Value": 255,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Enable manual control"
+	}
+ ]
+}
