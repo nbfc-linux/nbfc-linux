@@ -30,11 +30,11 @@ Installation
   - Either via AUR (`yaourt -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
-- Debian / Ubuntu:
-  - See (GitHub.com/nbfc-linux/packages/deb)[https://github.com/nbfc-linux/packages/tree/main/deb] for packages.
+- Debian / Ubuntu (untested):
+  - See [GitHub.com/nbfc-linux/packages/deb](https://github.com/nbfc-linux/packages/tree/main/deb) for packages.
 
 - Fedora (untestet)
-  - See (GitHub.com/nbfc-linux/packages/rpm)[https://github.com/nbfc-linux/packages/tree/main/rpm] for packages.
+  - See [GitHub.com/nbfc-linux/packages/rpm](https://github.com/nbfc-linux/packages/tree/main/rpm) for packages.
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)(with nix flakes)
