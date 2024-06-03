@@ -73,8 +73,12 @@ static float Fan_FanSpeedToPercentage(const Fan* self, int fanSpeed) {
   if (override)
     return override->FanSpeedPercentage;
 
-  if (my.minSpeedValueRead == my.maxSpeedValueRead)
-    return 0.0f; /* division by zero */
+  // Here we have been preventing a division by zero if both values are
+  // the same. This case cannot happen any longer, because it is tested in
+  // the config validation code.
+  //
+  // if (my.minSpeedValueRead == my.maxSpeedValueRead)
+  //   return 0.0f;
 
   return ((float)(fanSpeed - my.minSpeedValueRead) /
      (my.maxSpeedValueRead - my.minSpeedValueRead)) * 100.0f;

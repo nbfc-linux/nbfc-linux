@@ -15,7 +15,7 @@
 #define short_Unset SHRT_MIN
 #define float_Unset NAN
 
-static inline Error* bool_FromJson(bool* out, const nx_json* node) {
+static inline Error* Boolean_FromJson(Boolean* out, const nx_json* node) {
   if (node->type == NX_JSON_BOOL) {
     *out = node->val.u;
     return err_success();
@@ -59,10 +59,6 @@ static inline Error* float_FromJson(float* out, const nx_json* json) {
   if (! e)
     *out = d;
   return e;
-}
-
-static inline Error* Boolean_FromJson(Boolean* out, const nx_json* json) {
-  return bool_FromJson((bool*) out, json);
 }
 
 static inline Error* str_FromJson(const char** out, const nx_json* json) {
@@ -309,6 +305,18 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
     e = FanConfiguration_ValidateFields(f);
     e_goto(err);
+
+    if (f->MinSpeedValue == f->MaxSpeedValue) {
+      e = err_string(0, "MinSpeedValue and MaxSpeedValue cannot be the same");
+      e_goto(err);
+    }
+
+    if (f->IndependentReadMinMaxValues &&
+        f->MinSpeedValueRead == f->MaxSpeedValueRead)
+    {
+      e = err_string(0, "MinSpeedValueRead and MaxSpeedValueRead cannot be the same");
+      e_goto(err);
+    }
 
     for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
       Trace trace1 = {0};
