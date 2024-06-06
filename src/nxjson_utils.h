@@ -61,4 +61,20 @@ static inline nx_json *create_json_double(const char* key, nx_json* parent, doub
   return json;
 }
 
+static inline nx_json *create_json_bool(const char* key, nx_json* parent, bool val) {
+  nx_json* json = create_json(NX_JSON_BOOL, key, parent);
+  json->val.i = val;
+  return json;
+}
+
+static inline nx_json *create_json_object(const char* key, nx_json* parent) {
+  nx_json* json = create_json(NX_JSON_OBJECT, key, parent);
+  return json;
+}
+
+static inline nx_json *create_json_array(const char* key, nx_json* parent) {
+  nx_json* json = create_json(NX_JSON_ARRAY, key, parent);
+  return json;
+}
+
 #endif

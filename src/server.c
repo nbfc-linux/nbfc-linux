@@ -19,7 +19,6 @@ static int                Server_FD = -1;
 static struct sockaddr_in Server_Address;
 static pthread_t          Server_Thread_ID;
 
-static const char* Json_EscapeString(char*, const size_t, const char*);
 static void* Server_Run(void*);
 
 static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
@@ -98,10 +97,8 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
     return e;
 
   nx_json root = {0};
-  nx_json *o = create_json(NX_JSON_OBJECT, NULL, &root);
-
-  nx_json *o1 = create_json(NX_JSON_STRING, "status", o);
-  o1->val.text = "OK";
+  nx_json *o = create_json_object(NULL, &root);
+  create_json_string("status", o, "OK");
 
   e = Protocol_Send_Json(socket, o);
   nx_json_free(o);
@@ -118,56 +115,27 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
       return err_string(0, "Unknown arguments");
   }
 
-  static const char Bool_ToStr[2][6] = {"false", "true"};
-  char buf[256];
-  char result[NBFC_MAX_FILE_SIZE];
-  StringBuf  S = {result, 0, sizeof(result) - 1};
-  StringBuf* s = &S;
+  nx_json root = {0};
+  nx_json *o = create_json_object(NULL, &root);
+  create_json_integer("pid", o, getpid());
+  create_json_string("config", o, Service_Model_Config.NotebookModel);
+  create_json_bool("read-only", o, options.read_only);
+  create_json_double("temperature", o, Service_Temperature);
+  nx_json* fans = create_json_array("fans", o);
 
-  StringBuf_Printf(s, "{\n"
-    "\t\"pid\":         %d,\n"
-    "\t\"config\":      \"%s\",\n"
-    "\t\"read-only\":   %s,\n"
-    "\t\"temperature\": %.2f,\n"
-    "\t\"fans\": [\n",
-    getpid(),
-    Json_EscapeString(buf, sizeof(buf), Service_Model_Config.NotebookModel),
-    Bool_ToStr[options.read_only],
-    Service_Temperature);
-
-  size_t i = 0;
   for_each_array(Fan*, fan, Service_Fans) {
-    StringBuf_Printf(s, "\t\t{\n"
-      "\t\t\t\"name\":          \"%s\",\n"
-      "\t\t\t\"automode\":      %s,\n"
-      "\t\t\t\"critical\":      %s,\n"
-      "\t\t\t\"current_speed\": %.2f,\n"
-      "\t\t\t\"target_speed\":  %.2f,\n"
-      "\t\t\t\"speed_steps\":   %d\n"
-      "\t\t}%s\n",
-      Json_EscapeString(buf, sizeof(buf), fan->fanConfig->FanDisplayName),
-      Bool_ToStr[fan->mode == Fan_ModeAuto],
-      Bool_ToStr[fan->isCritical],
-      Fan_GetCurrentSpeed(fan),
-      Fan_GetTargetSpeed(fan),
-      Fan_GetSpeedSteps(fan),
-      (++i != Service_Fans.size ? "," : "")
-      );
+    nx_json* fan_json = create_json_object(NULL, fans);
+    create_json_string("name", fan_json, fan->fanConfig->FanDisplayName);
+    create_json_bool("automode", fan_json, (fan->mode == Fan_ModeAuto));
+    create_json_bool("critical", fan_json, fan->isCritical);
+    create_json_double("current_speed", fan_json, Fan_GetCurrentSpeed(fan));
+    create_json_double("target_speed", fan_json, Fan_GetTargetSpeed(fan));
+    create_json_integer("speed_steps", fan_json, Fan_GetSpeedSteps(fan));
   }
 
-  StringBuf_Printf(s, "\t\t]\n}\n");
-  if (s->size + 1 == s->capacity)
-    return (errno = ENOBUFS), err_stdlib(0, NULL);
-
-  e = Protocol_Send(socket, s->s, s->size, 0);
-  if (e)
-    return e;
-
-  e = Protocol_Send_End(socket);
-  if (e)
-    return e;
-
-  return err_success();
+  e = Protocol_Send_Json(socket, o);
+  nx_json_free(o);
+  return e;
 }
 
 static void *Server_Handle_Client(void *arg) {
@@ -232,9 +200,16 @@ END:
 }
 
 Error* Server_Init(int port) {
+  int opt = 1;
+
   // Create a TCP/IP socket
   if ((Server_FD = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
     return err_stdlib(0, "socket()");
+  }
+
+  if (setsockopt(Server_FD, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+    close(Server_FD);
+    return err_stdlib(0, "setsockopt()");
   }
 
   // Bind the socket to an address
@@ -243,11 +218,13 @@ Error* Server_Init(int port) {
   Server_Address.sin_port = htons(port);
 
   if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) < 0) {
+    close(Server_FD);
     return err_stdlib(0, "bind()");
   }
 
   // Listeon for incoming connections
   if (listen(Server_FD, 3) < 0) {
+    close(Server_FD);
     return err_stdlib(0, "listen()");
   }
 
@@ -289,9 +266,20 @@ Error* Server_Loop() {
 }
 
 static void* Server_Run(void* arg) {
+  int failures = 0;
+
   while (1) {
     Error* e = Server_Loop();
     e_warn();
+
+    if (e) {
+      if (++failures > 10) {
+        e_warn();
+        return NULL;
+      }
+    }
+    else
+      failures = 0;
   }
 
   return NULL;
@@ -302,18 +290,3 @@ void Server_Close() {
     close(Server_FD);
   Server_FD = -1;
 }
-
-// ", \, and control codes (anything less than U+0020).
-static const char* Json_EscapeString(char* buf, const size_t n, const char* s) {
-  size_t i = 0;
-  for (; *s && i < n - 6 - 1; ++s)
-    if (*s == '"' || *s == '\\' || *s < 0x20) {
-      snprintf(&buf[i], 7, "\\u%.4X", *s);
-      i += 6;
-    }
-    else
-      buf[i++] = *s;
-  buf[i] = '\0';
-  return buf;
-}
-

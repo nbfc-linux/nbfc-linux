@@ -556,7 +556,7 @@ static Error* ServiceInfo_TryLoad() {
   ServiceConfig_ValidateFields(&service_config); // Load defaults
 
   nx_json root = {0};
-  nx_json* in = create_json(NX_JSON_OBJECT, NULL, &root);
+  nx_json* in = create_json_object(NULL, &root);
   create_json_string("command", in, "status");
 
   char* buf = NULL;
@@ -827,7 +827,7 @@ static int Set() {
   ServiceConfig_ValidateFields(&service_config); // Load defaults
 
   nx_json root = {0};
-  nx_json* in = create_json(NX_JSON_OBJECT, NULL, &root);
+  nx_json* in = create_json_object(NULL, &root);
   create_json_string("command", in, "set-fan-speed");
 
   if (options.fans.size)

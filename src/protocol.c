@@ -1,5 +1,6 @@
 #include "protocol.h"
 
+#include "nxjson_utils.h"
 #include "reverse_nxjson.h"
 
 #define PROTOCOL_BUFFER_SIZE 4096
@@ -73,11 +74,8 @@ Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
 
 Error* Protocol_Send_Error(int socket, const char* message) {
   nx_json root = {0};
-  nx_json *o = create_json(NX_JSON_OBJECT, NULL, &root);
-
-  nx_json *o1 = create_json(NX_JSON_STRING, "error", o);
-  o1->val.text = message;
-
+  nx_json *o = create_json_object(NULL, &root);
+  create_json_string("error", o, message);
   Error* e = Protocol_Send_Json(socket, o);
   nx_json_free(o);
   return e;

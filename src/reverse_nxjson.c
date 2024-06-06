@@ -13,6 +13,8 @@
 #define ADD_INDENTION(N) \
     StringBuf_Printf(s, "\n%*s", N, " ")
 
+static const char* Json_EscapeString(char*, const size_t, const char*);
+
 char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
   while (nx != NULL) {
     if (nx->type == NX_JSON_OBJECT) {
@@ -34,7 +36,9 @@ char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
         ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
         StringBuf_AddCh(s, '"');
-        StringBuf_Printf(s, "%s", nx->val.text);
+        char buf[NBFC_MAX_FILE_SIZE];
+        Json_EscapeString(buf, sizeof(buf), nx->val.text);
+        StringBuf_Printf(s, "%s", buf);
         StringBuf_AddCh(s, '"');
       } else if (nx->type == NX_JSON_BOOL) {
         ADD_INDENTION(indent);
@@ -61,3 +65,18 @@ char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
 
   return s->s;
 }
+
+// ", \, and control codes (anything less than U+0020).
+static const char* Json_EscapeString(char* buf, const size_t n, const char* s) {
+  size_t i = 0;
+  for (; *s && i < n - 6 - 1; ++s)
+    if (*s == '"' || *s == '\\' || *s < 0x20) {
+      snprintf(&buf[i], 7, "\\u%.4X", *s);
+      i += 6;
+    }
+    else
+      buf[i++] = *s;
+  buf[i] = '\0';
+  return buf;
+}
+
