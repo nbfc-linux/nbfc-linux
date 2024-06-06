@@ -8,6 +8,7 @@
 #include "model_config.h"
 #include "pidfile.h"
 #include "generated/nbfc_service.help.h"
+#include "quit.h"
 
 #include <signal.h> // signal, SIGINT, SIGTERM
 #include <stdio.h>  // printf
@@ -18,11 +19,9 @@
 
 EC_VTable* ec;
 
-static volatile int quit;
-
 static void sig_handler(int sig) {
   if (sig == SIGTERM || sig == SIGINT)
-    quit = sig;
+    quit = true;
 }
 
 static struct option cli_options[] = {

@@ -6,6 +6,7 @@
 #include "error.h"
 #include "service.h"
 #include "log.h"
+#include "quit.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -200,16 +201,18 @@ END:
 }
 
 Error* Server_Init(int port) {
+  Error* e = NULL;
   int opt = 1;
 
   // Create a TCP/IP socket
   if ((Server_FD = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-    return err_stdlib(0, "socket()");
+    e = err_stdlib(0, "socket()");
+    goto error;
   }
 
   if (setsockopt(Server_FD, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
-    close(Server_FD);
-    return err_stdlib(0, "setsockopt()");
+    e = err_stdlib(0, "setsockopt()");
+    goto error;
   }
 
   // Bind the socket to an address
@@ -218,18 +221,25 @@ Error* Server_Init(int port) {
   Server_Address.sin_port = htons(port);
 
   if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) < 0) {
-    close(Server_FD);
-    return err_stdlib(0, "bind()");
+    e = err_stdlib(0, "bind()");
+    goto error;
   }
 
   // Listeon for incoming connections
   if (listen(Server_FD, 3) < 0) {
-    close(Server_FD);
-    return err_stdlib(0, "listen()");
+    e = err_stdlib(0, "listen()");
+    goto error;
   }
 
   Log_Info("Connected on port %d\n", ntohs(Server_Address.sin_port));
-  return err_success();
+
+error:
+  if (e) {
+    close(Server_FD);
+    Server_FD = -1;
+  }
+
+  return e;
 }
 
 Error* Server_Start() {
@@ -268,15 +278,13 @@ Error* Server_Loop() {
 static void* Server_Run(void* arg) {
   int failures = 0;
 
-  while (1) {
+  while (! quit) {
     Error* e = Server_Loop();
     e_warn();
 
     if (e) {
-      if (++failures > 10) {
-        e_warn();
+      if (++failures > 10)
         return NULL;
-      }
     }
     else
       failures = 0;
