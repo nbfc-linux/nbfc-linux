@@ -261,10 +261,6 @@ Error* Server_Loop() {
 
   if ((*new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0) {
     free(new_socket);
-
-    if (quit)
-      return err_success();
-
     return err_stdlib(0, "accept()");
   }
 
@@ -284,7 +280,11 @@ static void* Server_Run(void* arg) {
 
   while (! quit) {
     Error* e = Server_Loop();
-    e_warn();
+
+    // When the server stops, accept() from Server_Loop() returns
+    // EBADF. So don't handle this as an error.
+    if (! quit)
+      e_warn();
 
     if (e) {
       if (++failures > 10)
