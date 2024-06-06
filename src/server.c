@@ -261,6 +261,10 @@ Error* Server_Loop() {
 
   if ((*new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0) {
     free(new_socket);
+
+    if (quit)
+      return err_success();
+
     return err_stdlib(0, "accept()");
   }
 
