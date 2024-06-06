@@ -256,8 +256,15 @@
       {
         "name": "EmbeddedControllerType",
         "type": "EmbeddedControllerType",
-        "help": "Either `ECSysLinux` for using the `ec_sys` kernel module, or `ECLinux` for an alternative implementation using `/dev/port` without depending on kernel modules.",
+        "help": "Either `ec_sys` for using the `ec_sys` kernel module, `acpi_ec` for using the `acpi_ec` kernel module, or `dev_port` for an alternative implementation using `/dev/port` without depending on kernel modules.",
         "is_unset": "false"
+      },
+      {
+        "name": "Port",
+        "type": "int",
+        "help": "The port number to run under.",
+        "default": "6431",
+        "valid": "parameter > 0 && parameter < 65536"
       },
       {
         "name": "TargetFanSpeeds",

@@ -8,7 +8,6 @@
 #define NBFC_CONFIG_DIR                  SYSCONFDIR "/nbfc"
 #define NBFC_SERVICE_CONFIG              SYSCONFDIR "/nbfc/nbfc.json"
 #define NBFC_PID_FILE                    RUNSTATEDIR "/nbfc_service.pid"
-#define NBFC_STATE_FILE                  RUNSTATEDIR "/nbfc_service.state.json"
 
 #define NBFC_EXIT_SUCCESS 0
 #define NBFC_EXIT_FAILURE 1

@@ -78,6 +78,7 @@ Error* ModelConfig_ValidateFields(ModelConfig*);
 struct ServiceConfig {
 	const char*     SelectedConfigId;
 	EmbeddedControllerType EmbeddedControllerType;
+	int             Port;
 	array_of(float) TargetFanSpeeds;
 };
 

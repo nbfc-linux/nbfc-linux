@@ -69,7 +69,7 @@ const char* NX_JSON_MSGS[NX_JSON_ERR_INVALID_NUMBER + 1] = {
 
 #define IS_WHITESPACE(c) ((unsigned char)(c)<=(unsigned char)' ')
 
-static nx_json *create_json(nx_json_type type, const char *key, nx_json *parent) {
+nx_json *create_json(nx_json_type type, const char *key, nx_json *parent) {
 	nx_json *js = nx_calloc(type);
 	assert(js);
 	js->type = type;

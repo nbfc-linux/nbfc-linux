@@ -355,6 +355,7 @@ Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 struct ServiceConfig ServiceConfig_Unset = {
 	str_Unset,
 	EmbeddedControllerType_Unset,
+	int_Unset,
 	{NULL, 0},
 };
 
@@ -364,6 +365,11 @@ Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
 
 	if (false)
 		return err_string(0, "EmbeddedControllerType: Missing option");
+
+	if (self->Port == int_Unset)
+		self->Port = 6431;
+	else if (! (self->Port > 0 && self->Port < 65536))
+		return err_string(0, "Port: requires: parameter > 0 && parameter < 65536");
 
 	if (false)
 		return err_string(0, "TargetFanSpeeds: Missing option");
@@ -383,6 +389,8 @@ Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 			e = str_FromJson(&obj->SelectedConfigId, c);
 		else if (!strcmp(c->key, "EmbeddedControllerType"))
 			e = EmbeddedControllerType_FromJson(&obj->EmbeddedControllerType, c);
+		else if (!strcmp(c->key, "Port"))
+			e = int_FromJson(&obj->Port, c);
 		else if (!strcmp(c->key, "TargetFanSpeeds"))
 			e = array_of_float_FromJson(&obj->TargetFanSpeeds, c);
 		else

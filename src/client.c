@@ -4,20 +4,21 @@
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 
-#include <ctype.h>    // tolower
-#include <dirent.h>   // DIR, opendir, readdir, closedir
-#include <errno.h>    // ENODATA
-#include <fcntl.h>    // O_WRONLY, O_CREAT, O_TRUNC
-#include <float.h>    // FLT_MAX
-#include <locale.h>   // setlocale, LC_NUMERIC
-#include <limits.h>   // INT_MAX, PATH_MAX
-#include <signal.h>   // kill, SIGINT
-#include <stdbool.h>  // bool
-#include <stdio.h>    // printf, snprintf, remove
-#include <stdlib.h>   // exit, realpath, system, WEXITSTATUS, qsort
-#include <string.h>   // strcmp, strncmp, strncpy, strcat, strcspn, strrchr, strerror
-#include <sys/stat.h> // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
-#include <unistd.h>   // access, F_OK, geteuid
+#include <ctype.h>     // tolower
+#include <dirent.h>    // DIR, opendir, readdir, closedir
+#include <errno.h>     // ENODATA
+#include <fcntl.h>     // O_WRONLY, O_CREAT, O_TRUNC
+#include <float.h>     // FLT_MAX
+#include <locale.h>    // setlocale, LC_NUMERIC
+#include <limits.h>    // INT_MAX, PATH_MAX
+#include <signal.h>    // kill, SIGINT
+#include <stdbool.h>   // bool
+#include <stdio.h>     // printf, snprintf, remove
+#include <stdlib.h>    // exit, realpath, system, WEXITSTATUS, qsort
+#include <string.h>    // strcmp, strncmp, strncpy, strcat, strcspn, strrchr, strerror
+#include <sys/stat.h>  // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
+#include <unistd.h>    // access, F_OK, geteuid
+#include <arpa/inet.h>
 
 #include "generated/client.help.h"
 #include "log.h"
@@ -26,22 +27,25 @@
 #include "nxjson_utils.h"
 #include "parse_number.h"
 #include "parse_double.h"
+#include "protocol.h"
 #include "sleep.h"
 #include "slurp_file.h"
 #include "stringbuf.h"
+#include "service_config.h"
 
 #include "error.c"
 #include "optparse/optparse.c"
 #include "model_config.c"
 #include "memory.c"
 #include "program_name.c"
+#include "protocol.c"
 #include "nxjson.c"
 #include "reverse_nxjson.c"
+#include "service_config.c"
 
 #define DmiIdDirectoryPath "/sys/devices/virtual/dmi/id"
 
 static ServiceInfo service_info;
-static ServiceConfig service_config;
 
 static const cli99_option main_options[] = {
   {"-v|--version",  -'v', 0},
@@ -270,6 +274,44 @@ static char** get_longest_common_substrings(const char*, const char*);
 static char*  get_longest_common_substring(const char*, const char*);
 static float  get_similarity_index(const char*, const char*);
 
+Error* Client_Communicate(int port, const nx_json* in, char**buf, const nx_json** out) {
+  int sock = 0;
+  struct sockaddr_in serv_addr;
+  Error* e = NULL;
+
+  sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (sock < 0) {
+    e = err_stdlib(0, "socket()");
+    goto error;
+  }
+
+  serv_addr.sin_family = AF_INET;
+  serv_addr.sin_port = htons(port);
+
+  if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
+    e = err_string(0, "127.0.0.1: Invalid address / Address not supported");
+    goto error;
+  }
+
+  if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+    e = err_stdlib(0, "connect()");
+    goto error;
+  }
+
+  e = Protocol_Send_Json(sock, in);
+  if (e)
+    goto error;
+
+  e = Protocol_Receive_Json(sock, buf, out);
+  if (e)
+    goto error;
+
+error:
+  if (sock)
+    close(sock);
+  return e;
+}
+
 static const char* get_system_product() {
   static char buf[128] = {0};
   if (*buf)
@@ -406,7 +448,6 @@ static int Service_Stop() {
     Log_Error("Service not running\n");
     return NBFC_EXIT_SUCCESS;
   }
-  remove(NBFC_STATE_FILE);
   remove(NBFC_PID_FILE);
   Log_Info("Killing nbfc_service (%d)\n", pid);
   if (kill(pid, SIGINT) == -1) {
@@ -487,50 +528,6 @@ static array_of(ConfigFile) recommended_configs() {
   return files;
 }
 
-static Error* ServiceInfo_TryLoad() {
-  char buf[NBFC_MAX_FILE_SIZE];
-  const nx_json* js = NULL;
-  Error* e = nx_json_parse_file(&js, buf, sizeof(buf), NBFC_STATE_FILE);
-  if (e)
-    goto error;
-
-  e = ServiceInfo_FromJson(&service_info, js);
-  nx_json_free(js);
-
-  if (e)
-    goto error;
-
-  e = ServiceInfo_ValidateFields(&service_info);
-  if (e)
-    goto error;
-
-  for_each_array(FanInfo*, f, service_info.fans) {
-    e = FanInfo_ValidateFields(f);
-    if (e)
-      goto error;
-  }
-
-  if (e) {
-error:
-    e = err_string(e, NBFC_STATE_FILE);
-    return e;
-  }
-
-  return err_success();
-}
-
-static void ServiceInfo_Load() {
-  // The service info file is sometimes not completely written.
-  // That's why we try to load the file multiple times.
-  Error* e;
-  for (int tries = 0; ++tries <= 5;)
-    if ((e = ServiceInfo_TryLoad()) == err_success())
-      break;
-    else
-      sleep_ms(100);
-  e_die();
-}
-
 static void ServiceConfig_Load() {
   if (access(NBFC_SERVICE_CONFIG, F_OK) != 0) {
     service_config = ServiceConfig_Unset; // Clear values
@@ -553,39 +550,64 @@ error:
   }
 }
 
-static void ServiceConfig_Write() {
+static Error* ServiceInfo_TryLoad() {
+  Error* e;
+  ServiceConfig_Load();
+  ServiceConfig_ValidateFields(&service_config); // Load defaults
+
   nx_json root = {0};
-  nx_json *o = create_json(NX_JSON_OBJECT, NULL, &root);
+  nx_json* in = create_json(NX_JSON_OBJECT, NULL, &root);
+  create_json_string("command", in, "status");
 
-  if (service_config.SelectedConfigId != NULL) {
-    nx_json *o1 = create_json(NX_JSON_STRING, "SelectedConfigId", o);
-    o1->val.text = service_config.SelectedConfigId;
+  char* buf = NULL;
+  const nx_json* out = NULL;
+  e = Client_Communicate(service_config.Port, in, &buf, &out);
+  if (e)
+    goto error;
+
+  if (out->type != NX_JSON_OBJECT) {
+    e = err_string(0, "Not a JSON object");
+    goto error;
   }
 
-  if (service_config.EmbeddedControllerType != EmbeddedControllerType_Unset) {
-    nx_json *o1 = create_json(NX_JSON_STRING, "EmbeddedControllerType", o);
-    o1->val.text = EmbeddedControllerType_ToString(service_config.EmbeddedControllerType);
-  }
-
-  if (service_config.TargetFanSpeeds.size) {
-    nx_json *o1  = create_json(NX_JSON_ARRAY, "TargetFanSpeeds", o);
-
-    for_each_array(float*, f, service_config.TargetFanSpeeds) {
-      nx_json *o2 = create_json(NX_JSON_DOUBLE, NULL, o1);
-      o2->val.dbl = *f;
+  const nx_json* err = nx_json_get(out, "error");
+  if (err) {
+    if (err->type != NX_JSON_STRING) {
+      e = err_string(0, "'error' is not a string");
+      goto error;
     }
+
+    return err_string(0, err->val.text);
   }
 
-  char buf[NBFC_MAX_FILE_SIZE];
-  StringBuf s = { buf, 0, sizeof(buf) };
-  buf[0] = '\0';
+  e = ServiceInfo_FromJson(&service_info, out);
+  if (e)
+    goto error;
 
-  nx_json_to_string(o, &s, 0);
+  e = ServiceInfo_ValidateFields(&service_info);
+  if (e)
+    goto error;
 
-  if (write_file(NBFC_SERVICE_CONFIG, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
-    Log_Error("Could not write to " NBFC_SERVICE_CONFIG ": %s\n", strerror(errno));
-    exit(NBFC_EXIT_FAILURE);
+  for_each_array(FanInfo*, f, service_info.fans) {
+    e = FanInfo_ValidateFields(f);
+    if (e)
+      goto error;
   }
+
+error:
+  if (in)
+    nx_json_free(in);
+  if (out)
+    nx_json_free(out);
+  if (buf)
+    free(buf);
+
+  return e;
+}
+
+static inline void ServiceInfo_Load() {
+  Error* e = ServiceInfo_TryLoad();
+  e_die();
 }
 
 static int Wait_For_Hwmon() {
@@ -764,7 +786,11 @@ static int Config() {
 
     ServiceConfig_Load();
     service_config.SelectedConfigId = model;
-    ServiceConfig_Write();
+    Error* e = ServiceConfig_Write();
+    if (e) {
+      Log_Error("%s\n", err_print_all(e));
+      return NBFC_EXIT_FAILURE;
+    }
 
     if (options.a)
       return Service_Restart(0);
@@ -777,8 +803,6 @@ static int Config() {
 }
 
 static int Set() {
-  check_root();
-
   if (!options.a && !options.speeds.size) {
     printf(CLIENT_SET_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
@@ -799,39 +823,73 @@ static int Set() {
     return NBFC_EXIT_FAILURE;
   }
 
-  ServiceInfo_Load();
   ServiceConfig_Load();
+  ServiceConfig_ValidateFields(&service_config); // Load defaults
 
-  const int fancount = service_info.fans.size;
+  nx_json root = {0};
+  nx_json* in = create_json(NX_JSON_OBJECT, NULL, &root);
+  create_json_string("command", in, "set-fan-speed");
 
-  if (! options.fans.size) {
-    options.fans.data = Mem_Malloc(sizeof(int) * fancount);
-    for (int i = 0; i < fancount; ++i)
-      options.fans.data[i] = i;
-    options.fans.size = fancount;
+  if (options.fans.size)
+    create_json_integer("fan", in, options.fans.data[0]);
+
+  if (options.a)
+    create_json_string("speed", in, "auto");
+  else
+    create_json_double("speed", in, options.speeds.data[0]);
+
+  char* buf = NULL;
+  const nx_json* out = NULL;
+  Error* e = Client_Communicate(service_config.Port, in, &buf, &out);
+  if (e)
+    goto error;
+
+  if (out->type != NX_JSON_OBJECT) {
+    e = err_string(0, "Not a JSON object");
+    goto error;
   }
 
-  float* speeds = Mem_Malloc(sizeof(float) * fancount);
-
-  for (int i = 0; i < fancount; ++i)
-    speeds[i] = -1;
-  for (int i = 0; i < min(service_config.TargetFanSpeeds.size, fancount); ++i)
-    speeds[i] = service_config.TargetFanSpeeds.data[i];
-
-  for_each_array(int*, fan_index, options.fans) {
-    if (*fan_index >= fancount) {
-      Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", *fan_index);
-      return NBFC_EXIT_FAILURE;
+  const nx_json* err = nx_json_get(out, "error");
+  if (err) {
+    if (err->type != NX_JSON_STRING) {
+      e = err_string(0, "'error' is not a string");
+      goto error;
     }
 
-    speeds[*fan_index] = options.a ? -1 : options.speeds.data[0];
+    Log_Error("Service returned: %s\n", err->val.text);
+    return NBFC_EXIT_FAILURE;
   }
 
-  service_config.TargetFanSpeeds.data = speeds;
-  service_config.TargetFanSpeeds.size = fancount;
+  const nx_json* status = nx_json_get(out, "status");
+  if (! status) {
+    e = err_string(0, "Missing status in JSON output");
+    goto error;
+  }
 
-  ServiceConfig_Write();
-  return Service_Restart(0);
+  if (status->type != NX_JSON_STRING) {
+    e = err_string(0, "status: not a JSON string");
+    goto error;
+  }
+
+  if (strcmp(status->val.text, "OK")) {
+    e = err_string(0, "Status != OK");
+    goto error;
+  }
+
+error:
+  if (in)
+    nx_json_free(in);
+  if (out)
+    nx_json_free(out);
+  if (buf)
+    free(buf);
+
+  if (e) {
+    Log_Error("%s\n", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
+  return NBFC_EXIT_SUCCESS;
 }
 
 static char *to_lower(const char *a) {

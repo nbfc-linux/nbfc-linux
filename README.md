@@ -18,7 +18,7 @@ Comparison of NBFC C# and NBFC Linux
 |Memory consumption (ps\_mem)     | ~50MB                                 | ~350KB                                      |
 |Package size (pkg.tar.gz)        | 448K	                              | 100K                                        |
 |Service control rights           | Any user                              | Only root                                   |
-|IPC Concept                      | TCP/IP                                | Files                                       |
+|IPC Concept                      | TCP/IP                                | TCP/IP                                      |
 |IPC Protocol                     | Binary                                | JSON                                        |
 
 All programs, the [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probing tool](doc/ec_probe.1.md) are written in C.
@@ -86,10 +86,7 @@ Differences in detail
 |Notebook configuration files     | /opt/nbfc/Configs/\*.xml              | /usr/share/nbfc/configs/\*.json             |
 |Service binary                   | /opt/nbfc/nbfcservice.sh              | /bin/nbfc\_service                          |
 |PID File                         | /run/nbfc.pid                         | /run/nbfc\_service.pid                      |
-|State file                       | -                                     | /run/nbfc\_service.state.json               |
 |Config file                      | ?                                     | /etc/nbfc/nbfc.json                         |
-
-- The original NBFC service is queried and controlled by the client using TCP/IP. - NBFC Linux does not implement any "real" IPC. Information about the service can be queried by reading its state file. The client controls the service by simply rewriting its configuration file and reloading it.
 
 - The original NBFC service adjusts the fan speeds in intervals of `EcPollIntervall` according to `TemperatureThresholds`. - NBFC Linux directly sets the fan speed (also according to `TemperatureThresholds`).
 
@@ -129,5 +126,7 @@ start    -- Start the service
 status   -- Show the service status
 stop     -- Stop the service
 ```
+
+If you want to write a program that controls the NBFC service, see [protocol](/PROTOCOL.md).
 
 See also the documentation about the [nbfc configuration](doc/nbfc_service.json.5.md).
