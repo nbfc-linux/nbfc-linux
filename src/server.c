@@ -28,10 +28,10 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   Boolean auto_mode = Boolean_Unset;
   const int fancount = Service_Model_Config.FanConfigurations.size;
 
-	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "command"))
+  nx_json_for_each(c, json) {
+    if (!strcmp(c->key, "command"))
       continue;
-		else if (!strcmp(c->key, "fan")) {
+    else if (!strcmp(c->key, "fan")) {
       if (c->type != NX_JSON_INTEGER) {
         return err_string(0, "fan: not an integer");
       }
@@ -45,7 +45,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
         return err_string(0, "fan: no such fan available");
       }
     }
-		else if (!strcmp(c->key, "speed")) {
+    else if (!strcmp(c->key, "speed")) {
       if (c->type == NX_JSON_STRING && !strcmp(c->val.text, "auto")) {
         auto_mode = true;
         continue;
@@ -62,7 +62,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
         return err_string(0, "speed: Invalid value");
       }
     }
-		else {
+    else {
       return err_string(0, "Unknown arguments");
     }
   }
@@ -111,10 +111,10 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
 static Error* Server_Command_Status(int socket, const nx_json* json) {
   Error* e;
 
-	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "command"))
+  nx_json_for_each(c, json) {
+    if (!strcmp(c->key, "command"))
       continue;
-		else
+    else
       return err_string(0, "Unknown arguments");
   }
 
@@ -152,7 +152,7 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
       Fan_GetTargetSpeed(fan),
       Fan_GetSpeedSteps(fan),
       (++i != Service_Fans.size ? "," : "")
-    );
+      );
   }
 
   StringBuf_Printf(s, "\t\t]\n}\n");
