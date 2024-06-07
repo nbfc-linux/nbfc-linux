@@ -59,6 +59,9 @@ Error* Service_Init() {
   static char path[PATH_MAX];
   Service_State = Initialized_0_None;
 
+  // Lock =====================================================================
+  pthread_mutex_init(&Service_Lock, NULL);
+
   // Service config ===========================================================
   e = ServiceConfig_Init(options.service_config);
   if (e) {

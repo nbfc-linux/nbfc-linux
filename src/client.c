@@ -577,7 +577,10 @@ static Error* ServiceInfo_TryLoad() {
       goto error;
     }
 
-    return err_string(0, err->val.text);
+    static char errmsg[1024];
+    snprintf(errmsg, sizeof(errmsg), "%s", err->val.text);
+    e = err_string(0, errmsg);
+    goto error;
   }
 
   e = ServiceInfo_FromJson(&service_info, out);

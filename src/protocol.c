@@ -3,10 +3,12 @@
 #include "nxjson_utils.h"
 #include "reverse_nxjson.h"
 
+#include <sys/socket.h>
+
 #define PROTOCOL_BUFFER_SIZE 4096
 
-Error* Protocol_Send(int socket, const void* buffer, size_t length, int flags) {
-  int ret = send(socket, buffer, length, flags | MSG_NOSIGNAL);
+Error* Protocol_Send(int socket, const void* buffer, size_t length) {
+  int ret = send(socket, buffer, length, MSG_NOSIGNAL);
   if (ret < 0)
     return err_stdlib(0, "send");
   return err_success();
@@ -20,7 +22,7 @@ Error* Protocol_Send_Json(int socket, const nx_json* json) {
   nx_json_to_string(json, &s, 0);
   // TODO: handle case if buffer is too small
 
-  e = Protocol_Send(socket, s.s, s.size, 0);
+  e = Protocol_Send(socket, s.s, s.size);
   if (e)
     return e;
 
@@ -33,17 +35,16 @@ Error* Protocol_Send_Json(int socket, const nx_json* json) {
 
 Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
   char buffer[PROTOCOL_BUFFER_SIZE] = {0};
-  int valread;
+  int nread;
   const nx_json* json = NULL;
 
   char* msg = NULL;
   int msg_size = 0;
 
-  // Empfang von Daten
-  while ((valread = read(socket, buffer, PROTOCOL_BUFFER_SIZE)) > 0) {
-    msg = realloc(msg, msg_size + valread + 1);
-    memcpy(msg + msg_size, buffer, valread);
-    msg_size += valread;
+  while ((nread = read(socket, buffer, PROTOCOL_BUFFER_SIZE)) > 0) {
+    msg = realloc(msg, msg_size + nread + 1);
+    memcpy(msg + msg_size, buffer, nread);
+    msg_size += nread;
     msg[msg_size] = '\0';
 
     char *end_marker_pos = strstr(msg, PROTOCOL_END_MARKER);
@@ -51,9 +52,6 @@ Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
       *end_marker_pos = '\0';
       break;
     }
-
-    // Puffer leeren
-    memset(buffer, 0, PROTOCOL_BUFFER_SIZE);
   }
 
   if (msg) {
@@ -73,11 +71,17 @@ Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
 }
 
 Error* Protocol_Send_Error(int socket, const char* message) {
-  nx_json root = {0};
-  nx_json *o = create_json_object(NULL, &root);
-  create_json_string("error", o, message);
-  Error* e = Protocol_Send_Json(socket, o);
-  nx_json_free(o);
-  return e;
+  nx_json error  = {0};
+  error.type     = NX_JSON_STRING;
+  error.key      = "error";
+  error.val.text = message;
+
+  nx_json obj             = {0};
+  obj.type                = NX_JSON_OBJECT;
+  obj.val.children.length = 1;
+  obj.val.children.first  = &error;
+  obj.val.children.last   = &error;
+
+  return Protocol_Send_Json(socket, &obj);
 }
 

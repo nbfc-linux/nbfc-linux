@@ -19,6 +19,7 @@
 static int                Server_FD = -1;
 static struct sockaddr_in Server_Address;
 static pthread_t          Server_Thread_ID;
+static const int          Server_Max_Failures = 100;
 
 static void* Server_Run(void*);
 
@@ -32,18 +33,15 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
     if (!strcmp(c->key, "command"))
       continue;
     else if (!strcmp(c->key, "fan")) {
-      if (c->type != NX_JSON_INTEGER) {
+      if (c->type != NX_JSON_INTEGER)
         return err_string(0, "fan: not an integer");
-      }
 
       fan = c->val.i;
 
-      if (fan < 0) {
+      if (fan < 0)
         return err_string(0, "fan: cannot be negative");
-      }
-      else if (fan >= fancount) {
+      else if (fan >= fancount)
         return err_string(0, "fan: no such fan available");
-      }
     }
     else if (!strcmp(c->key, "speed")) {
       if (c->type == NX_JSON_STRING && !strcmp(c->val.text, "auto")) {
@@ -58,18 +56,16 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
         return err_string(0, "speed: Invalid type. Either float or 'auto'");
       }
 
-      if (speed < 0.0 || speed > 100.0) {
+      if (speed < 0.0 || speed > 100.0)
         return err_string(0, "speed: Invalid value");
-      }
     }
     else {
       return err_string(0, "Unknown arguments");
     }
   }
 
-  if (speed == -1 && auto_mode == Boolean_Unset) {
+  if (speed == -1 && auto_mode == Boolean_Unset)
     return err_string(0, "Missing argument: speed");
-  }
 
   float* speeds = Mem_Malloc(sizeof(float) * fancount);
 
@@ -140,56 +136,46 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
 }
 
 static void *Server_Handle_Client(void *arg) {
-  int socket = *((int *)arg);
-  free(arg);
-
+  const int socket = (int) (intptr_t) arg;
   const nx_json* json = NULL;
   char* buf = NULL;
+  Error* e;
 
-  Error* e = Protocol_Receive_Json(socket, &buf, &json);
-  if (e) {
-    Protocol_Send_Error(socket, err_print_all(e));
-    goto END;
-  }
+  e = Protocol_Receive_Json(socket, &buf, &json);
+  if (e)
+    goto error;
 
   if (json->type != NX_JSON_OBJECT) {
-    Protocol_Send_Error(socket, "Not a JSON object");
-    goto END;
+    e = err_string(0, "Not a JSON object");
+    goto error;
   }
 
   const nx_json* command = nx_json_get(json, "command");
   if (! command) {
-    Protocol_Send_Error(socket, "Missing 'command' field");
-    goto END;
+    e = err_string(0, "Missing 'command' field");
+    goto error;
   }
 
   if (command->type != NX_JSON_STRING) {
-    Protocol_Send_Error(socket, "command: not a string");
-    goto END;
+    e = err_string(0, "command: not a string");
+    goto error;
   }
 
   pthread_mutex_lock(&Service_Lock);
-
-  if (!strcmp(command->val.text, "set-fan-speed")) {
-    Error* e = Server_Command_Set_Fan(socket, json);
-    if (e) {
-      Protocol_Send_Error(socket, err_print_all(e));
-    }
-  }
-  else if (!strcmp(command->val.text, "status")) {
-    Error* e = Server_Command_Status(socket, json);
-    if (e) {
-      Protocol_Send_Error(socket, err_print_all(e));
-    }
-  }
-  else
   {
-    Protocol_Send_Error(socket, "Invalid command");
+    if (!strcmp(command->val.text, "set-fan-speed"))
+      e = Server_Command_Set_Fan(socket, json);
+    else if (!strcmp(command->val.text, "status"))
+      e = Server_Command_Status(socket, json);
+    else
+      e = err_string(0, "Invalid command");
   }
-
   pthread_mutex_unlock(&Service_Lock);
 
-END:
+error:
+  if (e)
+    Protocol_Send_Error(socket, err_print_all(e));
+
   if (buf)
     free(buf);
 
@@ -234,10 +220,8 @@ Error* Server_Init(int port) {
   Log_Info("Connected on port %d\n", ntohs(Server_Address.sin_port));
 
 error:
-  if (e) {
-    close(Server_FD);
-    Server_FD = -1;
-  }
+  if (e)
+    Server_Close();
 
   return e;
 }
@@ -257,18 +241,14 @@ void Server_Stop() {
 
 Error* Server_Loop() {
   int addrlen = sizeof(Server_Address);
-  int* new_socket = malloc(sizeof(int));
-
-  if ((*new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0) {
-    free(new_socket);
-    return err_stdlib(0, "accept()");
-  }
-
+  int new_socket;
   pthread_t thread_id;
-  if (pthread_create(&thread_id, NULL, Server_Handle_Client, new_socket) != 0) {
-    free(new_socket);
+
+  if ((new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0)
+    return err_stdlib(0, "accept()");
+
+  if (pthread_create(&thread_id, NULL, Server_Handle_Client, (void*) (intptr_t) new_socket) != 0)
     return err_stdlib(0, "pthread_create()");
-  }
 
   pthread_detach(thread_id);
 
@@ -287,7 +267,7 @@ static void* Server_Run(void* arg) {
       e_warn();
 
     if (e) {
-      if (++failures > 10)
+      if (++failures > Server_Max_Failures)
         return NULL;
     }
     else

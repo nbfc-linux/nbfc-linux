@@ -22,7 +22,6 @@ Error* ServiceConfig_Init(const char* file) {
 
   e = ServiceConfig_FromJson(&service_config, js);
   nx_json_free(js);
-
   if (e)
     return e;
 
@@ -66,7 +65,7 @@ Error* ServiceConfig_Write() {
       create_json_double(NULL, fanspeeds, *f);
   }
 
-  if (service_config.Port != int_Unset)
+  if (service_config.Port != int_Unset && service_config.Port != NBFC_DEFAULT_PORT)
     create_json_integer("Port", o, service_config.Port);
 
   char buf[NBFC_MAX_FILE_SIZE];
