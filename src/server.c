@@ -92,7 +92,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   Service_UpdateFanSpeedsByTargetFanSpeeds();
   kill(getpid(), SIGUSR1);
 
-  Error* e = ServiceConfig_Write();
+  Error* e = ServiceConfig_Write(options.service_config);
   if (e)
     return e;
 
@@ -208,6 +208,8 @@ Error* Server_Init() {
     e = err_stdlib(0, "bind");
     goto error;
   }
+
+  chmod(NBFC_SOCKET_PATH, 0666);
 
   if (listen(Server_FD, 3) < 0) {
     e = err_stdlib(0, "listen()");

@@ -821,7 +821,7 @@ static int Config() {
 
     ServiceConfig_Load();
     service_config.SelectedConfigId = model;
-    Error* e = ServiceConfig_Write();
+    Error* e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
     if (e) {
       Log_Error("%s\n", err_print_all(e));
       return NBFC_EXIT_FAILURE;

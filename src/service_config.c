@@ -48,7 +48,7 @@ Error* ServiceConfig_Init(const char* file) {
   return err_success();
 }
 
-Error* ServiceConfig_Write() {
+Error* ServiceConfig_Write(const char* file) {
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
 
@@ -72,8 +72,8 @@ Error* ServiceConfig_Write() {
   nx_json_to_string(o, &s, 0);
   nx_json_free(o);
 
-  if (write_file(NBFC_SERVICE_CONFIG, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
-    return err_stdlib(0, NBFC_SERVICE_CONFIG);
+  if (write_file(file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
+    return err_stdlib(0, file);
   }
 
   return err_success();
