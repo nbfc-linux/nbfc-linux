@@ -18,6 +18,7 @@
 #include "program_name.c"
 #include "protocol.c"
 #include "pidfile.c"
+#include "reverse_nxjson.c"
 #include "service.c"
 #include "service_config.c"
 #include "server.c"

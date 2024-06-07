@@ -110,3 +110,13 @@
  "Optional arguments:\n"                                                       \
  "  -h, --help            Shows this message and exit\n"                       \
  ""
+
+// TODO
+#define CLIENT_SHOW_VARIABLE_HELP_TEXT                                         \
+ "Usage: nbfc show-variable [-h] VARIABLE\n"                                   \
+ "\n"                                                                          \
+ "Print out a variable.\n"                                                     \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""

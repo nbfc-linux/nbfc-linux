@@ -86,6 +86,12 @@ static const cli99_option start_command_options[] = {
   cli99_options_end()
 };
 
+static const cli99_option show_variable_command_options[] = {
+  cli99_include_options(&main_options),
+  {"variable",         'V', 1},
+  cli99_options_end()
+};
+
 static const cli99_option *Options[] = {
   start_command_options,
   main_options,
@@ -95,6 +101,7 @@ static const cli99_option *Options[] = {
   set_command_options,
   main_options,
   main_options,
+  show_variable_command_options,
   main_options,
 };
 
@@ -107,7 +114,8 @@ static const char *HelpTexts[] = {
   CLIENT_SET_HELP_TEXT,
   CLIENT_WAIT_FOR_HWMON_HELP_TEXT,
   CLIENT_GET_MODEL_HELP_TEXT,
-  CLIENT_HELP_TEXT
+  CLIENT_SHOW_VARIABLE_HELP_TEXT,
+  CLIENT_HELP_TEXT,
 };
 
 enum Command {
@@ -119,13 +127,14 @@ enum Command {
   Command_Set,
   Command_Wait_For_Hwmon,
   Command_Get_Model_Name,
+  Command_Show_Variable,
   Command_Help,
 };
 
 static enum Command Command_From_String(const char* s) {
   const char* commands[] = {
     "start", "stop", "restart", "status", "config", "set",
-    "wait-for-hwmon", "get-model-name", "help"
+    "wait-for-hwmon", "get-model-name", "show-variable", "help"
   };
 
   for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
@@ -138,7 +147,8 @@ static enum Command Command_From_String(const char* s) {
 static struct {
   array_of(int) fans;
   array_of(float) speeds;
-  const char *config;
+  const char* config;
+  const char* variable;
   bool a;      // all/auto/apply
   bool l;      // list
   bool r;      // recommend/read-only
@@ -154,6 +164,7 @@ static int Set();
 static int Status();
 static int Wait_For_Hwmon();
 static int Get_Model_Name();
+static int Show_Variable();
 
 int main(int argc, char *const argv[]) {
   if (argc == 1) {
@@ -186,6 +197,9 @@ int main(int argc, char *const argv[]) {
       cli99_SetOptions(&p, Options[cmd], false);
       break;
 
+    case 'V':
+      options.variable = p.optarg;
+      break;
     case -'h':
       printf("%s", HelpTexts[cmd]);
       return NBFC_EXIT_SUCCESS;
@@ -264,6 +278,7 @@ int main(int argc, char *const argv[]) {
   case Command_Status:         return Status();
   case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
   case Command_Get_Model_Name: return Get_Model_Name();
+  case Command_Show_Variable:  return Show_Variable();
   default:                     return NBFC_EXIT_FAILURE;
   }
 }
@@ -275,7 +290,7 @@ static char*  get_longest_common_substring(const char*, const char*);
 static float  get_similarity_index(const char*, const char*);
 
 Error* Client_Communicate(int port, const nx_json* in, char**buf, const nx_json** out) {
-  int sock = 0;
+  int sock = -1;
   struct sockaddr_in serv_addr;
   Error* e = NULL;
 
@@ -307,7 +322,7 @@ Error* Client_Communicate(int port, const nx_json* in, char**buf, const nx_json*
     goto error;
 
 error:
-  if (sock)
+  if (sock != -1)
     close(sock);
   return e;
 }
@@ -652,6 +667,33 @@ static int Wait_For_Hwmon() {
 static int Get_Model_Name() {
   printf("%s\n", get_model_name());
   return NBFC_EXIT_SUCCESS;
+}
+
+static int Show_Variable() {
+  if (! options.variable) {
+    printf("Missing argument 'VARIABLE'\n\n");
+    printf(CLIENT_SHOW_VARIABLE_HELP_TEXT);
+    return NBFC_EXIT_CMDLINE;
+  }
+
+  int ret = NBFC_EXIT_SUCCESS;
+  char* variable = to_lower(options.variable);
+
+  if (! strcmp(variable, "port")) {
+    ServiceConfig_Load();
+    ServiceConfig_ValidateFields(&service_config); // Load defaults
+    printf("%d\n", service_config.Port);
+  }
+  else if (! strcmp(variable, "config_file")) {
+    printf("%s\n", NBFC_SERVICE_CONFIG);
+  }
+  else {
+    ret = NBFC_EXIT_FAILURE;
+    Log_Error("Unknown variable '%s'. Choose from 'port', 'config_file'\n", options.variable);
+  }
+
+  free(variable);
+  return ret;
 }
 
 static void print_fan_status(const FanInfo* fan) {

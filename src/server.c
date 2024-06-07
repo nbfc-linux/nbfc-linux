@@ -2,7 +2,7 @@
 
 #include "nbfc.h"
 #include "nxjson_utils.h"
-#include "reverse_nxjson.c"
+#include "reverse_nxjson.h"
 #include "error.h"
 #include "service.h"
 #include "log.h"
