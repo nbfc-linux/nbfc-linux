@@ -18,7 +18,9 @@
 #include <string.h>    // strcmp, strncmp, strncpy, strcat, strcspn, strrchr, strerror
 #include <sys/stat.h>  // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
 #include <unistd.h>    // access, F_OK, geteuid
-#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 #include "generated/client.help.h"
 #include "log.h"
@@ -289,24 +291,20 @@ static char** get_longest_common_substrings(const char*, const char*);
 static char*  get_longest_common_substring(const char*, const char*);
 static float  get_similarity_index(const char*, const char*);
 
-Error* Client_Communicate(int port, const nx_json* in, char**buf, const nx_json** out) {
+Error* Client_Communicate(const nx_json* in, char**buf, const nx_json** out) {
   int sock = -1;
-  struct sockaddr_in serv_addr;
+  struct sockaddr_un serv_addr;
   Error* e = NULL;
 
-  sock = socket(AF_INET, SOCK_STREAM, 0);
+  sock = socket(AF_UNIX, SOCK_STREAM, 0);
   if (sock < 0) {
     e = err_stdlib(0, "socket()");
     goto error;
   }
 
-  serv_addr.sin_family = AF_INET;
-  serv_addr.sin_port = htons(port);
-
-  if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
-    e = err_string(0, "127.0.0.1: Invalid address / Address not supported");
-    goto error;
-  }
+  memset(&serv_addr, 0, sizeof(serv_addr));
+  serv_addr.sun_family = AF_UNIX;
+  strncpy(serv_addr.sun_path, NBFC_SOCKET_PATH, sizeof(serv_addr.sun_path) - 1);
 
   if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
     e = err_stdlib(0, "connect()");
@@ -567,16 +565,13 @@ error:
 
 static Error* ServiceInfo_TryLoad() {
   Error* e;
-  ServiceConfig_Load();
-  ServiceConfig_ValidateFields(&service_config); // Load defaults
-
   nx_json root = {0};
   nx_json* in = create_json_object(NULL, &root);
   create_json_string("command", in, "status");
 
   char* buf = NULL;
   const nx_json* out = NULL;
-  e = Client_Communicate(service_config.Port, in, &buf, &out);
+  e = Client_Communicate(in, &buf, &out);
   if (e)
     goto error;
 
@@ -679,12 +674,7 @@ static int Show_Variable() {
   int ret = NBFC_EXIT_SUCCESS;
   char* variable = to_lower(options.variable);
 
-  if (! strcmp(variable, "port")) {
-    ServiceConfig_Load();
-    ServiceConfig_ValidateFields(&service_config); // Load defaults
-    printf("%d\n", service_config.Port);
-  }
-  else if (! strcmp(variable, "config_file")) {
+  if (! strcmp(variable, "config_file")) {
     printf("%s\n", NBFC_SERVICE_CONFIG);
   }
   else {
@@ -868,9 +858,6 @@ static int Set() {
     return NBFC_EXIT_FAILURE;
   }
 
-  ServiceConfig_Load();
-  ServiceConfig_ValidateFields(&service_config); // Load defaults
-
   nx_json root = {0};
   nx_json* in = create_json_object(NULL, &root);
   create_json_string("command", in, "set-fan-speed");
@@ -885,7 +872,7 @@ static int Set() {
 
   char* buf = NULL;
   const nx_json* out = NULL;
-  Error* e = Client_Communicate(service_config.Port, in, &buf, &out);
+  Error* e = Client_Communicate(in, &buf, &out);
   if (e)
     goto error;
 

@@ -3,6 +3,8 @@
 
 #include "error.h"
 
+#include <stdbool.h>
+
 Error* Server_Init();
 void   Server_Close();
 Error* Server_Start();

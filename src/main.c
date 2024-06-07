@@ -142,7 +142,7 @@ int main(int argc, char* const argv[])
     return NBFC_EXIT_INIT;
   }
 
-  e = Server_Init(service_config.Port);
+  e = Server_Init();
   if (e) {
     Log_Error("%s\n", err_print_all(e));
     return NBFC_EXIT_INIT;

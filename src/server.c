@@ -12,12 +12,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <arpa/inet.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <pthread.h>
 #include <signal.h>
 
 static int                Server_FD = -1;
-static struct sockaddr_in Server_Address;
+static struct sockaddr_un Server_Address;
 static pthread_t          Server_Thread_ID;
 static const int          Server_Max_Failures = 100;
 
@@ -186,38 +189,30 @@ error:
   return NULL;
 }
 
-Error* Server_Init(int port) {
+Error* Server_Init() {
   Error* e = NULL;
-  int opt = 1;
 
   // Create a TCP/IP socket
-  if ((Server_FD = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+  if ((Server_FD = socket(AF_UNIX, SOCK_STREAM, 0)) == 0) {
     e = err_stdlib(0, "socket()");
     goto error;
   }
 
-  if (setsockopt(Server_FD, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
-    e = err_stdlib(0, "setsockopt()");
+  memset(&Server_Address, 0, sizeof(Server_Address));
+  Server_Address.sun_family = AF_UNIX;
+  strncpy(Server_Address.sun_path, NBFC_SOCKET_PATH, sizeof(Server_Address.sun_path) - 1);
+
+  unlink(NBFC_SOCKET_PATH);
+
+  if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) == -1) {
+    e = err_stdlib(0, "bind");
     goto error;
   }
 
-  // Bind the socket to an address
-  Server_Address.sin_family = AF_INET;
-  Server_Address.sin_addr.s_addr = INADDR_ANY;
-  Server_Address.sin_port = htons(port);
-
-  if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) < 0) {
-    e = err_stdlib(0, "bind()");
-    goto error;
-  }
-
-  // Listeon for incoming connections
   if (listen(Server_FD, 3) < 0) {
     e = err_stdlib(0, "listen()");
     goto error;
   }
-
-  Log_Info("Connected on port %d\n", ntohs(Server_Address.sin_port));
 
 error:
   if (e)
@@ -281,4 +276,5 @@ void Server_Close() {
   if (Server_FD != -1)
     close(Server_FD);
   Server_FD = -1;
+  unlink(NBFC_SOCKET_PATH);
 }

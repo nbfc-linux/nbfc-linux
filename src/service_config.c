@@ -65,9 +65,6 @@ Error* ServiceConfig_Write() {
       create_json_double(NULL, fanspeeds, *f);
   }
 
-  if (service_config.Port != int_Unset && service_config.Port != NBFC_DEFAULT_PORT)
-    create_json_integer("Port", o, service_config.Port);
-
   char buf[NBFC_MAX_FILE_SIZE];
   StringBuf s = { buf, 0, sizeof(buf) };
   buf[0] = '\0';
