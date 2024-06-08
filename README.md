@@ -31,11 +31,11 @@ Installation
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - Debian / Ubuntu (untested):
-  - [Latest Version 0.2.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.2/nbfc-linux_0.2.2_amd64.deb)
+  - [Latest Version 0.2.5](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.5/nbfc-linux_0.2.5_amd64.deb)
   - See [GitHub.com/nbfc-linux/packages/deb](https://github.com/nbfc-linux/packages/tree/main/deb) for all versions.
 
 - Fedora (untestet)
-  - [Latest Version 0.2.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.2/nbfc-linux-0.2.2-1.x86_64.rpm)
+  - [Latest Version 0.2.5](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.5/nbfc-linux-0.2.5-1.x86_64.rpm)
   - See [GitHub.com/nbfc-linux/packages/rpm](https://github.com/nbfc-linux/packages/tree/main/rpm) for all versions.
 
 - NixOS:
