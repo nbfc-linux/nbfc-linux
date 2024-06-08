@@ -30,12 +30,6 @@
 <blockquote>
 <p>Use alternative config file (default /etc/nbfc/nbfc.json).</p>
 </blockquote>
-<p><strong>-s</strong>, <strong>--state-file</strong> <em>STATE
-FILE</em></p>
-<blockquote>
-<p>Write state to an alternative file (default
-/run/nbfc_service.state.json).</p>
-</blockquote>
 <p><strong>-e, --embedded-controller</strong> [<em>dummy</em>,
 <em>dev_port</em>, <em>ec_sys</em>, <em>acpi_ec</em>]</p>
 <blockquote>
@@ -52,11 +46,11 @@ all.</p></li>
 </ul>
 </blockquote>
 <h1>FILES</h1>
-<p><em>/run/nbfc_service.pid</em></p>
+<p><em>/var/run/nbfc_service.pid</em></p>
 <blockquote>
 <p>File containing the PID of current running nbfc_service.</p>
 </blockquote>
-<p><em>/run/nbfc_service.state.json</em></p>
+<p><em>/var/run/nbfc_service.state.json</em></p>
 <blockquote>
 <p>State file of nbfc_service. Updated every
 <strong>EcPollInterval</strong> milliseconds. See

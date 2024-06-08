@@ -7,7 +7,6 @@ _nbfc_service() {
     '(--fork -f)'{--fork,-f}'[Switch process to background after sucessfully started]'::'()'\
     '(--debug -d)'{--debug,-d}'[Enable tracing of reads and writes of the embedded controller]'::'()'\
     '(--config-file -c)'{--config-file=,-c+}'[Use alternative config file (default @SYSCONFDIR@/nbfc/nbfc.json)]':config:_files\
-    '(--state-file -s)'{--state-file=,-s+}'[Write state to an alternative file (default @RUNSTATEDIR@/nbfc_service.state.json)]':'state.json':_files\
     '(--embedded-controller -e)'{--embedded-controller=,-e+}'[Specify embedded controller to use]':EC:'(dummy dev_port ec_sys acpi_ec)'
 }
 

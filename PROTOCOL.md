@@ -23,16 +23,16 @@ Get a JSON that describes the server status
 
 `{"command": "status"}`
 
-**set-fan**
+**set-fan-speed**
 
 Set the speed for all fans:
 
-`{"command": "set-fan", "speed": <SPEED>}`
+`{"command": "set-fan-speed", "speed": <SPEED>}`
 
 Set the speed for a specific fan:
 
-`{"command": "set-fan", "fan": <NUMBER>, "speed": <SPEED>}`
+`{"command": "set-fan-speed", "fan": <NUMBER>, "speed": <SPEED>}`
 
 Set the fan mode to "auto" for a specific fan:
 
-`{"command": "set-fan", "fan": <NUMBER>, "speed": "auto"}`
+`{"command": "set-fan-speed", "fan": <NUMBER>, "speed": "auto"}`

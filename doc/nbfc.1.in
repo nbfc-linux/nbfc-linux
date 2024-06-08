@@ -149,13 +149,9 @@ Show help.
 File containing the PID of current running nbfc_service.
 .RE
 
-.I @RUNSTATEDIR@/nbfc_service.state.json
+.I @RUNSTATEDIR@/nbfc_service.socket
 .RS
-State file of nbfc_service. Updated every
-.B EcPollInterval
-milliseconds. See
-.BR nbfc_service.json (5)
-for further details.
+Socket file of nbfc_service.
 .RE
 
 .I @SYSCONFDIR@/nbfc.json

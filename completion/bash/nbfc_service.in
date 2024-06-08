@@ -6,15 +6,12 @@ _nbfc_service() {
     --config-file|-c)
        _filedir
        return 0;;
-    --state-file|-s)
-       _filedir
-       return 0;;
     --embedded-controller|-e)
        COMPREPLY=($(compgen -W 'dummy dev_port ec_sys acpi_ec' -- "$cur"))
        return 0;;
   esac
 
-  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --read-only -f --fork -d --debug -c --config-file -s --state-file -e --embedded-controller' -- "$cur"))
+  [[ "$cur" = -* ]] && COMPREPLY+=($(compgen -W '-h --help -r --read-only -f --fork -d --debug -c --config-file -e --embedded-controller' -- "$cur"))
 
   return 1
 }

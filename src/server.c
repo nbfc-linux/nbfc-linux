@@ -27,8 +27,8 @@ static const int          Server_Max_Failures = 100;
 static void* Server_Run(void*);
 
 static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
-  int fan = int_Unset;
-  float speed = float_Unset;
+  int fan = -1;
+  float speed = -2;
   const int fancount = Service_Model_Config.FanConfigurations.size;
 
   nx_json_for_each(c, json) {
@@ -66,7 +66,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
     }
   }
 
-  if (speed == float_Unset)
+  if (speed == -2)
     return err_string(0, "Missing argument: speed");
 
   float* speeds = Mem_Malloc(sizeof(float) * fancount);
@@ -76,7 +76,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   for (int i = 0; i < min(service_config.TargetFanSpeeds.size, fancount); ++i)
     speeds[i] = service_config.TargetFanSpeeds.data[i];
 
-  if (fan == int_Unset) {
+  if (fan == -1) {
     for (int i = 0; i < fancount; ++i)
       speeds[i] = speed;
   }

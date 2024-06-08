@@ -16,9 +16,9 @@ Comparison of NBFC C# and NBFC Linux
 |Configuration files              | XML (956KB)                           | [JSON](share/nbfc/configs) (840KB)          |
 |Runtime                          | Mono                                  | Native                                      |
 |Memory consumption (ps\_mem)     | ~50MB                                 | ~350KB                                      |
-|Package size (pkg.tar.gz)        | 448K	                              | 100K                                        |
-|Service control rights           | Any user                              | Only root                                   |
-|IPC Concept                      | TCP/IP                                | TCP/IP                                      |
+|Package size (pkg.tar.gz)        | 448K                                  | 100K                                        |
+|Service control rights           | Any user                              | Any user                                    |
+|IPC Concept                      | TCP/IP                                | Unix sockets                                |
 |IPC Protocol                     | Binary                                | JSON                                        |
 
 All programs, the [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probing tool](doc/ec_probe.1.md) are written in C.
@@ -31,11 +31,11 @@ Installation
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - Debian / Ubuntu (untested):
-  - [Latest Version 0.2.6](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.6/nbfc-linux_0.2.6_amd64.deb)
+  - [Latest Version 0.2.7](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.7/nbfc-linux_0.2.7_amd64.deb)
   - See [GitHub.com/nbfc-linux/packages/deb](https://github.com/nbfc-linux/packages/tree/main/deb) for all versions.
 
 - Fedora (untestet)
-  - [Latest Version 0.2.6](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.6/nbfc-linux-0.2.6-1.x86_64.rpm)
+  - [Latest Version 0.2.7](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.7/nbfc-linux-0.2.7-1.x86_64.rpm)
   - See [GitHub.com/nbfc-linux/packages/rpm](https://github.com/nbfc-linux/packages/tree/main/rpm) for all versions.
 
 - NixOS:
@@ -73,7 +73,7 @@ With `sudo nbfc config --set <MODEL>` a configuration is selected.
 
 `sudo nbfc start` will start the service.
 
-It can be queried by `sudo nbfc status -a`.
+It can be queried by `nbfc status -a`.
 
 If you wish `nbfc_service` to get started on boot, use `sudo systemctl enable nbfc_service`.
 
