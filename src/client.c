@@ -46,6 +46,7 @@
 #include "service_config.c"
 
 #define DmiIdDirectoryPath "/sys/devices/virtual/dmi/id"
+#define RecommendedConfigMatchThreshold 0.7f
 
 static ServiceInfo service_info;
 
@@ -287,11 +288,9 @@ int main(int argc, char *const argv[]) {
 
 static char*  to_lower(const char*);
 static bool   str_starts_with_ignorecase(const char*, const char*);
-static char** get_longest_common_substrings(const char*, const char*);
-static char*  get_longest_common_substring(const char*, const char*);
-static float  get_similarity_index(const char*, const char*);
+static float  word_difference(const char*, const char*);
 
-Error* Client_Communicate(const nx_json* in, char**buf, const nx_json** out) {
+Error* Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
   int sock = -1;
   struct sockaddr_un serv_addr;
   Error* e = NULL;
@@ -535,7 +534,7 @@ static array_of(ConfigFile) recommended_configs() {
   const char *product = get_model_name();
   array_of(ConfigFile) files = get_configs();
   for_each_array(ConfigFile*, file, files) {
-    file->diff = get_similarity_index(product, file->config_name);
+    file->diff = word_difference(product, file->config_name);
   }
   qsort(files.data, files.size, sizeof(struct ConfigFile), compare_config_by_diff);
   return files;
@@ -764,13 +763,27 @@ static int Config() {
     }
   }
   else if (options.r) {
+    fprintf(stderr,
+      "Note: The command 'nbfc config -r' outputs recommended configurations\n"
+      "based solely on comparing your model name with configuration file names.\n"
+      "This recommendation does not imply any further significance or validation\n"
+      "of the configurations beyond the string matching.\n\n");
+
     array_of(ConfigFile) files = recommended_configs();
+
     if (files.size && !strcmp(files.data[0].config_name, get_model_name())) {
       printf("%s\n", files.data[0].config_name);
-    } else {
+    }
+    else {
+      bool have_match = 0;
       for_each_array(ConfigFile*, file, files) {
-        if (file->diff >= 1.0f)
+        if (file->diff >= RecommendedConfigMatchThreshold) {
+          have_match = 1;
           printf("%s\n", file->config_name);
+        }
+      }
+      if (! have_match) {
+        Log_Error("No recommended configuration files found\n");
       }
     }
   }
@@ -941,150 +954,41 @@ static bool str_starts_with_ignorecase(const char* string, const char* prefix) {
   return true;
 }
 
-static char** get_longest_common_substrings(const char* str1, const char* str2) {
-  if (!str1 || !str2) {
-    return NULL;
+static int levenshtein_min(int a, int b, int c) {
+  if (a <= b && a <= c) {
+    return a;
   }
-
-  int len1 = strlen(str1);
-  int len2 = strlen(str2);
-  int** lookup = (int**)Mem_Calloc(len1 + 1, sizeof(int*));
-  for (int i = 0; i <= len1; i++) {
-    lookup[i] = (int*)Mem_Calloc(len2 + 1, sizeof(int));
+  else if (b <= a && b <= c) {
+    return b;
   }
-
-  int max_len = 0;
-  int* end_indices = NULL;
-  int num_end_indices = 0;
-
-  for (int i = 1; i <= len1; i++) {
-    for (int j = 1; j <= len2; j++) {
-      if (str1[i - 1] == str2[j - 1]) {
-        lookup[i][j] = lookup[i - 1][j - 1] + 1;
-        if (lookup[i][j] > max_len) {
-          max_len = lookup[i][j];
-          num_end_indices = 1;
-          end_indices = (int*)Mem_Realloc(end_indices, sizeof(int));
-          end_indices[0] = i;
-        } else if (lookup[i][j] == max_len) {
-          num_end_indices++;
-          end_indices = (int*)Mem_Realloc(end_indices, num_end_indices * sizeof(int));
-          end_indices[num_end_indices - 1] = i;
-        }
-      }
-    }
+  else {
+    return c;
   }
-
-  char** substrings = (char**)Mem_Calloc(num_end_indices + 1, sizeof(char*));
-  for (int i = 0; i < num_end_indices; i++) {
-    substrings[i] = (char*)Mem_Calloc(max_len + 1, sizeof(char));
-    strncpy(substrings[i], &str1[end_indices[i] - max_len], max_len);
-  }
-  substrings[num_end_indices] = NULL;
-
-  for (int i = 0; i <= len1; i++) {
-    Mem_Free(lookup[i]);
-  }
-  Mem_Free(lookup);
-  Mem_Free(end_indices);
-
-  return substrings;
 }
 
-static char* get_longest_common_substring(const char* str1, const char* str2) {
-  char** strings = get_longest_common_substrings(str1, str2);
-  if (strings == NULL)
-    return NULL;
+static int levenshtein(const char *s1, const char *s2) {
+  unsigned int x, y, s1len, s2len;
+  s1len = strlen(s1);
+  s2len = strlen(s2);
+  unsigned int matrix[s2len+1][s1len+1];
+  matrix[0][0] = 0;
+  for (x = 1; x <= s2len; x++)
+    matrix[x][0] = matrix[x-1][0] + 1;
+  for (y = 1; y <= s1len; y++)
+    matrix[0][y] = matrix[0][y-1] + 1;
+  for (x = 1; x <= s2len; x++)
+    for (y = 1; y <= s1len; y++)
+      matrix[x][y] = levenshtein_min(matrix[x-1][y] + 1, matrix[x][y-1] + 1, matrix[x-1][y-1] + (s1[y-1] == s2[x-1] ? 0 : 1));
 
-  char* ret = NULL;
-  char** string = strings;
-
-  if (*string) {
-    ret = *string;
-    ++string;
-  }
-
-  for (; *string; ++string) {
-    Mem_Free(*string);
-  }
-  Mem_Free(strings);
-  return ret;
+  return(matrix[s2len][s1len]);
 }
 
-static char **split(const char *str) {
-  int num_words = 0;
-  const char *p = str;
-
-  // Count words in str
-  while (*p) {
-    while (*p == ' ') {
-      p++;
-    }
-    if (*p) {
-      num_words++;
-      while (*p && (*p != ' ')) {
-        p++;
-      }
-    }
-  }
-
-  char **words = Mem_Malloc((num_words + 1) * sizeof(char *));
-  int i = 0;
-  p = str;
-  while (*p) {
-    while (*p == ' ') {
-      p++;
-    }
-    if (*p) {
-      const char *start = p;
-      while (*p && (*p != ' ')) {
-        p++;
-      }
-      const int len = p - start;
-      words[i] = Mem_Malloc((len + 1) * sizeof(char));
-      strncpy(words[i], start, len);
-      words[i][len] = '\0';
-      i++;
-    }
-  }
-
-  words[i] = NULL;
-
-  return words;
-}
-
-static float get_similarity_index(const char* model_name1, const char* model_name2) {
-  float result = 0;
-  char* model_name1_lower = to_lower(model_name1);
-  char* model_name2_lower = to_lower(model_name2);
-
-  char** model_name1_splitted = split(model_name1_lower);
-  char** model_name2_splitted = split(model_name2_lower);
-
-  for (char** s1 = model_name1_splitted; *s1; ++s1) {
-    float max_similarity = 0;
-
-    for (char** s2 = model_name2_splitted; *s2; ++s2) {
-      char* lcs = get_longest_common_substring(*s1, *s2);
-      int lcs_length = lcs ? strlen(lcs) : 0;
-      Mem_Free(lcs);
-
-      if (lcs_length < 2)
-        continue;
-
-      float similarity = (float)lcs_length / (float)max(strlen(*s1), strlen(*s2));
-      max_similarity = fmax(max_similarity, similarity);
-    }
-
-    result += max_similarity;
-  }
-
-  Mem_Free(model_name1_lower);
-  Mem_Free(model_name2_lower);
-  for (char** s = model_name1_splitted; *s; ++s) Mem_Free(*s);
-  for (char** s = model_name2_splitted; *s; ++s) Mem_Free(*s);
-  Mem_Free(model_name1_splitted);
-  Mem_Free(model_name2_splitted);
-
-  return result;
+static float word_difference(const char* s1, const char* s2) {
+  const int s1len = strlen(s1);
+  const int s2len = strlen(s2);
+  const int diff = levenshtein(s1, s2);
+  if (s1len > s2len)
+    return 1.0f - ((float) diff / s1len);
+  else
+    return 1.0f - ((float) diff / s2len);
 }
