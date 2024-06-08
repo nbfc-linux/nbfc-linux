@@ -120,3 +120,12 @@
  "Optional arguments:\n"                                                       \
  "  -h, --help            Shows this message and exit\n"                       \
  ""
+
+#define CLIENT_COMPLETE_FANS_TEXT                                              \
+ "Usage: nbfc complete-fans [-h]\n"                                            \
+ "\n"                                                                          \
+ "Used for completing shell command lines.\n"                                  \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""

@@ -104,6 +104,7 @@ static const cli99_option *Options[] = {
   set_command_options,
   main_options,
   main_options,
+  main_options,
   show_variable_command_options,
   main_options,
 };
@@ -117,6 +118,7 @@ static const char *HelpTexts[] = {
   CLIENT_SET_HELP_TEXT,
   CLIENT_WAIT_FOR_HWMON_HELP_TEXT,
   CLIENT_GET_MODEL_HELP_TEXT,
+  CLIENT_COMPLETE_FANS_TEXT,
   CLIENT_SHOW_VARIABLE_HELP_TEXT,
   CLIENT_HELP_TEXT,
 };
@@ -130,6 +132,7 @@ enum Command {
   Command_Set,
   Command_Wait_For_Hwmon,
   Command_Get_Model_Name,
+  Command_Complete_Fans,
   Command_Show_Variable,
   Command_Help,
 };
@@ -137,7 +140,7 @@ enum Command {
 static enum Command Command_From_String(const char* s) {
   const char* commands[] = {
     "start", "stop", "restart", "status", "config", "set",
-    "wait-for-hwmon", "get-model-name", "show-variable", "help"
+    "wait-for-hwmon", "get-model-name", "complete-fans", "show-variable", "help"
   };
 
   for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
@@ -168,6 +171,7 @@ static int Status();
 static int Wait_For_Hwmon();
 static int Get_Model_Name();
 static int Show_Variable();
+static int Complete_Fans();
 
 int main(int argc, char *const argv[]) {
   if (argc == 1) {
@@ -282,6 +286,7 @@ int main(int argc, char *const argv[]) {
   case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
   case Command_Get_Model_Name: return Get_Model_Name();
   case Command_Show_Variable:  return Show_Variable();
+  case Command_Complete_Fans:  return Complete_Fans();
   default:                     return NBFC_EXIT_FAILURE;
   }
 }
@@ -710,6 +715,18 @@ static void print_service_status() {
          service_info.read_only ? "true" : "false",
          service_info.config,
          service_info.temperature);
+}
+
+static int Complete_Fans() {
+  Error* e = ServiceInfo_TryLoad();
+  if (e)
+    return NBFC_EXIT_FAILURE;
+
+  int idx = 0;
+  for_each_array(const FanInfo*, f, service_info.fans)
+    printf("%d\t%s\n", idx++, f->name);
+
+  return NBFC_EXIT_SUCCESS;
 }
 
 static int Status() {

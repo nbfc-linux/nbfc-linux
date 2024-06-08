@@ -13,10 +13,12 @@ Error* Protocol_Send(int socket, const void* buffer, size_t length) {
 
   while (total_sent < length) {
     int ret = send(socket, buf_ptr + total_sent, length - total_sent, MSG_NOSIGNAL);
-    if (ret < 0 && errno != EINTR && errno != EAGAIN)
-      return err_stdlib(0, "send");
-    else
-      continue;
+    if (ret < 0) {
+      if (errno != EINTR && errno != EAGAIN)
+        return err_stdlib(0, "send");
+      else
+        continue;
+    }
 
     total_sent += ret;
   }
