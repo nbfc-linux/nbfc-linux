@@ -73,7 +73,7 @@ int main(int argc, char* const argv[])
 
   setlocale(LC_NUMERIC, "C"); // for json floats
 
-  signal(SIGINT, sig_handler);
+  signal(SIGINT,  sig_handler);
   signal(SIGTERM, sig_handler);
   signal(SIGUSR1, sig_handler);
   signal(SIGUSR2, sig_handler);
@@ -98,31 +98,32 @@ int main(int argc, char* const argv[])
 
   atexit(PID_Cleanup);
 
+  // We fork early because we use threads. However, we need to confirm if the child
+  // process has been initialized correctly. To achieve this, we communicate via this pipe.
+  // If there is any data (read() succeeds), it means the service was initialized correctly.
   int pipefd[2];
   if (pipe(pipefd) == -1) {
-    perror("pipe"); // TODO
-    exit(EXIT_FAILURE);
+    Log_Error("pipe(): %s\n", strerror(errno));
+    return NBFC_EXIT_FAILURE;
   }
 
   if (options.fork) {
     int pid = fork();
     switch (pid) {
     case -1:
-      e = err_stdlib(0, "fork");
-      Log_Error("%s\n", err_print_all(e));
-      return NBFC_EXIT_INIT;
+      Log_Error("fork(): %s\n", strerror(errno));
+      return NBFC_EXIT_FAILURE;
     case 0:
       close(pipefd[0]);
       break;
     default:
-      sleep_ms(500);
       close(pipefd[1]);
 
       char buf;
       if (read(pipefd[0], &buf, 1) == 1)
-        _exit(0);
+        _exit(NBFC_EXIT_SUCCESS);
       else
-        _exit(3);
+        _exit(NBFC_EXIT_INIT);
     }
   }
 
@@ -155,8 +156,8 @@ int main(int argc, char* const argv[])
   }
 
   if (write(pipefd[1], "1", 1) == -1) {
-    perror("write");
-    exit(EXIT_FAILURE);
+    Log_Error("write(): %s\n", strerror(errno));
+    return NBFC_EXIT_FAILURE;
   }
   close(pipefd[1]); 
 

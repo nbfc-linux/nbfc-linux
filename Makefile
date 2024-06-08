@@ -13,7 +13,7 @@ runstatedir	= /var/run
 orcdir   		= $(confdir)/init.d
 systemvdir  = $(confdir)/init.d
 
-INIT_SYSTEM = systemd # systemd, openrc
+INIT_SYSTEM = systemd # systemd, systemv, openrc
 
 ifeq ($(BUILD), debug)
 	CFLAGS   = -Og -g

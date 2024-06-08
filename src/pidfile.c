@@ -15,10 +15,10 @@ Error* PID_Write(bool acquire_lock) {
     flags = O_EXCL;
 
   if (write_file(NBFC_PID_FILE, flags|O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, buf, len) == -1) {
-    if (errno == EEXIST)
-      e = err_stdlib(0, "Failed to acquire lock file");
-
     e = err_stdlib(e, NBFC_PID_FILE);
+
+    if (errno == EEXIST)
+      e = err_string(e, "Failed to acquire lock file");
   }
 
   return e;

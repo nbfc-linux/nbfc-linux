@@ -37,14 +37,14 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
       continue;
     else if (!strcmp(c->key, "fan")) {
       if (c->type != NX_JSON_INTEGER)
-        return err_string(0, "fan: not an integer");
+        return err_string(0, "fan: Not an integer");
 
       fan = c->val.i;
 
       if (fan < 0)
-        return err_string(0, "fan: cannot be negative");
+        return err_string(0, "fan: Cannot be negative");
       else if (fan >= fancount)
-        return err_string(0, "fan: no such fan available");
+        return err_string(0, "fan: No such fan available");
     }
     else if (!strcmp(c->key, "speed")) {
       if (c->type == NX_JSON_STRING && !strcmp(c->val.text, "auto")) {
@@ -244,8 +244,10 @@ Error* Server_Loop() {
   if ((new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0)
     return err_stdlib(0, "accept()");
 
-  if (pthread_create(&thread_id, NULL, Server_Handle_Client, (void*) (intptr_t) new_socket) != 0)
+  if (pthread_create(&thread_id, NULL, Server_Handle_Client, (void*) (intptr_t) new_socket) != 0) {
+    close(new_socket);
     return err_stdlib(0, "pthread_create()");
+  }
 
   pthread_detach(thread_id);
 

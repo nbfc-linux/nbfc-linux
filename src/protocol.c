@@ -8,9 +8,17 @@
 #define PROTOCOL_BUFFER_SIZE 4096
 
 Error* Protocol_Send(int socket, const void* buffer, size_t length) {
-  int ret = send(socket, buffer, length, MSG_NOSIGNAL);
-  if (ret < 0)
-    return err_stdlib(0, "send");
+  size_t total_sent = 0;
+  const char* buf_ptr = (const char*) buffer;
+
+  while (total_sent < length) {
+    int ret = send(socket, buf_ptr + total_sent, length - total_sent, MSG_NOSIGNAL);
+    if (ret < 0 && errno != EINTR && errno != EAGAIN)
+      return err_stdlib(0, "send");
+
+    total_sent += ret;
+  }
+
   return err_success();
 }
 

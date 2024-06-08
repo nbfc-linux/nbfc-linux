@@ -666,7 +666,7 @@ static int Get_Model_Name() {
 
 static int Show_Variable() {
   if (! options.variable) {
-    printf("Missing argument 'VARIABLE'\n\n");
+    printf("Missing argument: VARIABLE\n\n");
     printf(CLIENT_SHOW_VARIABLE_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
@@ -674,12 +674,15 @@ static int Show_Variable() {
   int ret = NBFC_EXIT_SUCCESS;
   char* variable = to_lower(options.variable);
 
-  if (! strcmp(variable, "config_file")) {
+  if (! strcmp(variable, "config_file"))
     printf("%s\n", NBFC_SERVICE_CONFIG);
-  }
+  else if (! strcmp(variable, "socket_file"))
+    printf("%s\n", NBFC_SOCKET_PATH);
+  else if (! strcmp(variable, "pid_file"))
+    printf("%s\n", NBFC_PID_FILE);
   else {
     ret = NBFC_EXIT_FAILURE;
-    Log_Error("Unknown variable '%s'. Choose from 'port', 'config_file'\n", options.variable);
+    Log_Error("Unknown variable '%s'. Choose from 'config_file', 'socket_file', 'pid_file'\n", options.variable);
   }
 
   free(variable);
