@@ -118,9 +118,9 @@ Error* FS_Sensors_Init() {
         e = FS_TemperatureSource_GetTemperature(source, &t);
 #ifndef NDEBUG
         e_warn();
+#endif
         if (e)
           continue;
-#endif
         Log_Info("Using '%s' as temperature source\n", file);
         source->file = Mem_Strdup(file);
         if (++source == sources_end)

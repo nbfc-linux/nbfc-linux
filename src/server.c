@@ -27,9 +27,8 @@ static const int          Server_Max_Failures = 100;
 static void* Server_Run(void*);
 
 static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
-  int fan = -1;
-  float speed = -1;
-  Boolean auto_mode = Boolean_Unset;
+  int fan = int_Unset;
+  float speed = float_Unset;
   const int fancount = Service_Model_Config.FanConfigurations.size;
 
   nx_json_for_each(c, json) {
@@ -48,7 +47,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
     }
     else if (!strcmp(c->key, "speed")) {
       if (c->type == NX_JSON_STRING && !strcmp(c->val.text, "auto")) {
-        auto_mode = true;
+        speed = -1;
         continue;
       }
       else if (c->type == NX_JSON_DOUBLE)
@@ -67,7 +66,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
     }
   }
 
-  if (speed == -1 && auto_mode == Boolean_Unset)
+  if (speed == float_Unset)
     return err_string(0, "Missing argument: speed");
 
   float* speeds = Mem_Malloc(sizeof(float) * fancount);
@@ -77,13 +76,12 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   for (int i = 0; i < min(service_config.TargetFanSpeeds.size, fancount); ++i)
     speeds[i] = service_config.TargetFanSpeeds.data[i];
 
-  if (fan == -1) {
+  if (fan == int_Unset) {
     for (int i = 0; i < fancount; ++i)
-      speeds[i] = (auto_mode == true) ? -1 : speed;
+      speeds[i] = speed;
   }
-  else {
-    speeds[fan] = (auto_mode == true) ? -1 : speed;
-  }
+  else
+    speeds[fan] = speed;
 
   free(service_config.TargetFanSpeeds.data);
   service_config.TargetFanSpeeds.data = speeds;
@@ -106,14 +104,8 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
 }
 
 static Error* Server_Command_Status(int socket, const nx_json* json) {
-  Error* e;
-
-  nx_json_for_each(c, json) {
-    if (!strcmp(c->key, "command"))
-      continue;
-    else
+  if (json->val.children.length > 1)
       return err_string(0, "Unknown arguments");
-  }
 
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
@@ -133,7 +125,7 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
     create_json_integer("speed_steps", fan_json, Fan_GetSpeedSteps(fan));
   }
 
-  e = Protocol_Send_Json(socket, o);
+  Error* e = Protocol_Send_Json(socket, o);
   nx_json_free(o);
   return e;
 }
@@ -192,7 +184,6 @@ error:
 Error* Server_Init() {
   Error* e = NULL;
 
-  // Create a TCP/IP socket
   if ((Server_FD = socket(AF_UNIX, SOCK_STREAM, 0)) == 0) {
     e = err_stdlib(0, "socket()");
     goto error;
@@ -201,8 +192,6 @@ Error* Server_Init() {
   memset(&Server_Address, 0, sizeof(Server_Address));
   Server_Address.sun_family = AF_UNIX;
   strncpy(Server_Address.sun_path, NBFC_SOCKET_PATH, sizeof(Server_Address.sun_path) - 1);
-
-  unlink(NBFC_SOCKET_PATH);
 
   if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) == -1) {
     e = err_stdlib(0, "bind");
@@ -277,8 +266,9 @@ static void* Server_Run(void* arg) {
 }
 
 void Server_Close() {
-  if (Server_FD != -1)
+  if (Server_FD != -1) {
     close(Server_FD);
+    unlink(NBFC_SOCKET_PATH);
+  }
   Server_FD = -1;
-  unlink(NBFC_SOCKET_PATH);
 }

@@ -1,12 +1,12 @@
 The protocol of NBFC
 ====================
 
-My TCP/IP protocol involves exchanging JSON objects between a client and a server. In both directions, the protocol format is `<JSON>\nEND`, meaning that the data is read continuously until a newline followed by the string "END" (\nEND) is encountered. Each message begins with a JSON object and ends with the delimiter \nEND, which signifies the end of the transmission for that particular message. This structure ensures that both the client and the server can correctly parse and process the JSON data encapsulated within the message boundaries.
+My protocol involves exchanging JSON objects between a client and a server. In both directions, the protocol format is `<JSON>\nEND`, meaning that the data is read continuously until a newline followed by the string "END" (\nEND) is encountered. Each message begins with a JSON object and ends with the delimiter \nEND, which signifies the end of the transmission for that particular message. This structure ensures that both the client and the server can correctly parse and process the JSON data encapsulated within the message boundaries.
 
-Example usage using netcat:
+Example usage using socat:
 
 ```
- ~ > nc localhost 6431
+ ~ > socat - UNIX-CONNECT:/var/run/nbfc_service.socket
 {"command": "status"}
 END
 ```
