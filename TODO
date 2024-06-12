@@ -1,9 +1,5 @@
 - Make nbfc_service single threaded
 
-- Protocol_Send_Json: add Error handling
-
-- Add Port to documentation
-
 - src/optparse/
   - It works, but isn't finished yet
 

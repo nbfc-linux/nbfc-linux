@@ -27,7 +27,7 @@ Installation
 ------------
 
 - Arch Linux:
-  - Either via AUR (`yaourt -S nbfc-linux`)
+  - Either via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - Debian / Ubuntu (untested):

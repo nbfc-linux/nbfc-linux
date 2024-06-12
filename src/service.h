@@ -2,6 +2,7 @@
 #define NBFC_SERVICE_H_
 
 #include "error.h"
+#include "fan.h"
 #include "model_config.h"
 
 #include <stdbool.h>
