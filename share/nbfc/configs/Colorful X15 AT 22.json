@@ -1,0 +1,73 @@
+{
+  "NotebookModel": "Colorful X15 AT 22",
+  "Author": "sek1ro",
+  "EcPollInterval": 100,
+  "ReadWriteWords": false,
+  "CriticalTemperature": 77,
+  "CriticalTemperatureOffset": 7,
+  "FanConfigurations": [
+    {
+      "ReadRegister": 207,
+      "WriteRegister": 231,
+      "MinSpeedValue": 20,
+      "MaxSpeedValue": 100,
+      "IndependentReadMinMaxValues": false,
+      "MinSpeedValueRead": 0,
+      "MaxSpeedValueRead": 0,
+      "ResetRequired": false,
+      "FanSpeedResetValue": 50,
+      "FanDisplayName": "CPU Fan",
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 20,
+          "DownThreshold": 0,
+          "FanSpeed": 0.0
+        },
+        {
+          "UpThreshold": 50,
+          "DownThreshold": 20,
+          "FanSpeed": 23.0769234
+        },
+        {
+          "UpThreshold": 60,
+          "DownThreshold": 50,
+          "FanSpeed": 50
+        },
+        {
+          "UpThreshold": 65,
+          "DownThreshold": 55,
+          "FanSpeed": 70
+        },
+        {
+          "UpThreshold": 70,
+          "DownThreshold": 60,
+          "FanSpeed": 90
+        },
+        {
+          "UpThreshold": 76,
+          "DownThreshold": 60,
+          "FanSpeed": 100.0
+        }
+      ],
+      "FanSpeedPercentageOverrides": [
+        {
+          "FanSpeedPercentage": 100.0,
+          "FanSpeedValue": 100,
+          "TargetOperation": "ReadWrite"
+        }
+      ]
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Set",
+      "WriteOccasion": "OnInitialization",
+      "Register": 44,
+      "Value": 8,
+      "ResetRequired": true,
+      "ResetValue": 5,
+      "ResetWriteMode": "Set",
+      "Description": "Override"
+    }
+  ]
+}
