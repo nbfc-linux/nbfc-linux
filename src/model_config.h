@@ -1,6 +1,10 @@
 #ifndef NBFC_MODEL_CONFIG_H_
 #define NBFC_MODEL_CONFIG_H_
 
+#include "macros.h"
+#include "nxjson.h"
+#include "error.h"
+
 #if defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
 
 #define NBFC_PACKED_ENUM  __attribute__((packed))
@@ -33,17 +37,25 @@ enum NBFC_PACKED_ENUM EmbeddedControllerType_ {
   EmbeddedControllerType_Unset,
 };
 
+enum NBFC_PACKED_ENUM TemperatureAlgorithmType_ {
+  TemperatureAlgorithmType_Average,
+  TemperatureAlgorithmType_Min,
+  TemperatureAlgorithmType_Max,
+  TemperatureAlgorithmType_Unset,
+};
+
 enum NBFC_PACKED_ENUM Boolean_ {
   Boolean_False = 0,
   Boolean_True  = 1,
   Boolean_Unset,
 };
 
-typedef enum RegisterWriteMode_       RegisterWriteMode;
-typedef enum RegisterWriteOccasion_   RegisterWriteOccasion;
-typedef enum OverrideTargetOperation_ OverrideTargetOperation;
-typedef enum EmbeddedControllerType_  EmbeddedControllerType;
-typedef enum Boolean_                 Boolean;
+typedef enum RegisterWriteMode_        RegisterWriteMode;
+typedef enum RegisterWriteOccasion_    RegisterWriteOccasion;
+typedef enum OverrideTargetOperation_  OverrideTargetOperation;
+typedef enum EmbeddedControllerType_   EmbeddedControllerType;
+typedef enum Boolean_                  Boolean;
+typedef enum TemperatureAlgorithmType_ TemperatureAlgorithmType;
 
 #else /* no packed enums */
 
@@ -51,17 +63,20 @@ typedef char                          RegisterWriteMode;
 typedef char                          RegisterWriteOccasion;
 typedef char                          OverrideTargetOperation;
 typedef char                          EmbeddedControllerType;
+typedef char                          TemperatureAlgorithmType;
 typedef char                          Boolean;
 
 #endif /* packed enums */
 
-#include "macros.h"
-#include "nxjson.h"
-#include "error.h"
+typedef const char* str;
+declare_array_of(str);
+
 #include "generated/model_config.generated.h"
 
 EmbeddedControllerType EmbeddedControllerType_FromString(const char*);
 const char*            EmbeddedControllerType_ToString(EmbeddedControllerType);
+const char*            TemperatureAlgorithmType_ToString(TemperatureAlgorithmType);
+
 Error* ModelConfig_Validate(ModelConfig*);
 Error* ModelConfig_FromFile(ModelConfig*, const char*);
 void   ModelConfig_Free(ModelConfig*);

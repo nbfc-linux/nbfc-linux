@@ -6,11 +6,7 @@
 #include "ec_debug.h"
 #include "ec_dummy.h"
 #include "fan.h"
-#ifdef HAVE_SENSORS
-#include "lm_sensors.h"
-#endif
 #include "fs_sensors.h"
-#include "temperature_filter.h"
 #include "service_config.h"
 #include "nbfc.h"
 #include "memory.h"
@@ -40,11 +36,8 @@ enum Service_Initialization {
 };
 
 ModelConfig              Service_Model_Config;
-array_of(Fan)            Service_Fans;
-float                    Service_Temperature;
 pthread_mutex_t          Service_Lock;
-static Sensor_VTable*    sensor;
-static TemperatureFilter temp_filter;
+array_of(FanTemperatureControl) Service_Fans;
 static enum Service_Initialization Service_State;
 
 static Error* ApplyRegisterWriteConfig(int, uint8_t, RegisterWriteMode);
@@ -91,12 +84,12 @@ Error* Service_Init() {
 
   // Fans =====================================================================
   Service_Fans.size = Service_Model_Config.FanConfigurations.size;
-  Service_Fans.data = (Fan*) Mem_Calloc(Service_Fans.size, sizeof(Fan));
+  Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
   Service_State = Initialized_3_Fans;
 
   for_enumerate_array(size_t, i, Service_Fans) {
     e = Fan_Init(
-        &Service_Fans.data[i],
+        &Service_Fans.data[i].Fan,
         &Service_Model_Config.FanConfigurations.data[i],
         Service_Model_Config.CriticalTemperature,
         Service_Model_Config.ReadWriteWords
@@ -107,11 +100,11 @@ Error* Service_Init() {
 
   for_enumerate_array(size_t, i, service_config.TargetFanSpeeds) {
     if (service_config.TargetFanSpeeds.data[i] >= 0.0f) {
-      e = Fan_SetFixedSpeed(&Service_Fans.data[i], service_config.TargetFanSpeeds.data[i]);
+      e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, service_config.TargetFanSpeeds.data[i]);
       e_warn();
     }
     else
-      Fan_SetAutoSpeed(&Service_Fans.data[i]);
+      Fan_SetAutoSpeed(&Service_Fans.data[i].Fan);
   }
 
   // Embedded controller ======================================================
@@ -149,20 +142,24 @@ Error* Service_Init() {
   }
 
   // Sensor ===================================================================
-  e = (sensor = &FS_Sensors_VTable)->Init();
-#ifdef HAVE_SENSORS
-  if (e)
-    e = (sensor = &LM_Sensors_VTable)->Init();
-#endif
+  e = FS_Sensors_Init();
   if (e)
     goto error;
   Service_State = Initialized_5_Sensors;
 
-  // Temperature Filter =======================================================
-  e = TemperatureFilter_Init(&temp_filter, Service_Model_Config.EcPollInterval, NBFC_TEMPERATURE_FILTER_TIMESPAN);
+  // Fans with temperature filter =============================================
+  for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
+    e = FanTemperatureControl_SetDefaults(ftc, Service_Model_Config.EcPollInterval);
+    if (e)
+      goto error;
+  }
+  Service_State = Initialized_6_Temperature_Filter;
+
+  e = FanTemperatureControl_SetByConfig(&Service_Fans, &service_config.FanTemperatureSources, &Service_Model_Config);
   if (e)
     goto error;
-  Service_State = Initialized_6_Temperature_Filter;
+
+  FanTemperatureControl_Log(&Service_Fans, &Service_Model_Config);
 
   return err_success();
 
@@ -177,20 +174,14 @@ void Service_Loop() {
 
   pthread_mutex_lock(&Service_Lock);
 
-  e = sensor->GetTemperature(&Service_Temperature);
-  if (e)
-    goto error;
-
-  Service_Temperature = TemperatureFilter_FilterTemperature(&temp_filter, Service_Temperature);
-
   bool re_init_required = false;
-  for_each_array(Fan*, f, Service_Fans) {
-    e = Fan_UpdateCurrentSpeed(f);
+  for_each_array(FanTemperatureControl*, f, Service_Fans) {
+    e = Fan_UpdateCurrentSpeed(&f->Fan);
     if (e)
       goto error;
 
     // Re-init if current fan speeds are off by more than 15%
-    if (fabs(Fan_GetCurrentSpeed(f) - Fan_GetTargetSpeed(f)) > 15) {
+    if (fabs(Fan_GetCurrentSpeed(&f->Fan) - Fan_GetTargetSpeed(&f->Fan)) > 15) {
       re_init_required = true;
 
       if (options.debug)
@@ -204,10 +195,14 @@ void Service_Loop() {
       goto error;
   }
 
-  for_each_array(Fan*, f, Service_Fans) {
-    Fan_SetTemperature(f, Service_Temperature);
+  for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
+    e = FanTemperatureControl_UpdateFanTemperature(ftc);
+    if (e)
+      goto error;
+
+    Fan_SetTemperature(&ftc->Fan, ftc->Temperature);
     if (! options.read_only) {
-      e = Fan_ECFlush(f);
+      e = Fan_ECFlush(&ftc->Fan);
       if (e)
         goto error;
     }
@@ -256,8 +251,8 @@ static Error* ResetEC() {
     e = ResetRegisterWriteConfigs();
     if (e) r = e;
 
-    for_each_array(Fan*, f, Service_Fans) {
-      e = Fan_ECReset(f);
+    for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
+      e = Fan_ECReset(&ftc->Fan);
       if (e) r = e;
     }
   }
@@ -304,22 +299,23 @@ void Service_UpdateFanSpeedsByTargetFanSpeeds() {
 
   for_enumerate_array(size_t, i, service_config.TargetFanSpeeds) {
     if (service_config.TargetFanSpeeds.data[i] >= 0.0f) {
-      e = Fan_SetFixedSpeed(&Service_Fans.data[i], service_config.TargetFanSpeeds.data[i]);
+      e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, service_config.TargetFanSpeeds.data[i]);
       e_warn();
     }
     else
-      Fan_SetAutoSpeed(&Service_Fans.data[i]);
+      Fan_SetAutoSpeed(&Service_Fans.data[i].Fan);
 
-    Fan_ECFlush(&Service_Fans.data[i]);
+    Fan_ECFlush(&Service_Fans.data[i].Fan);
   }
 }
 
 void Service_Cleanup() {
   switch (Service_State) {
     case Initialized_6_Temperature_Filter:
-      TemperatureFilter_Close(&temp_filter);
+      for_each_array(FanTemperatureControl*, ftc, Service_Fans)
+        TemperatureFilter_Close(&ftc->TemperatureFilter);
     case Initialized_5_Sensors:
-      sensor->Cleanup();
+      FS_Sensors_Cleanup();
     case Initialized_4_Embedded_Controller:
       if (! options.read_only)
         ResetEC();

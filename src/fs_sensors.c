@@ -1,6 +1,5 @@
 #include "fs_sensors.h"
 
-#include "macros.h"
 #include "memory.h"
 #include "slurp_file.h"
 #include "log.h"
@@ -18,22 +17,11 @@ static const char* const LinuxHwmonDirs[] = {
   NULL
 };
 
-static const char* const LinuxTempSensorNames[] = {
-  "coretemp", "k10temp", "zenpower", NULL
-};
-
 static const char* const LinuxTempSensorFile = "temp%d_input";
 
-struct FS_TemperatureSource {
-  char* file;
-  float multiplier;
-};
-typedef struct FS_TemperatureSource FS_TemperatureSource;
-declare_array_of(FS_TemperatureSource);
+array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
-static array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
-
-static Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
+Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
   static char buf[32];
   int nread = slurp_file(buf, sizeof(buf) - 1, my.file);
   if (nread < 0)  return err_stdlib(0, my.file);
@@ -49,31 +37,6 @@ static Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, fl
     return err_stdlib(0, buf);
 
   return err_success();
-}
-
-Error* FS_Sensors_GetTemperature(float* out) {
-  Error* e = NULL;
-  float tmp, sum = 0;
-  int   total = 0;
-  for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources) {
-    e = FS_TemperatureSource_GetTemperature(s, &tmp);
-    if (! e) {
-      sum += tmp;
-      total++;
-    }
-  }
-
-  if (! total)
-    return err_string(0, "No temperatures available");
-  *out = sum / total;
-  return err_success();
-}
-
-static inline int IsLinuxTempSensorName(const char* s) {
-  for (const char* const* name = LinuxTempSensorNames; *name; ++name)
-    if (! strcmp(s, *name))
-      return true;
-  return false;
 }
 
 Error* FS_Sensors_Init() {
@@ -103,14 +66,12 @@ Error* FS_Sensors_Init() {
       while (nread && source_name[nread] < 32)
         source_name[nread--] = '\0'; /* strip whitespace */
 
-      if (! IsLinuxTempSensorName(source_name))
-        continue;
-
       for (int j = 0; j < 10; j++) {
         char filename[PATH_MAX];
         snprintf(filename, sizeof(filename), LinuxTempSensorFile, j);
         snprintf(file, sizeof(file), "%s/%s", dir, filename);
 
+        source->name = source_name;
         source->file = file;
         source->multiplier = 0.001;
 
@@ -121,8 +82,9 @@ Error* FS_Sensors_Init() {
 #endif
         if (e)
           continue;
-        Log_Info("Using '%s' as temperature source\n", file);
-        source->file = Mem_Strdup(file);
+        Log_Info("Available temperature source: '%s' (%s)\n", source->name, source->file);
+        source->name = Mem_Strdup(source->name);
+        source->file = Mem_Strdup(source->file);
         if (++source == sources_end)
           goto end;
       }
@@ -142,17 +104,13 @@ end:
 
 void FS_Sensors_Cleanup() {
   if (FS_Sensors_Sources.size) {
-    for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources)
+    for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources) {
+      Mem_Free(s->name);
       Mem_Free(s->file);
+    }
     Mem_Free(FS_Sensors_Sources.data);
     FS_Sensors_Sources.size = 0;
     FS_Sensors_Sources.data = NULL;
   }
 }
-
-Sensor_VTable FS_Sensors_VTable = {
-  FS_Sensors_Init,
-  FS_Sensors_Cleanup,
-  FS_Sensors_GetTemperature
-};
 

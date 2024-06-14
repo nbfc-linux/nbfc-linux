@@ -77,6 +77,60 @@ It can be queried by `nbfc status -a`.
 
 If you wish `nbfc_service` to get started on boot, use `sudo systemctl enable nbfc_service`.
 
+Advanced configuration
+----------------------
+
+NBFC-Linux allows you to specify which temperature sources to use for controlling fans and the algorithm to compute the temperature.
+
+**Default Configuration**
+
+If no configuration is specified, NBFC uses the "Average" algorithm and utilizes all sensor files named "coretemp," "k10temp," or "zenpower."
+
+**Available Algorithms**
+
+You can choose from three different algorithms to compute the temperature:
+
+- *"Average"*: Computes the average temperature from all specified sources.
+- *"Min"*: Selects the lowest temperature among all specified sources.
+- *"Max"*: Selects the highest temperature among all specified sources.
+
+**Specifying Temperature Sources**
+
+You can specify temperature sources either by sensor name (which may result in multiple temperature sources) or by providing a file path pointing to a temp*_input file.
+
+**Example Configuration**
+
+Here is a fictional example demonstrating how to configure NBFC-Linux:
+
+```
+{
+    "SelectedConfigId": "Asus G53SX",
+    "TargetFanSpeeds": [ -1.000000 ],
+    "FanTemperatureSources": [
+        {
+            "FanIndex": 0,
+            "TemperatureAlgorithmType": "Min",
+            "Sensors": [ "coretemp" ]
+        },
+        {
+            "FanIndex": 1,
+            "TemperatureAlgorithmType": "Average",
+            "Sensors": [ "nouveau" ]
+        },
+        {
+            "FanIndex": 2,
+            "TemperatureAlgorithmType": "Average",
+            "Sensors": [ "/sys/class/hwmon/hwmon4/temp2_input", "/sys/class/hwmon/hwmon4/temp3_input" ]
+        }
+    ]
+}
+```
+
+In this example:
+
+- *Fan 0* uses the "Min" algorithm with sensors named "coretemp."
+- *Fan 1* uses the "Average" algorithm with sensors named "nouveau."
+- *Fan 2* uses the "Average" algorithm with specific sensor file paths.
 
 Differences in detail
 ---------------------

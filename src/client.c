@@ -695,12 +695,14 @@ static int Show_Variable() {
 
 static void print_fan_status(const FanInfo* fan) {
   printf("Fan Display Name         : %s\n"
+         "Temperature              : %.2f\n"
          "Auto Control Enabled     : %s\n"
          "Critical Mode Enabled    : %s\n"
          "Current Fan Speed        : %.2f\n"
          "Target Fan Speed         : %.2f\n"
          "Fan Speed Steps          : %d\n",
          fan->name,
+         fan->temperature,
          fan->automode ? "true" : "false",
          fan->critical ? "true" : "false",
          fan->current_speed,
@@ -710,11 +712,9 @@ static void print_fan_status(const FanInfo* fan) {
 
 static void print_service_status() {
   printf("Read-only                : %s\n"
-         "Selected Config Name     : %s\n"
-         "Temperature              : %.2f\n",
+         "Selected Config Name     : %s\n",
          service_info.read_only ? "true" : "false",
-         service_info.config,
-         service_info.temperature);
+         service_info.config);
 }
 
 static int Complete_Fans() {

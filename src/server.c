@@ -112,12 +112,13 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
   create_json_integer("pid", o, getpid());
   create_json_string("config", o, Service_Model_Config.NotebookModel);
   create_json_bool("read-only", o, options.read_only);
-  create_json_double("temperature", o, Service_Temperature);
   nx_json* fans = create_json_array("fans", o);
 
-  for_each_array(Fan*, fan, Service_Fans) {
+  for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
+    const Fan* fan = &ftc->Fan;
     nx_json* fan_json = create_json_object(NULL, fans);
     create_json_string("name", fan_json, fan->fanConfig->FanDisplayName);
+    create_json_double("temperature", fan_json, ftc->Temperature);
     create_json_bool("automode", fan_json, (fan->mode == Fan_ModeAuto));
     create_json_bool("critical", fan_json, fan->isCritical);
     create_json_double("current_speed", fan_json, Fan_GetCurrentSpeed(fan));

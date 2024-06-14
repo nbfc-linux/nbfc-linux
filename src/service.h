@@ -4,6 +4,7 @@
 #include "error.h"
 #include "fan.h"
 #include "model_config.h"
+#include "temperature_filter.h"
 
 #include <stdbool.h>
 #include <pthread.h>
@@ -18,9 +19,8 @@ struct Service_Options {
 };
 
 extern ModelConfig     Service_Model_Config;
-extern array_of(Fan)   Service_Fans;
-extern float           Service_Temperature;
 extern pthread_mutex_t Service_Lock;
+extern array_of(FanTemperatureControl) Service_Fans;
 extern Service_Options options;
 
 Error* Service_Init();

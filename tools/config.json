@@ -245,6 +245,30 @@
     ]
   },
   {
+    "name": "FanTemperatureSourceConfig",
+    "help": "TODO",
+    "fields": [
+      {
+        "name": "FanIndex",
+        "type": "int",
+        "help": "Specify for which fan the config should be applied"
+      },
+      {
+        "name": "TemperatureAlgorithmType",
+        "type": "TemperatureAlgorithmType",
+        "default": "TemperatureAlgorithmType_Average",
+        "help": "Either 'average', 'max' or 'min'"
+      },
+      {
+        "name": "Sensors",
+        "type": "array_of(str)",
+        "unset": "{NULL, 0}",
+        "is_unset": "false",
+        "help": "Array of sensor names (as in /sys/class/hwmon/hwmon*/name) or sensor files (like /sys/class/hwmon/hwmon1/temp1_input)"
+      }
+    ]
+  },
+  {
     "name": "ServiceConfig",
     "help": "Main configuration file of nbfc_service",
     "fields": [
@@ -260,16 +284,16 @@
         "is_unset": "false"
       },
       {
-        "name": "Port",
-        "type": "int",
-        "help": "The port number to run under.",
-        "default": "6431",
-        "valid": "parameter > 0 && parameter < 65536"
-      },
-      {
         "name": "TargetFanSpeeds",
         "type": "array_of(float)",
         "help": "This holds the fixed speed of the fans. A value of `-1` means the fan should be left in auto mode.",
+        "unset": "{NULL, 0}",
+        "is_unset": "false"
+      },
+      {
+        "name": "FanTemperatureSources",
+        "type": "array_of(FanTemperatureSourceConfig)",
+        "help": "TODO",
         "unset": "{NULL, 0}",
         "is_unset": "false"
       }
@@ -282,6 +306,11 @@
       {
         "name": "name",
         "type": "const char*",
+        "help": ""
+      },
+      {
+        "name": "temperature",
+        "type": "float",
         "help": ""
       },
       {
@@ -328,11 +357,6 @@
       {
         "name": "read-only",
         "type": "Boolean",
-        "help": ""
-      },
-      {
-        "name": "temperature",
-        "type": "float",
         "help": ""
       },
       {

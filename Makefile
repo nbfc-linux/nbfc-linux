@@ -1,4 +1,4 @@
-version     = 0.2.7
+version     = 0.2.8
 
 PREFIX      = /usr
 
@@ -213,6 +213,8 @@ src/nbfc_service: \
 	src/ec_sys_linux.c src/ec_sys_linux.h \
 	src/error.c src/error.h \
 	src/fan.c src/fan.h \
+	src/fan_temperature_control.h \
+	src/fan_temperature_control.c \
 	src/fs_sensors.c src/fs_sensors.h \
 	src/generated/nbfc_service.help.h \
 	src/generated/model_config.generated.c \

@@ -11,6 +11,7 @@
 #include "ec_sys_linux.c"
 #include "error.c"
 #include "fan.c"
+#include "fan_temperature_control.c"
 #include "fs_sensors.c"
 #include "memory.c"
 #include "model_config.c"
