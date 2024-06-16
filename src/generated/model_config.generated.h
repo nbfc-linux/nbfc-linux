@@ -99,13 +99,13 @@ Error* ServiceConfig_FromJson(ServiceConfig*, const nx_json*);
 Error* ServiceConfig_ValidateFields(ServiceConfig*);
 
 struct FanInfo {
-	const char*     name;
-	float           temperature;
-	Boolean         automode;
-	Boolean         critical;
-	float           current_speed;
-	float           target_speed;
-	int             speed_steps;
+	const char*     Name;
+	float           Temperature;
+	Boolean         AutoMode;
+	Boolean         Critical;
+	float           CurrentSpeed;
+	float           TargetSpeed;
+	int             SpeedSteps;
 };
 
 typedef struct FanInfo FanInfo;
@@ -114,10 +114,10 @@ Error* FanInfo_FromJson(FanInfo*, const nx_json*);
 Error* FanInfo_ValidateFields(FanInfo*);
 
 struct ServiceInfo {
-	int             pid;
-	const char*     config;
-	Boolean         read_only;
-	array_of(FanInfo) fans;
+	int             PID;
+	const char*     SelectedConfigId;
+	Boolean         ReadOnly;
+	array_of(FanInfo) Fans;
 };
 
 typedef struct ServiceInfo ServiceInfo;

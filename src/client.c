@@ -605,7 +605,7 @@ static Error* ServiceInfo_TryLoad() {
   if (e)
     goto error;
 
-  for_each_array(FanInfo*, f, service_info.fans) {
+  for_each_array(FanInfo*, f, service_info.Fans) {
     e = FanInfo_ValidateFields(f);
     if (e)
       goto error;
@@ -701,20 +701,20 @@ static void print_fan_status(const FanInfo* fan) {
          "Current Fan Speed        : %.2f\n"
          "Target Fan Speed         : %.2f\n"
          "Fan Speed Steps          : %d\n",
-         fan->name,
-         fan->temperature,
-         fan->automode ? "true" : "false",
-         fan->critical ? "true" : "false",
-         fan->current_speed,
-         fan->target_speed,
-         fan->speed_steps);
+         fan->Name,
+         fan->Temperature,
+         fan->AutoMode ? "true" : "false",
+         fan->Critical ? "true" : "false",
+         fan->CurrentSpeed,
+         fan->TargetSpeed,
+         fan->SpeedSteps);
 }
 
 static void print_service_status() {
   printf("Read-only                : %s\n"
          "Selected Config Name     : %s\n",
-         service_info.read_only ? "true" : "false",
-         service_info.config);
+         service_info.ReadOnly ? "true" : "false",
+         service_info.SelectedConfigId);
 }
 
 static int Complete_Fans() {
@@ -723,8 +723,8 @@ static int Complete_Fans() {
     return NBFC_EXIT_FAILURE;
 
   int idx = 0;
-  for_each_array(const FanInfo*, f, service_info.fans)
-    printf("%d\t%s\n", idx++, f->name);
+  for_each_array(const FanInfo*, f, service_info.Fans)
+    printf("%d\t%s\n", idx++, f->Name);
 
   return NBFC_EXIT_SUCCESS;
 }
@@ -740,13 +740,13 @@ static int Status() {
       print_service_status();
 
     if (options.a) {
-      for_each_array(const FanInfo*, f, service_info.fans) {
+      for_each_array(const FanInfo*, f, service_info.Fans) {
         printf("\n");
         print_fan_status(f);
       }
     }
     else if (options.fans.size) {
-      const int fan_count = service_info.fans.size;
+      const int fan_count = service_info.Fans.size;
       bool *vis = Mem_Calloc(sizeof(bool), fan_count);
       for_each_array(int*, fan_index, options.fans) {
         if (*fan_index >= fan_count) {
@@ -755,7 +755,7 @@ static int Status() {
         }
         if (!vis[*fan_index]) {
           printf("\n");
-          print_fan_status(&service_info.fans.data[*fan_index]);
+          print_fan_status(&service_info.Fans.data[*fan_index]);
           vis[*fan_index] = 1;
         }
       }

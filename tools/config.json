@@ -304,37 +304,37 @@
     "help": "",
     "fields": [
       {
-        "name": "name",
+        "name": "Name",
         "type": "const char*",
         "help": ""
       },
       {
-        "name": "temperature",
+        "name": "Temperature",
         "type": "float",
         "help": ""
       },
       {
-        "name": "automode",
+        "name": "AutoMode",
         "type": "Boolean",
         "help": ""
       },
       {
-        "name": "critical",
+        "name": "Critical",
         "type": "Boolean",
         "help": ""
       },
       {
-        "name": "current_speed",
+        "name": "CurrentSpeed",
         "type": "float",
         "help": ""
       },
       {
-        "name": "target_speed",
+        "name": "TargetSpeed",
         "type": "float",
         "help": ""
       },
       {
-        "name": "speed_steps",
+        "name": "SpeedSteps",
         "type": "int",
         "help": ""
       }
@@ -345,22 +345,22 @@
     "help": "",
     "fields": [
       {
-        "name": "pid",
+        "name": "PID",
         "type": "int",
         "help": ""
       },
       {
-        "name": "config",
+        "name": "SelectedConfigId",
         "type": "const char*",
         "help": ""
       },
       {
-        "name": "read-only",
+        "name": "ReadOnly",
         "type": "Boolean",
         "help": ""
       },
       {
-        "name": "fans",
+        "name": "Fans",
         "type": "array_of(FanInfo)",
         "unset": "{NULL, 0}",
         "is_unset": "parameter.data == NULL",

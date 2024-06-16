@@ -109,21 +109,21 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
 
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
-  create_json_integer("pid", o, getpid());
-  create_json_string("config", o, Service_Model_Config.NotebookModel);
-  create_json_bool("read-only", o, options.read_only);
-  nx_json* fans = create_json_array("fans", o);
+  create_json_integer("PID", o, getpid());
+  create_json_string("SelectedConfigId", o, Service_Model_Config.NotebookModel);
+  create_json_bool("ReadOnly", o, options.read_only);
+  nx_json* fans = create_json_array("Fans", o);
 
   for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
     const Fan* fan = &ftc->Fan;
     nx_json* fan_json = create_json_object(NULL, fans);
-    create_json_string("name", fan_json, fan->fanConfig->FanDisplayName);
-    create_json_double("temperature", fan_json, ftc->Temperature);
-    create_json_bool("automode", fan_json, (fan->mode == Fan_ModeAuto));
-    create_json_bool("critical", fan_json, fan->isCritical);
-    create_json_double("current_speed", fan_json, Fan_GetCurrentSpeed(fan));
-    create_json_double("target_speed", fan_json, Fan_GetTargetSpeed(fan));
-    create_json_integer("speed_steps", fan_json, Fan_GetSpeedSteps(fan));
+    create_json_string("Name", fan_json, fan->fanConfig->FanDisplayName);
+    create_json_double("Temperature", fan_json, ftc->Temperature);
+    create_json_bool("AutoMode", fan_json, (fan->mode == Fan_ModeAuto));
+    create_json_bool("Critical", fan_json, fan->isCritical);
+    create_json_double("CurrentSpeed", fan_json, Fan_GetCurrentSpeed(fan));
+    create_json_double("TargetSpeed", fan_json, Fan_GetTargetSpeed(fan));
+    create_json_integer("SpeedSteps", fan_json, Fan_GetSpeedSteps(fan));
   }
 
   Error* e = Protocol_Send_Json(socket, o);
