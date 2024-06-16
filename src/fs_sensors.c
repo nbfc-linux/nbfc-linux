@@ -22,7 +22,7 @@ static const char* const LinuxTempSensorFile = "temp%d_input";
 array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
 Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
-  static char buf[32];
+  char buf[32];
   int nread = slurp_file(buf, sizeof(buf) - 1, my.file);
   if (nread < 0)  return err_stdlib(0, my.file);
   if (nread == 0) return (errno = ENODATA), err_stdlib(0, my.file);

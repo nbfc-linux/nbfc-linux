@@ -294,7 +294,7 @@ static void Trace_PrintBuf(const Trace* trace, char* buf, size_t size) {
 Error* ModelConfig_Validate(ModelConfig* c) {
   Error* e = NULL;
   Trace trace = {0};
-  static char buf[128];
+  char buf[1024];
 
   e = ModelConfig_ValidateFields(c);
   e_goto(err);

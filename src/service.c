@@ -49,7 +49,7 @@ static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
 Error* Service_Init() {
   Error* e;
-  static char path[PATH_MAX];
+  char path[PATH_MAX];
   Service_State = Initialized_0_None;
 
   // Lock =====================================================================

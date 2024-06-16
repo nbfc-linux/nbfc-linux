@@ -591,9 +591,7 @@ static Error* ServiceInfo_TryLoad() {
       goto error;
     }
 
-    static char errmsg[1024];
-    snprintf(errmsg, sizeof(errmsg), "%s", err->val.text);
-    e = err_string(0, errmsg);
+    e = err_string(0, err->val.text);
     goto error;
   }
 

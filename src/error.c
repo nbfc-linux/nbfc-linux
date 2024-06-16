@@ -56,7 +56,7 @@ Error* err_integer(Error* e, int i) {
 Error* err_string(Error* e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_String;
-  e->value.message = message;
+  snprintf(e->value.message, sizeof(e->value.message), "%s", message);
   return e;
 }
 
