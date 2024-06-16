@@ -1,6 +1,9 @@
+#define _XOPEN_SOURCE 500 /* unistd.h: export pwrite()/pread(), string.h: export strdup */
+
 #include <string.h>
 #include <locale.h>
 #include <getopt.h>
+#include <limits.h>
 
 #include "ec.h"
 #include "log.h"
