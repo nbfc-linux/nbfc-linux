@@ -1,5 +1,6 @@
 #include "protocol.h"
 
+#include "memory.h"
 #include "nxjson_utils.h"
 #include "reverse_nxjson.h"
 
@@ -54,7 +55,7 @@ Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
   int msg_size = 0;
 
   while ((nread = read(socket, buffer, PROTOCOL_BUFFER_SIZE)) > 0) {
-    msg = realloc(msg, msg_size + nread + 1);
+    msg = Mem_Realloc(msg, msg_size + nread + 1);
     memcpy(msg + msg_size, buffer, nread);
     msg_size += nread;
     msg[msg_size] = '\0';
@@ -69,7 +70,7 @@ Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
   if (msg) {
     json = nx_json_parse_utf8(msg);
     if (! json) {
-      free(msg);
+      Mem_Free(msg);
       return err_nxjson(0, "Invalid JSON");
     }
 

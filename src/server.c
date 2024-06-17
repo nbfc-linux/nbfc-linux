@@ -83,12 +83,12 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   else
     speeds[fan] = speed;
 
-  free(service_config.TargetFanSpeeds.data);
+  Mem_Free(service_config.TargetFanSpeeds.data);
   service_config.TargetFanSpeeds.data = speeds;
   service_config.TargetFanSpeeds.size = fancount;
 
   Service_UpdateFanSpeedsByTargetFanSpeeds();
-  kill(getpid(), SIGUSR1);
+  //kill(getpid(), SIGUSR1);
 
   Error* e = ServiceConfig_Write(options.service_config);
   if (e)
@@ -173,7 +173,7 @@ error:
     Protocol_Send_Error(socket, err_print_all(e));
 
   if (buf)
-    free(buf);
+    Mem_Free(buf);
 
   if (json)
     nx_json_free(json);

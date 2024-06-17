@@ -5,13 +5,13 @@
 
 #define ADD_KEY_NOT_NULL()                                                     \
   if (nx->key != NULL) {                                                       \
-    StringBuf_AddCh(s, '"');                                                 \
-    StringBuf_Printf(s, "%s", nx->key);                                       \
-    StringBuf_Printf(s, "%s", "\": ");                                               \
+    StringBuf_AddCh(s, '"');                                                   \
+    StringBuf_Printf(s, "%s", nx->key);                                        \
+    StringBuf_Printf(s, "%s", "\": ");                                         \
   }
 
 #define ADD_INDENTION(N) \
-    StringBuf_Printf(s, "\n%*s", N, " ")
+    StringBuf_Printf(s, "\n%*s", N, "")
 
 static const char* Json_EscapeString(char*, const size_t, const char*);
 

@@ -103,14 +103,12 @@ end:
 }
 
 void FS_Sensors_Cleanup() {
-  if (FS_Sensors_Sources.size) {
-    for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources) {
-      Mem_Free(s->name);
-      Mem_Free(s->file);
-    }
-    Mem_Free(FS_Sensors_Sources.data);
-    FS_Sensors_Sources.size = 0;
-    FS_Sensors_Sources.data = NULL;
+  for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources) {
+    Mem_Free(s->name);
+    Mem_Free(s->file);
   }
+  Mem_Free(FS_Sensors_Sources.data);
+  FS_Sensors_Sources.size = 0;
+  FS_Sensors_Sources.data = NULL;
 }
 

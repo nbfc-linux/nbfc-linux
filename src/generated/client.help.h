@@ -1,4 +1,4 @@
-#define CLIENT_HELP_TEXT                                                       \
+#define CLIENT_HELP_HELP_TEXT                                                  \
  "Usage: nbfc [-h] [--version] COMMAND [...]\n"                                \
  "\n"                                                                          \
  "NoteBook FanControl CLI Client\n"                                            \
@@ -121,7 +121,7 @@
  "  -h, --help            Shows this message and exit\n"                       \
  ""
 
-#define CLIENT_COMPLETE_FANS_TEXT                                              \
+#define CLIENT_COMPLETE_FANS_HELP_TEXT                                         \
  "Usage: nbfc complete-fans [-h]\n"                                            \
  "\n"                                                                          \
  "Used for completing shell command lines.\n"                                  \

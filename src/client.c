@@ -57,7 +57,7 @@ static const cli99_option main_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option status_command_options[] = {
+static const cli99_option status_options[] = {
   cli99_include_options(&main_options),
   {"-a|--all",      -'a', 0},
   {"-s|--service",  -'s', 0},
@@ -66,7 +66,7 @@ static const cli99_option status_command_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option config_command_options[] = {
+static const cli99_option config_options[] = {
   cli99_include_options(&main_options),
   {"-l|--list",       -'l', 0},
   {"-r|--recommend",  -'r', 0},
@@ -75,7 +75,7 @@ static const cli99_option config_command_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option set_command_options[] = {
+static const cli99_option set_options[] = {
   cli99_include_options(&main_options),
   {"-a|--auto",       -'a', 0},
   {"-s|--speed",      -'s', 1},
@@ -83,64 +83,54 @@ static const cli99_option set_command_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option start_command_options[] = {
+static const cli99_option start_options[] = {
   cli99_include_options(&main_options),
   {"-r|--read-only",  -'r', 0},
   cli99_options_end()
 };
 
-static const cli99_option show_variable_command_options[] = {
+static const cli99_option show_variable_options[] = {
   cli99_include_options(&main_options),
   {"variable",         'V', 1},
   cli99_options_end()
 };
 
-static const cli99_option *Options[] = {
-  start_command_options,
-  main_options,
-  start_command_options, // restart
-  status_command_options,
-  config_command_options,
-  set_command_options,
-  main_options,
-  main_options,
-  main_options,
-  show_variable_command_options,
-  main_options,
+#define NBFC_CLIENT_COMMANDS \
+  o("start",          Start,          START,           start)         \
+  o("stop",           Stop,           STOP,            main)          \
+  o("restart",        Restart,        RESTART,         start)         \
+  o("status",         Status,         STATUS,          status)        \
+  o("config",         Config,         CONFIG,          config)        \
+  o("set",            Set,            SET,             set)           \
+  o("wait-for-hwmon", Wait_For_Hwmon, WAIT_FOR_HWMON,  main)          \
+  o("get-model-name", Get_Model_Name, GET_MODEL,       main)          \
+  o("complete-fans",  Complete_Fans,  COMPLETE_FANS,   main)          \
+  o("show-variable",  Show_Variable,  SHOW_VARIABLE,   show_variable) \
+  o("help",           Help,           HELP,            main)
+
+enum Command {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
+  NBFC_CLIENT_COMMANDS
+#undef o
 };
 
 static const char *HelpTexts[] = {
-  CLIENT_START_HELP_TEXT,
-  CLIENT_STOP_HELP_TEXT,
-  CLIENT_RESTART_HELP_TEXT,
-  CLIENT_STATUS_HELP_TEXT,
-  CLIENT_CONFIG_HELP_TEXT,
-  CLIENT_SET_HELP_TEXT,
-  CLIENT_WAIT_FOR_HWMON_HELP_TEXT,
-  CLIENT_GET_MODEL_HELP_TEXT,
-  CLIENT_COMPLETE_FANS_TEXT,
-  CLIENT_SHOW_VARIABLE_HELP_TEXT,
-  CLIENT_HELP_TEXT,
+#define o(COMMAND, ENUM, HELP, OPTIONS)  CLIENT_ ## HELP ## _HELP_TEXT,
+  NBFC_CLIENT_COMMANDS
+#undef o
 };
 
-enum Command {
-  Command_Start,
-  Command_Stop,
-  Command_Restart,
-  Command_Status,
-  Command_Config,
-  Command_Set,
-  Command_Wait_For_Hwmon,
-  Command_Get_Model_Name,
-  Command_Complete_Fans,
-  Command_Show_Variable,
-  Command_Help,
+static const cli99_option *Options[] = {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _options,
+  NBFC_CLIENT_COMMANDS
+#undef o
 };
 
 static enum Command Command_From_String(const char* s) {
   const char* commands[] = {
-    "start", "stop", "restart", "status", "config", "set",
-    "wait-for-hwmon", "get-model-name", "complete-fans", "show-variable", "help"
+#define o(COMMAND, ENUM, HELP, OPTIONS)  COMMAND,
+    NBFC_CLIENT_COMMANDS
+#undef o
   };
 
   for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
@@ -175,7 +165,7 @@ static int Complete_Fans();
 
 int main(int argc, char *const argv[]) {
   if (argc == 1) {
-    printf(CLIENT_HELP_TEXT);
+    printf(CLIENT_HELP_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -185,7 +175,7 @@ int main(int argc, char *const argv[]) {
 
   int o;
   const char* err;
-  enum Command cmd = Command_Help;
+  enum Command cmd;
   cli99 p;
   cli99_Init(&p, argc, argv, main_options, cli99_options_python);
   while ((o = cli99_GetOpt(&p))) {
@@ -203,7 +193,6 @@ int main(int argc, char *const argv[]) {
       }
       cli99_SetOptions(&p, Options[cmd], false);
       break;
-
     case 'V':
       options.variable = p.optarg;
       break;
@@ -291,9 +280,9 @@ int main(int argc, char *const argv[]) {
   }
 }
 
-static char*  to_lower(const char*);
-static bool   str_starts_with_ignorecase(const char*, const char*);
-static float  word_difference(const char*, const char*);
+static char* to_lower(const char*);
+static bool  str_starts_with_ignorecase(const char*, const char*);
+static float word_difference(const char*, const char*);
 
 Error* Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
   int sock = -1;
@@ -482,7 +471,7 @@ static int Service_Restart(bool read_only) {
 
 struct ConfigFile {
   char *config_name;
-  double diff;
+  float diff;
 };
 typedef struct ConfigFile ConfigFile;
 declare_array_of(ConfigFile);
@@ -501,7 +490,7 @@ static array_of(ConfigFile) get_configs() {
     exit(NBFC_EXIT_FAILURE);
   }
 
-  struct dirent *file;
+  struct dirent* file;
   while ((file = readdir(directory)) != NULL) {
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, ".."))
       continue;
@@ -615,7 +604,7 @@ error:
   if (out)
     nx_json_free(out);
   if (buf)
-    free(buf);
+    Mem_Free(buf);
 
   return e;
 }
@@ -687,7 +676,7 @@ static int Show_Variable() {
     Log_Error("Unknown variable '%s'. Choose from 'config_file', 'socket_file', 'pid_file'\n", options.variable);
   }
 
-  free(variable);
+  Mem_Free(variable);
   return ret;
 }
 
@@ -859,7 +848,7 @@ static int Config() {
     }
 
     if (options.a)
-      return Service_Restart(0);
+      return Service_Restart(false);
   } else {
     printf(CLIENT_CONFIG_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
@@ -945,7 +934,7 @@ error:
   if (out)
     nx_json_free(out);
   if (buf)
-    free(buf);
+    Mem_Free(buf);
 
   if (e) {
     Log_Error("%s\n", err_print_all(e));

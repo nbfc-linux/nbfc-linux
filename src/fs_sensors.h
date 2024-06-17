@@ -1,6 +1,7 @@
 #ifndef NBFC_FS_SENSORS_H_
 #define NBFC_FS_SENSORS_H_
 
+#include "error.h"
 #include "macros.h"
 
 struct FS_TemperatureSource {
