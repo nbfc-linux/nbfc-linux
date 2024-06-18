@@ -105,6 +105,7 @@ struct FanInfo {
 	Boolean         Critical;
 	float           CurrentSpeed;
 	float           TargetSpeed;
+	float           RequestedSpeed;
 	int             SpeedSteps;
 };
 

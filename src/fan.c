@@ -115,6 +115,10 @@ float Fan_GetTargetSpeed(const Fan* self) {
   return my.isCritical ? 100.0f : my.targetFanSpeed;
 }
 
+float Fan_GetRequestedSpeed(const Fan* self) {
+  return my.targetFanSpeed;
+}
+
 void Fan_SetTemperature(Fan* self, float temperature)
 {
   // HandleCritalMode

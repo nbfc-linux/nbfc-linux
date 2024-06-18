@@ -1,5 +1,5 @@
-#define _XOPEN_SOURCE 500 /* unistd.h: export pwrite()/pread(), string.h: export strdup */
-#define _DEFAULT_SOURCE   /* endian.h: */
+#define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread(), string.h: strdup()
+#define _DEFAULT_SOURCE   // endian.h: htole16(), le16toh()
 
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))

@@ -445,6 +445,7 @@ struct FanInfo FanInfo_Unset = {
 	Boolean_Unset,
 	float_Unset,
 	float_Unset,
+	float_Unset,
 	int_Unset,
 };
 
@@ -466,6 +467,9 @@ Error* FanInfo_ValidateFields(FanInfo* self) {
 
 	if (self->TargetSpeed == float_Unset)
 		return err_string(0, "TargetSpeed: Missing option");
+
+	if (self->RequestedSpeed == float_Unset)
+		return err_string(0, "RequestedSpeed: Missing option");
 
 	if (self->SpeedSteps == int_Unset)
 		return err_string(0, "SpeedSteps: Missing option");
@@ -493,6 +497,8 @@ Error* FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 			e = float_FromJson(&obj->CurrentSpeed, c);
 		else if (!strcmp(c->key, "TargetSpeed"))
 			e = float_FromJson(&obj->TargetSpeed, c);
+		else if (!strcmp(c->key, "RequestedSpeed"))
+			e = float_FromJson(&obj->RequestedSpeed, c);
 		else if (!strcmp(c->key, "SpeedSteps"))
 			e = int_FromJson(&obj->SpeedSteps, c);
 		else

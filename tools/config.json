@@ -334,6 +334,11 @@
         "help": ""
       },
       {
+        "name": "RequestedSpeed",
+        "type": "float",
+        "help": ""
+      },
+      {
         "name": "SpeedSteps",
         "type": "int",
         "help": ""

@@ -69,23 +69,22 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   if (speed == -2)
     return err_string(0, "Missing argument: speed");
 
-  float* speeds = Mem_Malloc(sizeof(float) * fancount);
 
-  for (int i = 0; i < fancount; ++i)
-    speeds[i] = -1;
-  for (int i = 0; i < min(service_config.TargetFanSpeeds.size, fancount); ++i)
-    speeds[i] = service_config.TargetFanSpeeds.data[i];
+  // Resize TargetFanSpeeds array to match fancount
+  service_config.TargetFanSpeeds.data = Mem_Realloc(service_config.TargetFanSpeeds.data, sizeof(float) * fancount);
+
+  // Set fan speed to auto mode
+  for (int i = service_config.TargetFanSpeeds.size; i < fancount; ++i)
+    service_config.TargetFanSpeeds.data[i] = -1;
+
+  service_config.TargetFanSpeeds.size = fancount;
 
   if (fan == -1) {
     for (int i = 0; i < fancount; ++i)
-      speeds[i] = speed;
+      service_config.TargetFanSpeeds.data[i] = speed;
   }
   else
-    speeds[fan] = speed;
-
-  Mem_Free(service_config.TargetFanSpeeds.data);
-  service_config.TargetFanSpeeds.data = speeds;
-  service_config.TargetFanSpeeds.size = fancount;
+    service_config.TargetFanSpeeds.data[fan] = speed;
 
   Service_UpdateFanSpeedsByTargetFanSpeeds();
   //kill(getpid(), SIGUSR1);
@@ -123,6 +122,7 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
     create_json_bool("Critical", fan_json, fan->isCritical);
     create_json_double("CurrentSpeed", fan_json, Fan_GetCurrentSpeed(fan));
     create_json_double("TargetSpeed", fan_json, Fan_GetTargetSpeed(fan));
+    create_json_double("RequestedSpeed", fan_json, Fan_GetRequestedSpeed(fan));
     create_json_integer("SpeedSteps", fan_json, Fan_GetSpeedSteps(fan));
   }
 
@@ -192,10 +192,10 @@ Error* Server_Init() {
 
   memset(&Server_Address, 0, sizeof(Server_Address));
   Server_Address.sun_family = AF_UNIX;
-  strncpy(Server_Address.sun_path, NBFC_SOCKET_PATH, sizeof(Server_Address.sun_path) - 1);
+  snprintf(Server_Address.sun_path, sizeof(Server_Address.sun_path), NBFC_SOCKET_PATH);
 
   if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) == -1) {
-    e = err_stdlib(0, "bind");
+    e = err_stdlib(0, "bind()");
     goto error;
   }
 

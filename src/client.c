@@ -1,5 +1,5 @@
-#define _XOPEN_SOURCE 500 /* unistd.h: export pwrite()/pread(), string.h: export strdup */
-#define _DEFAULT_SOURCE   /* endian.h: */
+#define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread(), string.h: strdup
+#define _DEFAULT_SOURCE   // endian.h: htole16(), le16toh()
 
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
@@ -15,7 +15,7 @@
 #include <stdbool.h>   // bool
 #include <stdio.h>     // printf, snprintf, remove
 #include <stdlib.h>    // exit, realpath, system, WEXITSTATUS, qsort
-#include <string.h>    // strcmp, strncmp, strncpy, strcat, strcspn, strrchr, strerror
+#include <string.h>    // strcmp, strcat, strcspn, strrchr, strerror
 #include <sys/stat.h>  // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
 #include <unistd.h>    // access, F_OK, geteuid
 #include <sys/types.h>
@@ -285,19 +285,17 @@ static bool  str_starts_with_ignorecase(const char*, const char*);
 static float word_difference(const char*, const char*);
 
 Error* Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
-  int sock = -1;
+  int sock;
   struct sockaddr_un serv_addr;
   Error* e = NULL;
 
   sock = socket(AF_UNIX, SOCK_STREAM, 0);
-  if (sock < 0) {
-    e = err_stdlib(0, "socket()");
-    goto error;
-  }
+  if (sock < 0)
+    return err_stdlib(0, "socket()");
 
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sun_family = AF_UNIX;
-  strncpy(serv_addr.sun_path, NBFC_SOCKET_PATH, sizeof(serv_addr.sun_path) - 1);
+  snprintf(serv_addr.sun_path, sizeof(serv_addr.sun_path), NBFC_SOCKET_PATH);
 
   if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
     e = err_stdlib(0, "connect()");
@@ -313,15 +311,12 @@ Error* Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
     goto error;
 
 error:
-  if (sock != -1)
-    close(sock);
+  close(sock);
   return e;
 }
 
 static const char* get_system_product() {
-  static char buf[128] = {0};
-  if (*buf)
-    return buf;
+  static char buf[128];
 
   if (slurp_file(buf, sizeof(buf), DmiIdDirectoryPath "/product_name") == -1)
     goto error;
@@ -341,9 +336,7 @@ error:
 }
 
 static const char* get_system_vendor() {
-  static char buf[128] = {0};
-  if (*buf)
-    return buf;
+  static char buf[128];
 
   if (slurp_file(buf, sizeof(buf), DmiIdDirectoryPath "/sys_vendor") == -1)
     goto error;
@@ -363,9 +356,7 @@ error:
 }
 
 static const char* get_model_name() {
-  static char model_name[256] = {0};
-  if (*model_name)
-    return model_name;
+  static char model_name[256];
 
   struct vendor_alias { const char* key; const char* value; };
 
@@ -680,6 +671,11 @@ static int Show_Variable() {
   return ret;
 }
 
+static const char* bool_to_str(bool val) {
+  static const char strings[2][6] = {"false", "true"};
+  return strings[val];
+}
+
 static void print_fan_status(const FanInfo* fan) {
   printf("Fan Display Name         : %s\n"
          "Temperature              : %.2f\n"
@@ -687,20 +683,22 @@ static void print_fan_status(const FanInfo* fan) {
          "Critical Mode Enabled    : %s\n"
          "Current Fan Speed        : %.2f\n"
          "Target Fan Speed         : %.2f\n"
+         "Requested Fan Speed      : %.2f\n"
          "Fan Speed Steps          : %d\n",
          fan->Name,
          fan->Temperature,
-         fan->AutoMode ? "true" : "false",
-         fan->Critical ? "true" : "false",
+         bool_to_str(fan->AutoMode),
+         bool_to_str(fan->Critical),
          fan->CurrentSpeed,
          fan->TargetSpeed,
+         fan->RequestedSpeed,
          fan->SpeedSteps);
 }
 
 static void print_service_status() {
   printf("Read-only                : %s\n"
          "Selected Config Name     : %s\n",
-         service_info.ReadOnly ? "true" : "false",
+         bool_to_str(service_info.ReadOnly),
          service_info.SelectedConfigId);
 }
 
