@@ -14,7 +14,6 @@
 	 "ResetRequired": true,
 	 "FanSpeedResetValue": 0,
 	 "FanDisplayName": "Fan1",
-	 "TemperatureThresholds": [],
 	 "FanSpeedPercentageOverrides": [
 	  {
 	   "FanSpeedPercentage": 100.0,
@@ -22,6 +21,5 @@
 	  }
 	 ]
 	}
- ],
- "RegisterWriteConfigurations": []
+ ]
 }

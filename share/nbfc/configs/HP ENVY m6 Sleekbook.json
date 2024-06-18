@@ -12,7 +12,6 @@
 	 "MaxSpeedValue": 41,
 	 "ResetRequired": false,
 	 "FanSpeedResetValue": 0,
-	 "TemperatureThresholds": [],
 	 "FanSpeedPercentageOverrides": [
 	  {
 	   "FanSpeedPercentage": 76.92307692307693,

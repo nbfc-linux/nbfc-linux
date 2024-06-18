@@ -11,10 +11,7 @@
 	 "MinSpeedValue": 0,
 	 "MaxSpeedValue": 100,
 	 "ResetRequired": true,
-	 "FanSpeedResetValue": 30,
-	 "TemperatureThresholds": [],
-	 "FanSpeedPercentageOverrides": []
+	 "FanSpeedResetValue": 30
 	}
- ],
- "RegisterWriteConfigurations": []
+ ]
 }

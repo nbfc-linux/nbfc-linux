@@ -24,9 +24,7 @@
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  }
-	 ],
-	 "FanSpeedPercentageOverrides": []
+	 ]
 	}
- ],
- "RegisterWriteConfigurations": []
+ ]
 }

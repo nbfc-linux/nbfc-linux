@@ -16,9 +16,7 @@
 	 "MaxSpeedValueRead": 62,
 	 "ResetRequired": false,
 	 "FanSpeedResetValue": 0,
-	 "FanDisplayName": "Main Fan",
-	 "TemperatureThresholds": [],
-	 "FanSpeedPercentageOverrides": []
+	 "FanDisplayName": "Main Fan"
 	}
  ],
  "RegisterWriteConfigurations": [
