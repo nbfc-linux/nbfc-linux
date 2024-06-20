@@ -32,20 +32,20 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   const int fancount = Service_Model_Config.FanConfigurations.size;
 
   nx_json_for_each(c, json) {
-    if (!strcmp(c->key, "command"))
+    if (!strcmp(c->key, "Command"))
       continue;
-    else if (!strcmp(c->key, "fan")) {
+    else if (!strcmp(c->key, "Fan")) {
       if (c->type != NX_JSON_INTEGER)
-        return err_string(0, "fan: Not an integer");
+        return err_string(0, "Fan: Not an integer");
 
       fan = c->val.i;
 
       if (fan < 0)
-        return err_string(0, "fan: Cannot be negative");
+        return err_string(0, "Fan: Cannot be negative");
       else if (fan >= fancount)
-        return err_string(0, "fan: No such fan available");
+        return err_string(0, "Fan: No such fan available");
     }
-    else if (!strcmp(c->key, "speed")) {
+    else if (!strcmp(c->key, "Speed")) {
       if (c->type == NX_JSON_STRING && !strcmp(c->val.text, "auto")) {
         speed = -1;
         continue;
@@ -55,11 +55,11 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
       else if (c->type == NX_JSON_INTEGER)
         speed = c->val.i;
       else {
-        return err_string(0, "speed: Invalid type. Either float or 'auto'");
+        return err_string(0, "Speed: Invalid type. Either float or 'auto'");
       }
 
       if (speed < 0.0 || speed > 100.0)
-        return err_string(0, "speed: Invalid value");
+        return err_string(0, "Speed: Invalid value");
     }
     else {
       return err_string(0, "Unknown arguments");
@@ -67,7 +67,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   }
 
   if (speed == -2)
-    return err_string(0, "Missing argument: speed");
+    return err_string(0, "Missing argument: Speed");
 
   for_enumerate_array(int, i, Service_Fans) {
     if (fan == -1 || fan == i) {
@@ -86,7 +86,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
 
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
-  create_json_string("status", o, "OK");
+  create_json_string("Status", o, "OK");
 
   e = Protocol_Send_Json(socket, o);
   nx_json_free(o);
@@ -122,7 +122,7 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
   return e;
 }
 
-static void *Server_Handle_Client(void *arg) {
+static void* Server_Handle_Client(void* arg) {
   const int socket = (int) (intptr_t) arg;
   const nx_json* json = NULL;
   char* buf = NULL;
@@ -137,14 +137,14 @@ static void *Server_Handle_Client(void *arg) {
     goto error;
   }
 
-  const nx_json* command = nx_json_get(json, "command");
+  const nx_json* command = nx_json_get(json, "Command");
   if (! command) {
-    e = err_string(0, "Missing 'command' field");
+    e = err_string(0, "Missing 'Command' field");
     goto error;
   }
 
   if (command->type != NX_JSON_STRING) {
-    e = err_string(0, "command: not a string");
+    e = err_string(0, "Command: not a string");
     goto error;
   }
 
@@ -163,29 +163,26 @@ error:
   if (e)
     Protocol_Send_Error(socket, err_print_all(e));
 
-  if (buf)
-    Mem_Free(buf);
-
-  if (json)
-    nx_json_free(json);
-
+  Mem_Free(buf);
+  nx_json_free(json);
   close(socket);
+
   return NULL;
 }
 
 Error* Server_Init() {
   Error* e = NULL;
 
-  if ((Server_FD = socket(AF_UNIX, SOCK_STREAM, 0)) == 0) {
-    e = err_stdlib(0, "socket()");
-    goto error;
-  }
-
   memset(&Server_Address, 0, sizeof(Server_Address));
   Server_Address.sun_family = AF_UNIX;
   snprintf(Server_Address.sun_path, sizeof(Server_Address.sun_path), NBFC_SOCKET_PATH);
 
-  if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) == -1) {
+  if ((Server_FD = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
+    e = err_stdlib(0, "socket()");
+    goto error;
+  }
+
+  if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) < 0) {
     e = err_stdlib(0, "bind()");
     goto error;
   }
@@ -238,7 +235,7 @@ Error* Server_Loop() {
   return err_success();
 }
 
-static void* Server_Run(void* arg) {
+static void* Server_Run(void*) {
   int failures = 0;
 
   while (! quit) {

@@ -86,7 +86,7 @@ Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
 Error* Protocol_Send_Error(int socket, const char* message) {
   nx_json error  = {0};
   error.type     = NX_JSON_STRING;
-  error.key      = "error";
+  error.key      = "Error";
   error.val.text = message;
 
   nx_json obj             = {0};

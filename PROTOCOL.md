@@ -6,8 +6,8 @@ My protocol involves exchanging JSON objects between a client and a server. In b
 Example usage using socat:
 
 ```
- ~ > socat - UNIX-CONNECT:/var/run/nbfc_service.socket
-{"command": "status"}
+$ socat - UNIX-CONNECT:/var/run/nbfc_service.socket
+{"Command": "status"}
 END
 ```
 
@@ -21,18 +21,18 @@ Commands
 
 Get a JSON that describes the server status
 
-`{"command": "status"}`
+`{"Command": "status"}`
 
 **set-fan-speed**
 
 Set the speed for all fans:
 
-`{"command": "set-fan-speed", "speed": <SPEED>}`
+`{"Command": "set-fan-speed", "Speed": <SPEED>}`
 
 Set the speed for a specific fan:
 
-`{"command": "set-fan-speed", "fan": <NUMBER>, "speed": <SPEED>}`
+`{"Command": "set-fan-speed", "Fan": <NUMBER>, "Speed": <SPEED>}`
 
 Set the fan mode to "auto" for a specific fan:
 
-`{"command": "set-fan-speed", "fan": <NUMBER>, "speed": "auto"}`
+`{"Command": "set-fan-speed", "Fan": <NUMBER>, "Speed": "auto"}`

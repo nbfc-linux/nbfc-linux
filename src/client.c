@@ -13,11 +13,11 @@
 #include <limits.h>    // INT_MAX, PATH_MAX
 #include <signal.h>    // kill, SIGINT
 #include <stdbool.h>   // bool
-#include <stdio.h>     // printf, snprintf, remove
+#include <stdio.h>     // printf, snprintf
 #include <stdlib.h>    // exit, realpath, system, WEXITSTATUS, qsort
 #include <string.h>    // strcmp, strcat, strcspn, strrchr, strerror
 #include <sys/stat.h>  // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
-#include <unistd.h>    // access, F_OK, geteuid
+#include <unistd.h>    // access, F_OK, geteuid, unlink
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -445,7 +445,7 @@ static int Service_Stop() {
     Log_Error("Service not running\n");
     return NBFC_EXIT_SUCCESS;
   }
-  remove(NBFC_PID_FILE);
+  unlink(NBFC_PID_FILE);
   Log_Info("Killing nbfc_service (%d)\n", pid);
   if (kill(pid, SIGINT) == -1) {
     Log_Error("Failed to kill nbfc_service process (%d): %s\n", pid, strerror(errno));
@@ -551,7 +551,7 @@ static Error* ServiceInfo_TryLoad() {
   Error* e;
   nx_json root = {0};
   nx_json* in = create_json_object(NULL, &root);
-  create_json_string("command", in, "status");
+  create_json_string("Command", in, "status");
 
   char* buf = NULL;
   const nx_json* out = NULL;
@@ -564,10 +564,10 @@ static Error* ServiceInfo_TryLoad() {
     goto error;
   }
 
-  const nx_json* err = nx_json_get(out, "error");
+  const nx_json* err = nx_json_get(out, "Error");
   if (err) {
     if (err->type != NX_JSON_STRING) {
-      e = err_string(0, "'error' is not a string");
+      e = err_string(0, "'Error' is not a string");
       goto error;
     }
 
@@ -590,12 +590,9 @@ static Error* ServiceInfo_TryLoad() {
   }
 
 error:
-  if (in)
-    nx_json_free(in);
-  if (out)
-    nx_json_free(out);
-  if (buf)
-    Mem_Free(buf);
+  nx_json_free(in);
+  nx_json_free(out);
+  Mem_Free(buf);
 
   return e;
 }
@@ -878,15 +875,15 @@ static int Set() {
 
   nx_json root = {0};
   nx_json* in = create_json_object(NULL, &root);
-  create_json_string("command", in, "set-fan-speed");
+  create_json_string("Command", in, "set-fan-speed");
 
   if (options.fans.size)
-    create_json_integer("fan", in, options.fans.data[0]);
+    create_json_integer("Fan", in, options.fans.data[0]);
 
   if (options.a)
-    create_json_string("speed", in, "auto");
+    create_json_string("Speed", in, "auto");
   else
-    create_json_double("speed", in, options.speeds.data[0]);
+    create_json_double("Speed", in, options.speeds.data[0]);
 
   char* buf = NULL;
   const nx_json* out = NULL;
@@ -899,10 +896,10 @@ static int Set() {
     goto error;
   }
 
-  const nx_json* err = nx_json_get(out, "error");
+  const nx_json* err = nx_json_get(out, "Error");
   if (err) {
     if (err->type != NX_JSON_STRING) {
-      e = err_string(0, "'error' is not a string");
+      e = err_string(0, "'Error' is not a string");
       goto error;
     }
 
@@ -910,14 +907,14 @@ static int Set() {
     return NBFC_EXIT_FAILURE;
   }
 
-  const nx_json* status = nx_json_get(out, "status");
+  const nx_json* status = nx_json_get(out, "Status");
   if (! status) {
     e = err_string(0, "Missing status in JSON output");
     goto error;
   }
 
   if (status->type != NX_JSON_STRING) {
-    e = err_string(0, "status: not a JSON string");
+    e = err_string(0, "Status: not a JSON string");
     goto error;
   }
 
@@ -927,12 +924,9 @@ static int Set() {
   }
 
 error:
-  if (in)
-    nx_json_free(in);
-  if (out)
-    nx_json_free(out);
-  if (buf)
-    Mem_Free(buf);
+  nx_json_free(in);
+  nx_json_free(out);
+  Mem_Free(buf);
 
   if (e) {
     Log_Error("%s\n", err_print_all(e));
