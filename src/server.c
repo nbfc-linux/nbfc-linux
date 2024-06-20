@@ -69,27 +69,18 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   if (speed == -2)
     return err_string(0, "Missing argument: speed");
 
+  for_enumerate_array(int, i, Service_Fans) {
+    if (fan == -1 || fan == i) {
+      if (speed == -1)
+        Fan_SetAutoSpeed(&Service_Fans.data[i].Fan);
+      else
+        Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, speed);
 
-  // Resize TargetFanSpeeds array to match fancount
-  service_config.TargetFanSpeeds.data = Mem_Realloc(service_config.TargetFanSpeeds.data, sizeof(float) * fancount);
-
-  // Set fan speed to auto mode
-  for (int i = service_config.TargetFanSpeeds.size; i < fancount; ++i)
-    service_config.TargetFanSpeeds.data[i] = -1;
-
-  service_config.TargetFanSpeeds.size = fancount;
-
-  if (fan == -1) {
-    for (int i = 0; i < fancount; ++i)
-      service_config.TargetFanSpeeds.data[i] = speed;
+      Fan_ECFlush(&Service_Fans.data[i].Fan);
+    }
   }
-  else
-    service_config.TargetFanSpeeds.data[fan] = speed;
 
-  Service_UpdateFanSpeedsByTargetFanSpeeds();
-  //kill(getpid(), SIGUSR1);
-
-  Error* e = ServiceConfig_Write(options.service_config);
+  Error* e = Service_WriteTargetFanSpeedsToConfig();
   if (e)
     return e;
 
@@ -199,7 +190,10 @@ Error* Server_Init() {
     goto error;
   }
 
-  chmod(NBFC_SOCKET_PATH, 0666);
+  if (chmod(NBFC_SOCKET_PATH, 0666) < 0) {
+    e = err_stdlib(0, "chmod()");
+    goto error;
+  }
 
   if (listen(Server_FD, 3) < 0) {
     e = err_stdlib(0, "listen()");
@@ -256,8 +250,10 @@ static void* Server_Run(void* arg) {
       e_warn();
 
     if (e) {
-      if (++failures > Server_Max_Failures)
+      if (++failures > Server_Max_Failures) {
+        quit = 1;
         return NULL;
+      }
     }
     else
       failures = 0;
@@ -270,6 +266,6 @@ void Server_Close() {
   if (Server_FD != -1) {
     close(Server_FD);
     unlink(NBFC_SOCKET_PATH);
+    Server_FD = -1;
   }
-  Server_FD = -1;
 }

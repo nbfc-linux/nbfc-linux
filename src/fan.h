@@ -28,6 +28,7 @@ struct Fan {
 
   ThresholdManager threshMan;
   float targetFanSpeed;
+  float requestedSpeed;
   float currentSpeed;
   Fan_Mode mode;
   bool isCritical;

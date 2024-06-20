@@ -116,7 +116,7 @@ float Fan_GetTargetSpeed(const Fan* self) {
 }
 
 float Fan_GetRequestedSpeed(const Fan* self) {
-  return my.targetFanSpeed;
+  return my.requestedSpeed;
 }
 
 void Fan_SetTemperature(Fan* self, float temperature)
@@ -133,19 +133,21 @@ void Fan_SetTemperature(Fan* self, float temperature)
 }
 
 Error* Fan_SetFixedSpeed(Fan* self, float speed) {
+  Error* e = NULL;
   my.mode = Fan_ModeFixed;
 
   if (speed < 0.0f) {
-    my.targetFanSpeed = 0.0f;
-    return err_string(0, "speed < 0.0");
+    speed = 0.0f;
+    e = err_string(0, "speed < 0.0");
   }
   else if (speed > 100.0f) {
-    my.targetFanSpeed = 100.0f;
-    return err_string(0, "speed > 100.0");
+    speed = 100.0f;
+    e = err_string(0, "speed > 100.0");
   }
 
+  my.requestedSpeed = speed;
   my.targetFanSpeed = speed;
-  return err_success();
+  return e;
 }
 
 void Fan_SetAutoSpeed(Fan* self) {

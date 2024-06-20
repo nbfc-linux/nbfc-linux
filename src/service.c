@@ -294,19 +294,21 @@ static Error* ApplyRegisterWriteConfgurations(bool initializing) {
   return err_success();
 }
 
-void Service_UpdateFanSpeedsByTargetFanSpeeds() {
-  Error* e;
+Error* Service_WriteTargetFanSpeedsToConfig() {
+  const int fancount = Service_Model_Config.FanConfigurations.size;
 
-  for_enumerate_array(size_t, i, service_config.TargetFanSpeeds) {
-    if (service_config.TargetFanSpeeds.data[i] >= 0.0f) {
-      e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, service_config.TargetFanSpeeds.data[i]);
-      e_warn();
-    }
+  service_config.TargetFanSpeeds.data = Mem_Realloc(service_config.TargetFanSpeeds.data, sizeof(float) * fancount);
+  service_config.TargetFanSpeeds.size = fancount;
+
+  for_enumerate_array(int, i, Service_Fans) {
+    Fan* fan = &Service_Fans.data[i].Fan;
+    if (fan->mode == Fan_ModeAuto)
+      service_config.TargetFanSpeeds.data[i] = -1;
     else
-      Fan_SetAutoSpeed(&Service_Fans.data[i].Fan);
-
-    Fan_ECFlush(&Service_Fans.data[i].Fan);
+      service_config.TargetFanSpeeds.data[i] = Fan_GetRequestedSpeed(fan);
   }
+
+  return ServiceConfig_Write(options.service_config);
 }
 
 void Service_Cleanup() {
