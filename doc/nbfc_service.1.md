@@ -57,10 +57,9 @@ NoteBook FanControl service
 
 > File containing the PID of current running nbfc_service.
 
-*/var/run/nbfc_service.state.json*
+*/var/run/nbfc_service.socket*
 
-> State file of nbfc_service. Updated every **EcPollInterval**
-> milliseconds. See **nbfc_service.json**(5) for further details.
+> Socket file of nbfc_service.
 
 */usr/share/nbfc/configs/\*.json*
 

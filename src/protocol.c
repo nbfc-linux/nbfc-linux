@@ -16,7 +16,7 @@ Error* Protocol_Send(int socket, const void* buffer, size_t length) {
     int ret = send(socket, buf_ptr + total_sent, length - total_sent, MSG_NOSIGNAL);
     if (ret < 0) {
       if (errno != EINTR && errno != EAGAIN)
-        return err_stdlib(0, "send");
+        return err_stdlib(0, "send()");
       else
         continue;
     }

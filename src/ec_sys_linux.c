@@ -84,7 +84,7 @@ Error* EC_SysLinux_ReadWord(int register_, uint16_t* out) {
 static inline Error* EC_SysLinux_LoadKernelModule() {
   switch (system(EC_SysLinux_Module_Cmd)) {
   case 0:  return err_success();
-  case -1: return err_stdlib(0, "system");
+  case -1: return err_stdlib(0, "system()");
   default: return err_string(0, "Could not execute `" EC_SysLinux_Module_Cmd "'");
   }
 }
@@ -92,7 +92,7 @@ static inline Error* EC_SysLinux_LoadKernelModule() {
 static inline Error* EC_SysLinux_LoadACPIKernelModule() {
   switch (system(EC_SysLinux_ACPI_Module_Cmd)) {
   case 0:  return err_success();
-  case -1: return err_stdlib(0, "system");
+  case -1: return err_stdlib(0, "system()");
   default: return err_string(0, "Could not execute `" EC_SysLinux_ACPI_Module_Cmd "'");
   }
 }
