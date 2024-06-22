@@ -100,7 +100,7 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
   create_json_integer("PID", o, getpid());
-  create_json_string("SelectedConfigId", o, Service_Model_Config.NotebookModel);
+  create_json_string("SelectedConfigId", o, service_config.SelectedConfigId);
   create_json_bool("ReadOnly", o, options.read_only);
   nx_json* fans = create_json_array("Fans", o);
 

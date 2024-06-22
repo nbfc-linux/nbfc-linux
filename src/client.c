@@ -645,8 +645,7 @@ static int Get_Model_Name() {
 
 static int Show_Variable() {
   if (! options.variable) {
-    printf("Missing argument: VARIABLE\n\n");
-    printf(CLIENT_SHOW_VARIABLE_HELP_TEXT);
+    Log_Error("Missing argument: VARIABLE\n");
     return NBFC_EXIT_CMDLINE;
   }
 
