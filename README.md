@@ -17,7 +17,8 @@ Comparison of NBFC C# and NBFC Linux
 |Runtime                          | Mono                                  | Native                                      |
 |Memory consumption (ps\_mem)     | ~50MB                                 | ~350KB                                      |
 |Package size (pkg.tar.gz)        | 448K                                  | 100K                                        |
-|Service control rights           | Any user                              | Any user                                    |
+|Fan control rights               | Any user                              | Any user                                    |
+|Service control rights           | Any user                              | Only root                                   |
 |IPC Concept                      | TCP/IP                                | Unix sockets                                |
 |IPC Protocol                     | Binary                                | JSON                                        |
 
