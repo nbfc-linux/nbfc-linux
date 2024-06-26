@@ -658,6 +658,8 @@ static int Show_Variable() {
     printf("%s\n", NBFC_SOCKET_PATH);
   else if (! strcmp(variable, "pid_file"))
     printf("%s\n", NBFC_PID_FILE);
+  else if (! strcmp(variable, "model_configs_dir"))
+    printf("%s\n", NBFC_MODEL_CONFIGS_DIR);
   else {
     ret = NBFC_EXIT_FAILURE;
     Log_Error("Unknown variable '%s'. Choose from 'config_file', 'socket_file', 'pid_file'\n", options.variable);
