@@ -21,8 +21,11 @@ Comparison of NBFC C# and NBFC Linux
 |Service control rights           | Any user                              | Only root                                   |
 |IPC Concept                      | TCP/IP                                | Unix sockets                                |
 |IPC Protocol                     | Binary                                | JSON                                        |
+|Graphical User Interface         | Windows only                          | Linux only                                  |
 
-All programs, the [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probing tool](doc/ec_probe.1.md) are written in C.
+The [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probing tool](doc/ec_probe.1.md) are written in C.
+
+The GUI is written in Python and Qt5 (a GUI for GTK-3 will follow).
 
 Installation
 ------------
@@ -61,8 +64,13 @@ Installation
 - For systems with System-V-Init:
   - `./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --with-init-system=systemv && make && sudo make install`
 
-Getting started
----------------
+Getting started with the GUI
+----------------------------
+
+After installing NBFC-Linux you can configure it by running `sudo nbfc-qt`.
+
+Getting started without the GUI
+-------------------------------
 
 When running NBFC for the first time, you need to give it a configuration file for your laptop model.
 

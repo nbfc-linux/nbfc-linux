@@ -15,6 +15,7 @@ struct Service_Options {
   bool                   fork;
   bool                   read_only;
   bool                   debug;
+  bool                   python_hack;
   const char*            service_config;
 };
 

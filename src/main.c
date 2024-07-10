@@ -32,6 +32,7 @@ static struct option cli_options[] = {
   {"fork",                no_argument,       NULL, 'f'},
   {"debug",               no_argument,       NULL, 'd'},
   {"config-file",         required_argument, NULL, 'c'},
+  {"python-hack",         no_argument,       NULL, 'p'},
   {0,                     0,                 0,     0 },
 };
 
@@ -55,6 +56,7 @@ static void parse_opts(int argc, char* const argv[]) {
     case 'f':  options.fork           = 1;                         break;
     case 'd':  options.debug          = 1;                         break;
     case 'c':  options.service_config = optarg;                    break;
+    case 'p':  options.python_hack    = 1;                         break;
     default:   exit(NBFC_EXIT_CMDLINE);
     }
   }
@@ -160,6 +162,12 @@ int main(int argc, char* const argv[])
     return NBFC_EXIT_FAILURE;
   }
   close(pipefd[1]); 
+
+  // If we don't close STDERR and STDOUT, Python's subprocess.run() will block
+  if (options.python_hack) {
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+  }
 
   while (!quit) {
     Service_Loop();

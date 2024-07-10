@@ -76,7 +76,8 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
       else
         Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, speed);
 
-      Fan_ECFlush(&Service_Fans.data[i].Fan);
+      if (! options.read_only)
+        Fan_ECFlush(&Service_Fans.data[i].Fan);
     }
   }
 
@@ -183,7 +184,7 @@ Error* Server_Init() {
   }
 
   if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) < 0) {
-    e = err_stdlib(0, "bind()");
+    e = err_stdlib(err_string(0, NBFC_SOCKET_PATH), "bind()");
     goto error;
   }
 

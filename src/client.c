@@ -53,6 +53,7 @@ static ServiceInfo service_info;
 static const cli99_option main_options[] = {
   {"-v|--version",  -'v', 0},
   {"-h|--help",     -'h', 0},
+  {"--python-hack", -'p', 0},
   {"command",        'C', 1 | cli99_required_option},
   cli99_options_end()
 };
@@ -145,6 +146,7 @@ static struct {
   array_of(float) speeds;
   const char* config;
   const char* variable;
+  bool python_hack;
   bool a;      // all/auto/apply
   bool l;      // list
   bool r;      // recommend/read-only
@@ -202,6 +204,9 @@ int main(int argc, char *const argv[]) {
     case -'v':
       printf("nbfc " NBFC_VERSION "\n");
       return NBFC_EXIT_SUCCESS;
+    case -'p':
+      options.python_hack = 1;
+      break;
     case -'a':
       options.a = true;
       if (cmd == Command_Config) {
@@ -423,7 +428,7 @@ static int Service_Start(bool read_only) {
     return NBFC_EXIT_SUCCESS;
   }
 
-  char cmd[32] = "nbfc_service -f";
+  char cmd[64] = "nbfc_service --python-hack -f";
   if (read_only)
     strcat(cmd, " -r");
   int ret = system(cmd);
@@ -445,18 +450,19 @@ static int Service_Stop() {
     Log_Error("Service not running\n");
     return NBFC_EXIT_SUCCESS;
   }
-  unlink(NBFC_PID_FILE);
   Log_Info("Killing nbfc_service (%d)\n", pid);
   if (kill(pid, SIGINT) == -1) {
     Log_Error("Failed to kill nbfc_service process (%d): %s\n", pid, strerror(errno));
     return NBFC_EXIT_FAILURE;
   }
+  unlink(NBFC_PID_FILE);
   return NBFC_EXIT_SUCCESS;
 }
 
 static int Service_Restart(bool read_only) {
   check_root();
   Service_Stop();
+  sleep(1);
   return Service_Start(read_only);
 }
 
