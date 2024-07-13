@@ -140,7 +140,7 @@ class NbfcClient:
         '''
 
         request = {'Command': 'set-fan-speed', 'Speed': speed}
-        if fan:
+        if fan is not None:
             request['Fan'] = fan
         response = self.socket_communicate(request)
         if 'Error' in response:
