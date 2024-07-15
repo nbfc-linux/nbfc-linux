@@ -20,6 +20,7 @@
           src = nixpkgs.lib.cleanSource ./.;
 
           nativeBuildInputs = with pkgs; [
+	    python3
             autoreconfHook
           ];
           configureFlags = [
