@@ -58,6 +58,7 @@ nbfc.py: nbfc.py.in
 	$(REPLACE_VARS) < $< > $@
 
 nbfc-gui/nbfc-qt.py: nbfc-gui/about.py nbfc-gui/common.py nbfc-gui/fs_sensors.py nbfc-gui/nbfc_client.py nbfc-gui/qt.py
+	chmod +x ./nbfc-gui/include_files.py
 	(cd ./nbfc-gui; ./include_files.py qt.py > nbfc-qt.py)
 	chmod +x ./nbfc-gui/nbfc-qt.py
 
