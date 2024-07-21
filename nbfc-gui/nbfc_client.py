@@ -222,3 +222,14 @@ class NbfcClient:
         with open(self.config_file, 'w') as fh:
             return json.dump(config, fh, indent=1)
 
+    def get_model_configuration(self):
+        config = self.get_config()
+        if 'SelectedConfigId' not in config:
+            raise Exception('Configuration has no model configuration ("SelectedConfigID") set')
+
+        config_id = config['SelectedConfigId']
+        model_config_path = os.path.join(self.model_configs_dir, config_id + '.json')
+
+        with open(model_config_path, 'r') as fh:
+            return json.load(fh)
+

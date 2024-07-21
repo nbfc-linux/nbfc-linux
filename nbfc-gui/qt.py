@@ -374,17 +374,6 @@ class TemperatureSourcesWidget(QStackedWidget):
         self.apply()
         NBFC_CLIENT.restart(self.apply_buttons_widget.read_only_checkbox.isChecked())
 
-    def get_model_configuration(self):
-        config = NBFC_CLIENT.get_config()
-        if 'SelectedConfigId' not in config:
-            raise Exception('No model configuration selected')
-
-        config_id = config['SelectedConfigId']
-        model_config_path = os.path.join(NBFC_CLIENT.model_configs_dir, config_id + '.json')
-
-        with open(model_config_path, 'r') as fh:
-            return json.load(fh)
-
     def find_sensor_item(self, sensor):
         for i in range(self.available_temperature_sources.count()):
             item = self.available_temperature_sources.item(i)
@@ -408,7 +397,7 @@ class TemperatureSourcesWidget(QStackedWidget):
         try:
             config = NBFC_CLIENT.get_config()
             fan_temperature_sources = config.get('FanTemperatureSources', [])
-            model_config = self.get_model_configuration()
+            model_config = NBFC_CLIENT.get_model_configuration()
         except Exception as e:
             self.setCurrentWidget(self.error_widget)
             self.error_label.setText(str(e))
