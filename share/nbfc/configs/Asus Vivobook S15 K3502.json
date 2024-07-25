@@ -1,0 +1,54 @@
+{
+ "LegacyTemperatureThresholdsBehaviour": true,
+ "NotebookModel": "Asus Vivobook K3502",
+ "Author": "Strong361",
+ "EcPollInterval": 500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 100,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 236,
+	 "WriteRegister": 236,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 9,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 0,
+	 "FanDisplayName": "Fan1",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 0,
+	   "DownThreshold": 0,
+	   "FanSpeed": 11.1111116
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 70,
+	   "FanSpeed": 22.2222233
+	  },
+	  {
+	   "UpThreshold": 81,
+	   "DownThreshold": 73,
+	   "FanSpeed": 33.3333359
+	  },
+	  {
+	   "UpThreshold": 87,
+	   "DownThreshold": 80,
+	   "FanSpeed": 44.4444466
+	  },
+	  {
+	   "UpThreshold": 91,
+	   "DownThreshold": 86,
+	   "FanSpeed": 55.5555573
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 90,
+	   "FanSpeed": 66.66667
+	  }
+	 ]
+	}
+ ]
+}

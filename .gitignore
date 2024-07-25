@@ -26,3 +26,4 @@ configure~
 install-sh
 configure
 Makefile
+nbfc-gui/nbfc-qt.py

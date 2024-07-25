@@ -9,7 +9,7 @@
 #include <sensors/error.h>
 #endif
 
-Error error_stack[16];
+__thread Error error_stack[16];
 
 static void err_print(Error* e, StringBuf* s) {
   if (! e)
@@ -56,7 +56,7 @@ Error* err_integer(Error* e, int i) {
 Error* err_string(Error* e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_String;
-  e->value.message = message;
+  snprintf(e->value.message, sizeof(e->value.message), "%s", message);
   return e;
 }
 

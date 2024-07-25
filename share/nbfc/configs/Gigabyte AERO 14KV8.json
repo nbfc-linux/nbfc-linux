@@ -48,8 +48,7 @@
 	   "DownThreshold": 80,
 	   "FanSpeed": 100.0
 	  }
-	 ],
-	 "FanSpeedPercentageOverrides": []
+	 ]
 	},
 	{
 	 "ReadRegister": 254,
@@ -93,8 +92,7 @@
 	   "DownThreshold": 80,
 	   "FanSpeed": 100.0
 	  }
-	 ],
-	 "FanSpeedPercentageOverrides": []
+	 ]
 	}
  ],
  "RegisterWriteConfigurations": [

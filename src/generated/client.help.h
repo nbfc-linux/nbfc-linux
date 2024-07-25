@@ -1,4 +1,4 @@
-#define CLIENT_HELP_TEXT                                                       \
+#define CLIENT_HELP_HELP_TEXT                                                  \
  "Usage: nbfc [-h] [--version] COMMAND [...]\n"                                \
  "\n"                                                                          \
  "NoteBook FanControl CLI Client\n"                                            \
@@ -106,6 +106,25 @@
  "Usage: nbfc get-model-name [-h]\n"                                           \
  "\n"                                                                          \
  "Print out model name.\n"                                                     \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
+// TODO
+#define CLIENT_SHOW_VARIABLE_HELP_TEXT                                         \
+ "Usage: nbfc show-variable [-h] VARIABLE\n"                                   \
+ "\n"                                                                          \
+ "Print out a variable.\n"                                                     \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
+#define CLIENT_COMPLETE_FANS_HELP_TEXT                                         \
+ "Usage: nbfc complete-fans [-h]\n"                                            \
+ "\n"                                                                          \
+ "Used for completing shell command lines.\n"                                  \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Shows this message and exit\n"                       \

@@ -15,7 +15,7 @@
 #define short_Unset SHRT_MIN
 #define float_Unset NAN
 
-static inline Error* bool_FromJson(bool* out, const nx_json* node) {
+static inline Error* Boolean_FromJson(Boolean* out, const nx_json* node) {
   if (node->type == NX_JSON_BOOL) {
     *out = node->val.u;
     return err_success();
@@ -61,10 +61,6 @@ static inline Error* float_FromJson(float* out, const nx_json* json) {
   return e;
 }
 
-static inline Error* Boolean_FromJson(Boolean* out, const nx_json* json) {
-  return bool_FromJson((bool*) out, json);
-}
-
 static inline Error* str_FromJson(const char** out, const nx_json* json) {
   Error* e = nx_json_get_str(out, json);
   e_check();
@@ -104,6 +100,17 @@ static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* out, con
   return e;
 }
 
+static Error* TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, const nx_json* json) {
+  const char* s = NULL;
+  Error* e = nx_json_get_str(&s, json);
+  if (e) return e;
+  else if (!strcmp(s, "Average"))    *out = TemperatureAlgorithmType_Average;
+  else if (!strcmp(s, "Min"))        *out = TemperatureAlgorithmType_Min;
+  else if (!strcmp(s, "Max"))        *out = TemperatureAlgorithmType_Max;
+  else return err_string(0, "Invalid value for TemperatureAlgorithmType");
+  return e;
+}
+
 static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const nx_json* json) {
   const char* s = NULL;
   Error* e = nx_json_get_str(&s, json);
@@ -139,6 +146,16 @@ const char* EmbeddedControllerType_ToString(EmbeddedControllerType t) {
   return NULL;
 }
 
+const char* TemperatureAlgorithmType_ToString(TemperatureAlgorithmType t) {
+  switch (t) {
+  case TemperatureAlgorithmType_Average: return "Average";
+  case TemperatureAlgorithmType_Min:     return "Min";
+  case TemperatureAlgorithmType_Max:     return "Max";
+  default: assert(!"Invalid value for TemperatureAlgorithmType");
+  }
+  return NULL;
+}
+
 typedef Error* (FromJson_Callback)(void*, const nx_json*);
 
 static Error* array_of_FromJson(FromJson_Callback callback, void** v_data, size_t* v_size, size_t size, const nx_json* json) {
@@ -167,12 +184,14 @@ static inline Error* array_of_##T##_FromJson(array_of(T)* v, const nx_json *json
   return array_of_FromJson((FromJson_Callback*) T ## _FromJson, (void**) &v->data, &v->size, sizeof(T), json); \
 }
 
+define_array_of_T_FromJson(str)
 define_array_of_T_FromJson(float)
 define_array_of_T_FromJson(TemperatureThreshold)
 define_array_of_T_FromJson(FanConfiguration)
 define_array_of_T_FromJson(FanSpeedPercentageOverride)
 define_array_of_T_FromJson(RegisterWriteConfiguration)
 define_array_of_T_FromJson(FanInfo)
+define_array_of_T_FromJson(FanTemperatureSourceConfig)
 
 // ============================================================================
 // Default temperature thresholds
@@ -275,7 +294,7 @@ static void Trace_PrintBuf(const Trace* trace, char* buf, size_t size) {
 Error* ModelConfig_Validate(ModelConfig* c) {
   Error* e = NULL;
   Trace trace = {0};
-  static char buf[128];
+  char buf[1024];
 
   e = ModelConfig_ValidateFields(c);
   e_goto(err);
@@ -309,6 +328,18 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
     e = FanConfiguration_ValidateFields(f);
     e_goto(err);
+
+    if (f->MinSpeedValue == f->MaxSpeedValue) {
+      e = err_string(0, "MinSpeedValue and MaxSpeedValue cannot be the same");
+      e_goto(err);
+    }
+
+    if (f->IndependentReadMinMaxValues &&
+        f->MinSpeedValueRead == f->MaxSpeedValueRead)
+    {
+      e = err_string(0, "MinSpeedValueRead and MaxSpeedValueRead cannot be the same");
+      e_goto(err);
+    }
 
     for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
       Trace trace1 = {0};

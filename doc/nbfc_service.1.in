@@ -52,13 +52,6 @@ Use alternative config file (default @SYSCONFDIR@/nbfc/nbfc.json).
 .RE
 
 .PP
-.BR \-s ", " \-\-state\-file
-.I STATE FILE
-.RS
-Write state to an alternative file (default @RUNSTATEDIR@/nbfc_service.state.json).
-.RE
-
-.PP
 .B \-e, \-\-embedded\-controller
 .RI [ dummy ", " dev_port ", " ec_sys ", " acpi_ec ]
 .RS
@@ -86,13 +79,9 @@ File containing the PID of current running nbfc_service.
 .RE
 
 .PP
-.I @RUNSTATEDIR@/nbfc_service.state.json
+.I @RUNSTATEDIR@/nbfc_service.socket
 .RS
-State file of nbfc_service. Updated every
-.B EcPollInterval
-milliseconds. See
-.BR nbfc_service.json (5)
-for further details.
+Socket file of nbfc_service.
 .RE
 
 .PP

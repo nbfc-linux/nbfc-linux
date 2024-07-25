@@ -28,6 +28,7 @@ struct Fan {
 
   ThresholdManager threshMan;
   float targetFanSpeed;
+  float requestedSpeed;
   float currentSpeed;
   Fan_Mode mode;
   bool isCritical;
@@ -38,6 +39,7 @@ Error* Fan_Init(Fan*, FanConfiguration*, int criticalTemperature, bool readWrite
 Error* Fan_UpdateCurrentSpeed(Fan*);
 float  Fan_GetCurrentSpeed(const Fan*);
 float  Fan_GetTargetSpeed(const Fan*);
+float  Fan_GetRequestedSpeed(const Fan*);
 int    Fan_GetSpeedSteps(const Fan*);
 
 void   Fan_SetTemperature(Fan*, float temperature);

@@ -73,8 +73,12 @@ static float Fan_FanSpeedToPercentage(const Fan* self, int fanSpeed) {
   if (override)
     return override->FanSpeedPercentage;
 
-  if (my.minSpeedValueRead == my.maxSpeedValueRead)
-    return 0.0f; /* division by zero */
+  // Here we have been preventing a division by zero if both values are
+  // the same. This case cannot happen any longer, because it is tested in
+  // the config validation code.
+  //
+  // if (my.minSpeedValueRead == my.maxSpeedValueRead)
+  //   return 0.0f;
 
   return ((float)(fanSpeed - my.minSpeedValueRead) /
      (my.maxSpeedValueRead - my.minSpeedValueRead)) * 100.0f;
@@ -111,6 +115,10 @@ float Fan_GetTargetSpeed(const Fan* self) {
   return my.isCritical ? 100.0f : my.targetFanSpeed;
 }
 
+float Fan_GetRequestedSpeed(const Fan* self) {
+  return my.requestedSpeed;
+}
+
 void Fan_SetTemperature(Fan* self, float temperature)
 {
   // HandleCritalMode
@@ -125,19 +133,21 @@ void Fan_SetTemperature(Fan* self, float temperature)
 }
 
 Error* Fan_SetFixedSpeed(Fan* self, float speed) {
+  Error* e = NULL;
   my.mode = Fan_ModeFixed;
 
   if (speed < 0.0f) {
-    my.targetFanSpeed = 0.0f;
-    return err_string(0, "speed < 0.0");
+    speed = 0.0f;
+    e = err_string(0, "speed < 0.0");
   }
   else if (speed > 100.0f) {
-    my.targetFanSpeed = 100.0f;
-    return err_string(0, "speed > 100.0");
+    speed = 100.0f;
+    e = err_string(0, "speed > 100.0");
   }
 
+  my.requestedSpeed = speed;
   my.targetFanSpeed = speed;
-  return err_success();
+  return e;
 }
 
 void Fan_SetAutoSpeed(Fan* self) {

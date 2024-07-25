@@ -75,10 +75,22 @@ declare_array_of(ModelConfig);
 Error* ModelConfig_FromJson(ModelConfig*, const nx_json*);
 Error* ModelConfig_ValidateFields(ModelConfig*);
 
+struct FanTemperatureSourceConfig {
+	int             FanIndex;
+	TemperatureAlgorithmType TemperatureAlgorithmType;
+	array_of(str)   Sensors;
+};
+
+typedef struct FanTemperatureSourceConfig FanTemperatureSourceConfig;
+declare_array_of(FanTemperatureSourceConfig);
+Error* FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig*, const nx_json*);
+Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig*);
+
 struct ServiceConfig {
 	const char*     SelectedConfigId;
 	EmbeddedControllerType EmbeddedControllerType;
 	array_of(float) TargetFanSpeeds;
+	array_of(FanTemperatureSourceConfig) FanTemperatureSources;
 };
 
 typedef struct ServiceConfig ServiceConfig;
@@ -87,12 +99,14 @@ Error* ServiceConfig_FromJson(ServiceConfig*, const nx_json*);
 Error* ServiceConfig_ValidateFields(ServiceConfig*);
 
 struct FanInfo {
-	const char*     name;
-	Boolean         automode;
-	Boolean         critical;
-	float           current_speed;
-	float           target_speed;
-	int             speed_steps;
+	const char*     Name;
+	float           Temperature;
+	Boolean         AutoMode;
+	Boolean         Critical;
+	float           CurrentSpeed;
+	float           TargetSpeed;
+	float           RequestedSpeed;
+	int             SpeedSteps;
 };
 
 typedef struct FanInfo FanInfo;
@@ -101,11 +115,10 @@ Error* FanInfo_FromJson(FanInfo*, const nx_json*);
 Error* FanInfo_ValidateFields(FanInfo*);
 
 struct ServiceInfo {
-	int             pid;
-	const char*     config;
-	Boolean         read_only;
-	float           temperature;
-	array_of(FanInfo) fans;
+	int             PID;
+	const char*     SelectedConfigId;
+	Boolean         ReadOnly;
+	array_of(FanInfo) Fans;
 };
 
 typedef struct ServiceInfo ServiceInfo;

@@ -16,9 +16,7 @@
 	 "MaxSpeedValueRead": 255,
 	 "ResetRequired": true,
 	 "FanSpeedResetValue": 0,
-	 "FanDisplayName": "CPU/GPU fan",
-	 "TemperatureThresholds": [],
-	 "FanSpeedPercentageOverrides": []
+	 "FanDisplayName": "CPU/GPU fan"
 	},
 	{
 	 "ReadRegister": 235,
@@ -31,7 +29,6 @@
 	 "ResetRequired": true,
 	 "FanSpeedResetValue": 0,
 	 "FanDisplayName": "Max. fan speed switch (on/off)",
-	 "TemperatureThresholds": [],
 	 "FanSpeedPercentageOverrides": [
 	  {
 	   "FanSpeedPercentage": 100.0,
@@ -45,6 +42,5 @@
 	  }
 	 ]
 	}
- ],
- "RegisterWriteConfigurations": []
+ ]
 }

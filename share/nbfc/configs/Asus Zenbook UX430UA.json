@@ -52,8 +52,7 @@
 	   "DownThreshold": 81,
 	   "FanSpeed": 75.0
 	  }
-	 ],
-	 "FanSpeedPercentageOverrides": []
+	 ]
 	}
  ],
  "RegisterWriteConfigurations": [

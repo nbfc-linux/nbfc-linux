@@ -10,8 +10,6 @@
  "  -d, --debug           Enable tracing of reads and writes of the embedded controller\n"\
  "  -c CONFIG, --config-file CONFIG\n"                                         \
  "                        Use alternative config file (default " SYSCONFDIR "/nbfc/nbfc.json)\n"\
- "  -s STATE.JSON, --state-file STATE.JSON\n"                                  \
- "                        Write state to an alternative file (default " RUNSTATEDIR "/nbfc_service.state.json)\n"\
  "  -e EC, --embedded-controller EC\n"                                         \
  "                        Specify embedded controller to use\n"                \
  ""

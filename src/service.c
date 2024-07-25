@@ -6,16 +6,11 @@
 #include "ec_debug.h"
 #include "ec_dummy.h"
 #include "fan.h"
-#ifdef HAVE_SENSORS
-#include "lm_sensors.h"
-#endif
 #include "fs_sensors.h"
-#include "temperature_filter.h"
 #include "service_config.h"
 #include "nbfc.h"
 #include "memory.h"
 #include "macros.h"
-#include "info.h"
 #include "sleep.h"
 #include "model_config.h"
 
@@ -38,13 +33,11 @@ enum Service_Initialization {
   Initialized_4_Embedded_Controller,
   Initialized_5_Sensors,
   Initialized_6_Temperature_Filter,
-  Initialized_7_Info,
 };
 
-static ModelConfig       model_config;
-static Sensor_VTable*    sensor;
-static TemperatureFilter temp_filter;
-static array_of(Fan)     fans;
+ModelConfig              Service_Model_Config;
+pthread_mutex_t          Service_Lock;
+array_of(FanTemperatureControl) Service_Fans;
 static enum Service_Initialization Service_State;
 
 static Error* ApplyRegisterWriteConfig(int, uint8_t, RegisterWriteMode);
@@ -56,8 +49,11 @@ static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
 Error* Service_Init() {
   Error* e;
-  static char path[PATH_MAX];
+  char path[PATH_MAX];
   Service_State = Initialized_0_None;
+
+  // Lock =====================================================================
+  pthread_mutex_init(&Service_Lock, NULL);
 
   // Service config ===========================================================
   e = ServiceConfig_Init(options.service_config);
@@ -71,32 +67,32 @@ Error* Service_Init() {
   Log_Info("Using '%s' as model config\n", service_config.SelectedConfigId);
 
   snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, service_config.SelectedConfigId);
-  e = ModelConfig_FromFile(&model_config, path);
+  e = ModelConfig_FromFile(&Service_Model_Config, path);
   if (e) {
     e = err_string(e, path);
     goto error;
   }
   Service_State = Initialized_2_Model_Config;
 
-  e = ModelConfig_Validate(&model_config);
+  e = ModelConfig_Validate(&Service_Model_Config);
   if (e) {
     e = err_string(e, path);
     goto error;
   }
 
-  TemperatureThresholdManager_LegacyBehaviour = model_config.LegacyTemperatureThresholdsBehaviour;
+  TemperatureThresholdManager_LegacyBehaviour = Service_Model_Config.LegacyTemperatureThresholdsBehaviour;
 
   // Fans =====================================================================
-  fans.size = model_config.FanConfigurations.size;
-  fans.data = (Fan*) Mem_Calloc(fans.size, sizeof(Fan));
+  Service_Fans.size = Service_Model_Config.FanConfigurations.size;
+  Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
   Service_State = Initialized_3_Fans;
 
-  for_enumerate_array(size_t, i, fans) {
+  for_enumerate_array(size_t, i, Service_Fans) {
     e = Fan_Init(
-        &fans.data[i],
-        &model_config.FanConfigurations.data[i],
-        model_config.CriticalTemperature,
-        model_config.ReadWriteWords
+        &Service_Fans.data[i].Fan,
+        &Service_Model_Config.FanConfigurations.data[i],
+        Service_Model_Config.CriticalTemperature,
+        Service_Model_Config.ReadWriteWords
     );
     if (e)
       goto error;
@@ -104,11 +100,11 @@ Error* Service_Init() {
 
   for_enumerate_array(size_t, i, service_config.TargetFanSpeeds) {
     if (service_config.TargetFanSpeeds.data[i] >= 0.0f) {
-      e = Fan_SetFixedSpeed(&fans.data[i], service_config.TargetFanSpeeds.data[i]);
+      e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, service_config.TargetFanSpeeds.data[i]);
       e_warn();
     }
     else
-      Fan_SetAutoSpeed(&fans.data[i]);
+      Fan_SetAutoSpeed(&Service_Fans.data[i].Fan);
   }
 
   // Embedded controller ======================================================
@@ -146,38 +142,24 @@ Error* Service_Init() {
   }
 
   // Sensor ===================================================================
-  e = (sensor = &FS_Sensors_VTable)->Init();
-#ifdef HAVE_SENSORS
-  if (e)
-    e = (sensor = &LM_Sensors_VTable)->Init();
-#endif
+  e = FS_Sensors_Init();
   if (e)
     goto error;
   Service_State = Initialized_5_Sensors;
 
-  // Temperature Filter =======================================================
-  e = TemperatureFilter_Init(&temp_filter, model_config.EcPollInterval, NBFC_TEMPERATURE_FILTER_TIMESPAN);
-  if (e)
-    goto error;
+  // Fans with temperature filter =============================================
+  for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
+    e = FanTemperatureControl_SetDefaults(ftc, Service_Model_Config.EcPollInterval);
+    if (e)
+      goto error;
+  }
   Service_State = Initialized_6_Temperature_Filter;
 
-  // Fork =====================================================================
-  if (options.fork)
-    switch (fork()) {
-    case -1:
-      e = err_stdlib(0, "fork");
-      goto error;
-    case 0:
-      break;
-    default:
-      _exit(0);
-    }
-
-  // Info =====================================================================
-  e = Info_Init(options.state_file);
+  e = FanTemperatureControl_SetByConfig(&Service_Fans, &service_config.FanTemperatureSources, &Service_Model_Config);
   if (e)
     goto error;
-  Service_State = Initialized_7_Info;
+
+  FanTemperatureControl_Log(&Service_Fans, &Service_Model_Config);
 
   return err_success();
 
@@ -188,23 +170,18 @@ error:
 
 void Service_Loop() {
   Error* e;
-  float current_temperature;
   static int failures = 0;
 
-  e = sensor->GetTemperature(&current_temperature);
-  if (e)
-    goto error;
-
-  current_temperature = TemperatureFilter_FilterTemperature(&temp_filter, current_temperature);
+  pthread_mutex_lock(&Service_Lock);
 
   bool re_init_required = false;
-  for_each_array(Fan*, f, fans) {
-    e = Fan_UpdateCurrentSpeed(f);
+  for_each_array(FanTemperatureControl*, f, Service_Fans) {
+    e = Fan_UpdateCurrentSpeed(&f->Fan);
     if (e)
       goto error;
 
     // Re-init if current fan speeds are off by more than 15%
-    if (fabs(Fan_GetCurrentSpeed(f) - Fan_GetTargetSpeed(f)) > 15) {
+    if (fabs(Fan_GetCurrentSpeed(&f->Fan) - Fan_GetTargetSpeed(&f->Fan)) > 15) {
       re_init_required = true;
 
       if (options.debug)
@@ -218,20 +195,24 @@ void Service_Loop() {
       goto error;
   }
 
-  for_each_array(Fan*, f, fans) {
-    Fan_SetTemperature(f, current_temperature);
+  for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
+    e = FanTemperatureControl_UpdateFanTemperature(ftc);
+    if (e)
+      goto error;
+
+    Fan_SetTemperature(&ftc->Fan, ftc->Temperature);
     if (! options.read_only) {
-      e = Fan_ECFlush(f);
+      e = Fan_ECFlush(&ftc->Fan);
       if (e)
         goto error;
     }
   }
 
-  e = Info_Write(&model_config, current_temperature, options.read_only, &fans);
-
 error:
+  pthread_mutex_unlock(&Service_Lock);
+
   if (! e) {
-    sleep_ms(model_config.EcPollInterval);
+    sleep_ms(Service_Model_Config.EcPollInterval);
     failures = 0;
   }
   else {
@@ -270,8 +251,8 @@ static Error* ResetEC() {
     e = ResetRegisterWriteConfigs();
     if (e) r = e;
 
-    for_each_array(Fan*, f, fans) {
-      e = Fan_ECReset(f);
+    for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
+      e = Fan_ECReset(&ftc->Fan);
       if (e) r = e;
     }
   }
@@ -281,7 +262,7 @@ static Error* ResetEC() {
 
 static Error* ResetRegisterWriteConfigs() {
   Error* e = NULL;
-  for_each_array(RegisterWriteConfiguration*, cfg, model_config.RegisterWriteConfigurations)
+  for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations)
     if (cfg->ResetRequired) {
       e = ApplyRegisterWriteConfig(cfg->Register, cfg->ResetValue, cfg->ResetWriteMode);
       e_warn();
@@ -304,7 +285,7 @@ static Error* ApplyRegisterWriteConfig(int register_, uint8_t value, RegisterWri
 }
 
 static Error* ApplyRegisterWriteConfgurations(bool initializing) {
-  for_each_array(RegisterWriteConfiguration*, cfg, model_config.RegisterWriteConfigurations) {
+  for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations) {
     if (initializing || cfg->WriteOccasion == RegisterWriteOccasion_OnWriteFanSpeed) {
        Error* e = ApplyRegisterWriteConfig(cfg->Register, cfg->Value, cfg->WriteMode);
        e_check();
@@ -313,22 +294,38 @@ static Error* ApplyRegisterWriteConfgurations(bool initializing) {
   return err_success();
 }
 
+Error* Service_WriteTargetFanSpeedsToConfig() {
+  const int fancount = Service_Model_Config.FanConfigurations.size;
+
+  service_config.TargetFanSpeeds.data = Mem_Realloc(service_config.TargetFanSpeeds.data, sizeof(float) * fancount);
+  service_config.TargetFanSpeeds.size = fancount;
+
+  for_enumerate_array(int, i, Service_Fans) {
+    Fan* fan = &Service_Fans.data[i].Fan;
+    if (fan->mode == Fan_ModeAuto)
+      service_config.TargetFanSpeeds.data[i] = -1;
+    else
+      service_config.TargetFanSpeeds.data[i] = Fan_GetRequestedSpeed(fan);
+  }
+
+  return ServiceConfig_Write(options.service_config);
+}
+
 void Service_Cleanup() {
   switch (Service_State) {
-    case Initialized_7_Info:
-      Info_Close();
     case Initialized_6_Temperature_Filter:
-      TemperatureFilter_Close(&temp_filter);
+      for_each_array(FanTemperatureControl*, ftc, Service_Fans)
+        TemperatureFilter_Close(&ftc->TemperatureFilter);
     case Initialized_5_Sensors:
-      sensor->Cleanup();
+      FS_Sensors_Cleanup();
     case Initialized_4_Embedded_Controller:
       if (! options.read_only)
         ResetEC();
       ec->Close();
     case Initialized_3_Fans:
-      Mem_Free(fans.data);
+      Mem_Free(Service_Fans.data);
     case Initialized_2_Model_Config:
-      ModelConfig_Free(&model_config);
+      ModelConfig_Free(&Service_Model_Config);
     case Initialized_1_Service_Config:
       ServiceConfig_Free(&service_config);
     case Initialized_0_None:

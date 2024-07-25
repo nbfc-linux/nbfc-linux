@@ -1,23 +1,26 @@
-#define _XOPEN_SOURCE 500 /* unistd.h: export pwrite()/pread(), string.h: export strdup */
-#define _DEFAULT_SOURCE   /* endian.h: */
+#define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread(), string.h: strdup
+#define _DEFAULT_SOURCE   // endian.h: htole16(), le16toh()
 
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 
-#include <ctype.h>    // tolower
-#include <dirent.h>   // DIR, opendir, readdir, closedir
-#include <errno.h>    // ENODATA
-#include <fcntl.h>    // O_WRONLY, O_CREAT, O_TRUNC
-#include <float.h>    // FLT_MAX
-#include <locale.h>   // setlocale, LC_NUMERIC
-#include <limits.h>   // INT_MAX, PATH_MAX
-#include <signal.h>   // kill, SIGINT
-#include <stdbool.h>  // bool
-#include <stdio.h>    // printf, snprintf, remove
-#include <stdlib.h>   // exit, realpath, system, WEXITSTATUS, qsort
-#include <string.h>   // strcmp, strncmp, strncpy, strcat, strcspn, strrchr, strerror
-#include <sys/stat.h> // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
-#include <unistd.h>   // access, F_OK, geteuid
+#include <ctype.h>     // tolower
+#include <dirent.h>    // DIR, opendir, readdir, closedir
+#include <errno.h>     // ENODATA
+#include <fcntl.h>     // O_WRONLY, O_CREAT, O_TRUNC
+#include <float.h>     // FLT_MAX
+#include <locale.h>    // setlocale, LC_NUMERIC
+#include <limits.h>    // INT_MAX, PATH_MAX
+#include <signal.h>    // kill, SIGINT
+#include <stdbool.h>   // bool
+#include <stdio.h>     // printf, snprintf
+#include <stdlib.h>    // exit, realpath, system, WEXITSTATUS, qsort
+#include <string.h>    // strcmp, strcat, strcspn, strrchr, strerror
+#include <sys/stat.h>  // S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH
+#include <unistd.h>    // access, F_OK, geteuid, unlink
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 #include "generated/client.help.h"
 #include "log.h"
@@ -26,31 +29,36 @@
 #include "nxjson_utils.h"
 #include "parse_number.h"
 #include "parse_double.h"
+#include "protocol.h"
 #include "sleep.h"
 #include "slurp_file.h"
 #include "stringbuf.h"
+#include "service_config.h"
 
 #include "error.c"
 #include "optparse/optparse.c"
 #include "model_config.c"
 #include "memory.c"
 #include "program_name.c"
+#include "protocol.c"
 #include "nxjson.c"
 #include "reverse_nxjson.c"
+#include "service_config.c"
 
 #define DmiIdDirectoryPath "/sys/devices/virtual/dmi/id"
+#define RecommendedConfigMatchThreshold 0.7f
 
 static ServiceInfo service_info;
-static ServiceConfig service_config;
 
 static const cli99_option main_options[] = {
   {"-v|--version",  -'v', 0},
   {"-h|--help",     -'h', 0},
+  {"--python-hack", -'p', 0},
   {"command",        'C', 1 | cli99_required_option},
   cli99_options_end()
 };
 
-static const cli99_option status_command_options[] = {
+static const cli99_option status_options[] = {
   cli99_include_options(&main_options),
   {"-a|--all",      -'a', 0},
   {"-s|--service",  -'s', 0},
@@ -59,7 +67,7 @@ static const cli99_option status_command_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option config_command_options[] = {
+static const cli99_option config_options[] = {
   cli99_include_options(&main_options),
   {"-l|--list",       -'l', 0},
   {"-r|--recommend",  -'r', 0},
@@ -68,7 +76,7 @@ static const cli99_option config_command_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option set_command_options[] = {
+static const cli99_option set_options[] = {
   cli99_include_options(&main_options),
   {"-a|--auto",       -'a', 0},
   {"-s|--speed",      -'s', 1},
@@ -76,52 +84,54 @@ static const cli99_option set_command_options[] = {
   cli99_options_end()
 };
 
-static const cli99_option start_command_options[] = {
+static const cli99_option start_options[] = {
   cli99_include_options(&main_options),
   {"-r|--read-only",  -'r', 0},
   cli99_options_end()
 };
 
-static const cli99_option *Options[] = {
-  start_command_options,
-  main_options,
-  start_command_options, // restart
-  status_command_options,
-  config_command_options,
-  set_command_options,
-  main_options,
-  main_options,
-  main_options,
+static const cli99_option show_variable_options[] = {
+  cli99_include_options(&main_options),
+  {"variable",         'V', 1},
+  cli99_options_end()
+};
+
+#define NBFC_CLIENT_COMMANDS \
+  o("start",          Start,          START,           start)         \
+  o("stop",           Stop,           STOP,            main)          \
+  o("restart",        Restart,        RESTART,         start)         \
+  o("status",         Status,         STATUS,          status)        \
+  o("config",         Config,         CONFIG,          config)        \
+  o("set",            Set,            SET,             set)           \
+  o("wait-for-hwmon", Wait_For_Hwmon, WAIT_FOR_HWMON,  main)          \
+  o("get-model-name", Get_Model_Name, GET_MODEL,       main)          \
+  o("complete-fans",  Complete_Fans,  COMPLETE_FANS,   main)          \
+  o("show-variable",  Show_Variable,  SHOW_VARIABLE,   show_variable) \
+  o("help",           Help,           HELP,            main)
+
+enum Command {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
+  NBFC_CLIENT_COMMANDS
+#undef o
 };
 
 static const char *HelpTexts[] = {
-  CLIENT_START_HELP_TEXT,
-  CLIENT_STOP_HELP_TEXT,
-  CLIENT_RESTART_HELP_TEXT,
-  CLIENT_STATUS_HELP_TEXT,
-  CLIENT_CONFIG_HELP_TEXT,
-  CLIENT_SET_HELP_TEXT,
-  CLIENT_WAIT_FOR_HWMON_HELP_TEXT,
-  CLIENT_GET_MODEL_HELP_TEXT,
-  CLIENT_HELP_TEXT
+#define o(COMMAND, ENUM, HELP, OPTIONS)  CLIENT_ ## HELP ## _HELP_TEXT,
+  NBFC_CLIENT_COMMANDS
+#undef o
 };
 
-enum Command {
-  Command_Start,
-  Command_Stop,
-  Command_Restart,
-  Command_Status,
-  Command_Config,
-  Command_Set,
-  Command_Wait_For_Hwmon,
-  Command_Get_Model_Name,
-  Command_Help,
+static const cli99_option *Options[] = {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _options,
+  NBFC_CLIENT_COMMANDS
+#undef o
 };
 
 static enum Command Command_From_String(const char* s) {
   const char* commands[] = {
-    "start", "stop", "restart", "status", "config", "set",
-    "wait-for-hwmon", "get-model-name", "help"
+#define o(COMMAND, ENUM, HELP, OPTIONS)  COMMAND,
+    NBFC_CLIENT_COMMANDS
+#undef o
   };
 
   for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
@@ -134,7 +144,9 @@ static enum Command Command_From_String(const char* s) {
 static struct {
   array_of(int) fans;
   array_of(float) speeds;
-  const char *config;
+  const char* config;
+  const char* variable;
+  bool python_hack;
   bool a;      // all/auto/apply
   bool l;      // list
   bool r;      // recommend/read-only
@@ -150,10 +162,12 @@ static int Set();
 static int Status();
 static int Wait_For_Hwmon();
 static int Get_Model_Name();
+static int Show_Variable();
+static int Complete_Fans();
 
 int main(int argc, char *const argv[]) {
   if (argc == 1) {
-    printf(CLIENT_HELP_TEXT);
+    printf(CLIENT_HELP_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -163,7 +177,7 @@ int main(int argc, char *const argv[]) {
 
   int o;
   const char* err;
-  enum Command cmd = Command_Help;
+  enum Command cmd;
   cli99 p;
   cli99_Init(&p, argc, argv, main_options, cli99_options_python);
   while ((o = cli99_GetOpt(&p))) {
@@ -181,13 +195,18 @@ int main(int argc, char *const argv[]) {
       }
       cli99_SetOptions(&p, Options[cmd], false);
       break;
-
+    case 'V':
+      options.variable = p.optarg;
+      break;
     case -'h':
       printf("%s", HelpTexts[cmd]);
       return NBFC_EXIT_SUCCESS;
     case -'v':
       printf("nbfc " NBFC_VERSION "\n");
       return NBFC_EXIT_SUCCESS;
+    case -'p':
+      options.python_hack = 1;
+      break;
     case -'a':
       options.a = true;
       if (cmd == Command_Config) {
@@ -260,20 +279,49 @@ int main(int argc, char *const argv[]) {
   case Command_Status:         return Status();
   case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
   case Command_Get_Model_Name: return Get_Model_Name();
+  case Command_Show_Variable:  return Show_Variable();
+  case Command_Complete_Fans:  return Complete_Fans();
   default:                     return NBFC_EXIT_FAILURE;
   }
 }
 
-static char*  to_lower(const char*);
-static bool   str_starts_with_ignorecase(const char*, const char*);
-static char** get_longest_common_substrings(const char*, const char*);
-static char*  get_longest_common_substring(const char*, const char*);
-static float  get_similarity_index(const char*, const char*);
+static char* to_lower(const char*);
+static bool  str_starts_with_ignorecase(const char*, const char*);
+static float word_difference(const char*, const char*);
+
+Error* Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
+  int sock;
+  struct sockaddr_un serv_addr;
+  Error* e = NULL;
+
+  sock = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (sock < 0)
+    return err_stdlib(0, "socket()");
+
+  memset(&serv_addr, 0, sizeof(serv_addr));
+  serv_addr.sun_family = AF_UNIX;
+  snprintf(serv_addr.sun_path, sizeof(serv_addr.sun_path), NBFC_SOCKET_PATH);
+
+  if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+    e = err_stdlib(0, "connect()");
+    goto error;
+  }
+
+  e = Protocol_Send_Json(sock, in);
+  if (e)
+    goto error;
+
+  e = Protocol_Receive_Json(sock, buf, out);
+  if (e)
+    goto error;
+
+error:
+  close(sock);
+  return e;
+}
 
 static const char* get_system_product() {
-  static char buf[128] = {0};
-  if (*buf)
-    return buf;
+  static char buf[128];
 
   if (slurp_file(buf, sizeof(buf), DmiIdDirectoryPath "/product_name") == -1)
     goto error;
@@ -293,9 +341,7 @@ error:
 }
 
 static const char* get_system_vendor() {
-  static char buf[128] = {0};
-  if (*buf)
-    return buf;
+  static char buf[128];
 
   if (slurp_file(buf, sizeof(buf), DmiIdDirectoryPath "/sys_vendor") == -1)
     goto error;
@@ -315,9 +361,7 @@ error:
 }
 
 static const char* get_model_name() {
-  static char model_name[256] = {0};
-  if (*model_name)
-    return model_name;
+  static char model_name[256];
 
   struct vendor_alias { const char* key; const char* value; };
 
@@ -384,7 +428,7 @@ static int Service_Start(bool read_only) {
     return NBFC_EXIT_SUCCESS;
   }
 
-  char cmd[32] = "nbfc_service -f";
+  char cmd[64] = "nbfc_service --python-hack -f";
   if (read_only)
     strcat(cmd, " -r");
   int ret = system(cmd);
@@ -406,25 +450,25 @@ static int Service_Stop() {
     Log_Error("Service not running\n");
     return NBFC_EXIT_SUCCESS;
   }
-  remove(NBFC_STATE_FILE);
-  remove(NBFC_PID_FILE);
   Log_Info("Killing nbfc_service (%d)\n", pid);
   if (kill(pid, SIGINT) == -1) {
     Log_Error("Failed to kill nbfc_service process (%d): %s\n", pid, strerror(errno));
     return NBFC_EXIT_FAILURE;
   }
+  unlink(NBFC_PID_FILE);
   return NBFC_EXIT_SUCCESS;
 }
 
 static int Service_Restart(bool read_only) {
   check_root();
   Service_Stop();
+  sleep(1);
   return Service_Start(read_only);
 }
 
 struct ConfigFile {
   char *config_name;
-  double diff;
+  float diff;
 };
 typedef struct ConfigFile ConfigFile;
 declare_array_of(ConfigFile);
@@ -443,7 +487,7 @@ static array_of(ConfigFile) get_configs() {
     exit(NBFC_EXIT_FAILURE);
   }
 
-  struct dirent *file;
+  struct dirent* file;
   while ((file = readdir(directory)) != NULL) {
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, ".."))
       continue;
@@ -481,54 +525,10 @@ static array_of(ConfigFile) recommended_configs() {
   const char *product = get_model_name();
   array_of(ConfigFile) files = get_configs();
   for_each_array(ConfigFile*, file, files) {
-    file->diff = get_similarity_index(product, file->config_name);
+    file->diff = word_difference(product, file->config_name);
   }
   qsort(files.data, files.size, sizeof(struct ConfigFile), compare_config_by_diff);
   return files;
-}
-
-static Error* ServiceInfo_TryLoad() {
-  char buf[NBFC_MAX_FILE_SIZE];
-  const nx_json* js = NULL;
-  Error* e = nx_json_parse_file(&js, buf, sizeof(buf), NBFC_STATE_FILE);
-  if (e)
-    goto error;
-
-  e = ServiceInfo_FromJson(&service_info, js);
-  nx_json_free(js);
-
-  if (e)
-    goto error;
-
-  e = ServiceInfo_ValidateFields(&service_info);
-  if (e)
-    goto error;
-
-  for_each_array(FanInfo*, f, service_info.fans) {
-    e = FanInfo_ValidateFields(f);
-    if (e)
-      goto error;
-  }
-
-  if (e) {
-error:
-    e = err_string(e, NBFC_STATE_FILE);
-    return e;
-  }
-
-  return err_success();
-}
-
-static void ServiceInfo_Load() {
-  // The service info file is sometimes not completely written.
-  // That's why we try to load the file multiple times.
-  Error* e;
-  for (int tries = 0; ++tries <= 5;)
-    if ((e = ServiceInfo_TryLoad()) == err_success())
-      break;
-    else
-      sleep_ms(100);
-  e_die();
 }
 
 static void ServiceConfig_Load() {
@@ -553,39 +553,59 @@ error:
   }
 }
 
-static void ServiceConfig_Write() {
+static Error* ServiceInfo_TryLoad() {
+  Error* e;
   nx_json root = {0};
-  nx_json *o = create_json(NX_JSON_OBJECT, NULL, &root);
+  nx_json* in = create_json_object(NULL, &root);
+  create_json_string("Command", in, "status");
 
-  if (service_config.SelectedConfigId != NULL) {
-    nx_json *o1 = create_json(NX_JSON_STRING, "SelectedConfigId", o);
-    o1->val.text = service_config.SelectedConfigId;
+  char* buf = NULL;
+  const nx_json* out = NULL;
+  e = Client_Communicate(in, &buf, &out);
+  if (e)
+    goto error;
+
+  if (out->type != NX_JSON_OBJECT) {
+    e = err_string(0, "Not a JSON object");
+    goto error;
   }
 
-  if (service_config.EmbeddedControllerType != EmbeddedControllerType_Unset) {
-    nx_json *o1 = create_json(NX_JSON_STRING, "EmbeddedControllerType", o);
-    o1->val.text = EmbeddedControllerType_ToString(service_config.EmbeddedControllerType);
-  }
-
-  if (service_config.TargetFanSpeeds.size) {
-    nx_json *o1  = create_json(NX_JSON_ARRAY, "TargetFanSpeeds", o);
-
-    for_each_array(float*, f, service_config.TargetFanSpeeds) {
-      nx_json *o2 = create_json(NX_JSON_DOUBLE, NULL, o1);
-      o2->val.dbl = *f;
+  const nx_json* err = nx_json_get(out, "Error");
+  if (err) {
+    if (err->type != NX_JSON_STRING) {
+      e = err_string(0, "'Error' is not a string");
+      goto error;
     }
+
+    e = err_string(0, err->val.text);
+    goto error;
   }
 
-  char buf[NBFC_MAX_FILE_SIZE];
-  StringBuf s = { buf, 0, sizeof(buf) };
-  buf[0] = '\0';
+  e = ServiceInfo_FromJson(&service_info, out);
+  if (e)
+    goto error;
 
-  nx_json_to_string(o, &s, 0);
+  e = ServiceInfo_ValidateFields(&service_info);
+  if (e)
+    goto error;
 
-  if (write_file(NBFC_SERVICE_CONFIG, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
-    Log_Error("Could not write to " NBFC_SERVICE_CONFIG ": %s\n", strerror(errno));
-    exit(NBFC_EXIT_FAILURE);
+  for_each_array(FanInfo*, f, service_info.Fans) {
+    e = FanInfo_ValidateFields(f);
+    if (e)
+      goto error;
   }
+
+error:
+  nx_json_free(in);
+  nx_json_free(out);
+  Mem_Free(buf);
+
+  return e;
+}
+
+static inline void ServiceInfo_Load() {
+  Error* e = ServiceInfo_TryLoad();
+  e_die();
 }
 
 static int Wait_For_Hwmon() {
@@ -629,28 +649,73 @@ static int Get_Model_Name() {
   return NBFC_EXIT_SUCCESS;
 }
 
+static int Show_Variable() {
+  if (! options.variable) {
+    Log_Error("Missing argument: VARIABLE\n");
+    return NBFC_EXIT_CMDLINE;
+  }
+
+  int ret = NBFC_EXIT_SUCCESS;
+  char* variable = to_lower(options.variable);
+
+  if (! strcmp(variable, "config_file"))
+    printf("%s\n", NBFC_SERVICE_CONFIG);
+  else if (! strcmp(variable, "socket_file"))
+    printf("%s\n", NBFC_SOCKET_PATH);
+  else if (! strcmp(variable, "pid_file"))
+    printf("%s\n", NBFC_PID_FILE);
+  else if (! strcmp(variable, "model_configs_dir"))
+    printf("%s\n", NBFC_MODEL_CONFIGS_DIR);
+  else {
+    ret = NBFC_EXIT_FAILURE;
+    Log_Error("Unknown variable '%s'. Choose from 'config_file', 'socket_file', 'pid_file'\n", options.variable);
+  }
+
+  Mem_Free(variable);
+  return ret;
+}
+
+static const char* bool_to_str(bool val) {
+  static const char strings[2][6] = {"false", "true"};
+  return strings[val];
+}
+
 static void print_fan_status(const FanInfo* fan) {
   printf("Fan Display Name         : %s\n"
+         "Temperature              : %.2f\n"
          "Auto Control Enabled     : %s\n"
          "Critical Mode Enabled    : %s\n"
          "Current Fan Speed        : %.2f\n"
          "Target Fan Speed         : %.2f\n"
+         "Requested Fan Speed      : %.2f\n"
          "Fan Speed Steps          : %d\n",
-         fan->name,
-         fan->automode ? "true" : "false",
-         fan->critical ? "true" : "false",
-         fan->current_speed,
-         fan->target_speed,
-         fan->speed_steps);
+         fan->Name,
+         fan->Temperature,
+         bool_to_str(fan->AutoMode),
+         bool_to_str(fan->Critical),
+         fan->CurrentSpeed,
+         fan->TargetSpeed,
+         fan->RequestedSpeed,
+         fan->SpeedSteps);
 }
 
 static void print_service_status() {
   printf("Read-only                : %s\n"
-         "Selected Config Name     : %s\n"
-         "Temperature              : %.2f\n",
-         service_info.read_only ? "true" : "false",
-         service_info.config,
-         service_info.temperature);
+         "Selected Config Name     : %s\n",
+         bool_to_str(service_info.ReadOnly),
+         service_info.SelectedConfigId);
+}
+
+static int Complete_Fans() {
+  Error* e = ServiceInfo_TryLoad();
+  if (e)
+    return NBFC_EXIT_FAILURE;
+
+  int idx = 0;
+  for_each_array(const FanInfo*, f, service_info.Fans)
+    printf("%d\t%s\n", idx++, f->Name);
+
+  return NBFC_EXIT_SUCCESS;
 }
 
 static int Status() {
@@ -664,13 +729,13 @@ static int Status() {
       print_service_status();
 
     if (options.a) {
-      for_each_array(const FanInfo*, f, service_info.fans) {
+      for_each_array(const FanInfo*, f, service_info.Fans) {
         printf("\n");
         print_fan_status(f);
       }
     }
     else if (options.fans.size) {
-      const int fan_count = service_info.fans.size;
+      const int fan_count = service_info.Fans.size;
       bool *vis = Mem_Calloc(sizeof(bool), fan_count);
       for_each_array(int*, fan_index, options.fans) {
         if (*fan_index >= fan_count) {
@@ -679,7 +744,7 @@ static int Status() {
         }
         if (!vis[*fan_index]) {
           printf("\n");
-          print_fan_status(&service_info.fans.data[*fan_index]);
+          print_fan_status(&service_info.Fans.data[*fan_index]);
           vis[*fan_index] = 1;
         }
       }
@@ -704,13 +769,27 @@ static int Config() {
     }
   }
   else if (options.r) {
+    fprintf(stderr,
+      "Note: The command 'nbfc config -r' outputs recommended configurations\n"
+      "based solely on comparing your model name with configuration file names.\n"
+      "This recommendation does not imply any further significance or validation\n"
+      "of the configurations beyond the string matching.\n\n");
+
     array_of(ConfigFile) files = recommended_configs();
+
     if (files.size && !strcmp(files.data[0].config_name, get_model_name())) {
       printf("%s\n", files.data[0].config_name);
-    } else {
+    }
+    else {
+      bool have_match = 0;
       for_each_array(ConfigFile*, file, files) {
-        if (file->diff >= 1.0f)
+        if (file->diff >= RecommendedConfigMatchThreshold) {
+          have_match = 1;
           printf("%s\n", file->config_name);
+        }
+      }
+      if (! have_match) {
+        Log_Error("No recommended configuration files found\n");
       }
     }
   }
@@ -764,10 +843,14 @@ static int Config() {
 
     ServiceConfig_Load();
     service_config.SelectedConfigId = model;
-    ServiceConfig_Write();
+    Error* e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
+    if (e) {
+      Log_Error("%s\n", err_print_all(e));
+      return NBFC_EXIT_FAILURE;
+    }
 
     if (options.a)
-      return Service_Restart(0);
+      return Service_Restart(false);
   } else {
     printf(CLIENT_CONFIG_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
@@ -777,8 +860,6 @@ static int Config() {
 }
 
 static int Set() {
-  check_root();
-
   if (!options.a && !options.speeds.size) {
     printf(CLIENT_SET_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
@@ -799,39 +880,67 @@ static int Set() {
     return NBFC_EXIT_FAILURE;
   }
 
-  ServiceInfo_Load();
-  ServiceConfig_Load();
+  nx_json root = {0};
+  nx_json* in = create_json_object(NULL, &root);
+  create_json_string("Command", in, "set-fan-speed");
 
-  const int fancount = service_info.fans.size;
+  if (options.fans.size)
+    create_json_integer("Fan", in, options.fans.data[0]);
 
-  if (! options.fans.size) {
-    options.fans.data = Mem_Malloc(sizeof(int) * fancount);
-    for (int i = 0; i < fancount; ++i)
-      options.fans.data[i] = i;
-    options.fans.size = fancount;
+  if (options.a)
+    create_json_string("Speed", in, "auto");
+  else
+    create_json_double("Speed", in, options.speeds.data[0]);
+
+  char* buf = NULL;
+  const nx_json* out = NULL;
+  Error* e = Client_Communicate(in, &buf, &out);
+  if (e)
+    goto error;
+
+  if (out->type != NX_JSON_OBJECT) {
+    e = err_string(0, "Not a JSON object");
+    goto error;
   }
 
-  float* speeds = Mem_Malloc(sizeof(float) * fancount);
-
-  for (int i = 0; i < fancount; ++i)
-    speeds[i] = -1;
-  for (int i = 0; i < min(service_config.TargetFanSpeeds.size, fancount); ++i)
-    speeds[i] = service_config.TargetFanSpeeds.data[i];
-
-  for_each_array(int*, fan_index, options.fans) {
-    if (*fan_index >= fancount) {
-      Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", *fan_index);
-      return NBFC_EXIT_FAILURE;
+  const nx_json* err = nx_json_get(out, "Error");
+  if (err) {
+    if (err->type != NX_JSON_STRING) {
+      e = err_string(0, "'Error' is not a string");
+      goto error;
     }
 
-    speeds[*fan_index] = options.a ? -1 : options.speeds.data[0];
+    Log_Error("Service returned: %s\n", err->val.text);
+    return NBFC_EXIT_FAILURE;
   }
 
-  service_config.TargetFanSpeeds.data = speeds;
-  service_config.TargetFanSpeeds.size = fancount;
+  const nx_json* status = nx_json_get(out, "Status");
+  if (! status) {
+    e = err_string(0, "Missing status in JSON output");
+    goto error;
+  }
 
-  ServiceConfig_Write();
-  return Service_Restart(0);
+  if (status->type != NX_JSON_STRING) {
+    e = err_string(0, "Status: not a JSON string");
+    goto error;
+  }
+
+  if (strcmp(status->val.text, "OK")) {
+    e = err_string(0, "Status != OK");
+    goto error;
+  }
+
+error:
+  nx_json_free(in);
+  nx_json_free(out);
+  Mem_Free(buf);
+
+  if (e) {
+    Log_Error("%s\n", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
+  return NBFC_EXIT_SUCCESS;
 }
 
 static char *to_lower(const char *a) {
@@ -848,150 +957,41 @@ static bool str_starts_with_ignorecase(const char* string, const char* prefix) {
   return true;
 }
 
-static char** get_longest_common_substrings(const char* str1, const char* str2) {
-  if (!str1 || !str2) {
-    return NULL;
+static int levenshtein_min(int a, int b, int c) {
+  if (a <= b && a <= c) {
+    return a;
   }
-
-  int len1 = strlen(str1);
-  int len2 = strlen(str2);
-  int** lookup = (int**)Mem_Calloc(len1 + 1, sizeof(int*));
-  for (int i = 0; i <= len1; i++) {
-    lookup[i] = (int*)Mem_Calloc(len2 + 1, sizeof(int));
+  else if (b <= a && b <= c) {
+    return b;
   }
-
-  int max_len = 0;
-  int* end_indices = NULL;
-  int num_end_indices = 0;
-
-  for (int i = 1; i <= len1; i++) {
-    for (int j = 1; j <= len2; j++) {
-      if (str1[i - 1] == str2[j - 1]) {
-        lookup[i][j] = lookup[i - 1][j - 1] + 1;
-        if (lookup[i][j] > max_len) {
-          max_len = lookup[i][j];
-          num_end_indices = 1;
-          end_indices = (int*)Mem_Realloc(end_indices, sizeof(int));
-          end_indices[0] = i;
-        } else if (lookup[i][j] == max_len) {
-          num_end_indices++;
-          end_indices = (int*)Mem_Realloc(end_indices, num_end_indices * sizeof(int));
-          end_indices[num_end_indices - 1] = i;
-        }
-      }
-    }
+  else {
+    return c;
   }
-
-  char** substrings = (char**)Mem_Calloc(num_end_indices + 1, sizeof(char*));
-  for (int i = 0; i < num_end_indices; i++) {
-    substrings[i] = (char*)Mem_Calloc(max_len + 1, sizeof(char));
-    strncpy(substrings[i], &str1[end_indices[i] - max_len], max_len);
-  }
-  substrings[num_end_indices] = NULL;
-
-  for (int i = 0; i <= len1; i++) {
-    Mem_Free(lookup[i]);
-  }
-  Mem_Free(lookup);
-  Mem_Free(end_indices);
-
-  return substrings;
 }
 
-static char* get_longest_common_substring(const char* str1, const char* str2) {
-  char** strings = get_longest_common_substrings(str1, str2);
-  if (strings == NULL)
-    return NULL;
+static int levenshtein(const char *s1, const char *s2) {
+  unsigned int x, y, s1len, s2len;
+  s1len = strlen(s1);
+  s2len = strlen(s2);
+  unsigned int matrix[s2len+1][s1len+1];
+  matrix[0][0] = 0;
+  for (x = 1; x <= s2len; x++)
+    matrix[x][0] = matrix[x-1][0] + 1;
+  for (y = 1; y <= s1len; y++)
+    matrix[0][y] = matrix[0][y-1] + 1;
+  for (x = 1; x <= s2len; x++)
+    for (y = 1; y <= s1len; y++)
+      matrix[x][y] = levenshtein_min(matrix[x-1][y] + 1, matrix[x][y-1] + 1, matrix[x-1][y-1] + (s1[y-1] == s2[x-1] ? 0 : 1));
 
-  char* ret = NULL;
-  char** string = strings;
-
-  if (*string) {
-    ret = *string;
-    ++string;
-  }
-
-  for (; *string; ++string) {
-    Mem_Free(*string);
-  }
-  Mem_Free(strings);
-  return ret;
+  return(matrix[s2len][s1len]);
 }
 
-static char **split(const char *str) {
-  int num_words = 0;
-  const char *p = str;
-
-  // Count words in str
-  while (*p) {
-    while (*p == ' ') {
-      p++;
-    }
-    if (*p) {
-      num_words++;
-      while (*p && (*p != ' ')) {
-        p++;
-      }
-    }
-  }
-
-  char **words = Mem_Malloc((num_words + 1) * sizeof(char *));
-  int i = 0;
-  p = str;
-  while (*p) {
-    while (*p == ' ') {
-      p++;
-    }
-    if (*p) {
-      const char *start = p;
-      while (*p && (*p != ' ')) {
-        p++;
-      }
-      const int len = p - start;
-      words[i] = Mem_Malloc((len + 1) * sizeof(char));
-      strncpy(words[i], start, len);
-      words[i][len] = '\0';
-      i++;
-    }
-  }
-
-  words[i] = NULL;
-
-  return words;
-}
-
-static float get_similarity_index(const char* model_name1, const char* model_name2) {
-  float result = 0;
-  char* model_name1_lower = to_lower(model_name1);
-  char* model_name2_lower = to_lower(model_name2);
-
-  char** model_name1_splitted = split(model_name1_lower);
-  char** model_name2_splitted = split(model_name2_lower);
-
-  for (char** s1 = model_name1_splitted; *s1; ++s1) {
-    float max_similarity = 0;
-
-    for (char** s2 = model_name2_splitted; *s2; ++s2) {
-      char* lcs = get_longest_common_substring(*s1, *s2);
-      int lcs_length = lcs ? strlen(lcs) : 0;
-      Mem_Free(lcs);
-
-      if (lcs_length < 2)
-        continue;
-
-      float similarity = (float)lcs_length / (float)max(strlen(*s1), strlen(*s2));
-      max_similarity = fmax(max_similarity, similarity);
-    }
-
-    result += max_similarity;
-  }
-
-  Mem_Free(model_name1_lower);
-  Mem_Free(model_name2_lower);
-  for (char** s = model_name1_splitted; *s; ++s) Mem_Free(*s);
-  for (char** s = model_name2_splitted; *s; ++s) Mem_Free(*s);
-  Mem_Free(model_name1_splitted);
-  Mem_Free(model_name2_splitted);
-
-  return result;
+static float word_difference(const char* s1, const char* s2) {
+  const int s1len = strlen(s1);
+  const int s2len = strlen(s2);
+  const int diff = levenshtein(s1, s2);
+  if (s1len > s2len)
+    return 1.0f - ((float) diff / s1len);
+  else
+    return 1.0f - ((float) diff / s2len);
 }

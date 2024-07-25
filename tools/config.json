@@ -245,6 +245,30 @@
     ]
   },
   {
+    "name": "FanTemperatureSourceConfig",
+    "help": "TODO",
+    "fields": [
+      {
+        "name": "FanIndex",
+        "type": "int",
+        "help": "Specify for which fan the config should be applied"
+      },
+      {
+        "name": "TemperatureAlgorithmType",
+        "type": "TemperatureAlgorithmType",
+        "default": "TemperatureAlgorithmType_Average",
+        "help": "Either 'average', 'max' or 'min'"
+      },
+      {
+        "name": "Sensors",
+        "type": "array_of(str)",
+        "unset": "{NULL, 0}",
+        "is_unset": "false",
+        "help": "Array of sensor names (as in /sys/class/hwmon/hwmon*/name) or sensor files (like /sys/class/hwmon/hwmon1/temp1_input)"
+      }
+    ]
+  },
+  {
     "name": "ServiceConfig",
     "help": "Main configuration file of nbfc_service",
     "fields": [
@@ -256,13 +280,20 @@
       {
         "name": "EmbeddedControllerType",
         "type": "EmbeddedControllerType",
-        "help": "Either `ECSysLinux` for using the `ec_sys` kernel module, or `ECLinux` for an alternative implementation using `/dev/port` without depending on kernel modules.",
+        "help": "Either `ec_sys` for using the `ec_sys` kernel module, `acpi_ec` for using the `acpi_ec` kernel module, or `dev_port` for an alternative implementation using `/dev/port` without depending on kernel modules.",
         "is_unset": "false"
       },
       {
         "name": "TargetFanSpeeds",
         "type": "array_of(float)",
         "help": "This holds the fixed speed of the fans. A value of `-1` means the fan should be left in auto mode.",
+        "unset": "{NULL, 0}",
+        "is_unset": "false"
+      },
+      {
+        "name": "FanTemperatureSources",
+        "type": "array_of(FanTemperatureSourceConfig)",
+        "help": "TODO",
         "unset": "{NULL, 0}",
         "is_unset": "false"
       }
@@ -273,32 +304,42 @@
     "help": "",
     "fields": [
       {
-        "name": "name",
+        "name": "Name",
         "type": "const char*",
         "help": ""
       },
       {
-        "name": "automode",
-        "type": "Boolean",
-        "help": ""
-      },
-      {
-        "name": "critical",
-        "type": "Boolean",
-        "help": ""
-      },
-      {
-        "name": "current_speed",
+        "name": "Temperature",
         "type": "float",
         "help": ""
       },
       {
-        "name": "target_speed",
+        "name": "AutoMode",
+        "type": "Boolean",
+        "help": ""
+      },
+      {
+        "name": "Critical",
+        "type": "Boolean",
+        "help": ""
+      },
+      {
+        "name": "CurrentSpeed",
         "type": "float",
         "help": ""
       },
       {
-        "name": "speed_steps",
+        "name": "TargetSpeed",
+        "type": "float",
+        "help": ""
+      },
+      {
+        "name": "RequestedSpeed",
+        "type": "float",
+        "help": ""
+      },
+      {
+        "name": "SpeedSteps",
         "type": "int",
         "help": ""
       }
@@ -309,27 +350,22 @@
     "help": "",
     "fields": [
       {
-        "name": "pid",
+        "name": "PID",
         "type": "int",
         "help": ""
       },
       {
-        "name": "config",
+        "name": "SelectedConfigId",
         "type": "const char*",
         "help": ""
       },
       {
-        "name": "read-only",
+        "name": "ReadOnly",
         "type": "Boolean",
         "help": ""
       },
       {
-        "name": "temperature",
-        "type": "float",
-        "help": ""
-      },
-      {
-        "name": "fans",
+        "name": "Fans",
         "type": "array_of(FanInfo)",
         "unset": "{NULL, 0}",
         "is_unset": "parameter.data == NULL",

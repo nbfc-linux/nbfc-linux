@@ -62,6 +62,7 @@ typedef int (*nx_json_unicode_encoder)(unsigned int codepoint, char *p, char **e
 
 extern nx_json_unicode_encoder nx_json_unicode_to_utf8;
 
+nx_json *create_json(nx_json_type type, const char *key, nx_json *parent);
 const nx_json *nx_json_parse(char *text, nx_json_unicode_encoder encoder);
 const nx_json *nx_json_parse_utf8(char *text);
 const nx_json *nx_json_get(const nx_json *json, const char *key); // get object's property by key

@@ -16,19 +16,31 @@ Comparison of NBFC C# and NBFC Linux
 |Configuration files              | XML (956KB)                           | [JSON](share/nbfc/configs) (840KB)          |
 |Runtime                          | Mono                                  | Native                                      |
 |Memory consumption (ps\_mem)     | ~50MB                                 | ~350KB                                      |
-|Package size (pkg.tar.gz)        | 448K	                              | 100K                                        |
+|Package size (pkg.tar.gz)        | 448K                                  | 100K                                        |
+|Fan control rights               | Any user                              | Any user                                    |
 |Service control rights           | Any user                              | Only root                                   |
-|IPC Concept                      | TCP/IP                                | Files                                       |
+|IPC Concept                      | TCP/IP                                | Unix sockets                                |
 |IPC Protocol                     | Binary                                | JSON                                        |
+|Graphical User Interface         | Windows only                          | Linux only                                  |
 
-All programs, the [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probing tool](doc/ec_probe.1.md) are written in C.
+The [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probing tool](doc/ec_probe.1.md) are written in C.
+
+The GUI is written in Python and Qt5 (a GUI for GTK-3 will follow).
 
 Installation
 ------------
 
 - Arch Linux:
-  - Either via AUR (`yaourt -S nbfc-linux`)
+  - Either via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
+
+- Debian / Ubuntu (untested):
+  - [Latest Version 0.2.7](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.7/nbfc-linux_0.2.7_amd64.deb)
+  - See [GitHub.com/nbfc-linux/packages/deb](https://github.com/nbfc-linux/packages/tree/main/deb) for all versions.
+
+- Fedora (untestet)
+  - [Latest Version 0.2.7](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.7/nbfc-linux-0.2.7-1.x86_64.rpm)
+  - See [GitHub.com/nbfc-linux/packages/rpm](https://github.com/nbfc-linux/packages/tree/main/rpm) for all versions.
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)(with nix flakes)
@@ -52,8 +64,13 @@ Installation
 - For systems with System-V-Init:
   - `./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --with-init-system=systemv && make && sudo make install`
 
-Getting started
----------------
+Getting started with the GUI
+----------------------------
+
+After installing NBFC-Linux you can configure it by running `sudo nbfc-qt`.
+
+Getting started without the GUI
+-------------------------------
 
 When running NBFC for the first time, you need to give it a configuration file for your laptop model.
 
@@ -65,10 +82,64 @@ With `sudo nbfc config --set <MODEL>` a configuration is selected.
 
 `sudo nbfc start` will start the service.
 
-It can be queried by `sudo nbfc status -a`.
+It can be queried by `nbfc status -a`.
 
 If you wish `nbfc_service` to get started on boot, use `sudo systemctl enable nbfc_service`.
 
+Advanced configuration
+----------------------
+
+NBFC-Linux allows you to specify which temperature sources to use for controlling fans and the algorithm to compute the temperature.
+
+**Default Configuration**
+
+If no configuration is specified, NBFC uses the "Average" algorithm and utilizes all sensor files named "coretemp," "k10temp," or "zenpower."
+
+**Available Algorithms**
+
+You can choose from three different algorithms to compute the temperature:
+
+- *"Average"*: Computes the average temperature from all specified sources.
+- *"Min"*: Selects the lowest temperature among all specified sources.
+- *"Max"*: Selects the highest temperature among all specified sources.
+
+**Specifying Temperature Sources**
+
+You can specify temperature sources either by sensor name (which may result in multiple temperature sources) or by providing a file path pointing to a temp*_input file.
+
+**Example Configuration**
+
+Here is a fictional example demonstrating how to configure NBFC-Linux:
+
+```
+{
+    "SelectedConfigId": "Asus G53SX",
+    "TargetFanSpeeds": [ -1.000000 ],
+    "FanTemperatureSources": [
+        {
+            "FanIndex": 0,
+            "TemperatureAlgorithmType": "Min",
+            "Sensors": [ "coretemp" ]
+        },
+        {
+            "FanIndex": 1,
+            "TemperatureAlgorithmType": "Average",
+            "Sensors": [ "nouveau" ]
+        },
+        {
+            "FanIndex": 2,
+            "TemperatureAlgorithmType": "Average",
+            "Sensors": [ "/sys/class/hwmon/hwmon4/temp2_input", "/sys/class/hwmon/hwmon4/temp3_input" ]
+        }
+    ]
+}
+```
+
+In this example:
+
+- *Fan 0* uses the "Min" algorithm with sensors named "coretemp."
+- *Fan 1* uses the "Average" algorithm with sensors named "nouveau."
+- *Fan 2* uses the "Average" algorithm with specific sensor file paths.
 
 Differences in detail
 ---------------------
@@ -80,10 +151,7 @@ Differences in detail
 |Notebook configuration files     | /opt/nbfc/Configs/\*.xml              | /usr/share/nbfc/configs/\*.json             |
 |Service binary                   | /opt/nbfc/nbfcservice.sh              | /bin/nbfc\_service                          |
 |PID File                         | /run/nbfc.pid                         | /run/nbfc\_service.pid                      |
-|State file                       | -                                     | /run/nbfc\_service.state.json               |
 |Config file                      | ?                                     | /etc/nbfc/nbfc.json                         |
-
-- The original NBFC service is queried and controlled by the client using TCP/IP. - NBFC Linux does not implement any "real" IPC. Information about the service can be queried by reading its state file. The client controls the service by simply rewriting its configuration file and reloading it.
 
 - The original NBFC service adjusts the fan speeds in intervals of `EcPollIntervall` according to `TemperatureThresholds`. - NBFC Linux directly sets the fan speed (also according to `TemperatureThresholds`).
 
@@ -123,5 +191,7 @@ start    -- Start the service
 status   -- Show the service status
 stop     -- Stop the service
 ```
+
+If you want to write a program that controls the NBFC service, see [protocol](/PROTOCOL.md).
 
 See also the documentation about the [nbfc configuration](doc/nbfc_service.json.5.md).

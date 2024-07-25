@@ -1,4 +1,4 @@
-version     = 0.1.15
+version     = 0.2.8
 
 PREFIX      = /usr
 
@@ -13,7 +13,7 @@ runstatedir	= /var/run
 orcdir   		= $(confdir)/init.d
 systemvdir  = $(confdir)/init.d
 
-INIT_SYSTEM = systemd # systemd, openrc
+INIT_SYSTEM = systemd # systemd, systemv, openrc
 
 ifeq ($(BUILD), debug)
 	CFLAGS   = -Og -g
@@ -30,7 +30,7 @@ override CPPFLAGS += \
 	-DRUNSTATEDIR=\"$(runstatedir)\" \
 	-DVERSION=\"$(version)\"
 
-CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
+CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config nbfc-gui/nbfc-qt.py
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
 SYSTEMD = etc/systemd/system/nbfc_service.service
 OPEN_RC = etc/init.d/nbfc_service.openrc
@@ -42,9 +42,10 @@ ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_n
 all: deprecation_warning $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(SYSTEMV) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
-	install -Dm 755 src/nbfc_service  $(DESTDIR)$(bindir)/nbfc_service
-	install -Dm 755 src/ec_probe      $(DESTDIR)$(bindir)/ec_probe
-	install -Dm 755 src/nbfc          $(DESTDIR)$(bindir)/nbfc
+	install -Dm 755 src/nbfc_service    $(DESTDIR)$(bindir)/nbfc_service
+	install -Dm 755 src/ec_probe        $(DESTDIR)$(bindir)/ec_probe
+	install -Dm 755 src/nbfc            $(DESTDIR)$(bindir)/nbfc
+	install -Dm 755 nbfc-gui/nbfc-qt.py $(DESTDIR)$(bindir)/nbfc-qt
 
 REPLACE_VARS = sed \
 	-e 's|@BINDIR@|$(bindir)|g'           \
@@ -55,6 +56,10 @@ REPLACE_VARS = sed \
 
 nbfc.py: nbfc.py.in
 	$(REPLACE_VARS) < $< > $@
+
+nbfc-gui/nbfc-qt.py: nbfc-gui/about.py nbfc-gui/common.py nbfc-gui/fs_sensors.py nbfc-gui/nbfc_client.py nbfc-gui/qt.py
+	(cd ./nbfc-gui; ./include_files.py qt.py > nbfc-qt.py)
+	chmod +x ./nbfc-gui/nbfc-qt.py
 
 # Documentation ###############################################################
 doc/ec_probe.1: doc/ec_probe.1.in
@@ -131,13 +136,13 @@ install-systemv: etc/init.d/nbfc_service.systemv
 	# /usr/local/etc/init.d
 	install -Dm 755 etc/init.d/nbfc_service.systemv	 $(DESTDIR)$(systemvdir)/nbfc_service
 
-install-docs:
+install-docs: $(DOC)
 	install -Dm 644 doc/ec_probe.1           $(DESTDIR)$(man1dir)/ec_probe.1
 	install -Dm 644 doc/nbfc.1               $(DESTDIR)$(man1dir)/nbfc.1
 	install -Dm 644 doc/nbfc_service.1       $(DESTDIR)$(man1dir)/nbfc_service.1
 	install -Dm 644 doc/nbfc_service.json.5  $(DESTDIR)$(man5dir)/nbfc_service.json.5
 
-install-completion:
+install-completion: $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 	# ZSH
 	install -Dm 644 completion/zsh/_nbfc               $(DESTDIR)$(datadir)/zsh/site-functions/_nbfc
 	install -Dm 644 completion/zsh/_nbfc_service       $(DESTDIR)$(datadir)/zsh/site-functions/_nbfc_service
@@ -159,6 +164,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/nbfc_config
 	rm -f $(DESTDIR)$(bindir)/nbfc_service
 	rm -f $(DESTDIR)$(bindir)/ec_probe
+	rm -f $(DESTDIR)$(bindir)/nbfc-qt
 	
 	# /usr/local/lib/systemd/system
 	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service
@@ -213,11 +219,12 @@ src/nbfc_service: \
 	src/ec_sys_linux.c src/ec_sys_linux.h \
 	src/error.c src/error.h \
 	src/fan.c src/fan.h \
+	src/fan_temperature_control.h \
+	src/fan_temperature_control.c \
 	src/fs_sensors.c src/fs_sensors.h \
 	src/generated/nbfc_service.help.h \
 	src/generated/model_config.generated.c \
 	src/generated/model_config.generated.h \
-	src/info.c src/info.h \
 	src/lm_sensors.c src/lm_sensors.h \
 	src/macros.h \
 	src/main.c \
@@ -226,6 +233,9 @@ src/nbfc_service: \
 	src/nbfc.h \
 	src/nxjson.c src/nxjson.h \
 	src/nxjson_utils.h \
+	src/pidfile.c src/pidfile.h \
+	src/protocol.c src/protocol.h \
+	src/server.c src/server.h \
 	src/service.c src/service.h \
 	src/service_config.c src/service_config.h \
 	src/temperature_filter.c src/temperature_filter.h \
@@ -248,6 +258,7 @@ src/nbfc: \
 	src/error.h src/error.c \
 	src/generated/ec_probe.help.h \
 	src/optparse/optparse.h src/optparse/optparse.c \
+	src/protocol.c src/protocol.h \
 	src/nxjson.c src/reverse_nxjson.c src/nxjson.h \
 	src/nbfc.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS) $(LDFLAGS)

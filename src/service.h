@@ -2,9 +2,12 @@
 #define NBFC_SERVICE_H_
 
 #include "error.h"
+#include "fan.h"
 #include "model_config.h"
+#include "temperature_filter.h"
 
 #include <stdbool.h>
+#include <pthread.h>
 
 typedef struct Service_Options Service_Options;
 struct Service_Options {
@@ -12,14 +15,18 @@ struct Service_Options {
   bool                   fork;
   bool                   read_only;
   bool                   debug;
+  bool                   python_hack;
   const char*            service_config;
-  const char*            state_file;
 };
 
+extern ModelConfig     Service_Model_Config;
+extern pthread_mutex_t Service_Lock;
+extern array_of(FanTemperatureControl) Service_Fans;
 extern Service_Options options;
 
 Error* Service_Init();
 void   Service_Loop();
 void   Service_Cleanup();
+Error* Service_WriteTargetFanSpeedsToConfig();
 
 #endif

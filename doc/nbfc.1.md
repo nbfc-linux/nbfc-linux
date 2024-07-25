@@ -106,14 +106,13 @@ This program is used to control the NoteBook FanControl service.
 
 # FILES
 
-*/run/nbfc_service.pid*
+*/var/run/nbfc_service.pid*
 
 > File containing the PID of current running nbfc_service.
 
-*/run/nbfc_service.state.json*
+*/var/run/nbfc_service.socket*
 
-> State file of nbfc_service. Updated every **EcPollInterval**
-> milliseconds. See **nbfc_service.json**(5) for further details.
+> Socket file of nbfc_service.
 
 */etc/nbfc.json*
 

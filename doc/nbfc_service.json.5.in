@@ -367,11 +367,9 @@ The fan speed in percent.
 
 .SH FILES
 .PP
-.I @RUNSTATEDIR@/nbfc_service.state.json
+.I @RUNSTATEDIR@/nbfc_service.socket
 .RS
-State file of nbfc_service. Updated every
-.B EcPollInterval
-milliseconds.
+Socket file of nbfc_service.
 .RE
 
 .PP
