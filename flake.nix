@@ -20,9 +20,21 @@
           src = nixpkgs.lib.cleanSource ./.;
 
           nativeBuildInputs = with pkgs; [
-	    python3
             autoreconfHook
+            libsForQt5.qt5.wrapQtAppsHook
+            libsForQt5.qt5.qtbase
           ];
+          propagatedBuildInputs = with pkgs; [
+            (python3.withPackages (pythonPackages: with pythonPackages; [
+              pyqt5
+            ]))
+          ];
+          dontWrapQtApps = true;
+
+          preFixup = ''
+            wrapQtApp "$out/bin/nbfc-qt"
+          '';
+
           configureFlags = [
             "--prefix=${placeholder "out"}"
             "--sysconfdir=${placeholder "out"}/etc"
