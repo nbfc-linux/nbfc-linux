@@ -119,31 +119,31 @@ function _nbfc_fish_helper
   # ===========================================================================
 
   if test (count $argv) -lt 1
-  echo "$func: missing OPTIONS argument" >&2
-  return 1
+    echo "$func: missing OPTIONS argument" >&2
+    return 1
   end
 
   if test -n "$argv[1]"
-  for option in (string split -- ',' $argv[1])
-    # Using one big switch case is the fastest way
-    switch $option
-      case '--?*=';   set -a long_opts_with_arg           (string replace -- '='  '' $option)
-      case '--?*=\?'; set -a long_opts_with_optional_arg  (string replace -- '=?' '' $option)
-      case '--?*';    set -a long_opts_without_arg        $option
+    for option in (string split -- ',' $argv[1])
+      # Using one big switch case is the fastest way
+      switch $option
+        case '--?*=';   set -a long_opts_with_arg           (string replace -- '='  '' $option)
+        case '--?*=\?'; set -a long_opts_with_optional_arg  (string replace -- '=?' '' $option)
+        case '--?*';    set -a long_opts_without_arg        $option
 
-      case '-?=';     set -a short_opts_with_arg          (string replace -- '='  '' $option)
-      case '-?=\?';   set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
-      case '-?';      set -a short_opts_with_arg          $option
+        case '-?=';     set -a short_opts_with_arg          (string replace -- '='  '' $option)
+        case '-?=\?';   set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
+        case '-?';      set -a short_opts_with_arg          $option
 
-      case '-??*=';   set -a old_opts_with_arg            (string replace -- '='  '' $option)
-      case '-??*=\?'; set -a old_opts_with_optional_arg   (string replace -- '=?' '' $option)
-      case '-??*';    set -a old_opts_without_arg         $option
+        case '-??*=';   set -a old_opts_with_arg            (string replace -- '='  '' $option)
+        case '-??*=\?'; set -a old_opts_with_optional_arg   (string replace -- '=?' '' $option)
+        case '-??*';    set -a old_opts_without_arg         $option
 
-      case '*'
-        echo "$func: argv[1]: '$option' is not a short, long or old-style option" >&2
-        return 1
+        case '*'
+          echo "$func: argv[1]: '$option' is not a short, long or old-style option" >&2
+          return 1
+      end
     end
-  end
   end
 
   set -e argv[1]
@@ -160,100 +160,100 @@ function _nbfc_fish_helper
 
   set -l argi 2 # cmdline[1] is command name
   while test $argi -le $cmdline_count
-  set -l arg "$cmdline[$argi]"
-  set -l have_trailing_arg (test $argi -lt $cmdline_count && echo true || echo false)
+    set -l arg "$cmdline[$argi]"
+    set -l have_trailing_arg (test $argi -lt $cmdline_count && echo true || echo false)
 
-  switch $arg
-    case '-'
-      set -a positionals -
-    case '--'
-      for argi in (seq (math $argi + 1) $cmdline_count)
-        set -a positionals $cmdline[$argi]
-      end
-      break
-    case '--*'
-      for option in $long_opts_with_arg $long_opts_without_arg $long_opts_with_optional_arg
-        if string match -q -- "$option=*" $arg
-          set -a having_options $option
-          break
-        else if string match -q -- $option $arg
-          if contains -- $option $long_opts_with_arg
-            if $have_trailing_arg
-              set -a having_options $option
-              set argi (math $argi + 1)
-            end
-          else
-            set -a having_options $option
-          end
-          break
+    switch $arg
+      case '-'
+        set -a positionals -
+      case '--'
+        for argi in (seq (math $argi + 1) $cmdline_count)
+          set -a positionals $cmdline[$argi]
         end
-      end
-    case '-*'
-      set -l have_match false
-
-      for option in $old_opts_with_arg $old_opts_without_arg $old_opts_with_optional_arg
-        if string match -q -- "$option=*" $arg
-          set -a having_options $option
-          set have_match true
-          break
-        else if string match -q -- $option $arg
-          if contains -- $option $old_opts_with_arg
-            if $have_trailing_arg
-              set -a having_options $option
-              set argi (math $argi + 1)
-            end
-          else
+        break
+      case '--*'
+        for option in $long_opts_with_arg $long_opts_without_arg $long_opts_with_optional_arg
+          if string match -q -- "$option=*" $arg
             set -a having_options $option
-          end
-
-          set have_match true
-          break
-        end
-      end
-
-      if not $have_match
-        set -l arg_length (string length -- $arg)
-        set -l i 2
-        set is_end false
-        while not $is_end && test $i -le $arg_length
-          set -l char (string sub -s $i -l 1 -- "$arg")
-          set -l have_trailing_chars (test $i -lt $arg_length && echo true || echo false)
-
-          for option in $short_opts_with_arg $short_opts_without_arg $short_opts_with_optional_arg
-            set -l option_char (string sub -s 2 -l 1 -- $option)
-
-            if test "$char" = "$option_char"
-              if contains -- $option $short_opts_with_arg
-                if $have_trailing_chars
-                  set -a having_options $option
-                  set is_end true
-                else if $have_trailing_arg
-                  set -a having_options $option
-                  set argi (math $argi + 1)
-                  set is_end true
-                end
-              else if contains -- $option $short_opts_with_optional_arg
+            break
+          else if string match -q -- $option $arg
+            if contains -- $option $long_opts_with_arg
+              if $have_trailing_arg
                 set -a having_options $option
-
-                if $have_trailing_chars
-                  set is_end true
-                end
-              else
-                set -a having_options $option
+                set argi (math $argi + 1)
               end
-
-              break
+            else
+              set -a having_options $option
             end
+            break
           end
-
-          set i (math $i + 1)
         end
-      end
-    case '*'
-      set -a positionals $arg
-  end
+      case '-*'
+        set -l have_match false
 
-  set argi (math $argi + 1)
+        for option in $old_opts_with_arg $old_opts_without_arg $old_opts_with_optional_arg
+          if string match -q -- "$option=*" $arg
+            set -a having_options $option
+            set have_match true
+            break
+          else if string match -q -- $option $arg
+            if contains -- $option $old_opts_with_arg
+              if $have_trailing_arg
+                set -a having_options $option
+                set argi (math $argi + 1)
+              end
+            else
+              set -a having_options $option
+            end
+
+            set have_match true
+            break
+          end
+        end
+
+        if not $have_match
+          set -l arg_length (string length -- $arg)
+          set -l i 2
+          set is_end false
+          while not $is_end && test $i -le $arg_length
+            set -l char (string sub -s $i -l 1 -- "$arg")
+            set -l have_trailing_chars (test $i -lt $arg_length && echo true || echo false)
+
+            for option in $short_opts_with_arg $short_opts_without_arg $short_opts_with_optional_arg
+              set -l option_char (string sub -s 2 -l 1 -- $option)
+
+              if test "$char" = "$option_char"
+                if contains -- $option $short_opts_with_arg
+                  if $have_trailing_chars
+                    set -a having_options $option
+                    set is_end true
+                  else if $have_trailing_arg
+                    set -a having_options $option
+                    set argi (math $argi + 1)
+                    set is_end true
+                  end
+                else if contains -- $option $short_opts_with_optional_arg
+                  set -a having_options $option
+
+                  if $have_trailing_chars
+                    set is_end true
+                  end
+                else
+                  set -a having_options $option
+                end
+
+                break
+              end
+            end
+
+            set i (math $i + 1)
+          end
+        end
+      case '*'
+        set -a positionals $arg
+    end
+
+    set argi (math $argi + 1)
   end
 
   # ===========================================================================
@@ -261,46 +261,46 @@ function _nbfc_fish_helper
   # ===========================================================================
 
   if test (count $argv) -eq 0
-  echo "$func: missing command" >&2
-  return 1
+    echo "$func: missing command" >&2
+    return 1
   end
 
   set -l cmd "$argv[1]"
   set -e argv[1]
 
   switch $cmd
-  case 'positional_contains'
-    if test (count $argv) -eq 0
-      echo "$func: positional_contains: argv[3]: missing number" >&2
-      return 1
-    end
-
-    set -l positional_num $argv[1]
-    set -e argv[1]
-    contains -- $positionals[$positional_num] $argv && return 0 || return 1
-  case 'has_option'
-    for option in $having_options
-      contains -- $option $argv && return 0
-    end
-
-    return 1
-  case 'num_of_positionals'
-    if test (count $argv) -eq 0
-      count $positionals
-    else if test (count $argv) -eq 2
-      if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
-        test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
-      else
-        echo "$func: num_of_positionals: $argv[1]: unknown operator" >&2
+    case 'positional_contains'
+      if test (count $argv) -eq 0
+        echo "$func: positional_contains: argv[3]: missing number" >&2
         return 1
       end
-    else if test (count $argv) -eq 1
-      echo "$func: num_of_positionals: $argv[1]: missing operand" >&2
+
+      set -l positional_num $argv[1]
+      set -e argv[1]
+      contains -- $positionals[$positional_num] $argv && return 0 || return 1
+    case 'has_option'
+      for option in $having_options
+        contains -- $option $argv && return 0
+      end
+
       return 1
-    end
-  case '*'
-    echo "$func: argv[2]: invalid command" >&2
-    return 1
+    case 'num_of_positionals'
+      if test (count $argv) -eq 0
+        count $positionals
+      else if test (count $argv) -eq 2
+        if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
+          test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
+        else
+          echo "$func: num_of_positionals: $argv[1]: unknown operator" >&2
+          return 1
+        end
+      else if test (count $argv) -eq 1
+        echo "$func: num_of_positionals: $argv[1]: missing operand" >&2
+        return 1
+      end
+    case '*'
+      echo "$func: argv[2]: invalid command" >&2
+      return 1
   end
 end
 
