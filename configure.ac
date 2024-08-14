@@ -9,7 +9,7 @@ AC_PROG_INSTALL
 AC_CHECK_LIB([m], [roundf])
 
 # Checks for header files.
-AC_CHECK_HEADERS([fcntl.h stdint.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h stdint.h unistd.h sys/socket.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
@@ -27,7 +27,7 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([atexit memset mkdir realpath setlocale strchr strrchr strcspn strdup strerror strtol strtoull])
+AC_CHECK_FUNCS([atexit memset mkdir realpath setlocale socket strchr strrchr strstr strcspn strdup strerror strtol strtoull])
 
 # Init-System
 AC_ARG_WITH([init-system],
