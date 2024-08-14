@@ -149,9 +149,9 @@ install-completion: $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 	install -Dm 644 completion/bash/nbfc_service       $(DESTDIR)$(datadir)/bash-completion/completions/nbfc_service
 	install -Dm 644 completion/bash/ec_probe           $(DESTDIR)$(datadir)/bash-completion/completions/ec_probe
 	# FISH	
-	install -Dm 644 completion/fish/nbfc.fish          $(DESTDIR)$(datadir)/fish/completions/nbfc.fish
-	install -Dm 644 completion/fish/nbfc_service.fish  $(DESTDIR)$(datadir)/fish/completions/nbfc_service.fish
-	install -Dm 644 completion/fish/ec_probe.fish      $(DESTDIR)$(datadir)/fish/completions/ec_probe.fish
+	install -Dm 644 completion/fish/nbfc.fish          $(DESTDIR)$(datadir)/fish/vendor_completions.d/nbfc.fish
+	install -Dm 644 completion/fish/nbfc_service.fish  $(DESTDIR)$(datadir)/fish/vendor_completions.d/nbfc_service.fish
+	install -Dm 644 completion/fish/ec_probe.fish      $(DESTDIR)$(datadir)/fish/vendor_completions.d/ec_probe.fish
 
 install: install-core install-configs install-@INIT_SYSTEM@ install-docs install-completion
 
