@@ -81,8 +81,8 @@ agrp.add_argument('-a', '--auto', action='store_const', dest='speed', const=-1,
 agrp.add_argument('-s', '--speed', type=float, dest='speed', metavar='PERCENT',
                   help='Set fan speed to PERCENT')
 
-cmdp.add_argument('-f', '--fan',   type=int, metavar='FAN INDEX', default=0,
-                  help='Fan index (zero based)')
+cmdp.add_argument('-f', '--fan', type=int, metavar='FAN INDEX', default=0,
+                  help='Fan index (zero based)').complete('exec', 'nbfc complete-fans')
 
 # =============================================================================
 # Command 'wait-for-hwmon'

@@ -370,7 +370,7 @@ set -l guard003 "$helper '$options' positional_contains 1 set && not $helper '$o
 complete -c $prog -n $guard000 -s h -l help -d 'show this help message and exit' -f
 complete -c $prog -n $guard001 -s a -l auto -d "Set fan speed to 'auto'" -f
 complete -c $prog -n $guard002 -s s -l speed -d 'Set fan speed to PERCENT' -x
-complete -c $prog -n $guard003 -s f -l fan -d 'Fan index (zero based)' -x
+complete -c $prog -n $guard003 -s f -l fan -d 'Fan index (zero based)' -x -a '(nbfc complete-fans)'
 
 # command nbfc wait-for-hwmon
 set -l options "--help,-h,--version,--help,-h"

@@ -167,6 +167,23 @@ _nbfc_command() {
   _describe -- command DESCRIBE
 }
 
+_nbfc_exec() {
+  local IFS=$'\n'
+  local -a OUTPUT_LINES=($(eval "$1"))
+  unset IFS
+
+  local -a DESCRIBE
+  local LINE
+
+  for LINE in "${OUTPUT_LINES[@]}"; do
+  LINE="${LINE/:/\\:/}"
+  LINE="${LINE/$'\t'/:}"
+  DESCRIBE+=("$LINE")
+  done
+
+  _describe '' DESCRIBE
+}
+
 _nbfc() {
   # We have to check for subcommands here, because _arguments modifies $words
   local opts="--help,-h,--version"
@@ -250,7 +267,7 @@ _nbfc_set() {
     '(--help -h)'{--help,-h}'[show this help message and exit]'::' '
     '(--speed -s --auto -a)'{--auto,-a}"[Set fan speed to 'auto']"::' '
     '(--auto -a --speed -s)'{--speed=,-s+}'[Set fan speed to PERCENT]':PERCENT:' '
-    '(--fan -f)'{--fan=,-f+}'[Fan index (zero based)]':'FAN INDEX':' '
+    '(--fan -f)'{--fan=,-f+}'[Fan index (zero based)]':'FAN INDEX':"{_nbfc_exec 'nbfc complete-fans'}"
     1:command1:_nbfc_command
   )
 

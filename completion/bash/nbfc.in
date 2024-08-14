@@ -20,6 +20,19 @@ _nbfc_compgen_w_replacement() {
   done
 }
 
+_nbfc_exec() {
+  local IFS=$'\n'
+  local -a OUTPUT_LINES=($(eval "$1"))
+  unset IFS
+  local LINE
+  for LINE in "${OUTPUT_LINES[@]}"; do
+    LINE="${LINE%%$'\t'*}"
+    if [[ "$LINE" == "$cur"* ]]; then
+      COMPREPLY+=("$(printf '%q' "$LINE")")
+    fi
+  done
+}
+
 _nbfc() {
   local cur prev words cword split
   _init_completion -n = || return
@@ -639,6 +652,7 @@ _nbfc_set() {
       -s|--speed)
         return 0;;
       -f|--fan)
+        _nbfc_exec 'nbfc complete-fans'
         return 0;;
     esac
 
