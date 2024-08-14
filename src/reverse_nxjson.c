@@ -16,6 +16,8 @@
 static const char* Json_EscapeString(char*, const size_t, const char*);
 
 char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
+  static __thread char buf[NBFC_MAX_FILE_SIZE];
+
   while (nx != NULL) {
     if (nx->type == NX_JSON_OBJECT) {
       ADD_INDENTION(indent);
@@ -36,7 +38,6 @@ char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
         ADD_INDENTION(indent);
         ADD_KEY_NOT_NULL();
         StringBuf_AddCh(s, '"');
-        char buf[NBFC_MAX_FILE_SIZE];
         Json_EscapeString(buf, sizeof(buf), nx->val.text);
         StringBuf_Printf(s, "%s", buf);
         StringBuf_AddCh(s, '"');

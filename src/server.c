@@ -189,7 +189,7 @@ Error* Server_Init() {
   }
 
   if (chmod(NBFC_SOCKET_PATH, 0666) < 0) {
-    e = err_stdlib(0, "chmod()");
+    e = err_stdlib(err_string(0, NBFC_SOCKET_PATH), "chmod()");
     goto error;
   }
 
