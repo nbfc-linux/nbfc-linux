@@ -43,7 +43,7 @@ Installation
   - See [GitHub.com/nbfc-linux/packages/rpm](https://github.com/nbfc-linux/packages/tree/main/rpm) for all versions.
 
 - NixOS:
-  - [Declaratively](nixos-installation-new.md)(with nix flakes)
+  - [Declaratively](nixos-installation-new.md)
   - [Imperatively](nixos-installation.md) (with `nix profile install` or `nix-env -if .`)
 
 - Fedora - this will not build the current working directory, but downloads a source archive from chosen release on github and builds an installable rpm:
