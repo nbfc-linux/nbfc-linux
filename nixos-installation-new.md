@@ -1,9 +1,10 @@
 # Installing on NixOS
 
+## For people on stable
 Flakes must be enabled to follow this guide, if you do not want to enable flakes check [this installation guide](./nixos-installation.md)
 
 
-- Add this flake to inputs in your configuration:
+Add this flake to inputs in your configuration:
 
 ```nix
 # flake.nix
@@ -30,9 +31,15 @@ Flakes must be enabled to follow this guide, if you do not want to enable flakes
 
 ```
 
-NOTE: Check status of [nbfc-linux on nixpkgs](https://github.com/NixOS/nixpkgs/pull/296199) , if it has been merged into nixpkgs no need to use flakes simply add nbfc-linux to envrioment.systemPackages 
+After this follow the common instructions
 
+## For people on unstable
+
+nbfc-linux is already available in the nix repo so just follow the common instructions
+
+## Common instructions 
 - Mention it in the packages + enable nbfc service
+
 ```nix
 # nbfc.nix
 {
@@ -43,17 +50,24 @@ NOTE: Check status of [nbfc-linux on nixpkgs](https://github.com/NixOS/nixpkgs/p
 }: let
   myUser = "gaurav"; #adjust this to your username
   command = "bin/nbfc_service --config-file '/home/${myUser}/.config/nbfc.json'";
-
 in {
   environment.systemPackages = with pkgs; [
-    inputs.nbfc-linux.packages.x86_64-linux.default
+    # if you are on stable uncomment the next line
+    # inputs.nbfc-linux.packages.x86_64-linux.default
+    # if you are on unstable uncomment the next line
+    # nbfc-linux
   ];
   systemd.services.nbfc_service = {
     enable = true;
     description = "NoteBook FanControl service";
     serviceConfig.Type = "simple";
     path = [pkgs.kmod];
-    script = "${inputs.nbfc-linux.packages.x86_64-linux.default}/${command}";
+
+    # if you are on stable uncomment the next line
+    #  script = "${inputs.nbfc-linux.packages.x86_64-linux.default}/${command}";
+    # if you are on unstable uncomment the next line
+    #script = "${pkgs.nbfc-linux.packages}/${command}";
+   
     wantedBy = ["multi-user.target"];
   };
 }
@@ -68,7 +82,7 @@ in {
   ];
 ```
 
-# Chose configuration file
+### Chose configuration file
 
 Now if you try to set config the normal way you will encounter the following issue
 ```bash
