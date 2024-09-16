@@ -1,0 +1,106 @@
+prog: "nbfc"
+help: "NoteBook FanControl CLI Client"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+  - option_strings: ["--version"]
+    help: "show program's version number and exit"
+    takes_args: false
+
+---
+prog: "nbfc start"
+help: "Start the service"
+options:
+  - option_strings: ["-r", "--read-only"]
+    help: "Start in read-only mode"
+    takes_args: false
+
+---
+prog: "nbfc stop"
+help: "Stop the service"
+
+---
+prog: "nbfc restart"
+help: "Restart the service"
+options:
+  - option_strings: ["-r", "--read-only"]
+    help: "Restart in read-only mode"
+    takes_args: false
+
+---
+prog: "nbfc status"
+help: "Show the service status"
+options:
+  - option_strings: ["-a", "--all"]
+    help: "Show service and fan status (default)"
+    takes_args: false
+    group: "group1"
+
+  - option_strings: ["-s", "--service"]
+    help: "Show service status"
+    takes_args: false
+    group: "group1"
+
+  - option_strings: ["-f", "--fan"]
+    metavar: "FAN INDEX"
+    help: "Show status of fan (zero based)"
+    group: "group1"
+
+  - option_strings: ["-w", "--watch"]
+    metavar: "SECONDS"
+    help: "Show status periodically"
+
+---
+prog: "nbfc config"
+help: "List or apply configs"
+options:
+  - option_strings: ["-l", "--list"]
+    help: "List all available configs (default)"
+    takes_args: false
+    group: "group1"
+
+  - option_strings: ["-s", "--set"]
+    metavar: "config"
+    help: "Set a config"
+    group: "group1"
+    complete: ["file", {"directory": "@DATADIR@/nbfc/configs"}]
+
+  - option_strings: ["-a", "--apply"]
+    metavar: "config"
+    help: "Set a config and enable fan control"
+    group: "group1"
+    complete: ["file", {"directory": "@DATADIR@/nbfc/configs"}]
+
+  - option_strings: ["-r", "--recommend"]
+    help: "List configs which may work for your device"
+    takes_args: false
+    group: "group1"
+
+---
+prog: "nbfc set"
+help: "Control fan speed"
+options:
+  - option_strings: ["-a", "--auto"]
+    help: "Set fan speed to 'auto'"
+    takes_args: false
+    group: "group1"
+
+  - option_strings: ["-s", "--speed"]
+    metavar: "PERCENT"
+    help: "Set fan speed to PERCENT"
+    group: "group1"
+
+  - option_strings: ["-f", "--fan"]
+    metavar: "FAN INDEX"
+    help: "Fan index (zero based)"
+    complete: ["exec", "nbfc complete-fans"]
+
+---
+prog: "nbfc wait-for-hwmon"
+help: "Wait for /sys/class/hwmon/hwmon* files"
+
+---
+prog: "nbfc help"
+help: "Show help"

@@ -1,0 +1,28 @@
+prog: "nbfc_service"
+help: "NoteBook FanControl service"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+  - option_strings: ["-r", "--read-only"]
+    help: "Start in read-only mode"
+    takes_args: false
+
+  - option_strings: ["-f", "--fork"]
+    help: "Switch process to background after sucessfully started"
+    takes_args: false
+
+  - option_strings: ["-d", "--debug"]
+    help: "Enable tracing of reads and writes of the embedded controller"
+    takes_args: false
+
+  - option_strings: ["-c", "--config-file"]
+    metavar: "config"
+    help: "Use alternative config file (default @SYSCONFDIR@/nbfc/nbfc.json)"
+    complete: ["file"]
+
+  - option_strings: ["-e", "--embedded-controller"]
+    metavar: "EC"
+    help: "Specify embedded controller to use"
+    complete: ["choices", ["dummy", "dev_port", "ec_sys", "acpi_ec"]]
