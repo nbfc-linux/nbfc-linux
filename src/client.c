@@ -428,7 +428,9 @@ static int Service_Start(bool read_only) {
     return NBFC_EXIT_SUCCESS;
   }
 
-  char cmd[64] = "nbfc_service --python-hack -f";
+  char cmd[64] = "nbfc_service -f";
+  if (options.python_hack)
+    strcat(cmd, " --python-hack");
   if (read_only)
     strcat(cmd, " -r");
   int ret = system(cmd);
@@ -668,7 +670,7 @@ static int Show_Variable() {
     printf("%s\n", NBFC_MODEL_CONFIGS_DIR);
   else {
     ret = NBFC_EXIT_FAILURE;
-    Log_Error("Unknown variable '%s'. Choose from 'config_file', 'socket_file', 'pid_file'\n", options.variable);
+    Log_Error("Unknown variable '%s'. Choose from 'config_file', 'socket_file', 'pid_file', 'model_configs_dir'\n", options.variable);
   }
 
   Mem_Free(variable);
