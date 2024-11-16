@@ -140,5 +140,4 @@
       </FanSpeedPercentageOverrides>
     </FanConfiguration>
   </FanConfigurations>
-  <RegisterWriteConfigurations />
 </FanControlConfigV2>
