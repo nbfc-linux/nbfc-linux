@@ -38,7 +38,7 @@ Installation
   - [Latest Version 0.2.7](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.7/nbfc-linux_0.2.7_amd64.deb)
   - See [GitHub.com/nbfc-linux/packages/deb](https://github.com/nbfc-linux/packages/tree/main/deb) for all versions.
 
-- Fedora (untestet)
+- Fedora (untested)
   - [Latest Version 0.2.7](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.2.7/nbfc-linux-0.2.7-1.x86_64.rpm)
   - See [GitHub.com/nbfc-linux/packages/rpm](https://github.com/nbfc-linux/packages/tree/main/rpm) for all versions.
 
