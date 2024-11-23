@@ -23,24 +23,35 @@
 	   "FanSpeed": 0.0
 	  },
 	  {
-		"UpThreshold": 60,
-		"DownThreshold": 39,
-		"FanSpeed": 10.0
+	   "UpThreshold": 70,
+	   "DownThreshold": 65,
+	   "FanSpeed": 5.0
+
 	  },
 	  {
 	   "UpThreshold": 78,
-	   "DownThreshold": 55,
+	   "DownThreshold": 69,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 75,
 	   "FanSpeed": 30.0
 	  },
 	  {
-		"UpThreshold": 85,
-		"DownThreshold": 69,
-		"FanSpeed": 70.0
+	   "UpThreshold": 85,
+	   "DownThreshold": 75,
+	   "FanSpeed": 70.0
 	  },
 	  {
-		"UpThreshold": 90,
-		"DownThreshold": 78,
-		"FanSpeed": 80.0
+	   "UpThreshold": 89,
+	   "DownThreshold": 78,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 85,
+	   "FanSpeed": 100.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": []
@@ -58,29 +69,34 @@
 	 "FanDisplayName": "GPU fan",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 45,
+	   "UpThreshold": 52,
 	   "DownThreshold": 0,
 	   "FanSpeed": 0.0
 	  },
 	  {
-		"UpThreshold": 50,
-		"DownThreshold": 40,
-		"FanSpeed": 10.0
+		"UpThreshold": 60,
+		"DownThreshold": 48,
+		"FanSpeed": 8.0
 	  },
 	  {
 	   "UpThreshold": 73,
-	   "DownThreshold": 48,
+	   "DownThreshold": 55,
 	   "FanSpeed": 30.0
 	  },
 	  {
 	    "UpThreshold": 80,
-	    "DownThreshold": 65,
+	    "DownThreshold": 69,
 	    "FanSpeed": 52.0
 	  },
 	  {
-		"UpThreshold": 90,
+		"UpThreshold": 89,
 		"DownThreshold": 70,
 		"FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 83,
+	   "FanSpeed": 100.0
 	  }
 	 ],
 	 "FanSpeedPercentageOverrides": []
