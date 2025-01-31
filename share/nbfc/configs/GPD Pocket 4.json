@@ -1,0 +1,55 @@
+{
+    "LegacyTemperatureThresholdsBehaviour": true,
+    "NotebookModel": "GPD Pocket 4",
+    "Author": "yaocccc",
+    "EcPollInterval": 5000,
+    "ReadWriteWords": false,
+    "CriticalTemperature": 85,
+    "FanConfigurations": [
+        {
+            "ReadRegister": 122,
+            "WriteRegister": 122,
+            "MinSpeedValue": 1,
+            "MaxSpeedValue": 244,
+            "IndependentReadMinMaxValues": false,
+            "MinSpeedValueRead": 0,
+            "MaxSpeedValueRead": 0,
+            "ResetRequired": false,
+            "FanSpeedResetValue": 20,
+            "FanDisplayName": "CPU fan",
+            "TemperatureThresholds": [
+                {
+                    "UpThreshold": 0,
+                    "DownThreshold": 0,
+                    "FanSpeed": 0.0
+                },
+                {
+                    "UpThreshold": 50,
+                    "DownThreshold": 40,
+                    "FanSpeed": 10.0
+                },
+                {
+                    "UpThreshold": 60,
+                    "DownThreshold": 50,
+                    "FanSpeed": 25.0
+                },
+                {
+                    "UpThreshold": 70,
+                    "DownThreshold": 60,
+                    "FanSpeed": 50.0
+                },
+                {
+                    "UpThreshold": 80,
+                    "DownThreshold": 70,
+                    "FanSpeed": 75.0
+                },
+                {
+                    "UpThreshold": 85,
+                    "DownThreshold": 80,
+                    "FanSpeed": 100.0
+                }
+            ],
+            "FanSpeedPercentageOverrides": []
+        }
+    ]
+}
