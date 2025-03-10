@@ -1,0 +1,64 @@
+{
+    "NotebookModel": "ASUS Vivobook S15 S5506MA",
+    "Author": "actuallyaryaman",
+    "EcPollInterval": 1000,
+    "CriticalTemperature": 85,
+    "CriticalTemperatureOffset": 5,
+    "ReadWriteWords": false,
+    "FanConfigurations": [
+      {
+        "FanDisplayName": "CPU Fan",
+        "ReadRegister": 160,
+        "WriteRegister": 160,
+        "MinSpeedValue": 0,
+        "MaxSpeedValue": 8,
+        "TemperatureThresholds": [
+          {
+            "UpThreshold": 30   ,
+            "DownThreshold": 25,
+            "FanSpeed": 0
+          },
+          {
+            "UpThreshold": 50,
+            "DownThreshold": 45,
+            "FanSpeed": 30.0
+          },
+          {
+            "UpThreshold": 70,
+            "DownThreshold": 65,
+            "FanSpeed": 50.0
+          },
+          {
+            "UpThreshold": 80,
+            "DownThreshold": 75,
+            "FanSpeed": 100.0
+          }
+        ]
+      },
+      {
+        "FanDisplayName": "GPU Fan",
+        "ReadRegister": 206,
+        "WriteRegister": 206,
+        "MinSpeedValue": 0,
+        "MaxSpeedValue": 3,
+        "TemperatureThresholds": [
+          {
+            "UpThreshold": 50,
+            "DownThreshold": 40,
+            "FanSpeed": 30.0
+          },
+          {
+            "UpThreshold": 70,
+            "DownThreshold": 65,
+            "FanSpeed": 50.0
+          },
+          {
+            "UpThreshold": 85,
+            "DownThreshold": 80,
+            "FanSpeed": 100.0
+          }
+        ]
+      }
+    ]
+  }
+  
