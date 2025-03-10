@@ -1,0 +1,150 @@
+{
+  "LegacyTemperatureThresholdsBehaviour": true,
+  "NotebookModel": "Acer Aspire A715-41G",
+  "Author": "Crony Akatsuki",
+  "EcPollInterval": 2000,
+  "ReadWriteWords": true,
+  "CriticalTemperature": 85,
+  "FanConfigurations": [
+    {
+      "ReadRegister": 19,
+      "WriteRegister": 55,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "IndependentReadMinMaxValues": true,
+      "MinSpeedValueRead": 0,
+      "MaxSpeedValueRead": 6122,
+      "ResetRequired": true,
+      "FanSpeedResetValue": 0,
+      "FanDisplayName": "1.st fan",
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 30,
+          "DownThreshold": 0,
+          "FanSpeed": 30.0
+        },
+        {
+          "UpThreshold": 35,
+          "DownThreshold": 30,
+          "FanSpeed": 40.0
+        },
+        {
+          "UpThreshold": 40,
+          "DownThreshold": 35,
+          "FanSpeed": 50.0
+        },
+        {
+          "UpThreshold": 45,
+          "DownThreshold": 40,
+          "FanSpeed": 60.0
+        },
+        {
+          "UpThreshold": 50,
+          "DownThreshold": 45,
+          "FanSpeed": 70.0
+        },
+        {
+          "UpThreshold": 55,
+          "DownThreshold": 50,
+          "FanSpeed": 80.0
+        },
+        {
+          "UpThreshold": 60,
+          "DownThreshold": 55,
+          "FanSpeed": 90.0
+        },
+        {
+          "UpThreshold": 65,
+          "DownThreshold": 60,
+          "FanSpeed": 95.0
+        },
+        {
+          "UpThreshold": 70,
+          "DownThreshold": 65,
+          "FanSpeed": 100.0
+        }
+      ]
+    },
+    {
+      "ReadRegister": 21,
+      "WriteRegister": 58,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "IndependentReadMinMaxValues": true,
+      "MinSpeedValueRead": 0,
+      "MaxSpeedValueRead": 6122,
+      "ResetRequired": true,
+      "FanSpeedResetValue": 0,
+      "FanDisplayName": "2.nd fan",
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 30,
+          "DownThreshold": 0,
+          "FanSpeed": 30.0
+        },
+        {
+          "UpThreshold": 35,
+          "DownThreshold": 30,
+          "FanSpeed": 40.0
+        },
+        {
+          "UpThreshold": 40,
+          "DownThreshold": 35,
+          "FanSpeed": 50.0
+        },
+        {
+          "UpThreshold": 45,
+          "DownThreshold": 40,
+          "FanSpeed": 60.0
+        },
+        {
+          "UpThreshold": 50,
+          "DownThreshold": 45,
+          "FanSpeed": 70.0
+        },
+        {
+          "UpThreshold": 55,
+          "DownThreshold": 50,
+          "FanSpeed": 80.0
+        },
+        {
+          "UpThreshold": 60,
+          "DownThreshold": 55,
+          "FanSpeed": 90.0
+        },
+        {
+          "UpThreshold": 65,
+          "DownThreshold": 60,
+          "FanSpeed": 95.0
+        },
+        {
+          "UpThreshold": 70,
+          "DownThreshold": 65,
+          "FanSpeed": 100.0
+        }
+      ]
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Set",
+      "WriteOccasion": "OnInitialization",
+      "Register": 34,
+      "Value": 12,
+      "ResetRequired": true,
+      "ResetValue": 0,
+      "ResetWriteMode": "Set",
+      "Description": "1.st fan manual mode"
+    },
+    {
+      "WriteMode": "Set",
+      "WriteOccasion": "OnInitialization",
+      "Register": 33,
+      "Value": 48,
+      "ResetRequired": true,
+      "ResetValue": 0,
+      "ResetWriteMode": "Set",
+      "Description": "2.nd fan manual mode"
+    }
+  ]
+}
