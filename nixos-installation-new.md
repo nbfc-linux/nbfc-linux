@@ -66,7 +66,7 @@ in {
     # if you are on stable uncomment the next line
     #  script = "${inputs.nbfc-linux.packages.x86_64-linux.default}/${command}";
     # if you are on unstable uncomment the next line
-    #script = "${pkgs.nbfc-linux.packages}/${command}";
+    #script = "${pkgs.nbfc-linux}/${command}";
    
     wantedBy = ["multi-user.target"];
   };
