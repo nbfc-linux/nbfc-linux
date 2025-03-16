@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <FanControlConfigV2 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <NotebookModel>HP Victus 16-e0xxx</NotebookModel>
+  <NotebookModel>HP Victus 16-e0175AX</NotebookModel>
   <Author>iamslightlywind</Author>
   <EcPollInterval>1500</EcPollInterval>
   <ReadWriteWords>false</ReadWriteWords>
