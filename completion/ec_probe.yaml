@@ -3,25 +3,20 @@ help: "Probing tool for embedded controllers"
 options:
   - option_strings: ["-h", "--help"]
     help: "show this help message and exit"
-    takes_args: false
 
   - option_strings: ["-e", "--embedded-controller"]
     metavar: "EC"
     help: "Specify embedded controller to use"
     complete: ["choices", ["acpi_ec", "ec_sys", "dev_port"]]
-
 ---
 prog: "ec_probe dump"
 help: "Dump all EC registers"
 options:
   - option_strings: ["-c", "--color"]
     help: "Force colored output"
-    takes_args: false
 
   - option_strings: ["-C", "--no-color"]
     help: "Disable colored output"
-    takes_args: false
-
 ---
 prog: "ec_probe load"
 help: "Load a previously made dump into the embedded controller"
@@ -29,28 +24,24 @@ positionals:
   - number: 1
     metavar: "FILE"
     complete: ["file"]
-
 ---
 prog: "ec_probe read"
 help: "Read a byte from a EC register"
 options:
   - option_strings: ["-w", "--word"]
     help: "Combine two registers into one"
-    takes_args: false
 
 positionals:
   - number: 1
     metavar: "REGISTER"
     help: "Register source"
     complete: ["range", 0, 255]
-
 ---
 prog: "ec_probe write"
 help: "Write a byte to a EC register"
 options:
   - option_strings: ["-w", "--word"]
     help: "Combine two registers into one"
-    takes_args: false
 
 positionals:
   - number: 1
@@ -61,7 +52,7 @@ positionals:
   - number: 2
     metavar: "VALUE"
     help: "Value to write"
-
+    complete: ["integer"]
 ---
 prog: "ec_probe monitor"
 help: "Monitor all EC registers for changes"
@@ -69,10 +60,12 @@ options:
   - option_strings: ["-i", "--interval"]
     metavar: "seconds"
     help: "Monitored timespan"
+    complete: ["float"]
 
   - option_strings: ["-t", "--timespan"]
     metavar: "seconds"
     help: "Set poll intervall"
+    complete: ["integer"]
 
   - option_strings: ["-r", "--report"]
     metavar: "report"
@@ -81,20 +74,19 @@ options:
 
   - option_strings: ["-c", "--clearly"]
     help: "Blanks out consecutive duplicate readings"
-    takes_args: false
 
   - option_strings: ["-d", "--decimal"]
     help: "Output readings in decimal format instead of hexadecimal format"
-    takes_args: false
-
 ---
 prog: "ec_probe watch"
-help: "Monitor all EC registers for changes (alternative version"
+help: "Monitor all EC registers for changes (alternative version)"
 options:
   - option_strings: ["-i", "--interval"]
     metavar: "seconds"
     help: "Sets the update interval in seconds"
+    complete: ["float"]
 
   - option_strings: ["-t", "--timespan"]
     metavar: "seconds"
     help: "Sets how many seconds the program will run"
+    complete: ["integer"]

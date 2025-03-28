@@ -2,24 +2,6 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-_nbfc_compgen_w_replacement() {
-  local cur word append=0
-
-  [[ "$1" == "-a" ]] && { shift; append=1; }
-  [[ "$1" == "--" ]] && { shift; }
-
-  cur="$1"
-  shift
-
-  (( append )) || COMPREPLY=()
-
-  for word; do
-    if [[ "$word" == "$cur"* ]]; then
-      COMPREPLY+=("$(printf '%q' "$word")")
-    fi
-  done
-}
-
 _nbfc_parse_commandline() {
   POSITIONALS=()
   END_OF_OPTIONS=0
@@ -235,6 +217,8 @@ _nbfc_parse_commandline() {
               cmd+=" set";;
             wait-for-hwmon)
               cmd+=" wait-for-hwmon";;
+            get-model-name)
+              cmd+=" get-model-name";;
             help)
               cmd+=" help";;
             *) cmd+=" $arg";;
@@ -255,13 +239,6 @@ _nbfc_parse_commandline() {
   done
 }
 
-_nbfc_prefix_compreply() {
-  local i=0 prefix="$1"
-  for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
-    COMPREPLY[i]="$prefix${COMPREPLY[i]}"
-  done
-}
-
 _nbfc_exec() {
   local item desc
 
@@ -270,6 +247,13 @@ _nbfc_exec() {
       COMPREPLY+=("$(printf '%q' "$item")")
     fi
   done < <(eval "$1")
+}
+
+_nbfc_prefix_compreply() {
+  local i=0 prefix="$1"
+  for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
+    COMPREPLY[i]="$prefix${COMPREPLY[i]}"
+  done
 }
 
 _nbfc() {
@@ -281,6 +265,8 @@ _nbfc() {
 
   _nbfc_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   if (( 0 < POSITIONAL_NUM )); then
     case "${POSITIONALS[0]}" in
       start) _nbfc_start && return 0 || return 1;;
@@ -290,6 +276,7 @@ _nbfc() {
       config) _nbfc_config && return 0 || return 1;;
       set) _nbfc_set && return 0 || return 1;;
       wait-for-hwmon) _nbfc_wait_for_hwmon && return 0 || return 1;;
+      get-model-name) _nbfc_get_model_name && return 0 || return 1;;
       help) _nbfc_help && return 0 || return 1;;
     esac
   fi
@@ -298,12 +285,13 @@ _nbfc() {
     local -a opts=()
     (( ! ${#OPT_help} )) && opts+=(-h --help)
     (( ! ${#OPT_version} )) && opts+=(--version)
-    _nbfc_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
   test "$POSITIONAL_NUM" -eq 1 && {
-    _nbfc_compgen_w_replacement -- "$cur" start stop restart status config set wait-for-hwmon help
+    COMPREPLY=($(compgen -W 'start stop restart status config set wait-for-hwmon get-model-name help' -- "$cur"))
     return 0;
   }
 
@@ -316,10 +304,13 @@ _nbfc_start() {
 
   _nbfc_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
     (( ! ${#OPT_read_only} )) && opts+=(-r --read-only)
-    _nbfc_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -336,10 +327,13 @@ _nbfc_restart() {
 
   _nbfc_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
     (( ! ${#OPT_read_only} )) && opts+=(-r --read-only)
-    _nbfc_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -352,11 +346,16 @@ _nbfc_status() {
 
   _nbfc_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   __complete_option() {
     local opt="$1" cur="$2" mode="$3"
 
     case "$opt" in
-      --fan|-f|--watch|-w)
+      --fan|-f)
+        _nbfc_exec 'nbfc complete-fans'
+        return 0;;
+      --watch|-w)
         return 0;;
     esac
 
@@ -390,11 +389,12 @@ _nbfc_status() {
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
-    (( ! ${#OPT_all} && ! ${#OPT_service} && ! ${#OPT_fan} )) && opts+=(-a --all)
-    (( ! ${#OPT_service} && ! ${#OPT_all} && ! ${#OPT_fan} )) && opts+=(-s --service)
-    (( ! ${#OPT_fan} && ! ${#OPT_all} && ! ${#OPT_service} )) && opts+=(-f --fan)
-    (( ! ${#OPT_watch} )) && opts+=(-w --watch)
-    _nbfc_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    (( ! ${#OPT_service} && ! ${#OPT_fan} && ! ${#OPT_all} )) && opts+=(-a --all)
+    (( ! ${#OPT_all} && ! ${#OPT_fan} && ! ${#OPT_service} )) && opts+=(-s --service)
+    (( ! ${#OPT_all} && ! ${#OPT_service} && ! ${#OPT_fan} )) && opts+=(-f --fan=)
+    (( ! ${#OPT_watch} )) && opts+=(-w --watch=)
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -407,14 +407,16 @@ _nbfc_config() {
 
   _nbfc_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   __complete_option() {
     local opt="$1" cur="$2" mode="$3"
 
     case "$opt" in
       --set|-s|--apply|-a)
-        pushd @DATADIR@/nbfc/configs &>/dev/null && {
+        builtin pushd @DATADIR@/nbfc/configs &>/dev/null && {
           _filedir
-          popd &>/dev/null
+          builtin popd &>/dev/null
         }
         return 0;;
     esac
@@ -449,11 +451,12 @@ _nbfc_config() {
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
-    (( ! ${#OPT_list} && ! ${#OPT_set} && ! ${#OPT_apply} && ! ${#OPT_recommend} )) && opts+=(-l --list)
-    (( ! ${#OPT_set} && ! ${#OPT_list} && ! ${#OPT_apply} && ! ${#OPT_recommend} )) && opts+=(-s --set)
-    (( ! ${#OPT_apply} && ! ${#OPT_list} && ! ${#OPT_set} && ! ${#OPT_recommend} )) && opts+=(-a --apply)
-    (( ! ${#OPT_recommend} && ! ${#OPT_list} && ! ${#OPT_set} && ! ${#OPT_apply} )) && opts+=(-r --recommend)
-    _nbfc_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    (( ! ${#OPT_set} && ! ${#OPT_apply} && ! ${#OPT_recommend} && ! ${#OPT_list} )) && opts+=(-l --list)
+    (( ! ${#OPT_list} && ! ${#OPT_apply} && ! ${#OPT_recommend} && ! ${#OPT_set} )) && opts+=(-s --set=)
+    (( ! ${#OPT_list} && ! ${#OPT_set} && ! ${#OPT_recommend} && ! ${#OPT_apply} )) && opts+=(-a --apply=)
+    (( ! ${#OPT_list} && ! ${#OPT_set} && ! ${#OPT_apply} && ! ${#OPT_recommend} )) && opts+=(-r --recommend)
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -465,6 +468,8 @@ _nbfc_set() {
   local -a OPT_auto OPT_speed OPT_fan OPT_help OPT_version
 
   _nbfc_parse_commandline
+
+  local COMP_WORDBREAKS=''
 
   __complete_option() {
     local opt="$1" cur="$2" mode="$3"
@@ -507,10 +512,11 @@ _nbfc_set() {
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
-    (( ! ${#OPT_auto} && ! ${#OPT_speed} )) && opts+=(-a --auto)
-    (( ! ${#OPT_speed} && ! ${#OPT_auto} )) && opts+=(-s --speed)
-    (( ! ${#OPT_fan} )) && opts+=(-f --fan)
-    _nbfc_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    (( ! ${#OPT_speed} && ! ${#OPT_auto} )) && opts+=(-a --auto)
+    (( ! ${#OPT_auto} && ! ${#OPT_speed} )) && opts+=(-s --speed=)
+    (( ! ${#OPT_fan} )) && opts+=(-f --fan=)
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -518,6 +524,10 @@ _nbfc_set() {
 }
 
 _nbfc_wait_for_hwmon() {
+  return 0
+}
+
+_nbfc_get_model_name() {
   return 0
 }
 

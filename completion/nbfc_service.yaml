@@ -3,19 +3,15 @@ help: "NoteBook FanControl service"
 options:
   - option_strings: ["-h", "--help"]
     help: "show this help message and exit"
-    takes_args: false
 
   - option_strings: ["-r", "--read-only"]
     help: "Start in read-only mode"
-    takes_args: false
 
   - option_strings: ["-f", "--fork"]
     help: "Switch process to background after sucessfully started"
-    takes_args: false
 
   - option_strings: ["-d", "--debug"]
     help: "Enable tracing of reads and writes of the embedded controller"
-    takes_args: false
 
   - option_strings: ["-c", "--config-file"]
     metavar: "config"

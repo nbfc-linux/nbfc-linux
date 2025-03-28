@@ -10,7 +10,7 @@ _ec_probe_zsh_query() {
   # This function is for querying the command line.
   #
   # COMMANDS
-  #   setup <OPTIONS> <ARGS...>
+  #   init <OPTIONS> <ARGS...>
   #     This is the first call you have to make, otherwise the other commands
   #     won't (successfully) work.
   #
@@ -27,15 +27,18 @@ _ec_probe_zsh_query() {
   #   get_positional <NUM>
   #     Prints out the positional argument number NUM (starting from 1)
   #
-  #   has_option <OPTIONS...>
+  #   has_option [WITH_INCOMPLETE] <OPTIONS...>
   #     Checks if an option given in OPTIONS is passed on commandline.
+  #     If an option requires an argument, this command returns true only if the
+  #     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
+  #     returns true for options missing their arguments.
   #
   #   option_is <OPTIONS...> -- <VALUES...>
   #     Checks if one option in OPTIONS has a value of VALUES.
   #
   # EXAMPLE
   #   local POSITIONALS HAVING_OPTIONS OPTION_VALUES
-  #   zsh_query setup '-f,-a=,-optional=?' program_name -f -optional -a foo bar
+  #   zsh_query init '-f,-a=,-optional=?' program_name -f -optional -a foo bar
   #   zsh_query has_option -f
   #   zsh_query option_is -a -- foo
   #
@@ -46,8 +49,6 @@ _ec_probe_zsh_query() {
   #
   # ===========================================================================
 
-  local FUNC="zsh_query"
-
   __zsh_query_contains() {
     local arg='' key="$1"; shift
     for arg; do [[ "$key" == "$arg" ]] && return 0; done
@@ -55,7 +56,7 @@ _ec_probe_zsh_query() {
   }
 
   if [[ $# == 0 ]]; then
-    echo "$FUNC: missing command" >&2
+    echo "_ec_probe_zsh_query: missing command" >&2
     return 1;
   fi
 
@@ -65,12 +66,12 @@ _ec_probe_zsh_query() {
   case "$cmd" in
     get_positional)
       if test $# -ne 1; then
-        echo "$FUNC: get_positional: takes exactly one argument" >&2
+        echo "_ec_probe_zsh_query: get_positional: takes exactly one argument" >&2
         return 1;
       fi
 
       if test "$1" -eq 0; then
-        echo "$FUNC: get_positional: positionals start at 1, not 0!" >&2
+        echo "_ec_probe_zsh_query: get_positional: positionals start at 1, not 0!" >&2
         return 1
       fi
 
@@ -79,7 +80,7 @@ _ec_probe_zsh_query() {
       ;;
     has_option)
       if test $# -eq 0; then
-        echo "$FUNC: has_option: arguments required" >&2
+        echo "_ec_probe_zsh_query: has_option: arguments required" >&2
         return 1;
       fi
 
@@ -107,12 +108,12 @@ _ec_probe_zsh_query() {
       done
 
       if test ${#cmd_option_is_options[@]} -eq 0; then
-        echo "$FUNC: option_is: missing options" >&2
+        echo "_ec_probe_zsh_query: option_is: missing options" >&2
         return 1
       fi
 
       if test ${#cmd_option_is_values[@]} -eq 0; then
-        echo "$FUNC: option_is: missing values" >&2
+        echo "_ec_probe_zsh_query: option_is: missing values" >&2
         return 1
       fi
 
@@ -129,25 +130,24 @@ _ec_probe_zsh_query() {
 
       return 1
       ;;
-    setup)
+    init)
       local IFS=','
       local -a options=(${=1})
       unset IFS
       shift
       ;;
     *)
-      echo "$FUNC: argv[1]: invalid command" >&2
+      echo "_ec_probe_zsh_query: argv[1]: invalid command" >&2
       return 1
       ;;
   esac
 
-  # continuing setup....
+  # continuing init...
 
   # ===========================================================================
   # Parsing of available options
   # ===========================================================================
 
-  local -a   old_opts_with_arg=()   old_opts_with_optional_arg=()   old_opts_without_arg=()
   local -a  long_opts_with_arg=()  long_opts_with_optional_arg=()  long_opts_without_arg=()
   local -a short_opts_with_arg=() short_opts_with_optional_arg=() short_opts_without_arg=()
 
@@ -157,16 +157,10 @@ _ec_probe_zsh_query() {
       --?*=)    long_opts_with_arg+=("${option%=}");;
       --?*=\?)  long_opts_with_optional_arg+=("${option%=?}");;
       --?*)     long_opts_without_arg+=("$option");;
-
       -?=)      short_opts_with_arg+=("${option%=}");;
       -?=\?)    short_opts_with_optional_arg+=("${option%=?}");;
       -?)       short_opts_without_arg+=("$option");;
-
-      -??*=)    old_opts_with_arg+=("${option%=}");;
-      -??*=\?)  old_opts_with_optional_arg+=("${option%=?}");;
-      -??*)     old_opts_without_arg+=("$option");;
-
-      *) echo "$FUNC: $option: not a valid short, long or oldstyle option" >&2; return 1;;
+      *) echo "_ec_probe_zsh_query: $option: not a valid short, long or oldstyle option" >&2; return 1;;
     esac
   done
 
@@ -177,6 +171,7 @@ _ec_probe_zsh_query() {
   POSITIONALS=()
   HAVING_OPTIONS=()
   OPTION_VALUES=()
+  INCOMPLETE_OPTION=''
 
   local argi=2 # argi[1] is program name
   while [[ $argi -le $# ]]; do
@@ -204,30 +199,10 @@ _ec_probe_zsh_query() {
         else
           HAVING_OPTIONS+=("$arg")
           OPTION_VALUES+=("")
-        fi;;
+        fi
+        ;;
       -*)
         local end_of_parsing=false
-
-        if [[ "$arg" == *=* ]]; then
-          local option="${arg%%=*}"
-          local value="${arg#*=}"
-          if __zsh_query_contains "$option" "${old_opts_with_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
-            HAVING_OPTIONS+=("$option")
-            OPTION_VALUES+=("$value")
-            end_of_parsing=true
-          fi
-        elif __zsh_query_contains "$arg" "${old_opts_with_arg[@]}"; then
-          end_of_parsing=true
-          if $have_trailing_arg; then
-            HAVING_OPTIONS+=("$arg")
-            OPTION_VALUES+=("${@[$((argi + 1))]}")
-            (( argi++ ))
-          fi
-        elif __zsh_query_contains "$arg" "${old_opts_without_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
-          HAVING_OPTIONS+=("$arg")
-          OPTION_VALUES+=("")
-          end_of_parsing=true
-        fi
 
         local arg_length=${#arg}
         local i=1
@@ -244,7 +219,7 @@ _ec_probe_zsh_query() {
             if [[ -n "$trailing_chars" ]]; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("$trailing_chars")
-            else if $have_trailing_arg
+            elif $have_trailing_arg; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("${@[$((argi + 1))]}")
               (( argi++ ))
@@ -256,7 +231,8 @@ _ec_probe_zsh_query() {
           fi
 
           (( i++ ))
-        done;;
+        done
+        ;;
       *)
         POSITIONALS+=("$arg");;
     esac
@@ -272,7 +248,7 @@ _ec_probe__command() {
     read:'Read a byte from a EC register'
     write:'Write a byte to a EC register'
     monitor:'Monitor all EC registers for changes'
-    watch:'Monitor all EC registers for changes (alternative version'
+    watch:'Monitor all EC registers for changes (alternative version)'
   )
 
   _describe -- command items
@@ -280,8 +256,8 @@ _ec_probe__command() {
 
 _ec_probe() {
   local opts=-h,--help,-e=,--embedded-controller=
-  local -a HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=()
-  _ec_probe_zsh_query setup "$opts" "${words[@]}"
+  local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
+  _ec_probe_zsh_query init "$opts" "${words[@]}"
 
   case "$(_ec_probe_zsh_query get_positional 1)" in
     (dump) _ec_probe_dump; return $?;;
@@ -312,7 +288,7 @@ _ec_probe_dump() {
 _ec_probe_load() {
   local -a args=(
     1:command1:_ec_probe__command
-    2:' ':_files
+    2:FILE:_files
   )
   _arguments -S -s -w "${args[@]}"
 }
@@ -331,15 +307,15 @@ _ec_probe_write() {
     '(--word -w)'{-w,--word}'[Combine two registers into one]'
     1:command1:_ec_probe__command
     2:'Register destination':'({0..255})'
-    3:'Value to write':' '
+    3:'Value to write':_numbers
   )
   _arguments -S -s -w "${args[@]}"
 }
 
 _ec_probe_monitor() {
   local -a args=(
-    '(--interval -i)'{-i+,--interval=}'[Monitored timespan]':seconds:' '
-    '(--timespan -t)'{-t+,--timespan=}'[Set poll intervall]':seconds:' '
+    '(--interval -i)'{-i+,--interval=}'[Monitored timespan]':seconds:"_numbers -f"
+    '(--timespan -t)'{-t+,--timespan=}'[Set poll intervall]':seconds:_numbers
     '(--report -r)'{-r+,--report=}'[Save all readings as a CSV file]':report:_files
     '(--clearly -c)'{-c,--clearly}'[Blanks out consecutive duplicate readings]'
     '(--decimal -d)'{-d,--decimal}'[Output readings in decimal format instead of hexadecimal format]'
@@ -350,8 +326,8 @@ _ec_probe_monitor() {
 
 _ec_probe_watch() {
   local -a args=(
-    '(--interval -i)'{-i+,--interval=}'[Sets the update interval in seconds]':seconds:' '
-    '(--timespan -t)'{-t+,--timespan=}'[Sets how many seconds the program will run]':seconds:' '
+    '(--interval -i)'{-i+,--interval=}'[Sets the update interval in seconds]':seconds:"_numbers -f"
+    '(--timespan -t)'{-t+,--timespan=}'[Sets how many seconds the program will run]':seconds:_numbers
     1:command1:_ec_probe__command
   )
   _arguments -S -s -w "${args[@]}"

@@ -2,24 +2,6 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-_ec_probe_compgen_w_replacement() {
-  local cur word append=0
-
-  [[ "$1" == "-a" ]] && { shift; append=1; }
-  [[ "$1" == "--" ]] && { shift; }
-
-  cur="$1"
-  shift
-
-  (( append )) || COMPREPLY=()
-
-  for word; do
-    if [[ "$word" == "$cur"* ]]; then
-      COMPREPLY+=("$(printf '%q' "$word")")
-    fi
-  done
-}
-
 _ec_probe_prefix_compreply() {
   local i=0 prefix="$1"
   for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
@@ -259,6 +241,8 @@ _ec_probe() {
 
   _ec_probe_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   if (( 0 < POSITIONAL_NUM )); then
     case "${POSITIONALS[0]}" in
       dump) _ec_probe_dump && return 0 || return 1;;
@@ -275,7 +259,7 @@ _ec_probe() {
 
     case "$opt" in
       --embedded-controller|-e)
-        _ec_probe_compgen_w_replacement -- "$cur" acpi_ec ec_sys dev_port
+        COMPREPLY=($(compgen -W 'acpi_ec ec_sys dev_port' -- "$cur"))
         return 0;;
     esac
 
@@ -310,13 +294,14 @@ _ec_probe() {
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
     (( ! ${#OPT_help} )) && opts+=(-h --help)
-    (( ! ${#OPT_embedded_controller} )) && opts+=(-e --embedded-controller)
-    _ec_probe_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    (( ! ${#OPT_embedded_controller} )) && opts+=(-e --embedded-controller=)
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
   test "$POSITIONAL_NUM" -eq 1 && {
-    _ec_probe_compgen_w_replacement -- "$cur" dump load read write monitor watch
+    COMPREPLY=($(compgen -W 'dump load read write monitor watch' -- "$cur"))
     return 0;
   }
 
@@ -329,11 +314,14 @@ _ec_probe_dump() {
 
   _ec_probe_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
     (( ! ${#OPT_color} )) && opts+=(-c --color)
     (( ! ${#OPT_no_color} )) && opts+=(-C --no-color)
-    _ec_probe_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -345,6 +333,8 @@ _ec_probe_load() {
   local -a OPT_help OPT_embedded_controller
 
   _ec_probe_parse_commandline
+
+  local COMP_WORDBREAKS=''
 
   test "$POSITIONAL_NUM" -eq 2 && {
     _filedir
@@ -360,10 +350,13 @@ _ec_probe_read() {
 
   _ec_probe_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
     (( ! ${#OPT_word} )) && opts+=(-w --word)
-    _ec_probe_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -381,10 +374,13 @@ _ec_probe_write() {
 
   _ec_probe_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
     (( ! ${#OPT_word} )) && opts+=(-w --word)
-    _ec_probe_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -405,6 +401,8 @@ _ec_probe_monitor() {
   local -a OPT_interval OPT_timespan OPT_report OPT_clearly OPT_decimal OPT_help OPT_embedded_controller
 
   _ec_probe_parse_commandline
+
+  local COMP_WORDBREAKS=''
 
   __complete_option() {
     local opt="$1" cur="$2" mode="$3"
@@ -447,12 +445,13 @@ _ec_probe_monitor() {
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
-    (( ! ${#OPT_interval} )) && opts+=(-i --interval)
-    (( ! ${#OPT_timespan} )) && opts+=(-t --timespan)
-    (( ! ${#OPT_report} )) && opts+=(-r --report)
+    (( ! ${#OPT_interval} )) && opts+=(-i --interval=)
+    (( ! ${#OPT_timespan} )) && opts+=(-t --timespan=)
+    (( ! ${#OPT_report} )) && opts+=(-r --report=)
     (( ! ${#OPT_clearly} )) && opts+=(-c --clearly)
     (( ! ${#OPT_decimal} )) && opts+=(-d --decimal)
-    _ec_probe_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
@@ -464,6 +463,8 @@ _ec_probe_watch() {
   local -a OPT_interval OPT_timespan OPT_help OPT_embedded_controller
 
   _ec_probe_parse_commandline
+
+  local COMP_WORDBREAKS=''
 
   __complete_option() {
     local opt="$1" cur="$2" mode="$3"
@@ -503,9 +504,10 @@ _ec_probe_watch() {
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
-    (( ! ${#OPT_interval} )) && opts+=(-i --interval)
-    (( ! ${#OPT_timespan} )) && opts+=(-t --timespan)
-    _ec_probe_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    (( ! ${#OPT_interval} )) && opts+=(-i --interval=)
+    (( ! ${#OPT_timespan} )) && opts+=(-t --timespan=)
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 

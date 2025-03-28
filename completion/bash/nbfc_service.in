@@ -2,24 +2,6 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-_nbfc_service_compgen_w_replacement() {
-  local cur word append=0
-
-  [[ "$1" == "-a" ]] && { shift; append=1; }
-  [[ "$1" == "--" ]] && { shift; }
-
-  cur="$1"
-  shift
-
-  (( append )) || COMPREPLY=()
-
-  for word; do
-    if [[ "$word" == "$cur"* ]]; then
-      COMPREPLY+=("$(printf '%q' "$word")")
-    fi
-  done
-}
-
 _nbfc_service_prefix_compreply() {
   local i=0 prefix="$1"
   for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
@@ -129,6 +111,8 @@ _nbfc_service() {
 
   _nbfc_service_parse_commandline
 
+  local COMP_WORDBREAKS=''
+
   __complete_option() {
     local opt="$1" cur="$2" mode="$3"
 
@@ -137,7 +121,7 @@ _nbfc_service() {
         _filedir
         return 0;;
       --embedded-controller|-e)
-        _nbfc_service_compgen_w_replacement -- "$cur" dummy dev_port ec_sys acpi_ec
+        COMPREPLY=($(compgen -W 'dummy dev_port ec_sys acpi_ec' -- "$cur"))
         return 0;;
     esac
 
@@ -175,9 +159,10 @@ _nbfc_service() {
     (( ! ${#OPT_read_only} )) && opts+=(-r --read-only)
     (( ! ${#OPT_fork} )) && opts+=(-f --fork)
     (( ! ${#OPT_debug} )) && opts+=(-d --debug)
-    (( ! ${#OPT_config_file} )) && opts+=(-c --config-file)
-    (( ! ${#OPT_embedded_controller} )) && opts+=(-e --embedded-controller)
-    _nbfc_service_compgen_w_replacement -a -- "$cur" "${opts[@]}"
+    (( ! ${#OPT_config_file} )) && opts+=(-c --config-file=)
+    (( ! ${#OPT_embedded_controller} )) && opts+=(-e --embedded-controller=)
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 

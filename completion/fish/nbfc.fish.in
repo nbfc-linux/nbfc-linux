@@ -11,6 +11,7 @@ function _nbfc__command
     config 'List or apply configs' \
     set 'Control fan speed' \
     wait-for-hwmon 'Wait for /sys/class/hwmon/hwmon* files' \
+    get-model-name 'Print model name for notebook' \
     help 'Show help'
 end
 
@@ -38,8 +39,11 @@ function _nbfc_fish_query
   #     Checks if the positional argument number NUM is one of WORDS.
   #     NUM counts from one.
   #
-  #   has_option <OPTIONS...>
+  #   has_option [WITH_INCOMPLETE] <OPTIONS...>
   #     Checks if an option given in OPTIONS is passed on commandline.
+  #     If an option requires an argument, this command returns true only if the
+  #     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
+  #     returns true for options missing their arguments.
   #
   #   option_is <OPTIONS...> -- <VALUES...>
   #     Checks if any option in OPTIONS has a value of VALUES.
@@ -54,20 +58,9 @@ function _nbfc_fish_query
   #
   # ===========================================================================
 
-  set -l func '__fish_query'
-
   set -l positionals
   set -l having_options
   set -l option_values
-
-  switch (count $argv)
-    case 0
-      echo "$func: missing OPTIONS argument" >&2
-      return 1
-    case 1
-      echo "$func: missing COMMAND" >&2
-      return 1
-  end
 
   set -l options $argv[1]
   set -e argv[1]
@@ -87,38 +80,30 @@ function _nbfc_fish_query
     # =========================================================================
 
     set -l short_opts_with_arg
-    set -l long_opts_with_arg
-    set -l old_opts_with_arg
-
     set -l short_opts_without_arg
-    set -l long_opts_without_arg
-    set -l old_opts_without_arg
-
     set -l short_opts_with_optional_arg
+    set -l long_opts_with_arg
+    set -l long_opts_without_arg
     set -l long_opts_with_optional_arg
-    set -l old_opts_with_optional_arg
 
     set -l option
 
     if test -n "$options"
       for option in (string split -- ',' $options)
-        # Using one big switch case is the fastest way
-        switch $option
-          case '--?*=';   set -a long_opts_with_arg           (string replace -- '='  '' $option)
-          case '--?*=\?'; set -a long_opts_with_optional_arg  (string replace -- '=?' '' $option)
-          case '--?*';    set -a long_opts_without_arg        $option
-
-          case '-?=';     set -a short_opts_with_arg          (string replace -- '='  '' $option)
-          case '-?=\?';   set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
-          case '-?';      set -a short_opts_with_arg          $option
-
-          case '-??*=';   set -a old_opts_with_arg            (string replace -- '='  '' $option)
-          case '-??*=\?'; set -a old_opts_with_optional_arg   (string replace -- '=?' '' $option)
-          case '-??*';    set -a old_opts_without_arg         $option
-
-          case '*'
-            echo "$func: argv[1]: '$option' is not a short, long or old-style option" >&2
-            return 1
+        if false
+          true
+        else if string match -qr -- '^--.+=$' $option
+          set -a long_opts_with_arg (string replace -- '='  '' $option)
+        else if string match -qr -- '^--.+=\?$' $option
+          set -a long_opts_with_optional_arg (string replace -- '=?' '' $option)
+        else if string match -qr -- '^--.+$' $option
+          set -a long_opts_without_arg $option
+        else if string match -qr -- '^-.=$' $option
+          set -a short_opts_with_arg (string replace -- '='  '' $option)
+        else if string match -qr -- '^-.=\?$' $option
+          set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
+        else if string match -qr -- '^-.$' $option
+          set -a short_opts_without_arg $option
         end
       end
     end
@@ -161,26 +146,6 @@ function _nbfc_fish_query
         case '-*'
           set -l end_of_parsing false
 
-          if string match -q -- "*=*" $arg
-            set -l split (string split -m 1 -- '=' $arg)
-            if contains -- $split[1] $old_opts_with_arg $old_opts_with_optional_arg
-              set -a having_options $split[1]
-              set -a option_values "$split[2]"
-              set end_of_parsing true
-            end
-          else if contains -- $arg $old_opts_with_arg
-            set end_of_parsing true
-            if $have_trailing_arg
-              set -a having_options $arg
-              set -a option_values $cmdline[(math $argi + 1)]
-              set argi (math $argi + 1)
-            end
-          else if contains -- $arg $old_opts_without_arg $old_opts_with_optional_arg
-            set -a having_options $arg
-            set -a option_values ""
-            set end_of_parsing true
-          end
-
           set -l arg_length (string length -- $arg)
           set -l i 2
           while not $end_of_parsing; and test $i -le $arg_length
@@ -202,8 +167,8 @@ function _nbfc_fish_query
                 set argi (math $argi + 1)
               end
             else if contains -- $option $short_opts_with_optional_arg
-              set -a having_options $option
               set end_of_parsing true
+              set -a having_options $option
               set -a option_values "$trailing_chars" # may be empty
             end
 
@@ -229,7 +194,7 @@ function _nbfc_fish_query
   switch $cmd
     case 'positional_contains'
       if test (count $argv) -eq 0
-        echo "$func: positional_contains: argv[3]: missing number" >&2
+        echo "_nbfc_fish_query: positional_contains: argv[3]: missing number" >&2
         return 1
       end
 
@@ -247,54 +212,19 @@ function _nbfc_fish_query
         case 0
           count $positionals
         case 1
-          echo "$func: num_of_positionals: $argv[1]: missing operand" >&2
+          echo "_nbfc_fish_query: num_of_positionals: $argv[1]: missing operand" >&2
           return 1
         case 2
           if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
             test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
           else
-            echo "$func: num_of_positionals: $argv[1]: unknown operator" >&2
+            echo "_nbfc_fish_query: num_of_positionals: $argv[1]: unknown operator" >&2
             return 1
           end
         case '*'
-          echo "$func: num_of_positionals: too many arguments" >&2
+          echo "_nbfc_fish_query: num_of_positionals: too many arguments" >&2
           return 1
       end
-    case 'option_is'
-      set -l options
-      set -l values
-
-      for arg in $argv
-        set -e argv[1]
-
-        if string match -q -- -- $arg
-          set values $argv
-          break
-        else
-          set -a options $arg
-        end
-      end
-
-      if test (count $values) -eq 0
-        echo "$func: missing values" >&2
-        return 1
-      end
-
-      set -l i (count $having_options)
-      while test $i -ge 1
-        if contains -- $having_options[$i] $options
-          if contains -- $option_values[$i] $values
-            return 0
-          end
-        end
-
-        set i (math $i - 1)
-      end
-
-      return 1
-    case '*'
-      echo "$func: argv[2]: invalid command" >&2
-      return 1
   end
 end
 
@@ -348,6 +278,9 @@ end
 set -l prog "nbfc"
 set -l query "_nbfc_fish_query"
 
+# Delete existing completions
+complete -c $prog -e
+
 # Generally disable file completion
 complete -c $prog -x
 
@@ -381,7 +314,7 @@ set -l C002 "$query '$opts' positional_contains 1 status && not $query '$opts' h
 set -l C003 "$query '$opts' positional_contains 1 status && not $query '$opts' has_option -w --watch"
 complete -c $prog -n $C000 -s a -l all -d 'Show service and fan status (default)' -f
 complete -c $prog -n $C001 -s s -l service -d 'Show service status' -f
-complete -c $prog -n $C002 -s f -l fan -d 'Show status of fan (zero based)' -x
+complete -c $prog -n $C002 -s f -l fan -d 'Show status of fan (zero based)' -x -a '(nbfc complete-fans)'
 complete -c $prog -n $C003 -s w -l watch -d 'Show status periodically' -x
 
 # command nbfc config
@@ -405,6 +338,9 @@ complete -c $prog -n $C001 -s s -l speed -d 'Set fan speed to PERCENT' -x
 complete -c $prog -n $C002 -s f -l fan -d 'Fan index (zero based)' -x -a '(nbfc complete-fans)'
 
 # command nbfc wait-for-hwmon
+set -l opts "-h,--help,--version"
+
+# command nbfc get-model-name
 set -l opts "-h,--help,--version"
 
 # command nbfc help
