@@ -17,7 +17,10 @@ static inline ssize_t slurp_file(char* buf, size_t size, const char* file) {
     }
     else if (nread >= 0)
       buf[nread] = '\0';
+
+    int old_errno = errno;
     close(fd);
+    errno = old_errno;
   }
   return nread;
 }
@@ -28,7 +31,11 @@ static inline int write_file(const char* file, int flags, mode_t mode, const cha
     return -1;
 
   ssize_t nwritten = write(fd, content, size);
+
+  int old_errno = errno;
   close(fd);
+  errno = old_errno;
+
   if (nwritten == -1)
     return -1;
 

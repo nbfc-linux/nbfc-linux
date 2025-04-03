@@ -10,6 +10,8 @@
 #include "generated/nbfc_service.help.h"
 #include "quit.h"
 
+#include <errno.h>  // errno
+#include <string.h> // strerror
 #include <signal.h> // signal, SIGINT, SIGTERM
 #include <stdio.h>  // printf
 #include <stdlib.h> // exit, atexit

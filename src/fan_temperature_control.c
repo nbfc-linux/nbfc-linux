@@ -3,6 +3,7 @@
 #include "nbfc.h"
 
 #include <float.h>
+#include <string.h>
 
 static const char* const LinuxTempSensorNames[] = {
   "coretemp", "k10temp", "zenpower"
@@ -112,7 +113,7 @@ Error* FanTemperatureControl_SetByConfig(
 }
 
 Error* FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
-  float temp;
+  float temp; // NOLINT
   Error* e = FanTemperatureControl_GetTemperature(ftc, &temp);
   if (e)
     return e;

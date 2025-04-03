@@ -112,6 +112,7 @@ static const cli99_option show_variable_options[] = {
 enum Command {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
   NBFC_CLIENT_COMMANDS
+  Command_End
 #undef o
 };
 
@@ -138,7 +139,7 @@ static enum Command Command_From_String(const char* s) {
     if (!strcmp(commands[i], s))
       return (enum Command) i;
 
-  return (enum Command) -1;
+  return Command_End;
 }
 
 static struct {
@@ -177,14 +178,14 @@ int main(int argc, char *const argv[]) {
 
   int o;
   const char* err;
-  enum Command cmd;
+  enum Command cmd = Command_Help;
   cli99 p;
   cli99_Init(&p, argc, argv, main_options, cli99_options_python);
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
     case 'C':
       cmd = Command_From_String(p.optarg);
-      if (cmd == (enum Command) -1) {
+      if (cmd == Command_End) {
         Log_Error("Invalid command: %s\n", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }

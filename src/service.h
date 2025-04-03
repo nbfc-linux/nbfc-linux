@@ -3,6 +3,7 @@
 
 #include "error.h"
 #include "fan.h"
+#include "fan_temperature_control.h"
 #include "model_config.h"
 #include "temperature_filter.h"
 

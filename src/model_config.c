@@ -69,7 +69,7 @@ static inline Error* str_FromJson(const char** out, const nx_json* json) {
 }
 
 static Error* RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* json) {
-  const char* s = NULL;
+  const char* s; // NOLINT
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
   else if (!strcmp(s, "Set")) *out = RegisterWriteMode_Set;
@@ -80,7 +80,7 @@ static Error* RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* 
 }
 
 static Error* RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const nx_json* json) {
-  const char* s = NULL;
+  const char* s; // NOLINT
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
   else if (!strcmp(s, "OnWriteFanSpeed"))  *out = RegisterWriteOccasion_OnWriteFanSpeed;
@@ -90,7 +90,7 @@ static Error* RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const n
 }
 
 static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* out, const nx_json* json) {
-  const char* s = NULL;
+  const char* s; // NOLINT
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
   else if (!strcmp(s, "Read"))       *out = OverrideTargetOperation_Read;
@@ -101,7 +101,7 @@ static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* out, con
 }
 
 static Error* TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, const nx_json* json) {
-  const char* s = NULL;
+  const char* s; // NOLINT
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
   else if (!strcmp(s, "Average"))    *out = TemperatureAlgorithmType_Average;
@@ -112,7 +112,7 @@ static Error* TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, c
 }
 
 static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const nx_json* json) {
-  const char* s = NULL;
+  const char* s; // NOLINT
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
   EmbeddedControllerType t = EmbeddedControllerType_FromString(s);

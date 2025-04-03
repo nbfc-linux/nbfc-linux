@@ -1,11 +1,19 @@
+#undef _XOPEN_SOURCE
+
+#define _XOPEN_SOURCE 500 // pthread_kill
+
 #include "server.h"
 
 #include "nbfc.h"
 #include "nxjson_utils.h"
 #include "reverse_nxjson.h"
 #include "error.h"
+#include "fan_temperature_control.h"
 #include "service.h"
+#include "service_config.h"
 #include "log.h"
+#include "protocol.h"
+#include "memory.h"
 #include "quit.h"
 
 #include <stdio.h>
@@ -236,7 +244,7 @@ Error* Server_Loop() {
   return err_success();
 }
 
-static void* Server_Run(void*) {
+static void* Server_Run(void* unused) {
   int failures = 0;
 
   while (! quit) {

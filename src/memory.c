@@ -1,3 +1,7 @@
+#undef _XOPEN_SOURCE
+
+#define _XOPEN_SOURCE 500 // string.h: strdup()
+
 #include "memory.h"
 
 #include "macros.h" // unlikely
@@ -6,6 +10,7 @@
 #include <stdlib.h> // malloc, calloc, realloc, free, exit
 #include <string.h> // strerror
 #include <stdio.h>  // fprintf
+#include <errno.h>  // ENOMEM
 
 static void Mem_FatalError() {
   fprintf(stderr, "FATAL ERROR: %s\n", strerror(ENOMEM));

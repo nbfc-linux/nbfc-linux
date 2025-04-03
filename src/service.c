@@ -17,9 +17,9 @@
 #include <assert.h> // assert
 #include <stdio.h>  // snprintf
 #include <math.h>   // fabs
-#include <limits.h> // PATH_MAX
 #include <unistd.h> // fork
 #include <stdlib.h> // exit, _exit
+#include <linux/limits.h> // PATH_MAX
 
 Service_Options options;
 

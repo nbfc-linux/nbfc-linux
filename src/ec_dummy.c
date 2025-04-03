@@ -1,3 +1,7 @@
+#undef _DEFAULT_SOURCE
+
+#define _DEFAULT_SOURCE // endian.h: htole16
+
 #include "ec_dummy.h"
 
 #include <endian.h> // htole16

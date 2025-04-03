@@ -7,9 +7,9 @@
 #include <errno.h>   // ENODATA, EINVAL
 #include <stdio.h>   // snprintf
 #include <string.h>  // strcmp
-#include <limits.h>  // PATH_MAX
 #include <stdbool.h> // bool
 #include <stdlib.h>  // strtold
+#include <linux/limits.h> // PATH_MAX
 
 static const char* const LinuxHwmonDirs[] = {
   "/sys/class/hwmon/hwmon%d",

@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 static int64_t parse_number(const char* s, int64_t min, int64_t max, const char** errmsg) {
   errno = 0;

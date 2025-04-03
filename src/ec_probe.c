@@ -90,6 +90,7 @@ enum Command {
   Command_Monitor,
   Command_Watch,
   Command_Help,
+  Command_End
 };
 
 static enum Command Command_From_String(const char* s) {
@@ -99,7 +100,7 @@ static enum Command Command_From_String(const char* s) {
     if (!strcmp(cmds[i], s))
       return (enum Command) i;
 
-  return (enum Command) -1;
+  return Command_End;
 }
 
 static const char* HelpTexts[] = {
@@ -241,7 +242,7 @@ int main(int argc, char* const argv[]) {
     case Option_Command:
       cmd = Command_From_String(p.optarg);
 
-      if (cmd == (enum Command) -1) {
+      if (cmd == Command_End) {
         Log_Error("Invalid command: %s\n", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }

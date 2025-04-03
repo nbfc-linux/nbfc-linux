@@ -1,5 +1,6 @@
 #include "protocol.h"
 
+#include "nbfc.h"
 #include "memory.h"
 #include "nxjson_utils.h"
 #include "reverse_nxjson.h"

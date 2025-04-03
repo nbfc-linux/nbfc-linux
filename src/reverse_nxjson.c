@@ -1,5 +1,7 @@
 #include "reverse_nxjson.h"
 
+#include "nbfc.h"
+
 #include <stdio.h>
 #include <string.h>
 

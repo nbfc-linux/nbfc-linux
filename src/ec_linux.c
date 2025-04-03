@@ -1,4 +1,10 @@
-﻿#include "ec_linux.h"
+﻿#undef _XOPEN_SOURCE
+#undef _DEFAULT_SOURCE
+
+#define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread()
+#define _DEFAULT_SOURCE   // endian.h: htole16()
+
+#include "ec_linux.h"
 
 #include <errno.h>   // ETIME
 #include <endian.h>  // htole16

@@ -4,6 +4,7 @@
 #include "slurp_file.h"
 
 #include <unistd.h> // getpid
+#include <sys/stat.h>
 
 Error* PID_Write(bool acquire_lock) {
   Error* e = NULL;
