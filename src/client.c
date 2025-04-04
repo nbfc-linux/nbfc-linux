@@ -286,9 +286,9 @@ int main(int argc, char *const argv[]) {
   }
 }
 
-static char* to_lower(const char*);
+static char* str_to_lower(const char*);
 static bool  str_starts_with_ignorecase(const char*, const char*);
-static float word_difference(const char*, const char*);
+static float str_similarity(const char*, const char*);
 
 Error* Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
   int sock;
@@ -529,7 +529,7 @@ static array_of(ConfigFile) recommended_configs() {
   const char *product = get_model_name();
   array_of(ConfigFile) files = get_configs();
   for_each_array(ConfigFile*, file, files) {
-    file->diff = word_difference(product, file->config_name);
+    file->diff = str_similarity(product, file->config_name);
   }
   qsort(files.data, files.size, sizeof(struct ConfigFile), compare_config_by_diff);
   return files;
@@ -660,7 +660,7 @@ static int Show_Variable() {
   }
 
   int ret = NBFC_EXIT_SUCCESS;
-  char* variable = to_lower(options.variable);
+  char* variable = str_to_lower(options.variable);
 
   if (! strcmp(variable, "config_file"))
     printf("%s\n", NBFC_SERVICE_CONFIG);
@@ -685,29 +685,31 @@ static const char* bool_to_str(bool val) {
 }
 
 static void print_fan_status(const FanInfo* fan) {
-  printf("Fan Display Name         : %s\n"
-         "Temperature              : %.2f\n"
-         "Auto Control Enabled     : %s\n"
-         "Critical Mode Enabled    : %s\n"
-         "Current Fan Speed        : %.2f\n"
-         "Target Fan Speed         : %.2f\n"
-         "Requested Fan Speed      : %.2f\n"
-         "Fan Speed Steps          : %d\n",
-         fan->Name,
-         fan->Temperature,
-         bool_to_str(fan->AutoMode),
-         bool_to_str(fan->Critical),
-         fan->CurrentSpeed,
-         fan->TargetSpeed,
-         fan->RequestedSpeed,
-         fan->SpeedSteps);
+  printf(
+    "Fan Display Name         : %s\n"
+    "Temperature              : %.2f\n"
+    "Auto Control Enabled     : %s\n"
+    "Critical Mode Enabled    : %s\n"
+    "Current Fan Speed        : %.2f\n"
+    "Target Fan Speed         : %.2f\n"
+    "Requested Fan Speed      : %.2f\n"
+    "Fan Speed Steps          : %d\n",
+    fan->Name,
+    fan->Temperature,
+    bool_to_str(fan->AutoMode),
+    bool_to_str(fan->Critical),
+    fan->CurrentSpeed,
+    fan->TargetSpeed,
+    fan->RequestedSpeed,
+    fan->SpeedSteps);
 }
 
 static void print_service_status() {
-  printf("Read-only                : %s\n"
-         "Selected Config Name     : %s\n",
-         bool_to_str(service_info.ReadOnly),
-         service_info.SelectedConfigId);
+  printf(
+    "Read-only                : %s\n"
+    "Selected Config Name     : %s\n",
+    bool_to_str(service_info.ReadOnly),
+    service_info.SelectedConfigId);
 }
 
 static int Complete_Fans() {
@@ -947,7 +949,7 @@ error:
   return NBFC_EXIT_SUCCESS;
 }
 
-static char *to_lower(const char *a) {
+static char *str_to_lower(const char *a) {
   char* b = Mem_Strdup(a);
   for (char* c = b; *c; ++c)
     *c = tolower(*c);
@@ -990,7 +992,7 @@ static int levenshtein(const char *s1, const char *s2) {
   return(matrix[s2len][s1len]);
 }
 
-static float word_difference(const char* s1, const char* s2) {
+static float str_similarity(const char* s1, const char* s2) {
   const int s1len = strlen(s1);
   const int s2len = strlen(s2);
   const int diff = levenshtein(s1, s2);
