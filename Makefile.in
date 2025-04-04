@@ -222,9 +222,9 @@ src/nbfc_service: \
 	src/fan_temperature_control.h \
 	src/fan_temperature_control.c \
 	src/fs_sensors.c src/fs_sensors.h \
-	src/generated/nbfc_service.help.h \
 	src/generated/model_config.generated.c \
 	src/generated/model_config.generated.h \
+	src/help/nbfc_service.help.h \
 	src/lm_sensors.c src/lm_sensors.h \
 	src/macros.h \
 	src/main.c \
@@ -247,7 +247,7 @@ src/ec_probe: \
 	src/ec_probe.c \
 	src/ec_sys_linux.h src/ec_sys_linux.c \
 	src/error.h src/error.c \
-	src/generated/ec_probe.help.h \
+	src/help/ec_probe.help.h \
 	src/nbfc.h \
 	src/memory.h src/memory.c \
 	src/optparse/optparse.h src/optparse/optparse.c
@@ -256,7 +256,7 @@ src/ec_probe: \
 src/nbfc: \
 	src/client.c \
 	src/error.h src/error.c \
-	src/generated/ec_probe.help.h \
+	src/help/ec_probe.help.h \
 	src/optparse/optparse.h src/optparse/optparse.c \
 	src/protocol.c src/protocol.h \
 	src/nxjson.c src/reverse_nxjson.c src/nxjson.h \

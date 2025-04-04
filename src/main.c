@@ -7,7 +7,7 @@
 #include "ec.h"
 #include "model_config.h"
 #include "pidfile.h"
-#include "generated/nbfc_service.help.h"
+#include "help/nbfc_service.help.h"
 #include "quit.h"
 
 #include <errno.h>  // errno

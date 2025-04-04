@@ -10,7 +10,7 @@
 #include "optparse/optparse.h"
 #include "parse_number.h"
 #include "parse_double.h"
-#include "generated/ec_probe.help.h"
+#include "help/ec_probe.help.h"
 #include "program_name.c"
 #include "log.h"
 

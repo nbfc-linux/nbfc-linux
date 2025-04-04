@@ -22,7 +22,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "generated/client.help.h"
+#include "help/client.help.h"
 #include "log.h"
 #include "macros.h"
 #include "nbfc.h"
