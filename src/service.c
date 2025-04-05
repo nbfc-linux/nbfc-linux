@@ -329,6 +329,7 @@ void Service_Cleanup() {
     case Initialized_1_Service_Config:
       ServiceConfig_Free(&service_config);
     case Initialized_0_None:
+      break;
   }
 
   Service_State = Initialized_0_None;
