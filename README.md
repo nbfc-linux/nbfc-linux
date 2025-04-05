@@ -93,7 +93,7 @@ NBFC-Linux allows you to specify which temperature sources to use for controllin
 
 **Default Configuration**
 
-If no configuration is specified, NBFC uses the "Average" algorithm and utilizes all sensor files named "coretemp," "k10temp," or "zenpower."
+If no configuration is specified, NBFC uses the "Average" algorithm and utilizes all sensor files named "coretemp", "k10temp", or "zenpower".
 
 **Available Algorithms**
 
@@ -105,7 +105,7 @@ You can choose from three different algorithms to compute the temperature:
 
 **Specifying Temperature Sources**
 
-You can specify temperature sources either by sensor name (which may result in multiple temperature sources) or by providing a file path pointing to a temp*_input file.
+You can specify temperature sources either by sensor name (which may result in multiple temperature sources) or by providing a file path pointing to a temp\*\_input file.
 
 **Example Configuration**
 
@@ -171,6 +171,8 @@ Shell autocompletion
 --------------------
 
 NBFC-Linux comes with shell completion scripts for bash, fish and zsh.
+
+The completion files are generated using [crazy-complete](https://github.com/crazy-complete/crazy-complete).
 
 ```
 ~ $ nbfc_service <TAB>
