@@ -766,6 +766,86 @@ static int Status() {
   return NBFC_EXIT_SUCCESS;
 }
 
+/*
+ * Retrive the supported model for `model_name`.
+ *
+ * This function searches the model support database (a JSON file) for the
+ * given `model_name` and returns the compatible output model for it.
+ *
+ * The model support database is a JSON object where each key represents an
+ * input model name and each value represents an output model name:
+ *
+ *  {
+ *     "Input Model Name": "Output Model Name"
+ *  }
+ *
+ * If the model is found in the support database, the function will check if
+ * the corresponding output model exists in the provided `config_files`.
+ * If a match is found, the output model is returned. Otherwise, a warning
+ * is printed and `NULL` is returned.
+ *
+ * If the input model is not found in the support database, the function
+ * attempts to find the model name directly in `config_files` and returns it if
+ * a match is found.
+ *
+ * If there is no match, `NULL` is returned.
+ */
+static char* get_supported_model(array_of(ConfigFile)* config_files, const char* model_name) {
+  char buf[NBFC_MAX_FILE_SIZE];
+  const nx_json* root = NULL;
+  char* output_model = NULL;
+
+  Error* e = nx_json_parse_file(&root, buf, sizeof(buf), NBFC_MODEL_SUPPORT_FILE);
+  if (e) {
+    Log_Warn("%s: %s\n", NBFC_MODEL_SUPPORT_FILE, err_print_all(e));
+    goto end;
+  }
+
+  if (root->type != NX_JSON_OBJECT) {
+    Log_Warn("%s: Not a JSON object\n", NBFC_MODEL_SUPPORT_FILE);
+    goto end;
+  }
+
+  nx_json_for_each(model, root) {
+    if (model->type != NX_JSON_STRING) {
+      Log_Warn("%s: Invalid value for model `%s`: Not a string\n", NBFC_MODEL_SUPPORT_FILE, model->key);
+    }
+    else if (!strcmp(model->key, model_name)) {
+      if (output_model) {
+        Log_Warn("%s: Duplicate model key: `%s`\n", NBFC_MODEL_SUPPORT_FILE, model->key);
+      }
+      output_model = strdup(model->val.text);
+    }
+  }
+
+end:
+  nx_json_free(root);
+
+  if (output_model) {
+    // Ensure that the model actually exists
+    for_each_array(ConfigFile*, file, *config_files) {
+      if (!strcmp(file->config_name, output_model)) {
+        return output_model;
+      }
+    }
+
+    Log_Warn("%s: The model `%s` was found in the support database, but the specified configuration file (`%s`) is missing\n",
+        NBFC_MODEL_SUPPORT_FILE, model_name, output_model);
+
+    free(output_model);
+  }
+  else {
+    // Not found in support database, try a direct match on `config_files`
+    for_each_array(ConfigFile*, file, *config_files) {
+      if (!strcmp(file->config_name, model_name)) {
+        return strdup(model_name);
+      }
+    }
+  }
+
+  return NULL;
+}
+
 static int Config() {
   if (options.l) {
     array_of(ConfigFile) files = get_configs();
@@ -775,28 +855,36 @@ static int Config() {
     }
   }
   else if (options.r) {
-    fprintf(stderr,
-      "Note: The command 'nbfc config -r' outputs recommended configurations\n"
-      "based solely on comparing your model name with configuration file names.\n"
-      "This recommendation does not imply any further significance or validation\n"
-      "of the configurations beyond the string matching.\n\n");
-
+    const char* model_name = get_model_name();
     array_of(ConfigFile) files = recommended_configs();
+    char* matched_model = get_supported_model(&files, model_name);
 
-    if (files.size && !strcmp(files.data[0].config_name, get_model_name())) {
-      printf("%s\n", files.data[0].config_name);
+    if (matched_model) {
+      fprintf(stderr, "Found supported model:\n");
+      printf("%s\n", matched_model);
+      return NBFC_EXIT_SUCCESS;
     }
-    else {
-      bool have_match = 0;
-      for_each_array(ConfigFile*, file, files) {
-        if (file->diff >= RecommendedConfigMatchThreshold) {
-          have_match = 1;
-          printf("%s\n", file->config_name);
-        }
+
+    fprintf(stderr,
+      "\n"
+      "[!] NOTE:\n"
+      "[!] This output is based solely on comparing your model name\n"
+      "[!] with the configuration file names.\n"
+      "[!] This recommendation does not imply any further validation\n"
+      "[!] or significance beyond the string matching of the model\n"
+      "[!] and configuration names.\n"
+      "\n");
+
+    bool have_match = 0;
+    for_each_array(ConfigFile*, file, files) {
+      if (file->diff >= RecommendedConfigMatchThreshold) {
+        have_match = 1;
+        printf("%s\n", file->config_name);
       }
-      if (! have_match) {
-        Log_Error("No recommended configuration files found\n");
-      }
+    }
+
+    if (! have_match) {
+      Log_Error("No recommended configuration files found\n");
     }
   }
   else if (options.s || options.a) {
@@ -805,11 +893,11 @@ static int Config() {
     char path[PATH_MAX];
 
     if (!strcmp(options.config, "auto")) {
+      const char* model_name = get_model_name();
       array_of(ConfigFile) files = recommended_configs();
-      if (files.size && !strcmp(files.data[0].config_name, get_model_name())) {
-        model = files.data[0].config_name;
-      } else {
-        Log_Error("No recommended config found to apply automatically\n");
+      model = get_supported_model(&files, model_name);
+      if (! model) {
+        Log_Error("No config found to apply automatically\n");
         return NBFC_EXIT_FAILURE;
       }
     }

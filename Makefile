@@ -1,4 +1,4 @@
-version     = 0.2.8
+version     = 0.2.9
 
 PREFIX      = /usr
 
@@ -122,6 +122,7 @@ install-configs:
 	
 	# /usr/local/share/nbfc/configs
 	mkdir -p $(DESTDIR)$(datadir)/nbfc/configs
+	cp share/nbfc/model_support.json $(DESTDIR)$(datadir)/nbfc
 	cp -r share/nbfc/configs/* $(DESTDIR)$(datadir)/nbfc/configs
 
 install-systemd: etc/systemd/system/nbfc_service.service

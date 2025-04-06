@@ -1,5 +1,9 @@
 # Changelog
 
+## nbfc-linux-0.2.9 (2025-05-04)
+- Added model compatibility database (`/usr/share/nbfc/model_support.json`):
+  A file that maps each notebook model to its supported configuration.
+
 ## nbfc-linux-0.1.13 (2024-01-30)
 - Added support for OpenRC and System-V-Init
 
