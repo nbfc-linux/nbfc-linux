@@ -3,7 +3,7 @@ version     = 0.2.9
 PREFIX      = /usr
 
 bindir			= $(PREFIX)/bin
-confdir 		= /etc
+confdir 		= $(PREFIX)/etc
 datadir			= $(PREFIX)/share
 sysddir 		= $(PREFIX)/lib/systemd/system
 mandir 			= $(PREFIX)/share/man
@@ -119,7 +119,7 @@ etc/init.d/nbfc_service.systemv: etc/init.d/nbfc_service.systemv.in
 install-configs:
 	# /usr/local/etc/nbfc
 	mkdir -p $(DESTDIR)$(confdir)/nbfc
-	
+
 	# /usr/local/share/nbfc/configs
 	mkdir -p $(DESTDIR)$(datadir)/nbfc/configs
 	cp share/nbfc/model_support.json $(DESTDIR)$(datadir)/nbfc
@@ -166,37 +166,37 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/nbfc_service
 	rm -f $(DESTDIR)$(bindir)/ec_probe
 	rm -f $(DESTDIR)$(bindir)/nbfc-qt
-	
+
 	# /usr/local/lib/systemd/system
 	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service
-	
+
 	# /usr/local/etc/init.d
 	rm -f $(DESTDIR)$(orcdir)/nbfc_service
-	
+
 	# /usr/local/etc/init.d
 	rm -f $(DESTDIR)$(systemvdir)/nbfc_service
-	
+
 	# /usr/local/share/nbfc/configs
 	rm -rf $(DESTDIR)$(datadir)/nbfc
-	
+
 	# /usr/local/etc/nbfc
 	rm -rf $(DESTDIR)$(confdir)/nbfc
-	
+
 	# Documentation
 	rm -f $(DESTDIR)$(man1dir)/ec_probe.1
 	rm -f $(DESTDIR)$(man1dir)/nbfc.1
 	rm -f $(DESTDIR)$(man1dir)/nbfc_service.1
 	rm -f $(DESTDIR)$(man5dir)/nbfc_service.json.5
-	
+
 	# Completion
 	rm -f $(DESTDIR)$(datadir)/zsh/site-functions/_nbfc
 	rm -f $(DESTDIR)$(datadir)/zsh/site-functions/_nbfc_service
 	rm -f $(DESTDIR)$(datadir)/zsh/site-functions/_ec_probe
-	
+
 	rm -f $(DESTDIR)$(datadir)/bash-completion/completions/nbfc
 	rm -f $(DESTDIR)$(datadir)/bash-completion/completions/nbfc_service
 	rm -f $(DESTDIR)$(datadir)/bash-completion/completions/ec_probe
-	 
+
 	rm -f $(DESTDIR)$(datadir)/fish/completions/nbfc.fish
 	rm -f $(DESTDIR)$(datadir)/fish/completions/nbfc_service.fish
 	rm -f $(DESTDIR)$(datadir)/fish/completions/ec_probe.fish
@@ -287,7 +287,7 @@ doc: doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
 	pandoc -f man -t markdown doc/nbfc.1 							> doc/nbfc.1.md
 	pandoc -f man -t markdown doc/nbfc_service.1 			> doc/nbfc_service.1.md
 	pandoc -f man -t markdown doc/nbfc_service.json.5 > doc/nbfc_service.json.5.md
-	
+
 	pandoc -f man -t html doc/ec_probe.1 					> doc/ec_probe.1.html
 	pandoc -f man -t html doc/nbfc.1 							> doc/nbfc.1.html
 	pandoc -f man -t html doc/nbfc_service.1 			> doc/nbfc_service.1.html
