@@ -1,6 +1,7 @@
 #include "model_config.h"
 
 #include "nbfc.h"
+#include "log.h"
 #include "memory.h"
 #include "nxjson_utils.h"
 
@@ -123,15 +124,69 @@ static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const
 }
 
 EmbeddedControllerType EmbeddedControllerType_FromString(const char* s) {
-  if (!strcmp(s, "ec_sys"))       return EmbeddedControllerType_ECSysLinux;
-  if (!strcmp(s, "acpi_ec"))      return EmbeddedControllerType_ECSysLinuxACPI;
-  if (!strcmp(s, "dev_port"))     return EmbeddedControllerType_ECLinux;
-  if (!strcmp(s, "dummy"))        return EmbeddedControllerType_ECDummy;
+  if (!strcmp(s, "ec_sys")) {
+#if ENABLE_EC_SYS
+    return EmbeddedControllerType_ECSysLinux;
+#else
+ec_sys_disabled:
+    Log_Error("EmbeddedControllerType 'ec_sys' has been disabled at compile time.\n");
+    return EmbeddedControllerType_Unset;
+#endif
+  }
+
+  if (!strcmp(s, "acpi_ec")) {
+#if ENABLE_EC_ACPI
+    return EmbeddedControllerType_ECSysLinuxACPI;
+#else
+ec_acpi_disabled:
+    Log_Error("EmbeddedControllerType 'acpi_ec' has been disabled at compile time.\n");
+    return EmbeddedControllerType_Unset;
+#endif
+  }
+
+  if (!strcmp(s, "dev_port")) {
+#if ENABLE_EC_DEV_PORT
+    return EmbeddedControllerType_ECLinux;
+#else
+ec_dev_port_disabled:
+    Log_Error("EmbeddedControllerType 'dev_port' has been disabled at compile time.\n");
+    return EmbeddedControllerType_Unset;
+#endif
+  }
+
+  if (!strcmp(s, "dummy")) {
+#if ENABLE_EC_DUMMY
+    return EmbeddedControllerType_ECDummy;
+#else
+    Log_Error("EmbeddedControllerType 'dummy' has been disabled at compile time.\n");
+#endif
+  }
 
   // for older versions of nbfc-linux:
-  if (!strcmp(s, "ec_sys_linux")) return EmbeddedControllerType_ECSysLinux;
-  if (!strcmp(s, "ec_acpi"))      return EmbeddedControllerType_ECSysLinuxACPI;
-  if (!strcmp(s, "ec_linux"))     return EmbeddedControllerType_ECLinux;
+  if (!strcmp(s, "ec_sys_linux")) {
+#if ENABLE_EC_SYS
+    return EmbeddedControllerType_ECSysLinux;
+#else
+    goto ec_sys_disabled;
+#endif
+  }
+
+  if (!strcmp(s, "ec_acpi")) {
+#if ENABLE_EC_ACPI
+    return EmbeddedControllerType_ECSysLinuxACPI;
+#else
+    goto ec_acpi_disabled;
+#endif
+  }
+
+  if (!strcmp(s, "ec_linux")) {
+#if ENABLE_EC_DEV_PORT
+    return EmbeddedControllerType_ECLinux;
+#else
+    goto ec_dev_port_disabled;
+#endif
+  }
+
   return EmbeddedControllerType_Unset;
 }
 

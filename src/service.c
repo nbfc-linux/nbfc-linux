@@ -78,6 +78,7 @@ Error* Service_Init() {
     e = err_string(e, path);
     goto error;
   }
+
   Service_State = Initialized_2_Model_Config;
 
   e = ModelConfig_Validate(&Service_Model_Config);
@@ -134,8 +135,12 @@ Error* Service_Init() {
     goto error;
 
   if (options.debug) {
+#if ENABLE_EC_DEBUG
     EC_Debug_Controller = ec;
     ec = &EC_Debug_VTable;
+#else
+    Log_Warn("Debugging EC has been disabled at compile time.\n");
+#endif
   }
 
   Service_State = Initialized_4_Embedded_Controller;
@@ -233,19 +238,35 @@ error:
 }
 
 static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable* ec) {
+#if ENABLE_EC_SYS
   if (ec == &EC_SysLinux_VTable)       return EmbeddedControllerType_ECSysLinux;
+#endif
+#if ENABLE_EC_ACPI
   if (ec == &EC_SysLinux_ACPI_VTable)  return EmbeddedControllerType_ECSysLinuxACPI;
+#endif
+#if ENABLE_EC_DEV_PORT
   if (ec == &EC_Linux_VTable)          return EmbeddedControllerType_ECLinux;
+#endif
+#if ENABLE_EC_DUMMY
   if (ec == &EC_Dummy_VTable)          return EmbeddedControllerType_ECDummy;
+#endif
   return EmbeddedControllerType_Unset;
 }
 
 static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
   switch (t) {
+#if ENABLE_EC_SYS
   case EmbeddedControllerType_ECSysLinux:     return &EC_SysLinux_VTable;
+#endif
+#if ENABLE_EC_ACPI
   case EmbeddedControllerType_ECSysLinuxACPI: return &EC_SysLinux_ACPI_VTable;
+#endif
+#if ENABLE_EC_DEV_PORT
   case EmbeddedControllerType_ECLinux:        return &EC_Linux_VTable;
+#endif
+#if ENABLE_EC_DUMMY
   case EmbeddedControllerType_ECDummy:        return &EC_Dummy_VTable;
+#endif
   default: return NULL;
   }
 }

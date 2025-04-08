@@ -4,11 +4,25 @@
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 
+#include "config.h"
 #include "ec.c"
+
+#if ENABLE_EC_DEBUG
 #include "ec_debug.c"
+#endif
+
+#if ENABLE_EC_DUMMY
 #include "ec_dummy.c"
+#endif
+
+#if ENABLE_EC_DEV_PORT
 #include "ec_linux.c"
+#endif
+
+#if ENABLE_EC_SYS || ENABLE_EC_ACPI
 #include "ec_sys_linux.c"
+#endif
+
 #include "error.c"
 #include "fan.c"
 #include "fan_temperature_control.c"

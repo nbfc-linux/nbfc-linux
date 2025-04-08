@@ -90,6 +90,21 @@ int main(int argc, char* const argv[])
   Log_Info("SYSCONFDIR is '%s'\n", SYSCONFDIR);
   Log_Info("DATADIR is '%s'\n", DATADIR);
   Log_Info("RUNSTATEDIR is '%s'\n", RUNSTATEDIR);
+  Log_Info("Available Embedded Controllers: "
+#if ENABLE_EC_SYS
+    "ec_sys "
+#endif
+#if ENABLE_EC_ACPI
+    "acpi_ec "
+#endif
+#if ENABLE_EC_DEV_PORT
+    "dev_port "
+#endif
+#if ENABLE_EC_DUMMY
+    "dummy "
+#endif
+    "\n"
+  );
 
   if (options.read_only)
     Log_Info("Read-only mode enabled\n");

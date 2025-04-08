@@ -1,6 +1,7 @@
 #ifndef NBFC_MODEL_CONFIG_H_
 #define NBFC_MODEL_CONFIG_H_
 
+#include "config.h"
 #include "macros.h"
 #include "nxjson.h"
 #include "error.h"

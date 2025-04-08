@@ -29,7 +29,10 @@ AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([atexit memset mkdir realpath setlocale socket strchr strrchr strstr strcspn strdup strerror strtol strtoull])
 
+# =============================================================================
 # Init-System
+# =============================================================================
+
 AC_ARG_WITH([init-system],
   [AS_HELP_STRING([--with-init-system=SYSTEM], [Sets the Init-System (systemd, systemv, openrc)])],
   [init_system="$withval"],
@@ -43,8 +46,98 @@ esac
 AC_MSG_CHECKING([which Init-System should be used])
 AC_MSG_RESULT([$with_init_system])
 
+# =============================================================================
+# Embedded Controller Components
+# =============================================================================
+
+# ENABLE_EC_DEBUG -- Enable debugging of the embedded controller
+AC_ARG_ENABLE([ec-debug],
+  AS_HELP_STRING([--enable-ec-debug],
+    [Enable debugging of the embedded controller (default: enabled)]),
+    [enable_ec_debug=$enableval], [enable_ec_debug=yes])
+
+case "$enable_ec_debug" in
+  yes)
+    AC_DEFINE([ENABLE_EC_DEBUG], [1], [Define to 1 to enable debugging of the embedded controller])
+    ;;
+  *)
+    AC_DEFINE([ENABLE_EC_DEBUG], [0], [Define to 1 to enable debugging of the embedded controller])
+    ;;
+esac
+
+# ENABLE_EC_DUMMY - Enable the 'dummy' embedded controller
+AC_ARG_ENABLE([ec-dummy],
+  AS_HELP_STRING([--enable-ec-dummy],
+    [Enable the dummy embedded controller (default: enabled)]),
+    [enable_ec_dummy=$enableval], [enable_ec_dummy=yes])
+
+case "$enable_ec_dummy" in
+  yes)
+    AC_DEFINE([ENABLE_EC_DUMMY], [1], [Define to 1 to enable the 'dummy' embedded controller])
+    ;;
+  *)
+    AC_DEFINE([ENABLE_EC_DUMMY], [0], [Define to 1 to enable the 'dummy' embedded controller])
+    ;;
+esac
+
+# ENABLE_EC_DEV_PORT - Enable the '/dev/port' embedded controller
+AC_ARG_ENABLE([ec-dev-port],
+  AS_HELP_STRING([--enable-ec-dev-port],
+    [Enable the /dev/port embedded controller (default: enabled)]),
+    [enable_ec_dev_port=$enableval], [enable_ec_dev_port=yes])
+
+case "$enable_ec_dev_port" in
+  yes)
+    AC_DEFINE([ENABLE_EC_DEV_PORT], [1], [Define to 1 to enable the '/dev/port' embedded controller])
+    ;;
+  *)
+    AC_DEFINE([ENABLE_EC_DEV_PORT], [0], [Define to 1 to enable the '/dev/port' embedded controller])
+    ;;
+esac
+
+# ENABLE_EC_SYS - Enable the '/sys/kernel/debug/ec/ec0/io' embedded controller
+AC_ARG_ENABLE([ec-sys],
+  AS_HELP_STRING([--enable-ec-sys],
+    [Enable the /sys/kernel/debug/ec/ec0/io embedded controller (default: enabled)]),
+    [enable_ec_sys=$enableval], [enable_ec_sys=yes])
+
+case "$enable_ec_sys" in
+  yes)
+    AC_DEFINE([ENABLE_EC_SYS], [1], [Define to 1 to enable the '/sys/kernel/debug/ec/ec0/io' embedded controller])
+    ;;
+  *)
+    AC_DEFINE([ENABLE_EC_SYS], [0], [Define to 1 to enable the '/sys/kernel/debug/ec/ec0/io' embedded controller])
+    ;;
+esac
+
+# ENABLE_EC_ACPI - Enable the '/dev/ec' embedded controller
+AC_ARG_ENABLE([ec-acpi],
+  AS_HELP_STRING([--enable-ec-acpi],
+    [Enable the /dev/ec embedded controller (default: enabled)]),
+    [enable_ec_acpi=$enableval], [enable_ec_acpi=yes])
+
+case "$enable_ec_acpi" in
+  yes)
+    AC_DEFINE([ENABLE_EC_ACPI], [1], [Define to 1 to enable the '/dev/ec' embedded controller])
+    ;;
+  *)
+    AC_DEFINE([ENABLE_EC_ACPI], [0], [Define to 1 to enable the '/dev/ec' embedded controller])
+    ;;
+esac
+
 AC_SUBST([INIT_SYSTEM], [$init_system])
 AC_SUBST([PACKAGE_VERSION])
+
+AH_TOP([
+#ifndef CONFIG_H_
+#define CONFIG_H_
+])
+
+AH_BOTTOM([
+#endif
+])
+
+AC_CONFIG_HEADERS([src/config.h])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

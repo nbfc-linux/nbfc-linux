@@ -1,6 +1,7 @@
 #ifndef NBFC_EC_H_
 #define NBFC_EC_H_
 
+#include "config.h"
 #include "error.h"
 
 #include <stdint.h>

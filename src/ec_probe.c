@@ -27,8 +27,15 @@
 
 #include "error.c"             // src
 #include "ec.c"                // src
+                               //
+#if ENABLE_EC_DEV_PORT
 #include "ec_linux.c"          // src
+#endif
+
+#if ENABLE_EC_SYS || ENABLE_EC_ACPI
 #include "ec_sys_linux.c"      // src
+#endif
+
 #include "optparse/optparse.c" // src
 #include "memory.c"            // src
 #include "nxjson.c"            // src
@@ -279,9 +286,15 @@ int main(int argc, char* const argv[]) {
     case Option_File:     options.file = p.optarg;                 break;
     case Option_EmbeddedController:
       switch(EmbeddedControllerType_FromString(p.optarg)) {
+#if ENABLE_EC_SYS
         case EmbeddedControllerType_ECSysLinux:     ec = &EC_SysLinux_VTable;      break;
+#endif
+#if ENABLE_EC_ACPI
         case EmbeddedControllerType_ECSysLinuxACPI: ec = &EC_SysLinux_ACPI_VTable; break;
+#endif
+#if ENABLE_EC_DEV_PORT
         case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable;         break;
+#endif
         default:
           Log_Error("-e|--embedded-controller: Invalid value: %s\n", p.optarg);
           return NBFC_EXIT_CMDLINE;

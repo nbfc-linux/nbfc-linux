@@ -1,6 +1,7 @@
 #ifndef NBFC_SERVICE_H_
 #define NBFC_SERVICE_H_
 
+#include "config.h"
 #include "error.h"
 #include "fan.h"
 #include "fan_temperature_control.h"

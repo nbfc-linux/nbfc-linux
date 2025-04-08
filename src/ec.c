@@ -15,20 +15,26 @@ bool EC_CheckWorking(EC_VTable* ec) {
 }
 
 Error* EC_FindWorking(EC_VTable** out) {
+#if ENABLE_EC_SYS
   if (EC_CheckWorking(&EC_SysLinux_VTable)) {
     *out = &EC_SysLinux_VTable;
     return err_success();
   }
+#endif
 
+#if ENABLE_EC_ACPI
   if (EC_CheckWorking(&EC_SysLinux_ACPI_VTable)) {
     *out = &EC_SysLinux_ACPI_VTable;
     return err_success();
   }
+#endif
 
+#if ENABLE_EC_DEV_PORT
   if (EC_CheckWorking(&EC_Linux_VTable)) {
     *out = &EC_Linux_VTable;
     return err_success();
   }
+#endif
 
   return err_string(0, "No working implementation found for accessing the embedded controller");
 }
