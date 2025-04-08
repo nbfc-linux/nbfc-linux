@@ -1,0 +1,52 @@
+{
+  "NotebookModel": "GPD Win Mini",
+  "Author": "Justin Weiss",
+  "EcPollInterval": 5000,
+  "ReadWriteWords": false,
+  "CriticalTemperature": 85,
+  "FanConfigurations": [
+    {
+      "ReadRegister": 122,
+      "WriteRegister": 122,
+      "MinSpeedValue": 1,
+      "MaxSpeedValue": 244,
+      "ResetRequired": true,
+      "FanSpeedResetValue": 0,
+      "FanDisplayName": "Fan",
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 30,
+          "DownThreshold": 0,
+          "FanSpeed": 0.0
+        },
+        {
+          "UpThreshold": 45,
+          "DownThreshold": 25,
+          "FanSpeed": 30.0
+        },
+        {
+          "UpThreshold": 60,
+          "DownThreshold": 40,
+          "FanSpeed": 40.0
+        },
+        {
+          "UpThreshold": 70,
+          "DownThreshold": 50,
+          "FanSpeed": 60.0
+        },
+        {
+          "UpThreshold": 80,
+          "DownThreshold": 65,
+          "FanSpeed": 80.0
+        },
+        {
+          "UpThreshold": 85,
+          "DownThreshold": 75,
+          "FanSpeed": 100.0
+        }
+      ],
+      "FanSpeedPercentageOverrides": []
+    }
+  ],
+  "RegisterWriteConfigurations": []
+}
