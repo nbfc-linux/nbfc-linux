@@ -3,7 +3,7 @@ version     = 0.2.9
 PREFIX      = /usr
 
 bindir			= $(PREFIX)/bin
-confdir 		= $(PREFIX)/etc
+confdir 		= /etc
 datadir			= $(PREFIX)/share
 sysddir 		= $(PREFIX)/lib/systemd/system
 mandir 			= $(PREFIX)/share/man
