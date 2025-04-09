@@ -7,6 +7,19 @@ It provides the same utilities with the same interfaces as the original NBFC, al
 
 If you find my work helpful, you can show your appreciation by [buying me a coffee](https://paypal.me/BenjaminAbendroth).
 
+Table of Contents
+-----------------
+
+- [Comparison of NBFC C# and NBFC Linux](#comparison-of-nbfc-c-and-nbfc-linux)
+- [Installation](#installation)
+- [Getting started with the GUI](#getting-started-with-the-gui)
+- [Getting started without the GUI](#getting-started-without-the-gui)
+- [Advanced configuration](#advanced-configuration)
+- [Differences in detail](#differences-in-detail)
+- [Troubleshooting](#troubleshooting)
+- [Shell autocompletion](#shell-autocompletion)
+- [Contributing](#contributing)
+
 Comparison of NBFC C# and NBFC Linux
 ------------------------------------
 
@@ -138,8 +151,8 @@ Here is a fictional example demonstrating how to configure NBFC-Linux:
 
 In this example:
 
-- *Fan 0* uses the "Min" algorithm with sensors named "coretemp."
-- *Fan 1* uses the "Average" algorithm with sensors named "nouveau."
+- *Fan 0* uses the "Min" algorithm with sensors named "coretemp".
+- *Fan 1* uses the "Average" algorithm with sensors named "nouveau".
 - *Fan 2* uses the "Average" algorithm with specific sensor file paths.
 
 Differences in detail
@@ -195,6 +208,17 @@ status   -- Show the service status
 stop     -- Stop the service
 ```
 
-If you want to write a program that controls the NBFC service, see [protocol](/PROTOCOL.md).
+Contributing
+------------
+
+You can write a configuration file for your laptop model. See the [Wiki of the original NBFC](https://github.com/hirschmann/nbfc/wiki/How-to-create-a-NBFC-config) for more details.
+
+Please **do not** create issues on GitHub requesting a configuration file for your laptop!
+
+If you found a working configuration for your laptop model, you can register it in the [Compatibility Database](share/nbfc/model_support.json).
+
+If you want to write a program that controls the NBFC service, see the [protocol](/PROTOCOL.md).
+
+Developers are welcome to try optimizing the code of the service for memory usage. However, be warned that it is likely a waste of time, as the author has already tried every possible approach. It seems that every line of code is necessary for the current functionality.
 
 See also the documentation about the [nbfc configuration](doc/nbfc_service.json.5.md).
