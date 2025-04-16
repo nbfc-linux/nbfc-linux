@@ -49,8 +49,10 @@ void Set_Config_Action(enum Config_Action action) {
 }
 
 int List() {
-  array_of(ConfigFile) files = get_configs();
-  qsort(files.data, files.size, sizeof(struct ConfigFile), compare_config_by_name);
+  array_of(ConfigFile) files = List_All_Configs();
+
+  qsort(files.data, files.size, sizeof(ConfigFile), compare_config_by_name);
+
   for_each_array(ConfigFile*, file, files) {
     printf("%s\n", file->config_name);
   }
@@ -60,12 +62,12 @@ int List() {
 
 int Recommend() {
   const char* model_name = get_model_name();
-  array_of(ConfigFile) files = recommended_configs();
-  char* matched_model = get_supported_model(&files, model_name);
+  array_of(ConfigFile) files = List_Recommended_Configs();
+  char* config = Get_Supported_Config(&files, model_name);
 
-  if (matched_model) {
-    fprintf(stderr, "Found supported model:\n");
-    printf("%s\n", matched_model);
+  if (config) {
+    fprintf(stderr, "Found supported config:\n");
+    printf("%s\n", config);
     return NBFC_EXIT_SUCCESS;
   }
 
@@ -96,55 +98,48 @@ int Recommend() {
 
 int Set_Or_Apply() {
   check_root();
-  char *model;
-  char path[PATH_MAX];
+  char *config;
+  array_of(ConfigFile) files = List_All_Configs();
 
-  if (!strcmp(Config_Options.config, "auto")) {
-    const char* model_name = get_model_name();
-    array_of(ConfigFile) files = recommended_configs();
-    model = get_supported_model(&files, model_name);
-    if (! model) {
+  // "auto" ===================================================================
+  if (! strcmp(Config_Options.config, "auto")) {
+    config = Get_Supported_Config(&files, get_model_name());
+
+    if (! config) {
       Log_Error("No config found to apply automatically\n");
       return NBFC_EXIT_FAILURE;
     }
   }
-  else {
-    if (strrchr(Config_Options.config, '/')) {
-      if (! realpath(Config_Options.config, path)) {
-        Log_Error("Failed to resolve path '%s': %s\n", Config_Options.config, strerror(errno));
-        return NBFC_EXIT_FAILURE;
-      }
 
-      char* slash = strrchr(path, '/');
-      *slash = '\0';
-      model = slash + 1;
+  // Filename, not a path =====================================================
+  else if (! strrchr(Config_Options.config, '/')) {
+    config = Mem_Strdup(Config_Options.config);
 
-      if (strcmp(path, NBFC_MODEL_CONFIGS_DIR)) {
-        Log_Error("File does not reside in model configs dir (%s): %s\n",
-          NBFC_MODEL_CONFIGS_DIR, Config_Options.config);
-        return NBFC_EXIT_FAILURE;
-      }
-    }
-    else {
-      snprintf(path, sizeof(path), "%s", Config_Options.config);
-      model = path;
-    }
-
-    char* dot = strrchr(model, '.');
+    char* dot = strrchr(config, '.');
     if (dot)
       *dot = '\0';
 
-    char file[PATH_MAX];
-    snprintf(file, sizeof(file), NBFC_MODEL_CONFIGS_DIR "/%s.json", model);
-    if (access(file, F_OK)) {
-      Log_Error("No such config file found: %s\n", file);
+    if  (! Contains_Config(&files, config)) {
+      Log_Error("No such configuration available: %s\n", config);
+      return NBFC_EXIT_FAILURE;
+    }
+  }
+
+  // Path =====================================================================
+  else {
+    config = realpath(Config_Options.config, NULL);
+
+    if (! config) {
+      Log_Error("Failed to resolve path '%s': %s\n", Config_Options.config, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
 
   ServiceConfig_Load();
-  service_config.SelectedConfigId = model;
+  service_config.SelectedConfigId = config;
   Error* e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
+  Mem_Free(config);
+
   if (e) {
     Log_Error("%s\n", err_print_all(e));
     return NBFC_EXIT_FAILURE;

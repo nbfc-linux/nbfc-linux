@@ -88,6 +88,8 @@ Getting started without the GUI
 
 When running NBFC for the first time, you need to give it a configuration file for your laptop model.
 
+First, you should fetch new configuration files using `sudo nbfc update`.
+
 If you are lucky, `sudo nbfc config --set auto` will find a matching one and set it.
 
 `sudo nbfc config --recommend` will compare your DMI system-product-name to the available configuration file names and print a list of descending similarity.

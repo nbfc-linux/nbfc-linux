@@ -9,7 +9,7 @@ This program is used to control the NoteBook FanControl service.
 # SYNOPSIS
 
 **nbfc** {**start** \| **stop** \| **restart** \| **status** \|
-**config** \| **set** \| **help**} \[*OPTIONS*\]
+**config** \| **set** \| **update** \| **help**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -99,6 +99,18 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Fan index (zero based). If not given, all available fans are set to
 > > speed.
+
+**update** \[*OPTIONS*\]
+
+> Download new configuration files.
+>
+> **-p**, **\--parallel** *NUM*
+>
+> > Set the number of parallel downloads.
+>
+> **-q**, **\--quiet**
+>
+> > Set quiet mode.
 
 **help**
 

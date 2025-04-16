@@ -6,6 +6,9 @@
 #define NBFC_TEMPERATURE_FILTER_TIMESPAN 6000 /*ms*/
 #define NBFC_MODEL_CONFIGS_DIR           DATADIR "/nbfc/configs"
 #define NBFC_MODEL_SUPPORT_FILE          DATADIR "/nbfc/model_support.json"
+#define NBFC_MUTABLE_DIR                 "/var/lib/nbfc"
+#define NBFC_MODEL_CONFIGS_DIR_MUTABLE   NBFC_MUTABLE_DIR "/configs"
+#define NBFC_MODEL_SUPPORT_FILE_MUTABLE  NBFC_MUTABLE_DIR "/model_support.json"
 #define NBFC_CONFIG_DIR                  SYSCONFDIR "/nbfc"
 #define NBFC_SERVICE_CONFIG              SYSCONFDIR "/nbfc/nbfc.json"
 #define NBFC_PID_FILE                    RUNSTATEDIR "/nbfc_service.pid"

@@ -25,6 +25,7 @@
 #include "reverse_nxjson.c"
 #include "service_config.c"
 #include "optparse/optparse.c"
+#include "client/mkdir_p.c"
 #include "client/dmi.c"
 #include "client/config_files.c"
 #include "client/str_functions.c"
@@ -48,6 +49,7 @@ const cli99_option main_options[] = {
 #include "client/cmd_status.c"
 #include "client/cmd_config.c"
 #include "client/cmd_set.c"
+#include "client/cmd_update.c"
 #include "client/cmd_show_variable.c"
 #include "client/cmd_misc.c"
 
@@ -58,6 +60,7 @@ const cli99_option main_options[] = {
   o("status",         Status,         STATUS,          status)        \
   o("config",         Config,         CONFIG,          config)        \
   o("set",            Set,            SET,             set)           \
+  o("update",         Update,         UPDATE,          update)        \
   o("wait-for-hwmon", Wait_For_Hwmon, WAIT_FOR_HWMON,  main)          \
   o("get-model-name", Get_Model_Name, GET_MODEL,       main)          \
   o("complete-fans",  Complete_Fans,  COMPLETE_FANS,   main)          \
@@ -109,7 +112,8 @@ int main(int argc, char *const argv[]) {
 
   Program_Name_Set(argv[0]);
   setlocale(LC_NUMERIC, "C"); // for json floats
-  mkdir(NBFC_CONFIG_DIR, 0755);
+  mkdir_p(NBFC_CONFIG_DIR, 0755);
+  mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755);
 
   int o;
   const char* err;
@@ -250,6 +254,22 @@ int main(int argc, char *const argv[]) {
       break;
 
     // ========================================================================
+    // Update options
+    // ========================================================================
+
+    case Option_Update_Parallel:
+      Update_Options.parallel = parse_number(p.optarg, 0, INT_MAX, &err);
+      if (err) {
+        Log_Error("-p|--parallel: %s\n", err);
+        return NBFC_EXIT_FAILURE;
+      }
+      break;
+
+    case Option_Update_Quiet:
+      Update_Options.quiet = 1;
+      break;
+
+    // ========================================================================
     // Start/Restart options
     // ========================================================================
 
@@ -282,6 +302,7 @@ int main(int argc, char *const argv[]) {
   case Command_Config:         return Config();
   case Command_Set:            return Set();
   case Command_Status:         return Status();
+  case Command_Update:         return Update();
   case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
   case Command_Get_Model_Name: return Get_Model_Name();
   case Command_Show_Variable:  return Show_Variable();

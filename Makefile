@@ -1,4 +1,4 @@
-version     = 0.2.9
+version     = 0.3.0
 
 PREFIX      = /usr
 
@@ -23,7 +23,7 @@ else
 	LDFLAGS  = -s
 endif
 
-override LDLIBS   += -lm
+override LDLIBS   += -lm -lcurl -lcrypto
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(confdir)\"      \
 	-DDATADIR=\"$(datadir)\"         \

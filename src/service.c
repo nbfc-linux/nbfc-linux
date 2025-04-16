@@ -70,8 +70,14 @@ Error* Service_Init() {
     e = ModelConfig_FromFile(&Service_Model_Config, service_config.SelectedConfigId);
   }
   else {
-    snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, service_config.SelectedConfigId);
-    e = ModelConfig_FromFile(&Service_Model_Config, path);
+    snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR_MUTABLE, service_config.SelectedConfigId);
+
+    if (access(path, F_OK) == 0)
+      e = ModelConfig_FromFile(&Service_Model_Config, path);
+    else {
+      snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, service_config.SelectedConfigId);
+      e = ModelConfig_FromFile(&Service_Model_Config, path);
+    }
   }
 
   if (e) {

@@ -20,7 +20,7 @@ else
 	LDFLAGS  = -s
 endif
 
-override LDLIBS   += -lm
+override LDLIBS   += -lm -lcurl -lcrypto
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(sysconfdir)\"    \
 	-DDATADIR=\"$(datadir)\"          \

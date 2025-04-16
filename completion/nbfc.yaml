@@ -85,6 +85,17 @@ options:
     help: "Fan index (zero based)"
     complete: ["exec", "nbfc complete-fans"]
 ---
+prog: "nbfc update"
+help: "Download new configuration files"
+options:
+  - option_strings: ["-p", "--parallel"]
+    metavar: "NUM"
+    help: "Set number of parallel downloads"
+    complete: ["integer"]
+
+  - option_strings: ["-q", "--quiet"]
+    help: "Enable quiet mode"
+---
 prog: "nbfc wait-for-hwmon"
 help: "Wait for /sys/class/hwmon/hwmon* files"
 ---

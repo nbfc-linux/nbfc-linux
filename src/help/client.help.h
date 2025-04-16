@@ -14,6 +14,7 @@
  "    status              Show the service status\n"                           \
  "    config              List or apply configs\n"                             \
  "    set                 Control fan speed\n"                                 \
+ "    update              Download new configuration files\n"                  \
  "    wait-for-hwmon      Wait for /sys/class/hwmon/hwmon* files\n"            \
  "    get-model-name      Print out model name\n"                              \
  "    help                Show help\n"                                         \
@@ -91,6 +92,17 @@
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
+#define CLIENT_UPDATE_HELP_TEXT                                                \
+ "Usage: nbfc update [-h] [-p NUM] [-q]\n"                                     \
+ "\n"                                                                          \
+ "Update the available configuration files and the model support database.\n"  \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
+ "  -p, --parallel NUM    Set the number of parallel downloads\n"              \
+ "  -q, --quiet           Quiet mode\n"                                        \
  ""
 
 #define CLIENT_WAIT_FOR_HWMON_HELP_TEXT                                        \

@@ -5,8 +5,8 @@
 <h1>SYNOPSIS</h1>
 <p><strong>nbfc</strong> {<strong>start</strong> | <strong>stop</strong>
 | <strong>restart</strong> | <strong>status</strong> |
-<strong>config</strong> | <strong>set</strong> | <strong>help</strong>}
-[<em>OPTIONS</em>]</p>
+<strong>config</strong> | <strong>set</strong> | <strong>update</strong>
+| <strong>help</strong>} [<em>OPTIONS</em>]</p>
 <h1>OPTIONS</h1>
 <p><strong>-h</strong>, <strong>--help</strong></p>
 <blockquote>
@@ -92,6 +92,18 @@
 <blockquote>
 <p>Fan index (zero based). If not given, all available fans are set to
 speed.</p>
+</blockquote>
+</blockquote>
+<p><strong>update</strong> [<em>OPTIONS</em>]</p>
+<blockquote>
+<p>Download new configuration files.</p>
+<p><strong>-p</strong>, <strong>--parallel</strong> <em>NUM</em></p>
+<blockquote>
+<p>Set the number of parallel downloads.</p>
+</blockquote>
+<p><strong>-q</strong>, <strong>--quiet</strong></p>
+<blockquote>
+<p>Set quiet mode.</p>
 </blockquote>
 </blockquote>
 <p><strong>help</strong></p>

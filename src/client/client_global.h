@@ -40,6 +40,10 @@ enum Option {
   // Start/Restart options
   Option_Start_ReadOnly,
 
+  // Update options
+  Option_Update_Parallel,
+  Option_Update_Quiet,
+
   // Show-Variable options
   Option_ShowVariable_Variable,
 };

@@ -10,6 +10,7 @@ function _nbfc__command
     status 'Show the service status' \
     config 'List or apply configs' \
     set 'Control fan speed' \
+    update 'Download new configuration files' \
     wait-for-hwmon 'Wait for /sys/class/hwmon/hwmon* files' \
     get-model-name 'Print model name for notebook' \
     help 'Show help'
@@ -336,6 +337,13 @@ set -l C002 "$query '$opts' positional_contains 1 set && not $query '$opts' has_
 complete -c $prog -n $C000 -s a -l auto -d "Set fan speed to 'auto'" -f
 complete -c $prog -n $C001 -s s -l speed -d 'Set fan speed to PERCENT' -x
 complete -c $prog -n $C002 -s f -l fan -d 'Fan index (zero based)' -x -a '(nbfc complete-fans)'
+
+# command nbfc update
+set -l opts "-p=,--parallel=,-q,--quiet,-h,--help,--version"
+set -l C000 "$query '$opts' positional_contains 1 update && not $query '$opts' has_option -p --parallel"
+set -l C001 "$query '$opts' positional_contains 1 update && not $query '$opts' has_option -q --quiet"
+complete -c $prog -n $C000 -s p -l parallel -d 'Set number of parallel downloads' -x
+complete -c $prog -n $C001 -s q -l quiet -d 'Enable quiet mode' -f
 
 # command nbfc wait-for-hwmon
 set -l opts "-h,--help,--version"

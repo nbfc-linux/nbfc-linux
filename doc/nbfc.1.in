@@ -11,7 +11,7 @@ This program is used to control the NoteBook FanControl service.
 .SH SYNOPSIS
 .PP
 .B nbfc
-.RB { start " | " stop " | " restart " | " status " | " config " | "  set " | "  help }
+.RB { start " | " stop " | " restart " | " status " | " config " | "  set " | "  update " | " help }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -134,6 +134,23 @@ Set fan speed to PERCENT.
 .I FAN INDEX
 .RS
 Fan index (zero based). If not given, all available fans are set to speed.
+.RE
+.RE
+
+.B update
+.RI [ OPTIONS ]
+.RS
+Download new configuration files.
+
+.BR \-p ", " \-\-parallel
+.I NUM
+.RS
+Set the number of parallel downloads.
+.RE
+
+.BR \-q ", " \-\-quiet
+.RS
+Set quiet mode.
 .RE
 .RE
 

@@ -249,6 +249,7 @@ _nbfc__command() {
     status:'Show the service status'
     config:'List or apply configs'
     set:'Control fan speed'
+    update:'Download new configuration files'
     wait-for-hwmon:'Wait for /sys/class/hwmon/hwmon* files'
     get-model-name:'Print model name for notebook'
     help:'Show help'
@@ -281,6 +282,7 @@ _nbfc() {
     (status) _nbfc_status; return $?;;
     (config) _nbfc_config; return $?;;
     (set) _nbfc_set; return $?;;
+    (update) _nbfc_update; return $?;;
     (wait-for-hwmon) _nbfc_wait_for_hwmon; return $?;;
     (get-model-name) _nbfc_get_model_name; return $?;;
     (help) _nbfc_help; return $?;;
@@ -344,6 +346,15 @@ _nbfc_set() {
     '(--speed -s --auto -a)'{-a,--auto}"[Set fan speed to 'auto']"
     '(--auto -a --speed -s)'{-s+,--speed=}'[Set fan speed to PERCENT]':PERCENT:"_numbers -f"
     '(--fan -f)'{-f+,--fan=}'[Fan index (zero based)]':'FAN INDEX':"{_nbfc_exec 'nbfc complete-fans'}"
+    1:command1:_nbfc__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_update() {
+  local -a args=(
+    '(--parallel -p)'{-p+,--parallel=}'[Set number of parallel downloads]':NUM:_numbers
+    '(--quiet -q)'{-q,--quiet}'[Enable quiet mode]'
     1:command1:_nbfc__command
   )
   _arguments -S -s -w "${args[@]}"

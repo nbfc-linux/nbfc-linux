@@ -1,6 +1,10 @@
 # Changelog
 
-## nbfc-linux-0.2.9 (2025-05-04)
+## nbfc-linux-0.3.0 (2025-04-16)
+- Added command `nbfc update` to download new configuration files from the
+  configuration file repository as needed.
+
+## nbfc-linux-0.2.9 (2025-04-05)
 - Added model compatibility database (`/usr/share/nbfc/model_support.json`):
   A file that maps each notebook model to its supported configuration.
 

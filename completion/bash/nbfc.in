@@ -22,6 +22,20 @@ _nbfc_parse_commandline() {
       -)
         POSITIONALS[POSITIONAL_NUM++]="-";;
       -*)
+        case "$cmd" in 'nbfc update')
+          case "$arg" in
+            --parallel)
+              OPT_parallel+=("${words[++argi]}")
+              continue;;
+            --parallel=*)
+              OPT_parallel+=("${arg#*=}")
+              continue;;
+            --quiet)
+              OPT_quiet+=(_OPT_ISSET_)
+              continue;;
+          esac
+        esac
+
         case "$cmd" in 'nbfc set')
           case "$arg" in
             --auto)
@@ -117,6 +131,19 @@ _nbfc_parse_commandline() {
         for ((i=1; i < ${#arg}; ++i)); do
           char="${arg:$i:1}"
           trailing_chars="${arg:$((i + 1))}"
+          case "$cmd" in 'nbfc update')
+            case "$char" in
+              p)
+                if [[ -n "$trailing_chars" ]]
+                then OPT_parallel+=("$trailing_chars")
+                else OPT_parallel+=("${words[++argi]}")
+                fi
+                continue 2;;
+              q)
+                OPT_quiet+=(_OPT_ISSET_);;
+            esac
+          esac
+
           case "$cmd" in 'nbfc set')
             case "$char" in
               a)
@@ -215,6 +242,8 @@ _nbfc_parse_commandline() {
               cmd+=" config";;
             set)
               cmd+=" set";;
+            update)
+              cmd+=" update";;
             wait-for-hwmon)
               cmd+=" wait-for-hwmon";;
             get-model-name)
@@ -275,6 +304,7 @@ _nbfc() {
       status) _nbfc_status && return 0 || return 1;;
       config) _nbfc_config && return 0 || return 1;;
       set) _nbfc_set && return 0 || return 1;;
+      update) _nbfc_update && return 0 || return 1;;
       wait-for-hwmon) _nbfc_wait_for_hwmon && return 0 || return 1;;
       get-model-name) _nbfc_get_model_name && return 0 || return 1;;
       help) _nbfc_help && return 0 || return 1;;
@@ -291,7 +321,7 @@ _nbfc() {
   fi
 
   test "$POSITIONAL_NUM" -eq 1 && {
-    COMPREPLY=($(compgen -W 'start stop restart status config set wait-for-hwmon get-model-name help' -- "$cur"))
+    COMPREPLY=($(compgen -W 'start stop restart status config set update wait-for-hwmon get-model-name help' -- "$cur"))
     return 0;
   }
 
@@ -515,6 +545,62 @@ _nbfc_set() {
     (( ! ${#OPT_speed} && ! ${#OPT_auto} )) && opts+=(-a --auto)
     (( ! ${#OPT_auto} && ! ${#OPT_speed} )) && opts+=(-s --speed=)
     (( ! ${#OPT_fan} )) && opts+=(-f --fan=)
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  return 1
+}
+
+_nbfc_update() {
+  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
+  local -a OPT_parallel OPT_quiet OPT_help OPT_version
+
+  _nbfc_parse_commandline
+
+  local COMP_WORDBREAKS=''
+
+  __complete_option() {
+    local opt="$1" cur="$2" mode="$3"
+
+    case "$opt" in
+      --parallel|-p)
+        return 0;;
+    esac
+
+    return 1
+  }
+
+  case "$prev" in
+    --*)
+      __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0;;
+    -*)
+      case "$prev" in -*([qh])[p])
+        __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONALS && return 0
+      esac;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0;;
+    -*=*);;
+    --*);;
+    -*)
+        local i
+        for ((i=2; i <= ${#cur}; ++i)); do
+          local pre="${cur:0:$i}" value="${cur:$i}"
+          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {
+            _nbfc_prefix_compreply "$pre"
+            return 0
+          }
+        done;;
+  esac
+
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts=()
+    (( ! ${#OPT_parallel} )) && opts+=(-p --parallel=)
+    (( ! ${#OPT_quiet} )) && opts+=(-q --quiet)
     COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
