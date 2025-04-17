@@ -1,0 +1,120 @@
+{
+  "NotebookModel": "Bravo 17 C7VFKP",
+  "EcPollInterval": 1000,
+  "ReadWriteWords": false,
+  "CriticalTemperature": 85,
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "CPU Fan",
+      "ReadRegister": 113,
+      "WriteRegister": 114,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 128,
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 75,
+          "DownThreshold": 70,
+          "FanSpeed": 100.0
+        },
+        {
+          "UpThreshold": 65,
+          "DownThreshold": 60,
+          "FanSpeed": 75.0
+        },
+        {
+          "UpThreshold": 55,
+          "DownThreshold": 50,
+          "FanSpeed": 50.0
+        },
+        {
+          "UpThreshold": 45,
+          "DownThreshold": 35,
+          "FanSpeed": 25.0
+        },
+        {
+          "UpThreshold": 35,
+          "DownThreshold": 30,
+          "FanSpeed": 0.0
+        }
+      ]
+    },
+    {
+      "FanDisplayName": "GPU Fan",
+      "ReadRegister": 137,
+      "WriteRegister": 138,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 128,
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 75,
+          "DownThreshold": 70,
+          "FanSpeed": 100.0
+        },
+        {
+          "UpThreshold": 65,
+          "DownThreshold": 60,
+          "FanSpeed": 75.0
+        },
+        {
+          "UpThreshold": 55,
+          "DownThreshold": 50,
+          "FanSpeed": 50.0
+        },
+        {
+          "UpThreshold": 45,
+          "DownThreshold": 35,
+          "FanSpeed": 25.0
+        },
+        {
+          "UpThreshold": 35,
+          "DownThreshold": 30,
+          "FanSpeed": 0.0
+        }
+      ]
+    },
+    {
+      "FanDisplayName": "Cool Boost",
+      "ReadRegister": 152,
+      "WriteRegister": 152,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1,
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 85,
+          "DownThreshold": 80,
+          "FanSpeed": 100.0
+        },
+        {
+          "UpThreshold": 80,
+          "DownThreshold": 80,
+          "FanSpeed": 0.0
+        }
+      ],
+      "FanSpeedPercentageOverrides": [
+        {
+          "FanSpeedPercentage": 100,
+          "FanSpeedValue": 128,
+          "TargetOperation": "ReadWrite"
+        }
+      ]
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "Description": "Fan Mode Manual",
+      "WriteOccasion": "OnInitialization",
+      "Register": 244,
+      "Value": 76,
+      "ResetRequired": true,
+      "ResetValue": 12
+    },
+    {
+      "Description": "Cool Boost Off",
+      "WriteOccasion": "OnInitialization",
+      "Register": 152,
+      "Value": 0,
+      "ResetRequired": true,
+      "ResetValue": 0
+    }
+  ]
+}
