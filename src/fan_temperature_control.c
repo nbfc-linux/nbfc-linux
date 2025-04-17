@@ -97,7 +97,7 @@ static Error* FanTemperatureControl_AddTemperatureSources(
     source.file = (char*) sensor;
     source.multiplier = 0.001;
 
-    float t // NOLINT
+    float t; // NOLINT
     e = FS_TemperatureSource_GetTemperature(&source, &t);
     if (e)
       return e;
