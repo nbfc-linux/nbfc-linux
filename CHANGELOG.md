@@ -1,5 +1,9 @@
 # Changelog
 
+## nbfc-linux-0.3.2 (2025-04-17)
+- Now user defined commands are allowed as sensors in `FanTemperatureSources`.
+  If a sensor name is prefixed by `$`, its output will be used as temperature.
+
 ## nbfc-linux-0.3.1 (2025-04-17)
 - Now user defined file paths are allowed as sensors in `FanTemperatureSources`
 

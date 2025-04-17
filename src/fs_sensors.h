@@ -4,10 +4,17 @@
 #include "error.h"
 #include "macros.h"
 
+enum FS_TemperatureSource_Type {
+  FS_TemperatureSource_File,
+  FS_TemperatureSource_Command,
+};
+typedef enum FS_TemperatureSource_Type FS_TemperatureSource_Type;
+
 struct FS_TemperatureSource {
   char* name;
   char* file;
   float multiplier;
+  FS_TemperatureSource_Type type;
 };
 typedef struct FS_TemperatureSource FS_TemperatureSource;
 declare_array_of(FS_TemperatureSource);

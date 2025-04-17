@@ -93,9 +93,19 @@ static Error* FanTemperatureControl_AddTemperatureSources(
   if (! found_sensors) {
     // Sensor is a user defined file
     FS_TemperatureSource source;
-    source.name = "anonymous";
-    source.file = (char*) sensor;
-    source.multiplier = 0.001;
+
+    if (sensor[0] == '$') {
+      source.name = "command";
+      source.file = (char*) sensor + 1;
+      source.type = FS_TemperatureSource_Command;
+      source.multiplier = 1;
+    }
+    else {
+      source.name = "anonymous";
+      source.file = (char*) sensor;
+      source.type = FS_TemperatureSource_File;
+      source.multiplier = 0.001;
+    }
 
     float t; // NOLINT
     e = FS_TemperatureSource_GetTemperature(&source, &t);
@@ -107,6 +117,7 @@ static Error* FanTemperatureControl_AddTemperatureSources(
     FS_Sensors_Sources.data[idx].name = Mem_Strdup(source.name);
     FS_Sensors_Sources.data[idx].file = Mem_Strdup(source.file);
     FS_Sensors_Sources.data[idx].multiplier = source.multiplier;
+    FS_Sensors_Sources.data[idx].type = source.type;
     FS_Sensors_Sources.size = idx + 1;
 
     e = FanTemperatureControl_AddTemperatureSource(ftc, &FS_Sensors_Sources.data[idx]);

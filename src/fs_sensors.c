@@ -23,7 +23,20 @@ array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
 Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
   char buf[32];
-  int nread = slurp_file(buf, sizeof(buf), my.file);
+  int nread;
+
+  if (self->type == FS_TemperatureSource_File) {
+    nread = slurp_file(buf, sizeof(buf), my.file);
+  }
+  else {
+    FILE* fh = popen(my.file, "r");
+    if (! fh)
+      return err_stdlib(0, my.file);
+    nread = fread(buf, 1, sizeof(buf), fh);
+    int olderr = errno;
+    pclose(fh);
+    errno = olderr;
+  }
 
   if (nread < 0)
     return err_stdlib(0, my.file);
@@ -78,6 +91,7 @@ Error* FS_Sensors_Init() {
         source->name = source_name;
         source->file = file;
         source->multiplier = 0.001;
+        source->type = FS_TemperatureSource_File;
 
         float t;
         e = FS_TemperatureSource_GetTemperature(source, &t);

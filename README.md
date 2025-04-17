@@ -122,6 +122,7 @@ You can choose from three different algorithms to compute the temperature:
 **Specifying Temperature Sources**
 
 You can specify temperature sources either by sensor name (which may result in multiple temperature sources) or by providing a file path pointing to a temp\*\_input file.
+Alternatively, you can provide a command; its output will be treated as a temperature value. For specifying a command, prefix the sensor name with `$`.
 
 **Example Configuration**
 
@@ -146,6 +147,10 @@ Here is a fictional example demonstrating how to configure NBFC-Linux:
             "FanIndex": 2,
             "TemperatureAlgorithmType": "Average",
             "Sensors": [ "/sys/class/hwmon/hwmon4/temp2_input", "/sys/class/hwmon/hwmon4/temp3_input" ]
+        },
+        {
+            "FanIndex": 3,
+            "Sensors": [ "$ echo 42" ]
         }
     ]
 }
@@ -156,6 +161,7 @@ In this example:
 - *Fan 0* uses the "Min" algorithm with sensors named "coretemp".
 - *Fan 1* uses the "Average" algorithm with sensors named "nouveau".
 - *Fan 2* uses the "Average" algorithm with specific sensor file paths.
+- *Fan 3* uses the output of `echo 42` as temperature
 
 Differences in detail
 ---------------------
