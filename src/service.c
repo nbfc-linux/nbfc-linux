@@ -164,17 +164,11 @@ Error* Service_Init() {
     goto error;
   Service_State = Initialized_5_Sensors;
 
-  // Fans with temperature filter =============================================
-  for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
-    e = FanTemperatureControl_SetDefaults(ftc, Service_Model_Config.EcPollInterval);
-    if (e)
-      goto error;
-  }
-  Service_State = Initialized_6_Temperature_Filter;
-
-  e = FanTemperatureControl_SetByConfig(&Service_Fans, &service_config.FanTemperatureSources, &Service_Model_Config);
+  // Initialize fans with sensors and temperature filter ======================
+  e = FanTemperatureControl_Init(&Service_Fans, &service_config, &Service_Model_Config);
   if (e)
     goto error;
+  Service_State = Initialized_6_Temperature_Filter;
 
   FanTemperatureControl_Log(&Service_Fans, &Service_Model_Config);
 

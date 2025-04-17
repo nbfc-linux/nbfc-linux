@@ -1,5 +1,8 @@
 # Changelog
 
+## nbfc-linux-0.3.1 (2025-04-17)
+- Now user defined file paths are allowed as sensors in `FanTemperatureSources`
+
 ## nbfc-linux-0.3.0 (2025-04-16)
 - Added command `nbfc update` to download new configuration files from the
   configuration file repository as needed.

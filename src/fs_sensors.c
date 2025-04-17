@@ -38,7 +38,7 @@ Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* ou
   if (end == buf)
     errno = EINVAL;
   if (errno)
-    return err_stdlib(0, buf);
+    return err_stdlib(err_string(0, buf), my.file);
 
   return err_success();
 }
