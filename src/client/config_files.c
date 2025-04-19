@@ -99,8 +99,16 @@ static array_of(ConfigFile) Merge_Configs(array_of(ConfigFile)* a, array_of(Conf
 
 // List all configs (in the static config directory as well as in the mutable config directory).
 array_of(ConfigFile) List_All_Configs() {
-  array_of(ConfigFile) a = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR);
-  array_of(ConfigFile) b = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR_MUTABLE);
+  array_of(ConfigFile) a = {0};
+  array_of(ConfigFile) b = {0};
+
+  a = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR);
+
+  if (access(NBFC_MODEL_SUPPORT_FILE_MUTABLE, F_OK) == 0)
+    b = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR_MUTABLE);
+  else
+    return a;
+
   array_of(ConfigFile) c = Merge_Configs(&a, &b);
   ConfigFiles_Free(&a);
   ConfigFiles_Free(&b);
