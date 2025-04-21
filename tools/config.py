@@ -243,7 +243,7 @@ def write_parse_struct(struct, fh):
     p(f'\t*obj = {struct.name}_Unset;')
     p('')
     p( '\tif (!json || json->type != NX_JSON_OBJECT)')
-    p( '\t\treturn err_string(0, "not a JSON object");')
+    p( '\t\treturn err_string(0, "Not a JSON object");')
     p( '')
     p( '\tnx_json_for_each(c, json) {')
     p( '\t\tif (0);')

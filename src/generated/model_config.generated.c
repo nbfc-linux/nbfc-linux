@@ -25,7 +25,7 @@ Error* TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* j
 	*obj = TemperatureThreshold_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
@@ -69,7 +69,7 @@ Error* FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, cons
 	*obj = FanSpeedPercentageOverride_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
@@ -135,7 +135,7 @@ Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, cons
 	*obj = RegisterWriteConfiguration_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
@@ -243,7 +243,7 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 	*obj = FanConfiguration_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
@@ -335,7 +335,7 @@ Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 	*obj = ModelConfig_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
@@ -387,7 +387,7 @@ Error* FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, cons
 	*obj = FanTemperatureSourceConfig_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
@@ -431,7 +431,7 @@ Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 	*obj = ServiceConfig_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
@@ -493,7 +493,7 @@ Error* FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 	*obj = FanInfo_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
@@ -547,7 +547,7 @@ Error* ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
 	*obj = ServiceInfo_Unset;
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "not a JSON object");
+		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (0);
