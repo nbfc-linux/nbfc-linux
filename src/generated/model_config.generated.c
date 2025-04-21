@@ -8,15 +8,15 @@ struct TemperatureThreshold TemperatureThreshold_Unset = {
 
 Error* TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
 	if (self->UpThreshold == short_Unset)
-		return err_string(0, "UpThreshold: Missing option");
+		return err_stringf(0, "%s: %s", "UpThreshold", "Missing option");
 
 	if (self->DownThreshold == short_Unset)
-		return err_string(0, "DownThreshold: Missing option");
+		return err_stringf(0, "%s: %s", "DownThreshold", "Missing option");
 
 	if (self->FanSpeed == float_Unset)
-		return err_string(0, "FanSpeed: Missing option");
+		return err_stringf(0, "%s: %s", "FanSpeed", "Missing option");
 	else if (! (self->FanSpeed >= 0.0 && self->FanSpeed <= 100.0))
-		return err_string(0, "FanSpeed: requires: parameter >= 0.0 && parameter <= 100.0");
+		return err_stringf(0, "%s: %s", "FanSpeed", "requires: parameter >= 0.0 && parameter <= 100.0");
 	return err_success();
 }
 
@@ -50,14 +50,14 @@ struct FanSpeedPercentageOverride FanSpeedPercentageOverride_Unset = {
 
 Error* FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* self) {
 	if (self->FanSpeedPercentage == float_Unset)
-		return err_string(0, "FanSpeedPercentage: Missing option");
+		return err_stringf(0, "%s: %s", "FanSpeedPercentage", "Missing option");
 	else if (! (self->FanSpeedPercentage >= 0.0 && self->FanSpeedPercentage <= 100.0))
-		return err_string(0, "FanSpeedPercentage: requires: parameter >= 0.0 && parameter <= 100.0");
+		return err_stringf(0, "%s: %s", "FanSpeedPercentage", "requires: parameter >= 0.0 && parameter <= 100.0");
 
 	if (self->FanSpeedValue == int_Unset)
-		return err_string(0, "FanSpeedValue: Missing option");
+		return err_stringf(0, "%s: %s", "FanSpeedValue", "Missing option");
 	else if (! (self->FanSpeedValue >= 0 && self->FanSpeedValue <= 65535))
-		return err_string(0, "FanSpeedValue: requires: parameter >= 0 && parameter <= 65535");
+		return err_stringf(0, "%s: %s", "FanSpeedValue", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->TargetOperation == OverrideTargetOperation_Unset)
 		self->TargetOperation = OverrideTargetOperation_ReadWrite;
@@ -105,22 +105,22 @@ Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* sel
 		self->WriteOccasion = RegisterWriteOccasion_OnInitialization;
 
 	if (self->Register == short_Unset)
-		return err_string(0, "Register: Missing option");
+		return err_stringf(0, "%s: %s", "Register", "Missing option");
 	else if (! (self->Register >= 0 && self->Register <= 255))
-		return err_string(0, "Register: requires: parameter >= 0 && parameter <= 255");
+		return err_stringf(0, "%s: %s", "Register", "requires: parameter >= 0 && parameter <= 255");
 
 	if (self->Value == int_Unset)
-		return err_string(0, "Value: Missing option");
+		return err_stringf(0, "%s: %s", "Value", "Missing option");
 	else if (! (self->Value >= 0 && self->Value <= 65535))
-		return err_string(0, "Value: requires: parameter >= 0 && parameter <= 65535");
+		return err_stringf(0, "%s: %s", "Value", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->ResetRequired == Boolean_Unset)
 		self->ResetRequired = Boolean_False;
 
 	if (self->ResetValue == int_Unset)
-		return err_string(0, "ResetValue: Missing option");
+		return err_stringf(0, "%s: %s", "ResetValue", "Missing option");
 	else if (! (self->ResetValue >= 0 && self->ResetValue <= 65535))
-		return err_string(0, "ResetValue: requires: parameter >= 0 && parameter <= 65535");
+		return err_stringf(0, "%s: %s", "ResetValue", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->ResetWriteMode == RegisterWriteMode_Unset)
 		self->ResetWriteMode = RegisterWriteMode_Set;
@@ -181,37 +181,37 @@ struct FanConfiguration FanConfiguration_Unset = {
 
 Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
-		return err_string(0, "FanDisplayName: Missing option");
+		return err_stringf(0, "%s: %s", "FanDisplayName", "Missing option");
 
 	if (self->ReadRegister == short_Unset)
-		return err_string(0, "ReadRegister: Missing option");
+		return err_stringf(0, "%s: %s", "ReadRegister", "Missing option");
 	else if (! (self->ReadRegister >= 0 && self->ReadRegister <= 255))
-		return err_string(0, "ReadRegister: requires: parameter >= 0 && parameter <= 255");
+		return err_stringf(0, "%s: %s", "ReadRegister", "requires: parameter >= 0 && parameter <= 255");
 
 	if (self->WriteRegister == short_Unset)
-		return err_string(0, "WriteRegister: Missing option");
+		return err_stringf(0, "%s: %s", "WriteRegister", "Missing option");
 	else if (! (self->WriteRegister >= 0 && self->WriteRegister <= 255))
-		return err_string(0, "WriteRegister: requires: parameter >= 0 && parameter <= 255");
+		return err_stringf(0, "%s: %s", "WriteRegister", "requires: parameter >= 0 && parameter <= 255");
 
 	if (self->MinSpeedValue == int_Unset)
-		return err_string(0, "MinSpeedValue: Missing option");
+		return err_stringf(0, "%s: %s", "MinSpeedValue", "Missing option");
 	else if (! (self->MinSpeedValue >= 0 && self->MinSpeedValue <= 65535))
-		return err_string(0, "MinSpeedValue: requires: parameter >= 0 && parameter <= 65535");
+		return err_stringf(0, "%s: %s", "MinSpeedValue", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->MaxSpeedValue == int_Unset)
-		return err_string(0, "MaxSpeedValue: Missing option");
+		return err_stringf(0, "%s: %s", "MaxSpeedValue", "Missing option");
 	else if (! (self->MaxSpeedValue >= 0 && self->MaxSpeedValue <= 65535))
-		return err_string(0, "MaxSpeedValue: requires: parameter >= 0 && parameter <= 65535");
+		return err_stringf(0, "%s: %s", "MaxSpeedValue", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->MinSpeedValueRead == int_Unset)
 		self->MinSpeedValueRead = 0;
 	else if (! (self->MinSpeedValueRead >= 0 && self->MinSpeedValueRead <= 65535))
-		return err_string(0, "MinSpeedValueRead: requires: parameter >= 0 && parameter <= 65535");
+		return err_stringf(0, "%s: %s", "MinSpeedValueRead", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->MaxSpeedValueRead == int_Unset)
 		self->MaxSpeedValueRead = 0;
 	else if (! (self->MaxSpeedValueRead >= 0 && self->MaxSpeedValueRead <= 65535))
-		return err_string(0, "MaxSpeedValueRead: requires: parameter >= 0 && parameter <= 65535");
+		return err_stringf(0, "%s: %s", "MaxSpeedValueRead", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (self->IndependentReadMinMaxValues == Boolean_Unset)
 		self->IndependentReadMinMaxValues = Boolean_False;
@@ -222,16 +222,16 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (self->FanSpeedResetValue == int_Unset)
 		self->FanSpeedResetValue = 0;
 	else if (! (self->FanSpeedResetValue >= 0 && self->FanSpeedResetValue <= 65535))
-		return err_string(0, "FanSpeedResetValue: requires: parameter >= 0 && parameter <= 65535");
+		return err_stringf(0, "%s: %s", "FanSpeedResetValue", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (false)
-		return err_string(0, "TemperatureAlgorithmType: Missing option");
+		return err_stringf(0, "%s: %s", "TemperatureAlgorithmType", "Missing option");
 
 	if (false)
-		return err_string(0, "Sensors: Missing option");
+		return err_stringf(0, "%s: %s", "Sensors", "Missing option");
 
 	if (false)
-		return err_string(0, "TemperatureThresholds: Missing option");
+		return err_stringf(0, "%s: %s", "TemperatureThresholds", "Missing option");
 
 	if (self->FanSpeedPercentageOverrides.data == NULL)
 		self->FanSpeedPercentageOverrides = Config_DefaultFanSpeedPercentageOverrides;
@@ -296,7 +296,7 @@ struct ModelConfig ModelConfig_Unset = {
 
 Error* ModelConfig_ValidateFields(ModelConfig* self) {
 	if (self->NotebookModel == str_Unset)
-		return err_string(0, "NotebookModel: Missing option");
+		return err_stringf(0, "%s: %s", "NotebookModel", "Missing option");
 
 	if (self->Author == str_Unset)
 		self->Author = Mem_Strdup("");
@@ -307,7 +307,7 @@ Error* ModelConfig_ValidateFields(ModelConfig* self) {
 	if (self->EcPollInterval == short_Unset)
 		self->EcPollInterval = 3000;
 	else if (! (self->EcPollInterval > 0))
-		return err_string(0, "EcPollInterval: requires: parameter > 0");
+		return err_stringf(0, "%s: %s", "EcPollInterval", "requires: parameter > 0");
 
 	if (self->CriticalTemperature == short_Unset)
 		self->CriticalTemperature = 75;
@@ -315,18 +315,18 @@ Error* ModelConfig_ValidateFields(ModelConfig* self) {
 	if (self->CriticalTemperatureOffset == short_Unset)
 		self->CriticalTemperatureOffset = 15;
 	else if (! (self->CriticalTemperatureOffset > 0))
-		return err_string(0, "CriticalTemperatureOffset: requires: parameter > 0");
+		return err_stringf(0, "%s: %s", "CriticalTemperatureOffset", "requires: parameter > 0");
 
 	if (self->ReadWriteWords == Boolean_Unset)
 		self->ReadWriteWords = Boolean_False;
 
 	if (self->FanConfigurations.data == NULL)
-		return err_string(0, "FanConfigurations: Missing option");
+		return err_stringf(0, "%s: %s", "FanConfigurations", "Missing option");
 	else if (! (self->FanConfigurations.size > 0))
-		return err_string(0, "FanConfigurations: requires: parameter.size > 0");
+		return err_stringf(0, "%s: %s", "FanConfigurations", "requires: parameter.size > 0");
 
 	if (false)
-		return err_string(0, "RegisterWriteConfigurations: Missing option");
+		return err_stringf(0, "%s: %s", "RegisterWriteConfigurations", "Missing option");
 	return err_success();
 }
 
@@ -372,13 +372,13 @@ struct FanTemperatureSourceConfig FanTemperatureSourceConfig_Unset = {
 
 Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* self) {
 	if (self->FanIndex == int_Unset)
-		return err_string(0, "FanIndex: Missing option");
+		return err_stringf(0, "%s: %s", "FanIndex", "Missing option");
 
 	if (self->TemperatureAlgorithmType == TemperatureAlgorithmType_Unset)
 		self->TemperatureAlgorithmType = TemperatureAlgorithmType_Average;
 
 	if (false)
-		return err_string(0, "Sensors: Missing option");
+		return err_stringf(0, "%s: %s", "Sensors", "Missing option");
 	return err_success();
 }
 
@@ -413,16 +413,16 @@ struct ServiceConfig ServiceConfig_Unset = {
 
 Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
 	if (self->SelectedConfigId == str_Unset)
-		return err_string(0, "SelectedConfigId: Missing option");
+		return err_stringf(0, "%s: %s", "SelectedConfigId", "Missing option");
 
 	if (false)
-		return err_string(0, "EmbeddedControllerType: Missing option");
+		return err_stringf(0, "%s: %s", "EmbeddedControllerType", "Missing option");
 
 	if (false)
-		return err_string(0, "TargetFanSpeeds: Missing option");
+		return err_stringf(0, "%s: %s", "TargetFanSpeeds", "Missing option");
 
 	if (false)
-		return err_string(0, "FanTemperatureSources: Missing option");
+		return err_stringf(0, "%s: %s", "FanTemperatureSources", "Missing option");
 	return err_success();
 }
 
@@ -463,28 +463,28 @@ struct FanInfo FanInfo_Unset = {
 
 Error* FanInfo_ValidateFields(FanInfo* self) {
 	if (self->Name == str_Unset)
-		return err_string(0, "Name: Missing option");
+		return err_stringf(0, "%s: %s", "Name", "Missing option");
 
 	if (self->Temperature == float_Unset)
-		return err_string(0, "Temperature: Missing option");
+		return err_stringf(0, "%s: %s", "Temperature", "Missing option");
 
 	if (self->AutoMode == Boolean_Unset)
-		return err_string(0, "AutoMode: Missing option");
+		return err_stringf(0, "%s: %s", "AutoMode", "Missing option");
 
 	if (self->Critical == Boolean_Unset)
-		return err_string(0, "Critical: Missing option");
+		return err_stringf(0, "%s: %s", "Critical", "Missing option");
 
 	if (self->CurrentSpeed == float_Unset)
-		return err_string(0, "CurrentSpeed: Missing option");
+		return err_stringf(0, "%s: %s", "CurrentSpeed", "Missing option");
 
 	if (self->TargetSpeed == float_Unset)
-		return err_string(0, "TargetSpeed: Missing option");
+		return err_stringf(0, "%s: %s", "TargetSpeed", "Missing option");
 
 	if (self->RequestedSpeed == float_Unset)
-		return err_string(0, "RequestedSpeed: Missing option");
+		return err_stringf(0, "%s: %s", "RequestedSpeed", "Missing option");
 
 	if (self->SpeedSteps == int_Unset)
-		return err_string(0, "SpeedSteps: Missing option");
+		return err_stringf(0, "%s: %s", "SpeedSteps", "Missing option");
 	return err_success();
 }
 
@@ -529,16 +529,16 @@ struct ServiceInfo ServiceInfo_Unset = {
 
 Error* ServiceInfo_ValidateFields(ServiceInfo* self) {
 	if (self->PID == int_Unset)
-		return err_string(0, "PID: Missing option");
+		return err_stringf(0, "%s: %s", "PID", "Missing option");
 
 	if (self->SelectedConfigId == str_Unset)
-		return err_string(0, "SelectedConfigId: Missing option");
+		return err_stringf(0, "%s: %s", "SelectedConfigId", "Missing option");
 
 	if (self->ReadOnly == Boolean_Unset)
-		return err_string(0, "ReadOnly: Missing option");
+		return err_stringf(0, "%s: %s", "ReadOnly", "Missing option");
 
 	if (self->Fans.data == NULL)
-		return err_string(0, "Fans: Missing option");
+		return err_stringf(0, "%s: %s", "Fans", "Missing option");
 	return err_success();
 }
 
