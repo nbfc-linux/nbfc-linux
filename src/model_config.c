@@ -387,14 +387,14 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     e_goto(err);
 
     if (f->MinSpeedValue == f->MaxSpeedValue) {
-      e = err_string(0, "MinSpeedValue and MaxSpeedValue cannot be the same");
+      e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValue", "MaxSpeedValue");
       e_goto(err);
     }
 
     if (f->IndependentReadMinMaxValues &&
         f->MinSpeedValueRead == f->MaxSpeedValueRead)
     {
-      e = err_string(0, "MinSpeedValueRead and MaxSpeedValueRead cannot be the same");
+      e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValueRead", "MaxSpeedValueRead");
       e_goto(err);
     }
 
@@ -461,7 +461,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
     if (! has_0_FanSpeed) {
       Trace_PrintBuf(&trace, buf, sizeof(buf));
-      e = err_string(0, "No threshold with FanSpeed == 0 found");
+      e = err_stringf(0, "No threshold with FanSpeed == %d found", 0);
       e = err_string(e, buf);
       e_warn();
       e = NULL;
@@ -469,7 +469,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
     if (! has_100_FanSpeed) {
       Trace_PrintBuf(&trace, buf, sizeof(buf));
-      e = err_string(0, "No threshold with FanSpeed == 100 found");
+      e = err_stringf(0, "No threshold with FanSpeed == %d found", 100);
       e = err_string(e, buf);
       e_warn();
       e = NULL;
