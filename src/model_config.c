@@ -16,6 +16,8 @@
 #define short_Unset SHRT_MIN
 #define float_Unset NAN
 
+#define PTR_DIFF(A, B) ((int) (A - B))
+
 static inline Error* Boolean_FromJson(Boolean* out, const nx_json* node) {
   if (node->type == NX_JSON_BOOL) {
     *out = node->val.u;
@@ -355,7 +357,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
   e_goto(err);
 
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
-    snprintf(trace.text, sizeof(trace.text), "RegisterWriteConfigurations[%td]", r - c->RegisterWriteConfigurations.data);
+    snprintf(trace.text, sizeof(trace.text), "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
 
     // Don't make the validation fail if `ResetRequired` is false and `ResetValue` was not set
     if (r->ResetRequired == Boolean_False || r->ResetRequired == Boolean_Unset)
@@ -368,12 +370,12 @@ Error* ModelConfig_Validate(ModelConfig* c) {
   }
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
-    snprintf(trace.text, sizeof(trace.text), "FanConfigurations[%td]", f - c->FanConfigurations.data);
+    snprintf(trace.text, sizeof(trace.text), "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
 
     // Add a default FanDisplayName
     if (f->FanDisplayName == NULL) {
       char fan_name[32];
-      snprintf(fan_name, sizeof(fan_name), "Fan #%td", f - c->FanConfigurations.data);
+      snprintf(fan_name, sizeof(fan_name), "Fan #%d", PTR_DIFF(f, c->FanConfigurations.data));
       f->FanDisplayName = Mem_Strdup(fan_name);
     }
 
@@ -398,7 +400,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
     for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
       Trace trace1 = {0};
-      snprintf(trace1.text, sizeof(trace1.text), "FanSpeedPercentageOverrides[%td]", o - f->FanSpeedPercentageOverrides.data);
+      snprintf(trace1.text, sizeof(trace1.text), "FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
       trace.next = &trace1;
 
       e = FanSpeedPercentageOverride_ValidateFields(o);
@@ -425,7 +427,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
     for_each_array(TemperatureThreshold*, t, f->TemperatureThresholds) {
       Trace trace1 = {0};
-      snprintf(trace1.text, sizeof(trace1.text), "TemperatureThresholds[%td]", t - f->TemperatureThresholds.data);
+      snprintf(trace1.text, sizeof(trace1.text), "TemperatureThresholds[%d]", PTR_DIFF(t, f->TemperatureThresholds.data));
       trace.next = &trace1;
 
       e = TemperatureThreshold_ValidateFields(t);
