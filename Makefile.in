@@ -20,7 +20,11 @@ else
 	LDFLAGS  = -s
 endif
 
-override LDLIBS   += -lm -lcurl -lcrypto
+LDLIBS_CLIENT = -lm -lcurl -lcrypto
+LDLIBS_SERVICE = -lm
+LDLIBS_EC_PROBE = -lm
+LDLIBS_TEST_MODEL_CONFIG = -lm
+
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(sysconfdir)\"    \
 	-DDATADIR=\"$(datadir)\"          \
@@ -242,7 +246,7 @@ src/nbfc_service: \
 	src/temperature_filter.c src/temperature_filter.h \
 	src/temperature_threshold_manager.c src/temperature_threshold_manager.h \
 	src/optparse/optparse.h src/optparse/optparse.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDLIBS) $(LDFLAGS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDLIBS_SERVICE) $(LDFLAGS)
 
 src/ec_probe: \
 	src/ec_probe.c \
@@ -252,7 +256,7 @@ src/ec_probe: \
 	src/nbfc.h \
 	src/memory.h src/memory.c \
 	src/optparse/optparse.h src/optparse/optparse.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDLIBS) $(LDFLAGS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDLIBS_EC_PROBE) $(LDFLAGS)
 
 src/nbfc: \
 	src/client.c \
@@ -262,7 +266,7 @@ src/nbfc: \
 	src/protocol.c src/protocol.h \
 	src/nxjson.c src/reverse_nxjson.c src/nxjson.h \
 	src/nbfc.h
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS) $(LDFLAGS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
 
 src/test_model_config: \
 	src/error.c \
@@ -271,7 +275,7 @@ src/test_model_config: \
 	src/memory.c \
 	src/nxjson.c \
 	src/program_name.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/test_model_config.c -o src/test_model_config $(LDLIBS) $(LDFLAGS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/test_model_config.c -o src/test_model_config $(LDLIBS_TEST_MODEL_CONFIG) $(LDFLAGS)
 
 src/generated/: .force
 	mkdir -p src/generated
