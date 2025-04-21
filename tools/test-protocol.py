@@ -46,7 +46,7 @@ do_test('{}',
         {'Error': "Missing 'Command' field"})
 
 do_test('{"Command": 1}',
-        {'Error': 'Command: not a string'})
+        {'Error': 'Command: Not a string'})
 
 do_test('{"Command": "foo"}',
         {'Error': 'Invalid command'})

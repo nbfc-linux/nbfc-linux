@@ -153,7 +153,7 @@ static void* Server_Handle_Client(void* arg) {
   }
 
   if (command->type != NX_JSON_STRING) {
-    e = err_string(0, "Command: not a string");
+    e = err_string(0, "Command: Not a string");
     goto error;
   }
 
