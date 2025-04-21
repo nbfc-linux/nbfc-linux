@@ -31,7 +31,7 @@ static inline Error* int_FromJson(int* out, const nx_json* node) {
     *out = node->val.i;
     return err_success();
   }
-  return err_string(0, "Not a int");
+  return err_string(0, "Not an integer");
 }
 
 static inline Error* short_FromJson(short* out, const nx_json* node) {
