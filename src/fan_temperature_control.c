@@ -184,12 +184,12 @@ static Error* FanTemperatureControl_SetByModelConfig(
   Error* e;
 
   for_enumerate_array(int, fan_index, *fans) {
-    e = FanTemperatureControl_SetByModelConfig0(
-      &fans->data[fan_index],
-      &model_config->FanConfigurations.data[fan_index]);
+    FanTemperatureControl* ftc = &fans->data[fan_index];
+    FanConfiguration* fc = &model_config->FanConfigurations.data[fan_index];
 
+    e = FanTemperatureControl_SetByModelConfig0(ftc, fc);
     if (e)
-      return e;
+      return err_stringf(e, "FanConfigurations[%d] (%s)", fan_index, fc->FanDisplayName);
   }
 
   return err_success();
@@ -204,7 +204,7 @@ static Error* FanTemperatureControl_SetByServiceConfig(
 
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config->FanTemperatureSources) {
     if (ftsc->FanIndex < 0 || ftsc->FanIndex >= fans->size)
-      return err_string(0, "Invalid FanIndex in FanTemperatureSources");
+      return err_stringf(0, "Invalid FanIndex in FanTemperatureSources: %d", ftsc->FanIndex);
 
     FanTemperatureControl* ftc = &fans->data[ftsc->FanIndex];
     ftc->TemperatureAlgorithmType = ftsc->TemperatureAlgorithmType; // TODO?
@@ -219,7 +219,7 @@ static Error* FanTemperatureControl_SetByServiceConfig(
     for_each_array(const char**, sensor, ftsc->Sensors) {
       e = FanTemperatureControl_AddTemperatureSources(ftc, *sensor);
       if (e)
-        return e;
+        return err_stringf(e, "FanTemperatureSources[%d]", ftsc->FanIndex);
     }
   }
 
@@ -296,4 +296,3 @@ void FanTemperatureControl_Log(array_of(FanTemperatureControl)* fans, ModelConfi
         TemperatureAlgorithmType_ToString(ftc->TemperatureAlgorithmType));
   }
 }
-

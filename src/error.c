@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #ifdef HAVE_SENSORS
 #include <sensors/error.h>
 #endif
@@ -57,6 +58,18 @@ Error* err_string(Error* e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_String;
   snprintf(e->value.message, sizeof(e->value.message), "%s", message);
+  return e;
+}
+
+Error* err_stringf(Error* e, const char* message, ...) {
+  e = err_allocate(e);
+  e->system = ErrorSystem_String;
+
+  va_list args;
+  va_start(args, message);
+  vsnprintf(e->value.message, sizeof(e->value.message), message, args);
+  va_end(args);
+
   return e;
 }
 
