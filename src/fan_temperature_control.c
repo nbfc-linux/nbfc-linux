@@ -151,6 +151,50 @@ static Error* FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)*
   return err_success();
 }
 
+static Error* FanTemperatureControl_SetByModelConfig0(
+  FanTemperatureControl* ftc,
+  FanConfiguration* fc)
+{
+  Error* e;
+
+  if (fc->TemperatureAlgorithmType != TemperatureAlgorithmType_Unset)
+    ftc->TemperatureAlgorithmType = fc->TemperatureAlgorithmType;
+
+  // Use default sensor names
+  if (! fc->Sensors.size)
+    return err_success();
+
+  // Override sensors
+  ftc->TemperatureSourcesSize = 0;
+
+  for_each_array(const char**, sensor, fc->Sensors) {
+    e = FanTemperatureControl_AddTemperatureSources(ftc, *sensor);
+    if (e)
+      return e;
+  }
+
+  return err_success();
+}
+
+// Set fan temperature sources by model config
+static Error* FanTemperatureControl_SetByModelConfig(
+  array_of(FanTemperatureControl)* fans,
+  ModelConfig* model_config)
+{
+  Error* e;
+
+  for_enumerate_array(int, fan_index, *fans) {
+    e = FanTemperatureControl_SetByModelConfig0(
+      &fans->data[fan_index],
+      &model_config->FanConfigurations.data[fan_index]);
+
+    if (e)
+      return e;
+  }
+
+  return err_success();
+}
+
 // Initialize `fans` by `service_config`
 static Error* FanTemperatureControl_SetByServiceConfig(
   array_of(FanTemperatureControl)* fans,
@@ -208,6 +252,11 @@ Error* FanTemperatureControl_Init(
 
   // Set default TemperatureAlgorithmType and temperature sources.
   e = FanTemperatureControl_SetDefaults(fans);
+  if (e)
+    return e;
+
+  // Set temperature sources as specified in ModelConfig
+  e = FanTemperatureControl_SetByModelConfig(fans, model_config);
   if (e)
     return e;
 

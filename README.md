@@ -107,6 +107,8 @@ Advanced configuration
 
 NBFC-Linux allows you to specify which temperature sources to use for controlling fans and the algorithm to compute the temperature.
 
+> NOTE: Since version 0.3.3 NBFC-Linux also allows you to specify sensors in FanConfigurations using the `Sensors` field
+
 **Default Configuration**
 
 If no configuration is specified, NBFC uses the "Average" algorithm and utilizes all sensor files named "coretemp", "k10temp", or "zenpower".

@@ -173,6 +173,8 @@ struct FanConfiguration FanConfiguration_Unset = {
 	Boolean_Unset,
 	Boolean_Unset,
 	int_Unset,
+	TemperatureAlgorithmType_Unset,
+	{NULL, 0},
 	{NULL, 0},
 	{NULL, 0},
 };
@@ -223,6 +225,12 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 		return err_string(0, "FanSpeedResetValue: requires: parameter >= 0 && parameter <= 65535");
 
 	if (false)
+		return err_string(0, "TemperatureAlgorithmType: Missing option");
+
+	if (false)
+		return err_string(0, "Sensors: Missing option");
+
+	if (false)
 		return err_string(0, "TemperatureThresholds: Missing option");
 
 	if (self->FanSpeedPercentageOverrides.data == NULL)
@@ -259,6 +267,10 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 			e = Boolean_FromJson(&obj->ResetRequired, c);
 		else if (!strcmp(c->key, "FanSpeedResetValue"))
 			e = int_FromJson(&obj->FanSpeedResetValue, c);
+		else if (!strcmp(c->key, "TemperatureAlgorithmType"))
+			e = TemperatureAlgorithmType_FromJson(&obj->TemperatureAlgorithmType, c);
+		else if (!strcmp(c->key, "Sensors"))
+			e = array_of_str_FromJson(&obj->Sensors, c);
 		else if (!strcmp(c->key, "TemperatureThresholds"))
 			e = array_of_TemperatureThreshold_FromJson(&obj->TemperatureThresholds, c);
 		else if (!strcmp(c->key, "FanSpeedPercentageOverrides"))

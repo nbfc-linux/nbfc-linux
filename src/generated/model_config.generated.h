@@ -49,6 +49,8 @@ struct FanConfiguration {
 	Boolean         IndependentReadMinMaxValues;
 	Boolean         ResetRequired;
 	int             FanSpeedResetValue;
+	TemperatureAlgorithmType TemperatureAlgorithmType;
+	array_of(str)   Sensors;
 	array_of(TemperatureThreshold) TemperatureThresholds;
 	array_of(FanSpeedPercentageOverride) FanSpeedPercentageOverrides;
 };

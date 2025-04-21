@@ -167,6 +167,19 @@
         "valid": "parameter >= 0 && parameter <= 65535"
       },
       {
+        "name": "TemperatureAlgorithmType",
+        "type": "TemperatureAlgorithmType",
+        "help": "Either 'average', 'max' or 'min'",
+        "is_unset": "false"
+      },
+      {
+        "name": "Sensors",
+        "type": "array_of(str)",
+        "unset": "{NULL, 0}",
+        "is_unset": "false",
+        "help": "Array of sensor names (as in /sys/class/hwmon/hwmon*/name) or sensor files (like /sys/class/hwmon/hwmon1/temp1_input)"
+      },
+      {
         "name": "TemperatureThresholds",
         "type": "array_of(TemperatureThreshold)",
         "unset": "{NULL, 0}",

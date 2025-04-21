@@ -136,6 +136,23 @@ down.</p>
 <p>Defines the value which will be written to
 <strong>WriteRegister</strong> to reset the EC.</p>
 </blockquote>
+<p><strong>Sensors</strong>: <em>Array of String</em></p>
+<blockquote>
+<p>Defines which sensors shall be used for this fan. A sensor should be
+specified by its name.</p>
+</blockquote>
+<p><strong>TemperatureAlgorithmType</strong>: <em>String</em></p>
+<blockquote>
+<p>Specify the algorithm type to compute the temperature.</p>
+<ul>
+<li><p><strong>Average</strong>: Computes the average temperature from
+all specified sensors (default)</p></li>
+<li><p><strong>Min</strong>: Selects the lowest temperature among all
+specified sensors</p></li>
+<li><p><strong>Max</strong>: Selects the highest temperature among all
+specified sensors</p></li>
+</ul>
+</blockquote>
 <p><strong>TemperatureThresholds</strong>: <em>Array of
 TemperatureThresholds</em></p>
 <p><strong>FanSpeedPercentageOverrides</strong>: <em>Array of

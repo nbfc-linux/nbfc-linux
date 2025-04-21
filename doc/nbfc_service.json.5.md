@@ -129,6 +129,24 @@ Defines how NBFC controls a fan
 > Defines the value which will be written to **WriteRegister** to reset
 > the EC.
 
+**Sensors**: *Array of String*
+
+> Defines which sensors shall be used for this fan. A sensor should be
+> specified by its name.
+
+**TemperatureAlgorithmType**: *String*
+
+> Specify the algorithm type to compute the temperature.
+>
+> -   **Average**: Computes the average temperature from all specified
+>     sensors (default)
+>
+> -   **Min**: Selects the lowest temperature among all specified
+>     sensors
+>
+> -   **Max**: Selects the highest temperature among all specified
+>     sensors
+
 **TemperatureThresholds**: *Array of TemperatureThresholds*
 
 **FanSpeedPercentageOverrides**: *Array of FanSpeedPercentageOverride*

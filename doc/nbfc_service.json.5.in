@@ -212,6 +212,29 @@ to reset the EC.
 .RE
 
 .PP
+.BR Sensors :
+.I Array of String
+.RS
+Defines which sensors shall be used for this fan. A sensor should be specified by its name.
+.RE
+
+.PP
+.BR TemperatureAlgorithmType :
+.I String
+.RS
+Specify the algorithm type to compute the temperature.
+.IP \(bu 2
+.BR Average :
+Computes the average temperature from all specified sensors (default)
+.IP \(bu 2
+.BR Min :
+Selects the lowest temperature among all specified sensors
+.IP \(bu 2
+.BR Max :
+Selects the highest temperature among all specified sensors
+.RE
+
+.PP
 .BR TemperatureThresholds :
 .I Array of TemperatureThresholds
 
