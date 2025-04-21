@@ -28,6 +28,8 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([atexit memset mkdir realpath setlocale socket strchr strrchr strstr strcspn strdup strerror strtol strtoull])
+AC_CHECK_LIB([curl], [curl_easy_init], [], [AC_MSG_ERROR([libcurl not found])])
+AC_CHECK_LIB([crypto], [SHA1], [], [AC_MSG_ERROR([libcrypto (OpenSSL) not found])])
 
 # =============================================================================
 # Init-System
