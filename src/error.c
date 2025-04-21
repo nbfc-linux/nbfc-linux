@@ -23,7 +23,6 @@ static void err_print(Error* e, StringBuf* s) {
   case ErrorSystem_Sensors: StringBuf_Printf(s, "%s", sensors_strerror(e->value.code)); break;
 #endif
   case ErrorSystem_String:  StringBuf_Printf(s, "%s", e->value.message); break;
-  case ErrorSystem_Integer: StringBuf_Printf(s, "%d", e->value.code);    break;
   }
 }
 
@@ -45,13 +44,6 @@ const char* err_print_all(Error* e) {
   err_print(e, &s);
 
   return buf;
-}
-
-Error* err_integer(Error* e, int i) {
-  e = err_allocate(e);
-  e->system = ErrorSystem_Integer;
-  e->value.code = i;
-  return e;
 }
 
 Error* err_string(Error* e, const char* message) {

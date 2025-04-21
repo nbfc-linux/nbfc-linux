@@ -8,7 +8,6 @@
 
 enum ErrorSystem {
   ErrorSystem_String,
-  ErrorSystem_Integer,
   ErrorSystem_Stdlib,
   ErrorSystem_NxJson,
 };
@@ -31,7 +30,6 @@ extern __thread Error error_stack[16];
 #define err_success() NULL
 #define die(E, ...)   do { fprintf(stderr, __VA_ARGS__); exit(E); } while(0)
 
-Error* err_integer(Error*, int i);
 Error* err_string(Error*,  const char* message);
 Error* err_stringf(Error*, const char* message, ...);
 Error* err_stdlib(Error*,  const char* message);
