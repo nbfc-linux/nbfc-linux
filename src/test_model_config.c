@@ -6,8 +6,8 @@
 #include <limits.h>
 
 #include "ec.h"
-#include "log.h"
 #include "nbfc.h"
+#include "log.c"
 #include "error.c"
 #include "memory.c"
 #include "nxjson.c"

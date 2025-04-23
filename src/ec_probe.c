@@ -36,6 +36,7 @@
 #include "ec_sys_linux.c"      // src
 #endif
 
+#include "log.c"               // src
 #include "optparse/optparse.c" // src
 #include "memory.c"            // src
 #include "nxjson.c"            // src

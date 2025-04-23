@@ -25,6 +25,7 @@
 #include "ec_sys_linux.c"
 #endif
 
+#include "log.c"
 #include "error.c"
 #include "fan.c"
 #include "fan_temperature_control.c"

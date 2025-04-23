@@ -16,6 +16,7 @@
 #include "parse_number.h"
 #include "parse_double.h"
 
+#include "log.c"
 #include "error.c"
 #include "model_config.c"
 #include "memory.c"
