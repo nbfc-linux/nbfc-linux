@@ -1,5 +1,5 @@
 {
-    "LegacyTemperatureThresholdsBehaviour": true,
+    
     "NotebookModel": "HP Victus 15-fb0xxx",
     "Author": "subhojit131",
     "EcPollInterval": 1000,
@@ -73,6 +73,7 @@
         "ResetRequired": true,
         "FanSpeedResetValue": 255,
         "FanDisplayName": "GPU fan",
+        "Sensors": ["@GPU"],
         "TemperatureThresholds": [
          {
           "UpThreshold": 0,
