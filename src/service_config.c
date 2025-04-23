@@ -3,6 +3,7 @@
 #include "nbfc.h"
 #include "error.h"
 #include "memory.h"
+#include "stack_memory.h"
 #include "model_config.h"
 #include "nxjson_utils.h"
 #include "reverse_nxjson.h"
@@ -15,33 +16,34 @@
 ServiceConfig service_config = {0};
 
 Error* ServiceConfig_Init(const char* file) {
-  char buf[NBFC_MAX_FILE_SIZE];
+  Error* e;
+  char file_content[NBFC_MAX_FILE_SIZE];
+  char nxjson_memory[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
-  Error* e = nx_json_parse_file(&js, buf, sizeof(buf), file);
+
+  // Use memory from the stack to allocate data structures from nxjson
+  StackMemory_Init(nxjson_memory, sizeof(nxjson_memory));
+
+  e = nx_json_parse_file(&js, file_content, sizeof(file_content), file);
   if (e)
-    return e;
+    goto err;
 
   e = ServiceConfig_FromJson(&service_config, js);
-  nx_json_free(js);
   if (e)
-    return e;
+    goto err;
 
   e = ServiceConfig_ValidateFields(&service_config);
   if (e)
-    return e;
+    goto err;
 
   for_each_array(float*, f, service_config.TargetFanSpeeds) {
     if (*f > 100.0f) {
-      e = err_string(0, "TargetFanSpeeds: value cannot be greater than 100.0");
-      e = err_string(e, file);
-      e_warn();
+      Log_Warn("%s: TargetFanSpeeds: value cannot be greater than 100.0\n", file);
       *f = 100.0f;
     }
 
     if (*f < 0.0f && *f != -1.0f) {
-      e = err_string(0, "TargetFanSpeeds: Please use `-1' for selecting auto mode");
-      e = err_string(e, file);
-      e_warn();
+      Log_Warn("%s: TargetFanSpeeds: Please use `-1' for selecting auto mode\n", file);
       *f = -1.0f;
     }
   }
@@ -49,10 +51,13 @@ Error* ServiceConfig_Init(const char* file) {
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config.FanTemperatureSources) {
     e = FanTemperatureSourceConfig_ValidateFields(ftsc);
     if (e)
-      return e;
+      goto err;
   }
 
-  return err_success();
+err:
+  nx_json_free(js);
+  StackMemory_Destroy();
+  return e;
 }
 
 Error* ServiceConfig_Write(const char* file) {

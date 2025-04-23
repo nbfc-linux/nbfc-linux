@@ -15,6 +15,7 @@
 #include "program_name.c"
 #include "fan.c"
 #include "temperature_threshold_manager.c"
+#include "stack_memory.c"
 
 EC_VTable* ec;
 
