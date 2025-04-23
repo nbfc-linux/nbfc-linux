@@ -123,8 +123,13 @@ You can choose from three different algorithms to compute the temperature:
 
 **Specifying Temperature Sources**
 
-You can specify temperature sources either by sensor name (which may result in multiple temperature sources) or by providing a file path pointing to a temp\*\_input file.
-Alternatively, you can provide a command; its output will be treated as a temperature value. For specifying a command, prefix the sensor name with `$`.
+You can specify temperature sources either by a
+- *sensor name* (which may result in multiple temperature sources)
+- *temperature file*: A file containing the temperature (usually named `temp*_input`)
+- *shell command*: A command whose output is used as temperature (the command has to be prefixed by `$`)
+- *sensor group*:
+  - *@CPU*: Uses all sensors named "coretemp", "k10temp" or "zenpower"
+  - *@GPU*: Uses all sensors named "amdgpu", "nvidia", "nouveau" or "radeon"
 
 **Example Configuration**
 
@@ -153,6 +158,10 @@ Here is a fictional example demonstrating how to configure NBFC-Linux:
         {
             "FanIndex": 3,
             "Sensors": [ "$ echo 42" ]
+        },
+        {
+            "FanIndex": 4,
+            "Sensors": [ "@GPU" ]
         }
     ]
 }
@@ -164,6 +173,7 @@ In this example:
 - *Fan 1* uses the "Average" algorithm with sensors named "nouveau".
 - *Fan 2* uses the "Average" algorithm with specific sensor file paths.
 - *Fan 3* uses the output of `echo 42` as temperature
+- *Fan 4* uses all sensors found in the `@GPU` group ("amdgpu", "nvidia", "nouveau" or "radeon")
 
 Differences in detail
 ---------------------

@@ -131,8 +131,16 @@ Defines how NBFC controls a fan
 
 **Sensors**: *Array of String*
 
-> Defines which sensors shall be used for this fan. A sensor should be
-> specified by its name.
+> Defines which sensors shall be used for this fan. This should either
+> be a sensor name or a sensor group.
+>
+> Available groups:
+>
+> -   **\@CPU**: Uses all sensors named **coretemp**, **k10temp** or
+>     **zenpower**
+>
+> -   **\@GPU**: Uses all sensors named **amdgpu**, **nvidia**,
+>     **nouveau** or **radeon**
 
 **TemperatureAlgorithmType**: *String*
 

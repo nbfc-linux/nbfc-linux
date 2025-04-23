@@ -138,8 +138,17 @@ down.</p>
 </blockquote>
 <p><strong>Sensors</strong>: <em>Array of String</em></p>
 <blockquote>
-<p>Defines which sensors shall be used for this fan. A sensor should be
-specified by its name.</p>
+<p>Defines which sensors shall be used for this fan. This should either
+be a sensor name or a sensor group.</p>
+<p>Available groups:</p>
+<ul>
+<li><p><strong>@CPU</strong>: Uses all sensors named
+<strong>coretemp</strong>, <strong>k10temp</strong> or
+<strong>zenpower</strong></p></li>
+<li><p><strong>@GPU</strong>: Uses all sensors named
+<strong>amdgpu</strong>, <strong>nvidia</strong>,
+<strong>nouveau</strong> or <strong>radeon</strong></p></li>
+</ul>
 </blockquote>
 <p><strong>TemperatureAlgorithmType</strong>: <em>String</em></p>
 <blockquote>

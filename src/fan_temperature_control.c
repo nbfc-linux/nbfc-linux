@@ -5,13 +5,24 @@
 #include <float.h>
 #include <string.h>
 
-static const char* const LinuxTempSensorNames[] = {
+static const char* const CPUSensorNames[] = {
   "coretemp", "k10temp", "zenpower"
 };
 
-static inline int IsLinuxTempSensorName(const char* s) {
-  for (int i = 0; i < ARRAY_SSIZE(LinuxTempSensorNames); ++i)
-    if (! strcmp(s, LinuxTempSensorNames[i]))
+static const char* const GPUSensorNames[] = {
+  "amdgpu", "nvidia", "nouveau", "radeon"
+};
+
+static inline int IsCPUSensorName(const char* s) {
+  for (int i = 0; i < ARRAY_SSIZE(CPUSensorNames); ++i)
+    if (! strcmp(s, CPUSensorNames[i]))
+      return true;
+  return false;
+}
+
+static inline int IsGPUSensorName(const char* s) {
+  for (int i = 0; i < ARRAY_SSIZE(GPUSensorNames); ++i)
+    if (! strcmp(s, GPUSensorNames[i]))
       return true;
   return false;
 }
@@ -80,6 +91,47 @@ static Error* FanTemperatureControl_AddTemperatureSources(
   Error* e;
   bool found_sensors = false;
 
+  // ==========================================================================
+  // Sensor group "@CPU": Add all sensors found in `CPUSensorNames`
+  // ==========================================================================
+  if (!strcmp(sensor, "@CPU")) {
+    for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
+      if (IsCPUSensorName(ts->name)) {
+        e = FanTemperatureControl_AddTemperatureSource(ftc, ts);
+        if (e)
+          return e;
+
+        found_sensors = true;
+      }
+    }
+
+    return found_sensors
+      ? err_success()
+      : err_stringf(0, "%s: No sensors found", "@CPU");
+  }
+
+  // ==========================================================================
+  // Sensor group "@GPU": Add all sensors found in `GPUSensorNames`
+  // ==========================================================================
+  if (!strcmp(sensor, "@GPU")) {
+    for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
+      if (IsGPUSensorName(ts->name)) {
+        e = FanTemperatureControl_AddTemperatureSource(ftc, ts);
+        if (e)
+          return e;
+
+        found_sensors = true;
+      }
+    }
+
+    return found_sensors
+      ? err_success()
+      : err_stringf(0, "%s: No sensors found", "@GPU");
+  }
+
+  // ==========================================================================
+  // Add sensors by name or path (for available sensors)
+  // ==========================================================================
   for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
     if (!strcmp(sensor, ts->name) || !strcmp(sensor, ts->file)) {
       e = FanTemperatureControl_AddTemperatureSource(ftc, ts);
@@ -90,40 +142,45 @@ static Error* FanTemperatureControl_AddTemperatureSources(
     }
   }
 
-  if (! found_sensors) {
-    // Sensor is a user defined file
-    FS_TemperatureSource source;
+  if (found_sensors)
+    return err_success();
 
-    if (sensor[0] == '$') {
-      source.name = "command";
-      source.file = (char*) sensor + 1;
-      source.type = FS_TemperatureSource_Command;
-      source.multiplier = 1;
-    }
-    else {
-      source.name = "anonymous";
-      source.file = (char*) sensor;
-      source.type = FS_TemperatureSource_File;
-      source.multiplier = 0.001;
-    }
+  // ==========================================================================
+  // Create a new TemperatureSource (a user defined file or command)
+  // ==========================================================================
+  FS_TemperatureSource source;
 
-    float t; // NOLINT
-    e = FS_TemperatureSource_GetTemperature(&source, &t);
-    if (e)
-      return e;
-
-    const size_t idx = FS_Sensors_Sources.size;
-    FS_Sensors_Sources.data = Mem_Realloc(FS_Sensors_Sources.data, (idx + 1) * sizeof(FS_TemperatureSource));
-    FS_Sensors_Sources.data[idx].name = Mem_Strdup(source.name);
-    FS_Sensors_Sources.data[idx].file = Mem_Strdup(source.file);
-    FS_Sensors_Sources.data[idx].multiplier = source.multiplier;
-    FS_Sensors_Sources.data[idx].type = source.type;
-    FS_Sensors_Sources.size = idx + 1;
-
-    e = FanTemperatureControl_AddTemperatureSource(ftc, &FS_Sensors_Sources.data[idx]);
-    if (e)
-      return e;
+  if (sensor[0] == '$') {
+    // Sensor is a command
+    source.name = "command";
+    source.file = (char*) sensor + 1;
+    source.type = FS_TemperatureSource_Command;
+    source.multiplier = 1;
   }
+  else {
+    // Sensor is a user defined file
+    source.name = "anonymous";
+    source.file = (char*) sensor;
+    source.type = FS_TemperatureSource_File;
+    source.multiplier = 0.001;
+  }
+
+  float t; // NOLINT
+  e = FS_TemperatureSource_GetTemperature(&source, &t);
+  if (e)
+    return e;
+
+  const size_t idx = FS_Sensors_Sources.size;
+  FS_Sensors_Sources.data = Mem_Realloc(FS_Sensors_Sources.data, (idx + 1) * sizeof(FS_TemperatureSource));
+  FS_Sensors_Sources.data[idx].name = Mem_Strdup(source.name);
+  FS_Sensors_Sources.data[idx].file = Mem_Strdup(source.file);
+  FS_Sensors_Sources.data[idx].multiplier = source.multiplier;
+  FS_Sensors_Sources.data[idx].type = source.type;
+  FS_Sensors_Sources.size = idx + 1;
+
+  e = FanTemperatureControl_AddTemperatureSource(ftc, &FS_Sensors_Sources.data[idx]);
+  if (e)
+    return e;
 
   return err_success();
 }
@@ -131,7 +188,7 @@ static Error* FanTemperatureControl_AddTemperatureSources(
 // Set default sensors for FanTemperatureControls.
 // That means:
 //   - Use "Average" as TemperatureAlgorithmType
-//   - Utilize every sernsor that is matched by `IsLinuxTempSensorName`
+//   - Utilize every sensor that is matched by `IsCPUSensorName`
 static Error* FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)* fans) {
   Error* e;
 
@@ -140,7 +197,7 @@ static Error* FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)*
     ftc->TemperatureSourcesSize = 0;
 
     for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
-      if (IsLinuxTempSensorName(ts->name)) {
+      if (IsCPUSensorName(ts->name)) {
         e = FanTemperatureControl_AddTemperatureSource(ftc, ts);
         if (e)
           return e;

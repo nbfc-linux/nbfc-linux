@@ -215,7 +215,24 @@ to reset the EC.
 .BR Sensors :
 .I Array of String
 .RS
-Defines which sensors shall be used for this fan. A sensor should be specified by its name.
+Defines which sensors shall be used for this fan. This should either be a sensor name or a sensor group.
+
+Available groups:
+.IP \(bu 2
+.BR @CPU :
+Uses all sensors named
+.BR  coretemp ,
+.BR  k10temp
+or
+.BR  zenpower
+.IP \(bu 2
+.BR @GPU :
+Uses all sensors named
+.BR  amdgpu ,
+.BR  nvidia ,
+.BR  nouveau
+or
+.BR  radeon
 .RE
 
 .PP

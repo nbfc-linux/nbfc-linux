@@ -1,5 +1,11 @@
 # Changelog
 
+## nbfc-linux-0.3.4 (2025-04-23)
+- Now sensor groups can be specified as temperature sources.
+  Available groups are `@CPU` and `@GPU`.
+  Since notebook models may have different graphics cards, using `@GPU`
+  provides a portable way to refer to the GPU temperature.
+
 ## nbfc-linux-0.3.3 (2025-04-21)
 - FanConfigurations in the ModelConfig can now define their own sensors
   and specify the TemperatureAlgorithmType.
