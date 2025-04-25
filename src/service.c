@@ -39,7 +39,7 @@ static enum Service_Initialization Service_State;
 static Error* ApplyRegisterWriteConfig(int, uint8_t, RegisterWriteMode);
 static Error* ApplyRegisterWriteConfgurations(bool);
 static Error* ResetRegisterWriteConfigs();
-static Error* ResetEC();
+static void   ResetEC();
 static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable*);
 static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
@@ -251,20 +251,24 @@ static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
   }
 }
 
-static Error* ResetEC() {
-  Error* e, *r = NULL;
+static void ResetEC() {
+  Error* e;
+  bool failed = false;
+  int tries = 10;
 
-  for (int tries = 3; tries; tries--) {
+  do {
     e = ResetRegisterWriteConfigs();
-    if (e) r = e;
+    e_warn();
+    if (e)
+      failed = true;
 
     for_each_array(FanTemperatureControl*, ftc, Service_Fans) {
       e = Fan_ECReset(&ftc->Fan);
-      if (e) r = e;
+      e_warn();
+      if (e)
+        failed = true;
     }
-  }
-
-  return r;
+  } while (failed && --tries);
 }
 
 static Error* ResetRegisterWriteConfigs() {

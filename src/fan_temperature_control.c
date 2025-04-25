@@ -179,10 +179,7 @@ static Error* FanTemperatureControl_AddTemperatureSources(
   FS_Sensors_Sources.size = idx + 1;
 
   e = FanTemperatureControl_AddTemperatureSource(ftc, &FS_Sensors_Sources.data[idx]);
-  if (e)
-    return e;
-
-  return err_success();
+  return e;
 }
 
 // Set default sensors for FanTemperatureControls.

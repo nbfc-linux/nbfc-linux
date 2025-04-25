@@ -1,5 +1,5 @@
-#ifndef PARSE_DOUBLE_H
-#define PARSE_DOUBLE_H
+#ifndef PARSE_DOUBLE_H_
+#define PARSE_DOUBLE_H_
 
 #include <errno.h>
 #include <stdlib.h>

@@ -1,7 +1,3 @@
-#undef _XOPEN_SOURCE
-
-#define _XOPEN_SOURCE 500 // pthread_kill
-
 #include "server.h"
 
 #include "nbfc.h"

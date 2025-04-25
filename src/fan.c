@@ -138,11 +138,13 @@ Error* Fan_SetFixedSpeed(Fan* self, float speed) {
 
   if (speed < 0.0f) {
     speed = 0.0f;
-    e = err_string(0, "speed < 0.0");
+    errno = EINVAL;
+    e = err_stdlib(0, "speed");
   }
   else if (speed > 100.0f) {
     speed = 100.0f;
-    e = err_string(0, "speed > 100.0");
+    errno = EINVAL;
+    e = err_stdlib(0, "speed");
   }
 
   my.requestedSpeed = speed;
