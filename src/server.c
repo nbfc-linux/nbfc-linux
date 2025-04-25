@@ -24,15 +24,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/select.h>
 #include <pthread.h>
 #include <signal.h>
 
 static int                Server_FD = -1;
 static struct sockaddr_un Server_Address;
-static pthread_t          Server_Thread_ID;
-static const int          Server_Max_Failures = 100;
-
-static void* Server_Run(void*);
 
 static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   int fan = -1;
@@ -213,59 +210,35 @@ error:
   return e;
 }
 
-Error* Server_Start() {
-  if (pthread_create(&Server_Thread_ID, NULL, Server_Run, NULL) != 0) {
-    return err_stdlib(0, "pthread_create()");
+Error* Server_Loop(struct timeval* timeout) {
+  fd_set readfds;
+  FD_ZERO(&readfds);
+  FD_SET(Server_FD, &readfds);
+
+  int activity = select(Server_FD + 1, &readfds, NULL, NULL, timeout);
+  if (activity < 0) {
+    if (errno != EINTR)
+      return err_stdlib(0, "select()");
+    return err_success();
   }
 
-  pthread_detach(Server_Thread_ID);
-  return err_success();
-}
+  if (FD_ISSET(Server_FD, &readfds)) {
+    int addrlen = sizeof(Server_Address);
+    int new_socket;
+    pthread_t thread_id;
 
-void Server_Stop() {
-  pthread_kill(Server_Thread_ID, SIGTERM);
-}
+    if ((new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0)
+      return err_stdlib(0, "accept()");
 
-Error* Server_Loop() {
-  int addrlen = sizeof(Server_Address);
-  int new_socket;
-  pthread_t thread_id;
-
-  if ((new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0)
-    return err_stdlib(0, "accept()");
-
-  if (pthread_create(&thread_id, NULL, Server_Handle_Client, (void*) (intptr_t) new_socket) != 0) {
-    close(new_socket);
-    return err_stdlib(0, "pthread_create()");
-  }
-
-  pthread_detach(thread_id);
-
-  return err_success();
-}
-
-static void* Server_Run(void* unused) {
-  int failures = 0;
-
-  while (! quit) {
-    Error* e = Server_Loop();
-
-    // When the server stops, accept() from Server_Loop() returns
-    // EBADF. So don't handle this as an error.
-    if (! quit)
-      e_warn();
-
-    if (e) {
-      if (++failures > Server_Max_Failures) {
-        quit = 1;
-        return NULL;
-      }
+    if (pthread_create(&thread_id, NULL, Server_Handle_Client, (void*) (intptr_t) new_socket) != 0) {
+      close(new_socket);
+      return err_stdlib(0, "pthread_create()");
     }
-    else
-      failures = 0;
+
+    pthread_detach(thread_id);
   }
 
-  return NULL;
+  return err_success();
 }
 
 void Server_Close() {

@@ -1,5 +1,9 @@
 # Changelog
 
+## nbfc-linux-0.3.5 (2025-04-25)
+- Server now runs in the main thread.
+  This saves around 60KB of RAM.
+
 ## nbfc-linux-0.3.4 (2025-04-23)
 - Now sensor groups can be specified as temperature sources.
   Available groups are `@CPU` and `@GPU`.

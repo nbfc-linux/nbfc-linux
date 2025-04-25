@@ -11,14 +11,10 @@
 #include "nbfc.h"
 #include "memory.h"
 #include "macros.h"
-#include "sleep.h"
 #include "model_config.h"
 
-#include <assert.h> // assert
 #include <stdio.h>  // snprintf
 #include <math.h>   // fabs
-#include <unistd.h> // fork
-#include <stdlib.h> // exit, _exit
 #include <linux/limits.h> // PATH_MAX
 
 Service_Options options;
@@ -179,9 +175,8 @@ error:
   return e;
 }
 
-void Service_Loop() {
-  Error* e;
-  static int failures = 0;
+Error* Service_Loop() {
+  Error* e = err_success();
 
   pthread_mutex_lock(&Service_Lock);
 
@@ -221,20 +216,7 @@ void Service_Loop() {
 
 error:
   pthread_mutex_unlock(&Service_Lock);
-
-  if (! e) {
-    sleep_ms(Service_Model_Config.EcPollInterval);
-    failures = 0;
-  }
-  else {
-    if (++failures >= 100) {
-      Log_Error("%s\n", err_print_all(e));
-      Log_Error("We tried %d times, exiting now...\n", failures);
-      exit(NBFC_EXIT_FAILURE);
-    }
-
-    sleep_ms(10);
-  }
+  return e;
 }
 
 static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable* ec) {

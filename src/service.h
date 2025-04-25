@@ -27,7 +27,7 @@ extern array_of(FanTemperatureControl) Service_Fans;
 extern Service_Options options;
 
 Error* Service_Init();
-void   Service_Loop();
+Error* Service_Loop();
 void   Service_Cleanup();
 Error* Service_WriteTargetFanSpeedsToConfig();
 

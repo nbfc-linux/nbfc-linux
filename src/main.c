@@ -8,6 +8,7 @@
 #include "model_config.h"
 #include "pidfile.h"
 #include "help/nbfc_service.help.h"
+#include "sleep.h"
 #include "quit.h"
 
 #include <errno.h>  // errno
@@ -67,6 +68,11 @@ static void parse_opts(int argc, char* const argv[]) {
     Log_Error("Too much arguments\n");
     exit(NBFC_EXIT_CMDLINE);
   }
+}
+
+static inline void set_time_by_msecs(struct timeval* tv, unsigned int msecs) {
+  tv->tv_sec = msecs / 1000;
+  tv->tv_usec = (msecs % 1000) * 1000;
 }
 
 int main(int argc, char* const argv[])
@@ -168,12 +174,6 @@ int main(int argc, char* const argv[])
     return NBFC_EXIT_INIT;
   }
 
-  e = Server_Start();
-  if (e) {
-    Log_Error("%s\n", err_print_all(e));
-    return NBFC_EXIT_INIT;
-  }
-
   if (write(pipefd[1], "1", 1) == -1) {
     Log_Error("write(): %s\n", strerror(errno));
     return NBFC_EXIT_FAILURE;
@@ -186,11 +186,38 @@ int main(int argc, char* const argv[])
     close(STDERR_FILENO);
   }
 
-  while (!quit) {
-    Service_Loop();
-  }
+  int failures = 0;
 
-  Server_Stop();
+  while (!quit) {
+    // ========================================================================
+    // Run the service loop.
+    // This does the main work of the service.
+    // ========================================================================
+    e = Service_Loop();
+    if (! e) {
+      failures = 0;
+    }
+    else {
+      if (++failures >= 100) {
+        Log_Error("%s\n", err_print_all(e));
+        Log_Error("We tried %d times, exiting now...\n", failures);
+        return NBFC_EXIT_FAILURE;
+      }
+      sleep_ms(10);
+      continue;
+    }
+
+    // ========================================================================
+    // Run the server loop for Service_Model_Config.EcPollInterval miliseconds.
+    // ========================================================================
+    struct timeval timeout;
+    set_time_by_msecs(&timeout, Service_Model_Config.EcPollInterval);
+
+    while (!quit && (timeout.tv_sec > 0 || timeout.tv_usec > 0)) {
+      e = Server_Loop(&timeout);
+      e_warn();
+    }
+  }
 
   return 0;
 }
