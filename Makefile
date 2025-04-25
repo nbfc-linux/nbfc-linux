@@ -230,7 +230,6 @@ src/nbfc_service: \
 	src/generated/model_config.generated.c \
 	src/generated/model_config.generated.h \
 	src/help/nbfc_service.help.h \
-	src/lm_sensors.c src/lm_sensors.h \
 	src/macros.h \
 	src/main.c \
 	src/memory.c src/memory.h \

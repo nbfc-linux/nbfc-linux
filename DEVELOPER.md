@@ -13,17 +13,13 @@ For translating them to JSON, do
 ### error.c
 
 For chaining error messages, there is a `Error error_stack[16];`.
-Errors can be strings, integers or error codes belonging to an error system.
+Errors can be strings or error codes belonging to an error system.
 
 ```
 enum ErrorSystem {
   ErrorSystem_String,
-  ErrorSystem_Integer,
   ErrorSystem_Stdlib,
   ErrorSystem_NxJson,
-#ifdef HAVE_SENSORS
-  ErrorSystem_Sensors,
-#endif
 };
 
 typedef struct Error Error;

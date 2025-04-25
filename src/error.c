@@ -6,9 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#ifdef HAVE_SENSORS
-#include <sensors/error.h>
-#endif
 
 __thread Error error_stack[16];
 
@@ -19,9 +16,6 @@ static void err_print(Error* e, StringBuf* s) {
   switch (e->system) {
   case ErrorSystem_Stdlib:  StringBuf_Printf(s, "%s", strerror(e->value.code)); break;
   case ErrorSystem_NxJson:  StringBuf_Printf(s, "%s", NX_JSON_MSGS[e->value.code]); break;
-#ifdef HAVE_SENSORS
-  case ErrorSystem_Sensors: StringBuf_Printf(s, "%s", sensors_strerror(e->value.code)); break;
-#endif
   case ErrorSystem_String:  StringBuf_Printf(s, "%s", e->value.message); break;
   }
 }
