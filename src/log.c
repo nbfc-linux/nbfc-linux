@@ -5,17 +5,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-void Log_Debug(const char* fmt, ...) {
-  fprintf(stderr, "%s: DEBUG: ", Program_Name);
+LogLevel Log_LogLevel = LogLevel_Info;
 
-  va_list args;
-  va_start(args, fmt);
-  vfprintf(stderr, fmt, args);
-  va_end(args);
-}
+void Log_Error(const char* fmt, ...) {
+  if (Log_LogLevel < LogLevel_Error)
+    return;
 
-void Log_Info(const char* fmt, ...) {
-  fprintf(stderr, "%s: INFO: ", Program_Name); \
+  fprintf(stderr, "%s: ERROR: ", Program_Name);
 
   va_list args;
   va_start(args, fmt);
@@ -24,6 +20,9 @@ void Log_Info(const char* fmt, ...) {
 }
 
 void Log_Warn(const char* fmt, ...) {
+  if (Log_LogLevel < LogLevel_Warn)
+    return;
+
   fprintf(stderr, "%s: WARNING: ", Program_Name);
 
   va_list args;
@@ -32,11 +31,27 @@ void Log_Warn(const char* fmt, ...) {
   va_end(args);
 }
 
-void Log_Error(const char* fmt, ...) {
-  fprintf(stderr, "%s: ERROR: ", Program_Name);
+void Log_Info(const char* fmt, ...) {
+  if (Log_LogLevel < LogLevel_Info)
+    return;
+
+  fprintf(stderr, "%s: INFO: ", Program_Name); \
 
   va_list args;
   va_start(args, fmt);
   vfprintf(stderr, fmt, args);
   va_end(args);
 }
+
+void Log_Debug(const char* fmt, ...) {
+  if (Log_LogLevel < LogLevel_Debug)
+    return;
+
+  fprintf(stderr, "%s: DEBUG: ", Program_Name);
+
+  va_list args;
+  va_start(args, fmt);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+}
+

@@ -189,9 +189,7 @@ Error* Service_Loop() {
     // Re-init if current fan speeds are off by more than 15%
     if (fabs(Fan_GetCurrentSpeed(&f->Fan) - Fan_GetTargetSpeed(&f->Fan)) > 15) {
       re_init_required = true;
-
-      if (options.debug)
-        Log_Debug("re_init_required = 1;\n");
+      Log_Debug("re_init_required = 1;\n");
     }
   }
 

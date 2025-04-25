@@ -53,11 +53,14 @@ static void parse_opts(int argc, char* const argv[]) {
         exit(NBFC_EXIT_CMDLINE);
       }
       break;
+    case 'd':
+      options.debug = 1;
+      Log_LogLevel = LogLevel_Debug;
+      break;
     case 'v':  printf("nbfc-linux " NBFC_VERSION "\n"); exit(0);   break;
     case 'h':  printf(NBFC_SERVICE_HELP_TEXT, argv[0]); exit(0);   break;
     case 'r':  options.read_only      = 1;                         break;
     case 'f':  options.fork           = 1;                         break;
-    case 'd':  options.debug          = 1;                         break;
     case 'c':  options.service_config = optarg;                    break;
     case 'p':  options.python_hack    = 1;                         break;
     default:   exit(NBFC_EXIT_CMDLINE);
