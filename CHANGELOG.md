@@ -1,5 +1,9 @@
 # Changelog
 
+## nbfc-linux-0.3.8 (2025-04-26)
+- Comments can now be added to any JSON object in the configuration files
+  by using the "Comment" field.
+
 ## nbfc-linux-0.3.7 (2025-04-26)
 - Improved the forking and daemonization process
 - Dropped the `pipe(), write(), read()` logic that has been used to communicate

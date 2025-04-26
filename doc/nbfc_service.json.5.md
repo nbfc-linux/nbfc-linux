@@ -4,6 +4,9 @@ nbfc_service.json - Notebook FanControl service configuration
 
 # CONFIGURATION
 
+**NOTE**: Comments can be added in any JSON object by using the
+**Comment** field.
+
 ## ServiceConfig
 
 Main configuration file of nbfc_service (*/etc/nbfc.json*)
@@ -11,7 +14,7 @@ Main configuration file of nbfc_service (*/etc/nbfc.json*)
 **SelectedConfigId**: *String*
 
 > The selected config model. This equals the basename of a notebook
-> model configuration file.
+> model configuration file. Absolute file paths can also be specified.
 
 **EmbeddedControllerType**: *String*
 

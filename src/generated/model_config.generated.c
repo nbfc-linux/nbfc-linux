@@ -28,7 +28,7 @@ Error* TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* j
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "UpThreshold"))
 			e = short_FromJson(&obj->UpThreshold, c);
 		else if (!strcmp(c->key, "DownThreshold"))
@@ -72,7 +72,7 @@ Error* FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, cons
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "FanSpeedPercentage"))
 			e = float_FromJson(&obj->FanSpeedPercentage, c);
 		else if (!strcmp(c->key, "FanSpeedValue"))
@@ -138,7 +138,7 @@ Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, cons
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "WriteMode"))
 			e = RegisterWriteMode_FromJson(&obj->WriteMode, c);
 		else if (!strcmp(c->key, "WriteOccasion"))
@@ -246,7 +246,7 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "FanDisplayName"))
 			e = str_FromJson(&obj->FanDisplayName, c);
 		else if (!strcmp(c->key, "ReadRegister"))
@@ -338,7 +338,7 @@ Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "NotebookModel"))
 			e = str_FromJson(&obj->NotebookModel, c);
 		else if (!strcmp(c->key, "Author"))
@@ -390,7 +390,7 @@ Error* FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, cons
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "FanIndex"))
 			e = int_FromJson(&obj->FanIndex, c);
 		else if (!strcmp(c->key, "TemperatureAlgorithmType"))
@@ -434,7 +434,7 @@ Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "SelectedConfigId"))
 			e = str_FromJson(&obj->SelectedConfigId, c);
 		else if (!strcmp(c->key, "EmbeddedControllerType"))
@@ -496,7 +496,7 @@ Error* FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "Name"))
 			e = str_FromJson(&obj->Name, c);
 		else if (!strcmp(c->key, "Temperature"))
@@ -550,7 +550,7 @@ Error* ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (0);
+		if (!strcmp(c->key, "Comment"));
 		else if (!strcmp(c->key, "PID"))
 			e = int_FromJson(&obj->PID, c);
 		else if (!strcmp(c->key, "SelectedConfigId"))

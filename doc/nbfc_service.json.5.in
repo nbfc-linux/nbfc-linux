@@ -6,6 +6,12 @@ nbfc_service.json \- Notebook FanControl service configuration
 
 .SH CONFIGURATION
 
+.BR NOTE :
+Comments can be added in any JSON object by using the
+.B Comment
+field.
+.RE
+
 .SS ServiceConfig
 .PP
 Main configuration file of nbfc_service
@@ -15,7 +21,7 @@ Main configuration file of nbfc_service
 .BR SelectedConfigId :
 .I String
 .RS
-The selected config model. This equals the basename of a notebook model configuration file.
+The selected config model. This equals the basename of a notebook model configuration file. Absolute file paths can also be specified.
 .RE
 
 .PP

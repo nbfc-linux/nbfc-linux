@@ -246,7 +246,7 @@ def write_parse_struct(struct, fh):
     p( '\t\treturn err_string(0, "Not a JSON object");')
     p( '')
     p( '\tnx_json_for_each(c, json) {')
-    p( '\t\tif (0);')
+    p( '\t\tif (!strcmp(c->key, "Comment"));')
 
     for field in struct:
         p(f'\t\telse if (!strcmp(c->key, "{field.name}"))')
