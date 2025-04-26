@@ -1,6 +1,7 @@
 #include "fan_temperature_control.h"
 
 #include "nbfc.h"
+#include "memory.h"
 
 #include <float.h>
 #include <string.h>
