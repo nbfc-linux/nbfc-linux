@@ -3,10 +3,8 @@
 
 #include "error.h"
 
-#include <sys/time.h>
-
 Error* Server_Init();
-Error* Server_Loop(struct timeval*);
+Error* Server_Loop(int);
 void   Server_Close();
 
 #endif

@@ -1,5 +1,11 @@
 # Changelog
 
+## nbfc-linux-0.3.6 (2025-04-26)
+- Server now doesn't use threads to handle client connections. This saves some RAM.
+- `select()` has been replaced by `poll()`.
+- Incoming messages have a maximum size. This prevents the server of exiting
+  in case of receiving huge messages.
+
 ## nbfc-linux-0.3.5 (2025-04-25)
 - Server now runs in the main thread.
   This saves around 60KB of RAM.

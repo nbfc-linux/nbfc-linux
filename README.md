@@ -29,7 +29,7 @@ Comparison of NBFC C# and NBFC Linux
 |Configuration files              | XML (956KB)                           | [JSON](share/nbfc/configs) (840KB)          |
 |Model compatibility database     | No                                    | [Yes](share/nbfc/model_support.json)        |
 |Runtime                          | Mono                                  | Native                                      |
-|Memory consumption (ps\_mem)     | ~50MB                                 | ~350KB                                      |
+|Memory consumption (ps\_mem)     | ~50MB                                 | ~280KB                                      |
 |Package size (pkg.tar.gz)        | 448K                                  | 100K                                        |
 |Fan control rights               | Any user                              | Any user                                    |
 |Service control rights           | Any user                              | Only root                                   |

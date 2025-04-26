@@ -4,6 +4,7 @@ import json
 import socket
 
 SOCKET = '/var/run/nbfc_service.socket'
+MAX_MESSAGE_SIZE = 256
 
 def communicate(socket_file, data):
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as client_socket:
@@ -50,6 +51,9 @@ do_test('{"Command": 1}',
 
 do_test('{"Command": "foo"}',
         {'Error': 'Invalid command'})
+
+do_test('x' * (MAX_MESSAGE_SIZE + 1),
+        {'Error': 'Message too large'})
 
 # Command "set-fan-speed" =====================================================
 do_test('{"Command": "set-fan-speed"}',

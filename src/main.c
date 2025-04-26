@@ -19,6 +19,7 @@
 #include <locale.h> // setlocale, LC_NUMERIC
 #include <getopt.h> // getopt_long
 #include <unistd.h> // fork
+#include <sys/time.h> // gettimeofday
 
 EC_VTable* ec;
 
@@ -213,11 +214,18 @@ int main(int argc, char* const argv[])
     // ========================================================================
     // Run the server loop for Service_Model_Config.EcPollInterval miliseconds.
     // ========================================================================
-    struct timeval timeout;
-    set_time_by_msecs(&timeout, Service_Model_Config.EcPollInterval);
+    struct timeval start, current;
+    gettimeofday(&start, NULL);
 
-    while (!quit && (timeout.tv_sec > 0 || timeout.tv_usec > 0)) {
-      e = Server_Loop(&timeout);
+    while (!quit) {
+      gettimeofday(&current, NULL);
+      int elapsed = (current.tv_sec - start.tv_sec) * 1000 + (current.tv_usec - start.tv_usec) / 1000;
+      int timeout = Service_Model_Config.EcPollInterval - elapsed;
+
+      if (timeout <= 0)
+        break;
+
+      e = Server_Loop(timeout);
       e_warn();
     }
   }

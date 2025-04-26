@@ -32,7 +32,6 @@ enum Service_Initialization {
 };
 
 ModelConfig              Service_Model_Config;
-pthread_mutex_t          Service_Lock;
 array_of(FanTemperatureControl) Service_Fans;
 static enum Service_Initialization Service_State;
 
@@ -47,9 +46,6 @@ Error* Service_Init() {
   Error* e;
   char path[PATH_MAX];
   Service_State = Initialized_0_None;
-
-  // Lock =====================================================================
-  pthread_mutex_init(&Service_Lock, NULL);
 
   // Service config ===========================================================
   e = ServiceConfig_Init(options.service_config);
@@ -178,8 +174,6 @@ error:
 Error* Service_Loop() {
   Error* e = err_success();
 
-  pthread_mutex_lock(&Service_Lock);
-
   bool re_init_required = false;
   for_each_array(FanTemperatureControl*, f, Service_Fans) {
     e = Fan_UpdateCurrentSpeed(&f->Fan);
@@ -213,7 +207,6 @@ Error* Service_Loop() {
   }
 
 error:
-  pthread_mutex_unlock(&Service_Lock);
   return e;
 }
 

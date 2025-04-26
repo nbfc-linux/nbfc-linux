@@ -1,6 +1,7 @@
 #include "server.h"
 
 #include "nbfc.h"
+#include "macros.h"
 #include "nxjson_utils.h"
 #include "reverse_nxjson.h"
 #include "error.h"
@@ -10,23 +11,46 @@
 #include "log.h"
 #include "protocol.h"
 #include "memory.h"
-#include "quit.h"
+#include "stack_memory.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/select.h>
-#include <pthread.h>
-#include <signal.h>
+#include <errno.h>      // errno, EWOULDBLOCK, EAGAIN, EFBIG, EINTR
+#include <stdio.h>      // snprintf
+#include <string.h>     // strcmp, memset
+#include <unistd.h>     // read, close, unlink
+#include <sys/stat.h>   // chmod
+#include <sys/socket.h> // socket, bind, listen, accept
+#include <sys/un.h>     // sockaddr_un
+#include <fcntl.h>      // fcntl
+#include <poll.h>       // poll, POLLIN
+
+#define SERVER_MAX_MESSAGE_SIZE 256 // Max size for incoming messages
+
+struct Client {
+  int fd;
+  bool active;
+  char buf[SERVER_MAX_MESSAGE_SIZE];
+  size_t bufsz;
+};
+typedef struct Client Client;
+declare_array_of(Client);
 
 static int                Server_FD = -1;
 static struct sockaddr_un Server_Address;
+static array_of(Client)   Server_Clients = {0};
+static struct pollfd*     Server_PollFDs = NULL;
+static size_t             Server_PollFDSize = 0;
 
+/* Command "set-fan-speed"
+ *
+ * Examples of incoming JSON:
+ *
+ * {"Command": "set-fan-speed", "Speed": <SPEED>}
+ * {"Command": "set-fan-speed", "Fan": <NUMBER>, "Speed": <SPEED>}
+ * {"Command": "set-fan-speed", "Fan": <NUMBER>, "Speed": "auto"}
+ *
+ * Note: We don't use StackMemory_Init() here, because that has already
+ * been called in Server_HandleClient().
+ */
 static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   int fan = -1;
   float speed = -2;
@@ -95,6 +119,15 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   return e;
 }
 
+/* Command "status"
+ *
+ * Examples of incoming JSON:
+ *
+ * {"Command": "status"}
+ *
+ * Note: We don't use StackMemory_Init() here, because that has already
+ * been called in Server_HandleClient().
+ */
 static Error* Server_Command_Status(int socket, const nx_json* json) {
   if (json->val.children.length > 1)
       return err_string(0, "Unknown arguments");
@@ -124,54 +157,12 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
   return e;
 }
 
-static void* Server_Handle_Client(void* arg) {
-  const int socket = (int) (intptr_t) arg;
-  const nx_json* json = NULL;
-  char* buf = NULL;
-  Error* e;
-
-  e = Protocol_Receive_Json(socket, &buf, &json);
-  if (e)
-    goto error;
-
-  if (json->type != NX_JSON_OBJECT) {
-    e = err_string(0, "Not a JSON object");
-    goto error;
-  }
-
-  const nx_json* command = nx_json_get(json, "Command");
-  if (! command) {
-    e = err_string(0, "Missing 'Command' field");
-    goto error;
-  }
-
-  if (command->type != NX_JSON_STRING) {
-    e = err_string(0, "Command: Not a string");
-    goto error;
-  }
-
-  pthread_mutex_lock(&Service_Lock);
-  {
-    if (!strcmp(command->val.text, "set-fan-speed"))
-      e = Server_Command_Set_Fan(socket, json);
-    else if (!strcmp(command->val.text, "status"))
-      e = Server_Command_Status(socket, json);
-    else
-      e = err_string(0, "Invalid command");
-  }
-  pthread_mutex_unlock(&Service_Lock);
-
-error:
-  if (e)
-    Protocol_Send_Error(socket, err_print_all(e));
-
-  Mem_Free(buf);
-  nx_json_free(json);
-  close(socket);
-
-  return NULL;
-}
-
+/* Initialize server.
+ *
+ * Call socket(), bind() and listen().
+ *
+ * Also change the mode of the socket file to 0666.
+ */
 Error* Server_Init() {
   Error* e = NULL;
 
@@ -206,32 +197,245 @@ error:
   return e;
 }
 
-Error* Server_Loop(struct timeval* timeout) {
-  fd_set readfds;
-  FD_ZERO(&readfds);
-  FD_SET(Server_FD, &readfds);
+// Return a new `Client` structure
+static Client* Server_AllocateClient() {
+  // Try to use an existing client that is inactive
+  for_each_array(Client*, client, Server_Clients)
+    if (! client->active)
+      return client;
 
-  int activity = select(Server_FD + 1, &readfds, NULL, NULL, timeout);
-  if (activity < 0) {
-    if (errno != EINTR)
-      return err_stdlib(0, "select()");
-    return err_success();
-  }
+  // Allocate space for new client
+  const size_t idx = Server_Clients.size;
+  Server_Clients.data = Mem_Realloc(Server_Clients.data, (idx + 1) * sizeof(Client));
+  Server_Clients.size = idx + 1;
+  return &Server_Clients.data[idx];
+}
 
-  if (FD_ISSET(Server_FD, &readfds)) {
-    int addrlen = sizeof(Server_Address);
-    int new_socket;
-    pthread_t thread_id;
+/* Initialize a client
+ *
+ * - Make it active
+ * - Set its file descriptor
+ * - Reset the buffer
+ * - Make the file descriptor non blocking
+ */
+static Error* Server_UseClient(Client* client, int fd) {
+  int flags = fcntl(fd, F_GETFL, 0);
 
-    if ((new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0)
-      return err_stdlib(0, "accept()");
+  if (flags == -1)
+    return err_stdlib(0, "fcntl()");
 
-    if (pthread_create(&thread_id, NULL, Server_Handle_Client, (void*) (intptr_t) new_socket) != 0) {
-      close(new_socket);
-      return err_stdlib(0, "pthread_create()");
+  if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1)
+    return err_stdlib(0, "fcntl()");
+
+  client->active = true;
+  client->fd = fd;
+  client->bufsz = 0;
+  client->buf[0] = '\0';
+  return err_success();
+}
+
+// Find an active client whose file descriptor matches `fd`
+static Client* Server_FindClientByFileDescriptor(int fd) {
+  for_each_array(Client*, client, Server_Clients)
+    if (client->active && client->fd == fd)
+      return client;
+
+  return NULL;
+}
+
+// Get the number of active clients
+static size_t Server_GetNumberOfActiveClients() {
+  size_t num_clients = 0;
+  for_each_array(Client*, client, Server_Clients)
+    num_clients += client->active;
+  return num_clients;
+}
+
+// Accept a new connection and add setup client
+static Error* Server_AcceptClient() {
+  Error* e;
+  int addrlen = sizeof(Server_Address);
+  int new_socket;
+
+  if ((new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0)
+    return err_stdlib(0, "accept()");
+
+  Client* client = Server_AllocateClient();
+
+  e = Server_UseClient(client, new_socket);
+  if (e)
+    close(new_socket);
+
+  return e;
+}
+
+/* Receive the incoming message for the client
+ *
+ * Return `0` if the message has been fully received, else `-1`.
+ */
+static int Server_ReceiveMessage(Client* client) {
+  size_t space_left;
+  size_t size_to_read;
+  int    nread;
+
+  do {
+    space_left = sizeof(client->buf) - client->bufsz - 1;
+
+    if (space_left <= 0) {
+      errno = EFBIG;
+      return -1;
     }
 
-    pthread_detach(thread_id);
+    if (space_left > PROTOCOL_BUFFER_SIZE)
+      size_to_read = PROTOCOL_BUFFER_SIZE;
+    else
+      size_to_read = space_left;
+
+    Log_Debug("read(%d, ..., %d)\n", client->fd, size_to_read);
+
+    nread = read(client->fd, client->buf + client->bufsz, size_to_read);
+
+    if (nread < 0)
+      return -1;
+
+    client->bufsz += nread;
+    client->buf[client->bufsz] = '\0';
+
+    char* end_marker_pos = strstr(client->buf, PROTOCOL_END_MARKER);
+    if (end_marker_pos) {
+      *end_marker_pos = '\0';
+      break;
+    }
+  } while (nread > 0);
+
+  return 0;
+}
+
+/* Process a client connection.
+ *
+ * - Read the message from the client file descriptor
+ * - Parse it as JSON
+ * - Call the command functions
+ */
+static void Server_HandleClient(Client* client) {
+  Error* e = NULL;
+  const nx_json* json = NULL;
+
+  Log_Debug("Server_HandleClient(fd=%d)\n", client->fd);
+
+  if (Server_ReceiveMessage(client) == -1) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK)
+      return;
+    else if (errno == EFBIG) {
+      e = err_string(0, "Message too large");
+      goto end;
+    }
+    else {
+      Log_Warn("Client %d read failed: %s\n", client->fd, strerror(errno));
+      close(client->fd);
+      client->active = false;
+      return;
+    }
+  }
+
+  // The functions `Server_Command_Set_Fan()` and `Server_Command_Status()`
+  // are also allocating using this stack, so keep this large
+  char nxjson_memory[NBFC_MAX_FILE_SIZE];
+
+  StackMemory_Init(nxjson_memory, sizeof(nxjson_memory));
+
+  json = nx_json_parse_utf8(client->buf);
+
+  if (! json) {
+    e = err_nxjson(0, "Invalid JSON");
+    goto end;
+  }
+
+  if (json->type != NX_JSON_OBJECT) {
+    e = err_string(0, "Not a JSON object");
+    goto end;
+  }
+
+  const nx_json* command = nx_json_get(json, "Command");
+  if (! command) {
+    e = err_string(0, "Missing 'Command' field");
+    goto end;
+  }
+
+  if (command->type != NX_JSON_STRING) {
+    e = err_string(0, "Command: Not a string");
+    goto end;
+  }
+
+  if (!strcmp(command->val.text, "set-fan-speed"))
+    e = Server_Command_Set_Fan(client->fd, json);
+  else if (!strcmp(command->val.text, "status"))
+    e = Server_Command_Status(client->fd, json);
+  else
+    e = err_string(0, "Invalid command");
+
+end:
+  nx_json_free(json);
+  StackMemory_Destroy();
+  if (e)
+    Protocol_Send_Error(client->fd, err_print_all(e));
+  close(client->fd);
+  client->active = false;
+}
+
+// Hadle incoming connections and process clients
+Error* Server_Loop(int timeout) {
+  const size_t num_clients = Server_GetNumberOfActiveClients();
+  const size_t needed_fdsize = num_clients + 1;
+
+  Log_Debug("Server_Loop(timeout=%d): num clients: %d\n", timeout, num_clients);
+
+  // Allocate pollfd array if needed
+  if (needed_fdsize > Server_PollFDSize) {
+    Server_PollFDs = Mem_Realloc(Server_PollFDs, needed_fdsize * sizeof(struct pollfd));
+    Server_PollFDSize = needed_fdsize;
+  }
+
+  // Add server file descriptor to Server_PollFDs
+  Server_PollFDs[0].fd = Server_FD;
+  Server_PollFDs[0].events = POLLIN;
+
+  // Add clients to Server_PollFDs
+  size_t idx = 1;
+  for_each_array(Client*, client, Server_Clients) {
+    if (client->active) {
+      Server_PollFDs[idx].fd = client->fd;
+      Server_PollFDs[idx].events = POLLIN;
+      ++idx;
+    }
+  }
+
+  // Call poll() ...
+  int poll_count = poll(Server_PollFDs, needed_fdsize, timeout);
+  if (poll_count < 0) {
+    if (errno != EINTR)
+      return err_stdlib(0, "poll()");
+    else
+      return err_success();
+  }
+
+  // We have an incoming connection ...
+  if (Server_PollFDs[0].revents & POLLIN) {
+    Error* e = Server_AcceptClient();
+    if (e)
+      return e;
+  }
+
+  // Check for activity on client file descriptors ...
+  for (idx = 1; idx < needed_fdsize; ++idx) {
+    if (Server_PollFDs[idx].revents & POLLIN) {
+      Client* client = Server_FindClientByFileDescriptor(Server_PollFDs[idx].fd);
+      if (client == NULL)
+        Log_Warn("No client with fd=%d found\n", Server_PollFDs[idx].fd);
+      else {
+        Server_HandleClient(client);
+      }
+    }
   }
 
   return err_success();

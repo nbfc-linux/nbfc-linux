@@ -9,7 +9,6 @@
 #include "temperature_filter.h"
 
 #include <stdbool.h>
-#include <pthread.h>
 
 typedef struct Service_Options Service_Options;
 struct Service_Options {
@@ -22,7 +21,6 @@ struct Service_Options {
 };
 
 extern ModelConfig     Service_Model_Config;
-extern pthread_mutex_t Service_Lock;
 extern array_of(FanTemperatureControl) Service_Fans;
 extern Service_Options options;
 
