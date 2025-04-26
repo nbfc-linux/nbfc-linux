@@ -218,6 +218,7 @@ clean:
 
 src/nbfc_service: \
 	src/build.c \
+	src/config.h \
 	src/ec_debug.h src/ec_debug.c \
 	src/ec_dummy.h src/ec_dummy.c \
 	src/ec_linux.c src/ec_linux.h \
@@ -248,6 +249,7 @@ src/nbfc_service: \
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDLIBS_SERVICE) $(LDFLAGS)
 
 src/ec_probe: \
+	src/config.h \
 	src/ec_probe.c \
 	src/ec_sys_linux.h src/ec_sys_linux.c \
 	src/error.h src/error.c \
@@ -258,6 +260,7 @@ src/ec_probe: \
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDLIBS_EC_PROBE) $(LDFLAGS)
 
 src/nbfc: \
+	src/config.h \
 	src/client.c \
 	src/error.h src/error.c \
 	src/help/ec_probe.help.h \
@@ -268,6 +271,7 @@ src/nbfc: \
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
 
 src/test_model_config: \
+	src/config.h \
 	src/error.c \
 	src/generated/model_config.generated.h \
 	src/generated/model_config.generated.c \
