@@ -9,7 +9,6 @@
 #include "pidfile.h"
 #include "help/nbfc_service.help.h"
 #include "sleep.h"
-#include "quit.h"
 
 #include <errno.h>  // errno
 #include <string.h> // strerror
@@ -22,6 +21,8 @@
 #include <sys/time.h> // gettimeofday
 
 EC_VTable* ec;
+
+static volatile bool quit = false;
 
 static void sig_handler(int sig) {
   if (sig == SIGTERM || sig == SIGINT)

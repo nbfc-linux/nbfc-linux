@@ -43,6 +43,5 @@
 #include "server.c"
 #include "temperature_filter.c"
 #include "temperature_threshold_manager.c"
-#include "quit.c"
 
 #include "main.c"
