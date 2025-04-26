@@ -1,5 +1,12 @@
 # Changelog
 
+## nbfc-linux-0.3.7 (2025-04-26)
+- Improved the forking and daemonization process
+- Dropped the `pipe(), write(), read()` logic that has been used to communicate
+  between parent and child process.
+- Using `setsid()` to fully daemonize on fork()
+- Using `chdir()` to change to root directory ("/")
+
 ## nbfc-linux-0.3.6 (2025-04-26)
 - Server now doesn't use threads to handle client connections. This saves some RAM.
 - `select()` has been replaced by `poll()`.

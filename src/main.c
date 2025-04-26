@@ -17,7 +17,7 @@
 #include <stdlib.h> // exit, atexit
 #include <locale.h> // setlocale, LC_NUMERIC
 #include <getopt.h> // getopt_long
-#include <unistd.h> // fork
+#include <unistd.h> // fork, setsid, chdir
 #include <sys/time.h> // gettimeofday
 
 EC_VTable* ec;
@@ -64,7 +64,7 @@ static void parse_opts(int argc, char* const argv[]) {
     case 'r':  options.read_only      = 1;                         break;
     case 'f':  options.fork           = 1;                         break;
     case 'c':  options.service_config = optarg;                    break;
-    case 'p':  options.python_hack    = 1;                         break;
+    case 'p':  /* --python-hack is not longer needed */            break;
     default:   exit(NBFC_EXIT_CMDLINE);
     }
   }
@@ -73,11 +73,6 @@ static void parse_opts(int argc, char* const argv[]) {
     Log_Error("Too much arguments\n");
     exit(NBFC_EXIT_CMDLINE);
   }
-}
-
-static inline void set_time_by_msecs(struct timeval* tv, unsigned int msecs) {
-  tv->tv_sec = msecs / 1000;
-  tv->tv_usec = (msecs % 1000) * 1000;
 }
 
 int main(int argc, char* const argv[])
@@ -92,6 +87,10 @@ int main(int argc, char* const argv[])
   signal(SIGTERM, sig_handler);
   signal(SIGUSR1, sig_handler);
   signal(SIGUSR2, sig_handler);
+
+  // Change working directory to root to ensure that the process doesn't block
+  // the unmounting of filesystems by holding a directory open.
+  chdir("/");
 
   options.service_config = NBFC_SERVICE_CONFIG;
   options.embedded_controller_type = EmbeddedControllerType_Unset;
@@ -128,50 +127,13 @@ int main(int argc, char* const argv[])
 
   atexit(PID_Cleanup);
 
-  // We fork early because we use threads. However, we need to confirm if the child
-  // process has been initialized correctly. To achieve this, we communicate via this pipe.
-  // If there is any data (read() succeeds), it means the service was initialized correctly.
-  int pipefd[2];
-  if (pipe(pipefd) == -1) {
-    Log_Error("pipe(): %s\n", strerror(errno));
-    return NBFC_EXIT_FAILURE;
-  }
-
-  if (options.fork) {
-    int pid = fork();
-    switch (pid) {
-    case -1:
-      Log_Error("fork(): %s\n", strerror(errno));
-      return NBFC_EXIT_FAILURE;
-    case 0:
-      close(pipefd[0]);
-      break;
-    default:
-      close(pipefd[1]);
-
-      char buf;
-      if (read(pipefd[0], &buf, 1) == 1)
-        _exit(NBFC_EXIT_SUCCESS);
-      else
-        _exit(NBFC_EXIT_INIT);
-    }
-  }
-
-  // We got a new PID
-  e = PID_Write(false);
+  e = Service_Init();
   if (e) {
     Log_Error("%s\n", err_print_all(e));
     return NBFC_EXIT_INIT;
   }
 
   atexit(Service_Cleanup);
-  atexit(Server_Close);
-
-  e = Service_Init();
-  if (e) {
-    Log_Error("%s\n", err_print_all(e));
-    return NBFC_EXIT_INIT;
-  }
 
   e = Server_Init();
   if (e) {
@@ -179,16 +141,38 @@ int main(int argc, char* const argv[])
     return NBFC_EXIT_INIT;
   }
 
-  if (write(pipefd[1], "1", 1) == -1) {
-    Log_Error("write(): %s\n", strerror(errno));
-    return NBFC_EXIT_FAILURE;
-  }
-  close(pipefd[1]); 
+  atexit(Server_Close);
 
-  // If we don't close STDERR and STDOUT, Python's subprocess.run() will block
-  if (options.python_hack) {
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
+  if (options.fork) {
+    switch (fork()) {
+    case -1:
+      Log_Error("fork(): %s\n", strerror(errno));
+      return NBFC_EXIT_FAILURE;
+    case 0:
+      // Create a new session and detach from the controlling terminal
+      // to run the process as a true daemon.
+      if (setsid() < 0) {
+        Log_Error("setsid(): %s\n", strerror(errno));
+        return NBFC_EXIT_FAILURE;
+      }
+
+      // We got a new PID
+      e = PID_Write(false);
+      if (e) {
+        Log_Error("%s\n", err_print_all(e));
+        return NBFC_EXIT_INIT;
+      }
+
+      // Close standard file descriptors (stdin, stdout, stderr)
+      // because a daemon should not be attached to a terminal.
+      close(STDIN_FILENO);
+      close(STDOUT_FILENO);
+      close(STDERR_FILENO);
+
+      break;
+    default:
+      _exit(NBFC_EXIT_SUCCESS);
+    }
   }
 
   int failures = 0;
