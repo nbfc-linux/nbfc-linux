@@ -1,5 +1,8 @@
 # Changelog
 
+## nbfc-linux-0.3.9 (2025-04-26)
+- Support for logging though syslog facility
+
 ## nbfc-linux-0.3.8 (2025-04-26)
 - Comments can now be added to any JSON object in the configuration files
   by using the "Comment" field.

@@ -1,4 +1,4 @@
-AC_INIT([nbfc-linux], [0.3.8], [braph93@gmx.de])
+AC_INIT([nbfc-linux], [0.3.9], [braph93@gmx.de])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -47,6 +47,23 @@ esac
 
 AC_MSG_CHECKING([which Init-System should be used])
 AC_MSG_RESULT([$with_init_system])
+
+# =============================================================================
+# Syslog
+# =============================================================================
+AC_ARG_ENABLE([syslog],
+  AS_HELP_STRING([--enable-syslog],
+    [Enable logging through the syslog facility (default: enabled)]),
+    [enable_syslog=$enableval], [enable_syslog=yes])
+
+case "$enable_syslog" in
+  yes)
+    AC_DEFINE([ENABLE_SYSLOG], [1], [Define to 1 to enable logging through syslog()])
+    ;;
+  *)
+    AC_DEFINE([ENABLE_SYSLOG], [0], [Define to 1 to enable logging through syslog()])
+    ;;
+esac
 
 # =============================================================================
 # Embedded Controller Components

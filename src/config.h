@@ -3,6 +3,9 @@
 
 /* Default config.h for builds without ./configure */
 
+/* Define to 1 to enable logging through syslog() */
+#define ENABLE_SYSLOG 1
+
 /* Define to 1 to enable the '/sys/kernel/debug/ec/ec0/io' embedded controller */
 #define ENABLE_EC_SYS 1
 

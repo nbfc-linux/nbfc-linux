@@ -1,6 +1,8 @@
 #ifndef LOG_H_
 #define LOG_H_
 
+#include <stdbool.h>
+
 enum LogLevel {
   LogLevel_Quiet,
   LogLevel_Error,
@@ -12,6 +14,8 @@ typedef enum LogLevel LogLevel;
 
 extern LogLevel Log_LogLevel;
 
+void Log_Init(bool);
+void Log_Close();
 void Log_Error(const char* fmt, ...);
 void Log_Warn(const char* fmt, ...);
 void Log_Info(const char* fmt, ...);

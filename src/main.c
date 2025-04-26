@@ -96,6 +96,9 @@ int main(int argc, char* const argv[])
   options.embedded_controller_type = EmbeddedControllerType_Unset;
   parse_opts(argc, argv);
 
+  Log_Init(options.fork);
+  atexit(Log_Close);
+
   Log_Info("Running version " NBFC_VERSION "\n");
   Log_Info("SYSCONFDIR is '%s'\n", SYSCONFDIR);
   Log_Info("DATADIR is '%s'\n", DATADIR);
