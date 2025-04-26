@@ -17,6 +17,7 @@ Table of Contents
 - [Advanced configuration](#advanced-configuration)
 - [Differences in detail](#differences-in-detail)
 - [Troubleshooting](#troubleshooting)
+- [Advanced Compilation](#advanced-compilation)
 - [Shell autocompletion](#shell-autocompletion)
 - [Contributing](#contributing)
 
@@ -200,6 +201,20 @@ There is also an alternative implementation which uses `/dev/port`, called `dev_
 It can be specified on the commandline using `--embedded-controller=dev_port` and permanently set in `/etc/nbfc/nbfc.json` with `"EmbeddedControllerType": "dev_port"`.
 
 Many Linux distributions do not provide the `ec_sys` module, and the module should be compiled manually. Alternatively, the [`acpi_ec`](https://github.com/MusiKid/acpi_ec) module can be used. The `acpi_ec` module comes with a DKMS config script, which automatically rebuilds the `acpi_ec` module when a new kernel is installed and supports running NBFC with Secure Boot and Lockdown Kernel. NBFC-Linux will try to use the `acpi_ec` module if available. It can be set with `"EmbeddedControllerType": "acpi_ec"`.
+
+Advanced Compilation
+--------------------
+
+NBFC-Linux allows disabling features at compile time to produce an even smaller binary.
+
+Pass the following flags to `./configure` to disable specific components.
+
+- `--disable-syslog`: Don't log to syslog in daemon mode
+- `--disable-ec-debug`: Disable debugging of reads/writes from/to the embedded controller
+- `--disable-ec-dummy`: Disable the dummy embedded controller implementation
+- `--disable-ec-dev-port`: Disable the /dev/port embedded controller implementation
+- `--disable-ec-sys`: Disable the embedded controller implementation that relies on `ec_sys` kernel module
+- `--disable-ec-acpi`: Disable the embedded controllern implementation that relies on the `acpi_ec` kernel module
 
 Shell autocompletion
 --------------------
