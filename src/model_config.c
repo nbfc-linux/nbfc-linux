@@ -319,28 +319,22 @@ void ModelConfig_Free(ModelConfig* c) {
   memset(c, 0, sizeof(*c));
 }
 
-struct Trace {
-  char text[128];
-  struct Trace* next;
-};
-typedef struct Trace Trace;
+static size_t Trace_Add0(char* buf, size_t bufsz, const char* fmt, ...) {
+  const size_t len = strlen(buf);
 
-static void Trace_PrintBuf(const Trace* trace, char* buf, size_t size) {
-  int buf_written = 0;
-  while (trace) {
-    if (trace->text[0]) {
-      const int written = snprintf(buf + buf_written, size - buf_written, "%s: ", trace->text);
-      if (written >= size - buf_written)
-        return;
-      buf_written += written;
-    }
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(buf + len, bufsz - len, fmt, args);
+  va_end(args);
 
-    trace = trace->next;
-  }
-
-  if (buf_written)
-    buf[buf_written - 2] = '\0'; // strip ": "
+  return len;
 }
+
+#define Trace_Add(BUF, FMT, ...) \
+  Trace_Add0(BUF, sizeof(BUF), FMT, __VA_ARGS__)
+
+#define Trace_Reset(BUF, OLD) \
+  BUF[OLD] = '\0'
 
 // ============================================================================
 // Validation code
@@ -350,15 +344,16 @@ static void Trace_PrintBuf(const Trace* trace, char* buf, size_t size) {
 // that cannot be auto-generated.
 
 Error* ModelConfig_Validate(ModelConfig* c) {
-  Error* e = NULL;
-  Trace trace = {0};
-  char buf[1024];
+  Error* e;
+  char trace[1024] = {0};
+  size_t old, old1;
 
   e = ModelConfig_ValidateFields(c);
-  e_goto(err);
+  if (e)
+    return e;
 
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
-    snprintf(trace.text, sizeof(trace.text), "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
+    old = Trace_Add(trace, "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
 
     // Don't make the validation fail if `ResetRequired` is false and `ResetValue` was not set
     if (r->ResetRequired == Boolean_False || r->ResetRequired == Boolean_Unset)
@@ -367,11 +362,11 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     e = RegisterWriteConfiguration_ValidateFields(r);
     e_goto(err);
 
-    trace.text[0] = 0;
+    Trace_Reset(trace, old);
   }
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
-    snprintf(trace.text, sizeof(trace.text), "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
+    old = Trace_Add(trace, "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
 
     // Add a default FanDisplayName
     if (f->FanDisplayName == NULL) {
@@ -400,14 +395,12 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     }
 
     for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
-      Trace trace1 = {0};
-      snprintf(trace1.text, sizeof(trace1.text), "FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
-      trace.next = &trace1;
+      old1 = Trace_Add(trace, ": FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
 
       e = FanSpeedPercentageOverride_ValidateFields(o);
       e_goto(err);
 
-      trace.next = NULL;
+      Trace_Reset(trace, old1);
     }
 
     if (! f->TemperatureThresholds.size) {
@@ -427,9 +420,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     bool has_100_FanSpeed = false;
 
     for_each_array(TemperatureThreshold*, t, f->TemperatureThresholds) {
-      Trace trace1 = {0};
-      snprintf(trace1.text, sizeof(trace1.text), "TemperatureThresholds[%d]", PTR_DIFF(t, f->TemperatureThresholds.data));
-      trace.next = &trace1;
+      old1 = Trace_Add(trace, ": TemperatureThresholds[%d]", PTR_DIFF(t, f->TemperatureThresholds.data));
 
       e = TemperatureThreshold_ValidateFields(t);
       e_goto(err);
@@ -443,8 +434,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
       }
 
       if (t->UpThreshold > c->CriticalTemperature) {
-        Trace_PrintBuf(&trace, buf, sizeof(buf));
-        Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", buf);
+        Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", trace);
       }
 
       for_each_array(TemperatureThreshold*, t1, f->TemperatureThresholds) {
@@ -454,24 +444,21 @@ Error* ModelConfig_Validate(ModelConfig* c) {
         }
       }
 
-      trace.next = NULL;
+      Trace_Reset(trace, old1);
     }
 
-    if (! has_0_FanSpeed) {
-      Trace_PrintBuf(&trace, buf, sizeof(buf));
-      Log_Warn("%s: No threshold with FanSpeed == %d found\n", buf, 0);
-    }
+    if (! has_0_FanSpeed)
+      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace, 0);
 
-    if (! has_100_FanSpeed) {
-      Trace_PrintBuf(&trace, buf, sizeof(buf));
-      Log_Warn("%s: No threshold with FanSpeed == %d found\n", buf, 100);
-    }
+    if (! has_100_FanSpeed)
+      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace, 100);
+
+    Trace_Reset(trace, old);
   }
 
 err:
   if (e) {
-    Trace_PrintBuf(&trace, buf, sizeof(buf));
-    return err_string(e, buf);
+    return err_string(e, trace);
   }
 
   return err_success();
