@@ -27,6 +27,7 @@
 
 #include "log.c"
 #include "error.c"
+#include "trace.c"
 #include "fan.c"
 #include "fan_temperature_control.c"
 #include "fs_sensors.c"

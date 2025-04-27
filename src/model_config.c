@@ -2,6 +2,7 @@
 
 #include "nbfc.h"
 #include "log.h"
+#include "trace.h"
 #include "memory.h"
 #include "stack_memory.h"
 #include "nxjson_utils.h"
@@ -319,23 +320,6 @@ void ModelConfig_Free(ModelConfig* c) {
   memset(c, 0, sizeof(*c));
 }
 
-static size_t Trace_Add0(char* buf, size_t bufsz, const char* fmt, ...) {
-  const size_t len = strlen(buf);
-
-  va_list args;
-  va_start(args, fmt);
-  vsnprintf(buf + len, bufsz - len, fmt, args);
-  va_end(args);
-
-  return len;
-}
-
-#define Trace_Add(BUF, FMT, ...) \
-  Trace_Add0(BUF, sizeof(BUF), FMT, __VA_ARGS__)
-
-#define Trace_Reset(BUF, OLD) \
-  BUF[OLD] = '\0'
-
 // ============================================================================
 // Validation code
 // ============================================================================
@@ -345,15 +329,14 @@ static size_t Trace_Add0(char* buf, size_t bufsz, const char* fmt, ...) {
 
 Error* ModelConfig_Validate(ModelConfig* c) {
   Error* e;
-  char trace[1024] = {0};
-  size_t old, old1;
+  Trace trace = {0};
 
   e = ModelConfig_ValidateFields(c);
   if (e)
     return e;
 
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
-    old = Trace_Add(trace, "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
+    Trace_Push(&trace, "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
 
     // Don't make the validation fail if `ResetRequired` is false and `ResetValue` was not set
     if (r->ResetRequired == Boolean_False || r->ResetRequired == Boolean_Unset)
@@ -362,11 +345,11 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     e = RegisterWriteConfiguration_ValidateFields(r);
     e_goto(err);
 
-    Trace_Reset(trace, old);
+    Trace_Pop(&trace);
   }
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
-    old = Trace_Add(trace, "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
+    Trace_Push(&trace, "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
 
     // Add a default FanDisplayName
     if (f->FanDisplayName == NULL) {
@@ -395,12 +378,12 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     }
 
     for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
-      old1 = Trace_Add(trace, ": FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
+      Trace_Push(&trace, "FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
 
       e = FanSpeedPercentageOverride_ValidateFields(o);
       e_goto(err);
 
-      Trace_Reset(trace, old1);
+      Trace_Pop(&trace);
     }
 
     if (! f->TemperatureThresholds.size) {
@@ -420,7 +403,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     bool has_100_FanSpeed = false;
 
     for_each_array(TemperatureThreshold*, t, f->TemperatureThresholds) {
-      old1 = Trace_Add(trace, ": TemperatureThresholds[%d]", PTR_DIFF(t, f->TemperatureThresholds.data));
+      Trace_Push(&trace, "TemperatureThresholds[%d]", PTR_DIFF(t, f->TemperatureThresholds.data));
 
       e = TemperatureThreshold_ValidateFields(t);
       e_goto(err);
@@ -434,7 +417,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
       }
 
       if (t->UpThreshold > c->CriticalTemperature) {
-        Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", trace);
+        Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", trace.buf);
       }
 
       for_each_array(TemperatureThreshold*, t1, f->TemperatureThresholds) {
@@ -444,21 +427,21 @@ Error* ModelConfig_Validate(ModelConfig* c) {
         }
       }
 
-      Trace_Reset(trace, old1);
+      Trace_Pop(&trace);
     }
 
     if (! has_0_FanSpeed)
-      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace, 0);
+      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace.buf, 0);
 
     if (! has_100_FanSpeed)
-      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace, 100);
+      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace.buf, 100);
 
-    Trace_Reset(trace, old);
+    Trace_Pop(&trace);
   }
 
 err:
   if (e) {
-    return err_string(e, trace);
+    return err_string(e, trace.buf);
   }
 
   return err_success();

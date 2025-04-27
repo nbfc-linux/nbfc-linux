@@ -9,6 +9,7 @@
 #include "nbfc.h"
 #include "log.c"
 #include "error.c"
+#include "trace.c"
 #include "memory.c"
 #include "nxjson.c"
 #include "model_config.c"
