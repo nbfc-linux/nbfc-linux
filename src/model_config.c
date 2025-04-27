@@ -444,10 +444,7 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
       if (t->UpThreshold > c->CriticalTemperature) {
         Trace_PrintBuf(&trace, buf, sizeof(buf));
-        e = err_string(0, "UpThreshold cannot be greater than CriticalTemperature");
-        e = err_string(e, buf);
-        e_warn();
-        e = NULL;
+        Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", buf);
       }
 
       for_each_array(TemperatureThreshold*, t1, f->TemperatureThresholds) {
@@ -462,18 +459,12 @@ Error* ModelConfig_Validate(ModelConfig* c) {
 
     if (! has_0_FanSpeed) {
       Trace_PrintBuf(&trace, buf, sizeof(buf));
-      e = err_stringf(0, "No threshold with FanSpeed == %d found", 0);
-      e = err_string(e, buf);
-      e_warn();
-      e = NULL;
+      Log_Warn("%s: No threshold with FanSpeed == %d found\n", buf, 0);
     }
 
     if (! has_100_FanSpeed) {
       Trace_PrintBuf(&trace, buf, sizeof(buf));
-      e = err_stringf(0, "No threshold with FanSpeed == %d found", 100);
-      e = err_string(e, buf);
-      e_warn();
-      e = NULL;
+      Log_Warn("%s: No threshold with FanSpeed == %d found\n", buf, 100);
     }
   }
 
