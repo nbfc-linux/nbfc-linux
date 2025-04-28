@@ -64,6 +64,13 @@ Error* ServiceConfig_Init(const char* file) {
     if (e)
       goto err;
 
+    for_each_array(FanTemperatureSourceConfig*, ftsc1, service_config.FanTemperatureSources) {
+      if (ftsc != ftsc1 && ftsc->FanIndex == ftsc1->FanIndex) {
+        e = err_string(0, "Duplicate FanIndex");
+        goto err;
+      }
+    }
+
     Trace_Pop(&trace);
   }
 
