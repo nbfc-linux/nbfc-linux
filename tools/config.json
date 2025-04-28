@@ -269,8 +269,8 @@
       {
         "name": "TemperatureAlgorithmType",
         "type": "TemperatureAlgorithmType",
-        "default": "TemperatureAlgorithmType_Average",
-        "help": "Either 'average', 'max' or 'min'"
+        "help": "Either 'average', 'max' or 'min'",
+        "is_unset": "false"
       },
       {
         "name": "Sensors",

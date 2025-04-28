@@ -374,8 +374,8 @@ Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* sel
 	if (self->FanIndex == int_Unset)
 		return err_stringf(0, "%s: %s", "FanIndex", "Missing option");
 
-	if (self->TemperatureAlgorithmType == TemperatureAlgorithmType_Unset)
-		self->TemperatureAlgorithmType = TemperatureAlgorithmType_Average;
+	if (false)
+		return err_stringf(0, "%s: %s", "TemperatureAlgorithmType", "Missing option");
 
 	if (false)
 		return err_stringf(0, "%s: %s", "Sensors", "Missing option");

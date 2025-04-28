@@ -262,7 +262,9 @@ static Error* FanTemperatureControl_SetByServiceConfig(
       return err_stringf(0, "Invalid FanIndex in FanTemperatureSources: %d", ftsc->FanIndex);
 
     FanTemperatureControl* ftc = &fans->data[ftsc->FanIndex];
-    ftc->TemperatureAlgorithmType = ftsc->TemperatureAlgorithmType; // TODO?
+
+    if (ftsc->TemperatureAlgorithmType != TemperatureAlgorithmType_Unset)
+      ftc->TemperatureAlgorithmType = ftsc->TemperatureAlgorithmType;
 
     // If no sensors are given, use the defaults
     if (! ftsc->Sensors.size)
