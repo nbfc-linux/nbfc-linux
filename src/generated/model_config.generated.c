@@ -373,6 +373,8 @@ struct FanTemperatureSourceConfig FanTemperatureSourceConfig_Unset = {
 Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* self) {
 	if (self->FanIndex == int_Unset)
 		return err_stringf(0, "%s: %s", "FanIndex", "Missing option");
+	else if (! (self->FanIndex >= 0))
+		return err_stringf(0, "%s: %s", "FanIndex", "requires: parameter >= 0");
 
 	if (false)
 		return err_stringf(0, "%s: %s", "TemperatureAlgorithmType", "Missing option");

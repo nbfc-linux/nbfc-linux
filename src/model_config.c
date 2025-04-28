@@ -2,6 +2,7 @@
 
 #include "nbfc.h"
 #include "log.h"
+#include "macros.h"
 #include "memory.h"
 #include "stack_memory.h"
 #include "nxjson_utils.h"
@@ -16,8 +17,6 @@
 #define int_Unset   INT_MIN
 #define short_Unset SHRT_MIN
 #define float_Unset NAN
-
-#define PTR_DIFF(A, B) ((int) (A - B))
 
 static inline Error* Boolean_FromJson(Boolean* out, const nx_json* node) {
   if (node->type == NX_JSON_BOOL) {

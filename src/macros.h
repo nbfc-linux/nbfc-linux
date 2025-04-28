@@ -9,6 +9,8 @@
 #define max(A, B)        ((A) > (B) ? (A) : (B))
 #define min(A, B)        ((A) < (B) ? (A) : (B))
 
+#define PTR_DIFF(A, B) ((int) (A - B))
+
 #define ARRAY_SIZE(A)    (sizeof(A) / sizeof(*A))
 #define ARRAY_SSIZE(A)   ((ssize_t) ARRAY_SIZE(A))
 #define array_of(T)      array_of_ ## T

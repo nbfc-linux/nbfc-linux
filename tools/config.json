@@ -264,6 +264,7 @@
       {
         "name": "FanIndex",
         "type": "int",
+        "valid": "parameter >= 0",
         "help": "Specify for which fan the config should be applied"
       },
       {

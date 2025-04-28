@@ -2,7 +2,9 @@
 
 #include "nbfc.h"
 #include "error.h"
+#include "macros.h"
 #include "memory.h"
+#include "trace.h"
 #include "stack_memory.h"
 #include "model_config.h"
 #include "nxjson_utils.h"
@@ -17,9 +19,12 @@ ServiceConfig service_config = {0};
 
 Error* ServiceConfig_Init(const char* file) {
   Error* e;
+  Trace trace = {0};
   char file_content[NBFC_MAX_FILE_SIZE];
   char nxjson_memory[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
+
+  Trace_Push(&trace, file);
 
   // Use memory from the stack to allocate data structures from nxjson
   StackMemory_Init(nxjson_memory, sizeof(nxjson_memory));
@@ -37,27 +42,38 @@ Error* ServiceConfig_Init(const char* file) {
     goto err;
 
   for_each_array(float*, f, service_config.TargetFanSpeeds) {
+    Trace_Push(&trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_config.TargetFanSpeeds.data));
+
     if (*f > 100.0f) {
-      Log_Warn("%s: TargetFanSpeeds: value cannot be greater than 100.0\n", file);
+      Log_Warn("%s: Value cannot be greater than 100.0\n", trace.buf);
       *f = 100.0f;
     }
 
     if (*f < 0.0f && *f != -1.0f) {
-      Log_Warn("%s: TargetFanSpeeds: Please use `-1' for selecting auto mode\n", file);
+      Log_Warn("%s: Please use `-1' for selecting auto mode\n", trace.buf);
       *f = -1.0f;
     }
+
+    Trace_Pop(&trace);
   }
 
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config.FanTemperatureSources) {
+    Trace_Push(&trace, "FanTemperatureSources[%d]", PTR_DIFF(ftsc, service_config.FanTemperatureSources.data));
+
     e = FanTemperatureSourceConfig_ValidateFields(ftsc);
     if (e)
       goto err;
+
+    Trace_Pop(&trace);
   }
 
 err:
   nx_json_free(js);
   StackMemory_Destroy();
-  return e;
+  if (e)
+    return err_string(e, trace.buf);
+
+  return err_success();
 }
 
 Error* ServiceConfig_Write(const char* file) {

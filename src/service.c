@@ -52,7 +52,6 @@ Error* Service_Init() {
   // Service config ===========================================================
   e = ServiceConfig_Init(options.service_config);
   if (e) {
-    e = err_string(e, options.service_config);
     goto error;
   }
   Service_State = Initialized_1_Service_Config;
