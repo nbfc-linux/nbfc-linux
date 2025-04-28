@@ -74,9 +74,11 @@ int test_model_config(const char* file) {
   Error* e = ModelConfig_FromFile(&model_config, path);
   e_die();
 
-  e = ModelConfig_Validate(&model_config);
-  e_warn();
+  Trace trace = {0};
+  e = ModelConfig_Validate(&trace, &model_config);
   if (e) {
+    e = err_string(e, trace.buf);
+    e_warn();
     ret = 1;
     goto end;
   }

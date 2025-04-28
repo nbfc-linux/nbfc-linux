@@ -288,7 +288,7 @@ static void copy_array_of_TemperatureThreshold(
   array_of(TemperatureThreshold)* src) {
   dest->size = src->size;
   dest->data = Mem_Malloc(src->size * sizeof(TemperatureThreshold));
-  memcpy(dest->data, src->data, src->size * sizeof(TemperatureThreshold)); 
+  memcpy(dest->data, src->data, src->size * sizeof(TemperatureThreshold));
 }
 
 static array_of(FanSpeedPercentageOverride) Config_DefaultFanSpeedPercentageOverrides = {
@@ -325,6 +325,54 @@ void ModelConfig_Free(ModelConfig* c) {
 //
 // Calls *_ValidateFields on each structure and does some validations
 // that cannot be auto-generated.
+
+
+Error* TemperatureThresholds_Validate(
+  Trace* trace,
+  array_of(TemperatureThreshold)* TemperatureThresholds,
+  int CriticalTemperature
+)
+{
+  Error* e;
+  bool has_0_FanSpeed   = false;
+  bool has_100_FanSpeed = false;
+
+  for_each_array(TemperatureThreshold*, t, *TemperatureThresholds) {
+    Trace_Push(trace, "TemperatureThresholds[%d]", PTR_DIFF(t, TemperatureThresholds->data));
+
+    e = TemperatureThreshold_ValidateFields(t);
+    e_check();
+
+    has_0_FanSpeed   |= (t->FanSpeed == 0);
+    has_100_FanSpeed |= (t->FanSpeed == 100);
+
+    if (t->UpThreshold < t->DownThreshold) {
+      e = err_string(0, "UpThreshold cannot be less than DownThreshold");
+      return e;
+    }
+
+    if (t->UpThreshold > CriticalTemperature) {
+      Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", trace->buf);
+    }
+
+    for_each_array(TemperatureThreshold*, t1, *TemperatureThresholds) {
+      if (t != t1 && t->UpThreshold == t1->UpThreshold) {
+        e = err_string(0, "Duplicate UpThreshold");
+        return e;
+      }
+    }
+
+    Trace_Pop(trace);
+  }
+
+  if (! has_0_FanSpeed)
+    Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace->buf, 0);
+
+  if (! has_100_FanSpeed)
+    Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace->buf, 100);
+
+  return err_success();
+}
 
 Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
   Error* e;
@@ -396,42 +444,8 @@ Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
         );
     }
 
-    bool has_0_FanSpeed   = false;
-    bool has_100_FanSpeed = false;
-
-    for_each_array(TemperatureThreshold*, t, f->TemperatureThresholds) {
-      Trace_Push(trace, "TemperatureThresholds[%d]", PTR_DIFF(t, f->TemperatureThresholds.data));
-
-      e = TemperatureThreshold_ValidateFields(t);
-      e_check();
-
-      has_0_FanSpeed   |= (t->FanSpeed == 0);
-      has_100_FanSpeed |= (t->FanSpeed == 100);
-
-      if (t->UpThreshold < t->DownThreshold) {
-        e = err_string(0, "UpThreshold cannot be less than DownThreshold");
-        return e;
-      }
-
-      if (t->UpThreshold > c->CriticalTemperature) {
-        Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", trace->buf);
-      }
-
-      for_each_array(TemperatureThreshold*, t1, f->TemperatureThresholds) {
-        if (t != t1 && t->UpThreshold == t1->UpThreshold) {
-          e = err_string(0, "Duplicate UpThreshold");
-          return e;
-        }
-      }
-
-      Trace_Pop(trace);
-    }
-
-    if (! has_0_FanSpeed)
-      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace->buf, 0);
-
-    if (! has_100_FanSpeed)
-      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace->buf, 100);
+    e = TemperatureThresholds_Validate(trace, &f->TemperatureThresholds, c->CriticalTemperature);
+    e_check();
 
     Trace_Pop(trace);
   }
