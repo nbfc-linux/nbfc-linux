@@ -2,7 +2,6 @@
 
 #include "nbfc.h"
 #include "log.h"
-#include "trace.h"
 #include "memory.h"
 #include "stack_memory.h"
 #include "nxjson_utils.h"
@@ -327,29 +326,27 @@ void ModelConfig_Free(ModelConfig* c) {
 // Calls *_ValidateFields on each structure and does some validations
 // that cannot be auto-generated.
 
-Error* ModelConfig_Validate(ModelConfig* c) {
+Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
   Error* e;
-  Trace trace = {0};
 
   e = ModelConfig_ValidateFields(c);
-  if (e)
-    return e;
+  e_check();
 
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
-    Trace_Push(&trace, "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
+    Trace_Push(trace, "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
 
     // Don't make the validation fail if `ResetRequired` is false and `ResetValue` was not set
     if (r->ResetRequired == Boolean_False || r->ResetRequired == Boolean_Unset)
       r->ResetValue = 0;
 
     e = RegisterWriteConfiguration_ValidateFields(r);
-    e_goto(err);
+    e_check();
 
-    Trace_Pop(&trace);
+    Trace_Pop(trace);
   }
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
-    Trace_Push(&trace, "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
+    Trace_Push(trace, "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
 
     // Add a default FanDisplayName
     if (f->FanDisplayName == NULL) {
@@ -363,27 +360,27 @@ Error* ModelConfig_Validate(ModelConfig* c) {
       f->FanSpeedResetValue = 0;
 
     e = FanConfiguration_ValidateFields(f);
-    e_goto(err);
+    e_check();
 
     if (f->MinSpeedValue == f->MaxSpeedValue) {
       e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValue", "MaxSpeedValue");
-      e_goto(err);
+      return e;
     }
 
     if (f->IndependentReadMinMaxValues &&
         f->MinSpeedValueRead == f->MaxSpeedValueRead)
     {
       e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValueRead", "MaxSpeedValueRead");
-      e_goto(err);
+      return e;
     }
 
     for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
-      Trace_Push(&trace, "FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
+      Trace_Push(trace, "FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
 
       e = FanSpeedPercentageOverride_ValidateFields(o);
-      e_goto(err);
+      e_check();
 
-      Trace_Pop(&trace);
+      Trace_Pop(trace);
     }
 
     if (! f->TemperatureThresholds.size) {
@@ -403,45 +400,40 @@ Error* ModelConfig_Validate(ModelConfig* c) {
     bool has_100_FanSpeed = false;
 
     for_each_array(TemperatureThreshold*, t, f->TemperatureThresholds) {
-      Trace_Push(&trace, "TemperatureThresholds[%d]", PTR_DIFF(t, f->TemperatureThresholds.data));
+      Trace_Push(trace, "TemperatureThresholds[%d]", PTR_DIFF(t, f->TemperatureThresholds.data));
 
       e = TemperatureThreshold_ValidateFields(t);
-      e_goto(err);
+      e_check();
 
       has_0_FanSpeed   |= (t->FanSpeed == 0);
       has_100_FanSpeed |= (t->FanSpeed == 100);
 
       if (t->UpThreshold < t->DownThreshold) {
         e = err_string(0, "UpThreshold cannot be less than DownThreshold");
-        goto err;
+        return e;
       }
 
       if (t->UpThreshold > c->CriticalTemperature) {
-        Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", trace.buf);
+        Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", trace->buf);
       }
 
       for_each_array(TemperatureThreshold*, t1, f->TemperatureThresholds) {
         if (t != t1 && t->UpThreshold == t1->UpThreshold) {
           e = err_string(0, "Duplicate UpThreshold");
-          goto err;
+          return e;
         }
       }
 
-      Trace_Pop(&trace);
+      Trace_Pop(trace);
     }
 
     if (! has_0_FanSpeed)
-      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace.buf, 0);
+      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace->buf, 0);
 
     if (! has_100_FanSpeed)
-      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace.buf, 100);
+      Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace->buf, 100);
 
-    Trace_Pop(&trace);
-  }
-
-err:
-  if (e) {
-    return err_string(e, trace.buf);
+    Trace_Pop(trace);
   }
 
   return err_success();

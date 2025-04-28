@@ -9,6 +9,7 @@
 #include "fs_sensors.h"
 #include "service_config.h"
 #include "nbfc.h"
+#include "trace.h"
 #include "memory.h"
 #include "macros.h"
 #include "model_config.h"
@@ -44,6 +45,7 @@ static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
 Error* Service_Init() {
   Error* e;
+  Trace trace = {0};
   char path[PATH_MAX];
   Service_State = Initialized_0_None;
 
@@ -79,9 +81,10 @@ Error* Service_Init() {
 
   Service_State = Initialized_2_Model_Config;
 
-  e = ModelConfig_Validate(&Service_Model_Config);
+  Trace_Push(&trace, path);
+  e = ModelConfig_Validate(&trace, &Service_Model_Config);
   if (e) {
-    e = err_string(e, path);
+    e = err_string(e, trace.buf);
     goto error;
   }
 

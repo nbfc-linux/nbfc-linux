@@ -5,6 +5,7 @@
 #include "macros.h"
 #include "nxjson.h"
 #include "error.h"
+#include "trace.h"
 
 #if defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
 
@@ -78,7 +79,7 @@ EmbeddedControllerType EmbeddedControllerType_FromString(const char*);
 const char*            EmbeddedControllerType_ToString(EmbeddedControllerType);
 const char*            TemperatureAlgorithmType_ToString(TemperatureAlgorithmType);
 
-Error* ModelConfig_Validate(ModelConfig*);
+Error* ModelConfig_Validate(Trace*, ModelConfig*);
 Error* ModelConfig_FromFile(ModelConfig*, const char*);
 void   ModelConfig_Free(ModelConfig*);
 
