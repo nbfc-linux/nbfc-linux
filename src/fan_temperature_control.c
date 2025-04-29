@@ -212,7 +212,7 @@ static Error* FanTemperatureControl_SetByModelConfig0(
 {
   Error* e;
 
-  if (fc->TemperatureAlgorithmType != TemperatureAlgorithmType_Unset)
+  if (FanConfiguration_IsSet_TemperatureAlgorithmType(fc))
     ftc->TemperatureAlgorithmType = fc->TemperatureAlgorithmType;
 
   // Use default sensor names
@@ -263,7 +263,7 @@ static Error* FanTemperatureControl_SetByServiceConfig(
 
     FanTemperatureControl* ftc = &fans->data[ftsc->FanIndex];
 
-    if (ftsc->TemperatureAlgorithmType != TemperatureAlgorithmType_Unset)
+    if (FanTemperatureSourceConfig_IsSet_TemperatureAlgorithmType(ftsc))
       ftc->TemperatureAlgorithmType = ftsc->TemperatureAlgorithmType;
 
     // If no sensors are given, use the defaults

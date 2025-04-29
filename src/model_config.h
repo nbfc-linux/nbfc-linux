@@ -46,17 +46,10 @@ enum NBFC_PACKED_ENUM TemperatureAlgorithmType_ {
   TemperatureAlgorithmType_Unset,
 };
 
-enum NBFC_PACKED_ENUM Boolean_ {
-  Boolean_False = 0,
-  Boolean_True  = 1,
-  Boolean_Unset,
-};
-
 typedef enum RegisterWriteMode_        RegisterWriteMode;
 typedef enum RegisterWriteOccasion_    RegisterWriteOccasion;
 typedef enum OverrideTargetOperation_  OverrideTargetOperation;
 typedef enum EmbeddedControllerType_   EmbeddedControllerType;
-typedef enum Boolean_                  Boolean;
 typedef enum TemperatureAlgorithmType_ TemperatureAlgorithmType;
 
 #else /* no packed enums */
@@ -66,7 +59,6 @@ typedef char                          RegisterWriteOccasion;
 typedef char                          OverrideTargetOperation;
 typedef char                          EmbeddedControllerType;
 typedef char                          TemperatureAlgorithmType;
-typedef char                          Boolean;
 
 #endif /* packed enums */
 

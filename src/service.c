@@ -119,7 +119,7 @@ Error* Service_Init() {
     // --embedded-controller given
     ec = EC_By_EmbeddedControllerType(options.embedded_controller_type);;
   }
-  else if (service_config.EmbeddedControllerType != EmbeddedControllerType_Unset) {
+  else if (ServiceConfig_IsSet_EmbeddedControllerType(&service_config)) {
     ec = EC_By_EmbeddedControllerType(service_config.EmbeddedControllerType);
   }
   else {

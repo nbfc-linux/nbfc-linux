@@ -1,19 +1,13 @@
 /* Auto generated code ['./tools/config.py', 'source'] */
 
-struct TemperatureThreshold TemperatureThreshold_Unset = {
-	short_Unset,
-	short_Unset,
-	float_Unset,
-};
-
 Error* TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
-	if (self->UpThreshold == short_Unset)
+	if (! TemperatureThreshold_IsSet_UpThreshold(self))
 		return err_stringf(0, "%s: %s", "UpThreshold", "Missing option");
 
-	if (self->DownThreshold == short_Unset)
+	if (! TemperatureThreshold_IsSet_DownThreshold(self))
 		return err_stringf(0, "%s: %s", "DownThreshold", "Missing option");
 
-	if (self->FanSpeed == float_Unset)
+	if (! TemperatureThreshold_IsSet_FanSpeed(self))
 		return err_stringf(0, "%s: %s", "FanSpeed", "Missing option");
 	else if (! (self->FanSpeed >= 0.0 && self->FanSpeed <= 100.0))
 		return err_stringf(0, "%s: %s", "FanSpeed", "requires: parameter >= 0.0 && parameter <= 100.0");
@@ -21,20 +15,30 @@ Error* TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
 }
 
 Error* TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = TemperatureThreshold_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "UpThreshold"))
-			e = short_FromJson(&obj->UpThreshold, c);
-		else if (!strcmp(c->key, "DownThreshold"))
-			e = short_FromJson(&obj->DownThreshold, c);
-		else if (!strcmp(c->key, "FanSpeed"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "UpThreshold")) {
+			e = int16_t_FromJson(&obj->UpThreshold, c);
+			if (!e)
+				TemperatureThreshold_Set_UpThreshold(obj);
+		}
+		else if (!strcmp(c->key, "DownThreshold")) {
+			e = int16_t_FromJson(&obj->DownThreshold, c);
+			if (!e)
+				TemperatureThreshold_Set_DownThreshold(obj);
+		}
+		else if (!strcmp(c->key, "FanSpeed")) {
 			e = float_FromJson(&obj->FanSpeed, c);
+			if (!e)
+				TemperatureThreshold_Set_FanSpeed(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);
@@ -42,43 +46,45 @@ Error* TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* j
 	return err_success();
 }
 
-struct FanSpeedPercentageOverride FanSpeedPercentageOverride_Unset = {
-	float_Unset,
-	int_Unset,
-	OverrideTargetOperation_Unset,
-};
-
 Error* FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* self) {
-	if (self->FanSpeedPercentage == float_Unset)
+	if (! FanSpeedPercentageOverride_IsSet_FanSpeedPercentage(self))
 		return err_stringf(0, "%s: %s", "FanSpeedPercentage", "Missing option");
 	else if (! (self->FanSpeedPercentage >= 0.0 && self->FanSpeedPercentage <= 100.0))
 		return err_stringf(0, "%s: %s", "FanSpeedPercentage", "requires: parameter >= 0.0 && parameter <= 100.0");
 
-	if (self->FanSpeedValue == int_Unset)
+	if (! FanSpeedPercentageOverride_IsSet_FanSpeedValue(self))
 		return err_stringf(0, "%s: %s", "FanSpeedValue", "Missing option");
-	else if (! (self->FanSpeedValue >= 0 && self->FanSpeedValue <= 65535))
-		return err_stringf(0, "%s: %s", "FanSpeedValue", "requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->TargetOperation == OverrideTargetOperation_Unset)
+	if (! FanSpeedPercentageOverride_IsSet_TargetOperation(self))
 		self->TargetOperation = OverrideTargetOperation_ReadWrite;
 	return err_success();
 }
 
 Error* FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = FanSpeedPercentageOverride_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "FanSpeedPercentage"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "FanSpeedPercentage")) {
 			e = float_FromJson(&obj->FanSpeedPercentage, c);
-		else if (!strcmp(c->key, "FanSpeedValue"))
-			e = int_FromJson(&obj->FanSpeedValue, c);
-		else if (!strcmp(c->key, "TargetOperation"))
+			if (!e)
+				FanSpeedPercentageOverride_Set_FanSpeedPercentage(obj);
+		}
+		else if (!strcmp(c->key, "FanSpeedValue")) {
+			e = uint16_t_FromJson(&obj->FanSpeedValue, c);
+			if (!e)
+				FanSpeedPercentageOverride_Set_FanSpeedValue(obj);
+		}
+		else if (!strcmp(c->key, "TargetOperation")) {
 			e = OverrideTargetOperation_FromJson(&obj->TargetOperation, c);
+			if (!e)
+				FanSpeedPercentageOverride_Set_TargetOperation(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);
@@ -86,75 +92,83 @@ Error* FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, cons
 	return err_success();
 }
 
-struct RegisterWriteConfiguration RegisterWriteConfiguration_Unset = {
-	RegisterWriteMode_Unset,
-	RegisterWriteOccasion_Unset,
-	short_Unset,
-	int_Unset,
-	Boolean_Unset,
-	int_Unset,
-	RegisterWriteMode_Unset,
-	str_Unset,
-};
-
 Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self) {
-	if (self->WriteMode == RegisterWriteMode_Unset)
+	if (! RegisterWriteConfiguration_IsSet_WriteMode(self))
 		self->WriteMode = RegisterWriteMode_Set;
 
-	if (self->WriteOccasion == RegisterWriteOccasion_Unset)
+	if (! RegisterWriteConfiguration_IsSet_WriteOccasion(self))
 		self->WriteOccasion = RegisterWriteOccasion_OnInitialization;
 
-	if (self->Register == short_Unset)
+	if (! RegisterWriteConfiguration_IsSet_Register(self))
 		return err_stringf(0, "%s: %s", "Register", "Missing option");
-	else if (! (self->Register >= 0 && self->Register <= 255))
-		return err_stringf(0, "%s: %s", "Register", "requires: parameter >= 0 && parameter <= 255");
 
-	if (self->Value == int_Unset)
+	if (! RegisterWriteConfiguration_IsSet_Value(self))
 		return err_stringf(0, "%s: %s", "Value", "Missing option");
-	else if (! (self->Value >= 0 && self->Value <= 65535))
-		return err_stringf(0, "%s: %s", "Value", "requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->ResetRequired == Boolean_Unset)
-		self->ResetRequired = Boolean_False;
+	if (! RegisterWriteConfiguration_IsSet_ResetRequired(self))
+		self->ResetRequired = false;
 
-	if (self->ResetValue == int_Unset)
+	if (! RegisterWriteConfiguration_IsSet_ResetValue(self))
 		return err_stringf(0, "%s: %s", "ResetValue", "Missing option");
-	else if (! (self->ResetValue >= 0 && self->ResetValue <= 65535))
-		return err_stringf(0, "%s: %s", "ResetValue", "requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->ResetWriteMode == RegisterWriteMode_Unset)
+	if (! RegisterWriteConfiguration_IsSet_ResetWriteMode(self))
 		self->ResetWriteMode = RegisterWriteMode_Set;
 
-	if (self->Description == str_Unset)
+	if (! RegisterWriteConfiguration_IsSet_Description(self))
 		self->Description = Mem_Strdup("");
 	return err_success();
 }
 
 Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = RegisterWriteConfiguration_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "WriteMode"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "WriteMode")) {
 			e = RegisterWriteMode_FromJson(&obj->WriteMode, c);
-		else if (!strcmp(c->key, "WriteOccasion"))
+			if (!e)
+				RegisterWriteConfiguration_Set_WriteMode(obj);
+		}
+		else if (!strcmp(c->key, "WriteOccasion")) {
 			e = RegisterWriteOccasion_FromJson(&obj->WriteOccasion, c);
-		else if (!strcmp(c->key, "Register"))
-			e = short_FromJson(&obj->Register, c);
-		else if (!strcmp(c->key, "Value"))
-			e = int_FromJson(&obj->Value, c);
-		else if (!strcmp(c->key, "ResetRequired"))
-			e = Boolean_FromJson(&obj->ResetRequired, c);
-		else if (!strcmp(c->key, "ResetValue"))
-			e = int_FromJson(&obj->ResetValue, c);
-		else if (!strcmp(c->key, "ResetWriteMode"))
+			if (!e)
+				RegisterWriteConfiguration_Set_WriteOccasion(obj);
+		}
+		else if (!strcmp(c->key, "Register")) {
+			e = uint8_t_FromJson(&obj->Register, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_Register(obj);
+		}
+		else if (!strcmp(c->key, "Value")) {
+			e = uint16_t_FromJson(&obj->Value, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_Value(obj);
+		}
+		else if (!strcmp(c->key, "ResetRequired")) {
+			e = bool_FromJson(&obj->ResetRequired, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_ResetRequired(obj);
+		}
+		else if (!strcmp(c->key, "ResetValue")) {
+			e = uint16_t_FromJson(&obj->ResetValue, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_ResetValue(obj);
+		}
+		else if (!strcmp(c->key, "ResetWriteMode")) {
 			e = RegisterWriteMode_FromJson(&obj->ResetWriteMode, c);
-		else if (!strcmp(c->key, "Description"))
+			if (!e)
+				RegisterWriteConfiguration_Set_ResetWriteMode(obj);
+		}
+		else if (!strcmp(c->key, "Description")) {
 			e = str_FromJson(&obj->Description, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_Description(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);
@@ -162,67 +176,36 @@ Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, cons
 	return err_success();
 }
 
-struct FanConfiguration FanConfiguration_Unset = {
-	str_Unset,
-	short_Unset,
-	short_Unset,
-	int_Unset,
-	int_Unset,
-	int_Unset,
-	int_Unset,
-	Boolean_Unset,
-	Boolean_Unset,
-	int_Unset,
-	TemperatureAlgorithmType_Unset,
-	{NULL, 0},
-	{NULL, 0},
-	{NULL, 0},
-};
-
 Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
 		return err_stringf(0, "%s: %s", "FanDisplayName", "Missing option");
 
-	if (self->ReadRegister == short_Unset)
+	if (! FanConfiguration_IsSet_ReadRegister(self))
 		return err_stringf(0, "%s: %s", "ReadRegister", "Missing option");
-	else if (! (self->ReadRegister >= 0 && self->ReadRegister <= 255))
-		return err_stringf(0, "%s: %s", "ReadRegister", "requires: parameter >= 0 && parameter <= 255");
 
-	if (self->WriteRegister == short_Unset)
+	if (! FanConfiguration_IsSet_WriteRegister(self))
 		return err_stringf(0, "%s: %s", "WriteRegister", "Missing option");
-	else if (! (self->WriteRegister >= 0 && self->WriteRegister <= 255))
-		return err_stringf(0, "%s: %s", "WriteRegister", "requires: parameter >= 0 && parameter <= 255");
 
-	if (self->MinSpeedValue == int_Unset)
+	if (! FanConfiguration_IsSet_MinSpeedValue(self))
 		return err_stringf(0, "%s: %s", "MinSpeedValue", "Missing option");
-	else if (! (self->MinSpeedValue >= 0 && self->MinSpeedValue <= 65535))
-		return err_stringf(0, "%s: %s", "MinSpeedValue", "requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->MaxSpeedValue == int_Unset)
+	if (! FanConfiguration_IsSet_MaxSpeedValue(self))
 		return err_stringf(0, "%s: %s", "MaxSpeedValue", "Missing option");
-	else if (! (self->MaxSpeedValue >= 0 && self->MaxSpeedValue <= 65535))
-		return err_stringf(0, "%s: %s", "MaxSpeedValue", "requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->MinSpeedValueRead == int_Unset)
+	if (! FanConfiguration_IsSet_MinSpeedValueRead(self))
 		self->MinSpeedValueRead = 0;
-	else if (! (self->MinSpeedValueRead >= 0 && self->MinSpeedValueRead <= 65535))
-		return err_stringf(0, "%s: %s", "MinSpeedValueRead", "requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->MaxSpeedValueRead == int_Unset)
+	if (! FanConfiguration_IsSet_MaxSpeedValueRead(self))
 		self->MaxSpeedValueRead = 0;
-	else if (! (self->MaxSpeedValueRead >= 0 && self->MaxSpeedValueRead <= 65535))
-		return err_stringf(0, "%s: %s", "MaxSpeedValueRead", "requires: parameter >= 0 && parameter <= 65535");
 
-	if (self->IndependentReadMinMaxValues == Boolean_Unset)
-		self->IndependentReadMinMaxValues = Boolean_False;
+	if (! FanConfiguration_IsSet_IndependentReadMinMaxValues(self))
+		self->IndependentReadMinMaxValues = false;
 
-	if (self->ResetRequired == Boolean_Unset)
-		self->ResetRequired = Boolean_False;
+	if (! FanConfiguration_IsSet_ResetRequired(self))
+		self->ResetRequired = false;
 
-	if (self->FanSpeedResetValue == int_Unset)
+	if (! FanConfiguration_IsSet_FanSpeedResetValue(self))
 		self->FanSpeedResetValue = 0;
-	else if (! (self->FanSpeedResetValue >= 0 && self->FanSpeedResetValue <= 65535))
-		return err_stringf(0, "%s: %s", "FanSpeedResetValue", "requires: parameter >= 0 && parameter <= 65535");
 
 	if (false)
 		return err_stringf(0, "%s: %s", "TemperatureAlgorithmType", "Missing option");
@@ -233,48 +216,91 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
 		return err_stringf(0, "%s: %s", "TemperatureThresholds", "Missing option");
 
-	if (self->FanSpeedPercentageOverrides.data == NULL)
+	if (! FanConfiguration_IsSet_FanSpeedPercentageOverrides(self))
 		self->FanSpeedPercentageOverrides = Config_DefaultFanSpeedPercentageOverrides;
 	return err_success();
 }
 
 Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = FanConfiguration_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "FanDisplayName"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "FanDisplayName")) {
 			e = str_FromJson(&obj->FanDisplayName, c);
-		else if (!strcmp(c->key, "ReadRegister"))
-			e = short_FromJson(&obj->ReadRegister, c);
-		else if (!strcmp(c->key, "WriteRegister"))
-			e = short_FromJson(&obj->WriteRegister, c);
-		else if (!strcmp(c->key, "MinSpeedValue"))
-			e = int_FromJson(&obj->MinSpeedValue, c);
-		else if (!strcmp(c->key, "MaxSpeedValue"))
-			e = int_FromJson(&obj->MaxSpeedValue, c);
-		else if (!strcmp(c->key, "MinSpeedValueRead"))
-			e = int_FromJson(&obj->MinSpeedValueRead, c);
-		else if (!strcmp(c->key, "MaxSpeedValueRead"))
-			e = int_FromJson(&obj->MaxSpeedValueRead, c);
-		else if (!strcmp(c->key, "IndependentReadMinMaxValues"))
-			e = Boolean_FromJson(&obj->IndependentReadMinMaxValues, c);
-		else if (!strcmp(c->key, "ResetRequired"))
-			e = Boolean_FromJson(&obj->ResetRequired, c);
-		else if (!strcmp(c->key, "FanSpeedResetValue"))
-			e = int_FromJson(&obj->FanSpeedResetValue, c);
-		else if (!strcmp(c->key, "TemperatureAlgorithmType"))
+			if (!e)
+				FanConfiguration_Set_FanDisplayName(obj);
+		}
+		else if (!strcmp(c->key, "ReadRegister")) {
+			e = uint8_t_FromJson(&obj->ReadRegister, c);
+			if (!e)
+				FanConfiguration_Set_ReadRegister(obj);
+		}
+		else if (!strcmp(c->key, "WriteRegister")) {
+			e = uint8_t_FromJson(&obj->WriteRegister, c);
+			if (!e)
+				FanConfiguration_Set_WriteRegister(obj);
+		}
+		else if (!strcmp(c->key, "MinSpeedValue")) {
+			e = uint16_t_FromJson(&obj->MinSpeedValue, c);
+			if (!e)
+				FanConfiguration_Set_MinSpeedValue(obj);
+		}
+		else if (!strcmp(c->key, "MaxSpeedValue")) {
+			e = uint16_t_FromJson(&obj->MaxSpeedValue, c);
+			if (!e)
+				FanConfiguration_Set_MaxSpeedValue(obj);
+		}
+		else if (!strcmp(c->key, "MinSpeedValueRead")) {
+			e = uint16_t_FromJson(&obj->MinSpeedValueRead, c);
+			if (!e)
+				FanConfiguration_Set_MinSpeedValueRead(obj);
+		}
+		else if (!strcmp(c->key, "MaxSpeedValueRead")) {
+			e = uint16_t_FromJson(&obj->MaxSpeedValueRead, c);
+			if (!e)
+				FanConfiguration_Set_MaxSpeedValueRead(obj);
+		}
+		else if (!strcmp(c->key, "IndependentReadMinMaxValues")) {
+			e = bool_FromJson(&obj->IndependentReadMinMaxValues, c);
+			if (!e)
+				FanConfiguration_Set_IndependentReadMinMaxValues(obj);
+		}
+		else if (!strcmp(c->key, "ResetRequired")) {
+			e = bool_FromJson(&obj->ResetRequired, c);
+			if (!e)
+				FanConfiguration_Set_ResetRequired(obj);
+		}
+		else if (!strcmp(c->key, "FanSpeedResetValue")) {
+			e = uint16_t_FromJson(&obj->FanSpeedResetValue, c);
+			if (!e)
+				FanConfiguration_Set_FanSpeedResetValue(obj);
+		}
+		else if (!strcmp(c->key, "TemperatureAlgorithmType")) {
 			e = TemperatureAlgorithmType_FromJson(&obj->TemperatureAlgorithmType, c);
-		else if (!strcmp(c->key, "Sensors"))
+			if (!e)
+				FanConfiguration_Set_TemperatureAlgorithmType(obj);
+		}
+		else if (!strcmp(c->key, "Sensors")) {
 			e = array_of_str_FromJson(&obj->Sensors, c);
-		else if (!strcmp(c->key, "TemperatureThresholds"))
+			if (!e)
+				FanConfiguration_Set_Sensors(obj);
+		}
+		else if (!strcmp(c->key, "TemperatureThresholds")) {
 			e = array_of_TemperatureThreshold_FromJson(&obj->TemperatureThresholds, c);
-		else if (!strcmp(c->key, "FanSpeedPercentageOverrides"))
+			if (!e)
+				FanConfiguration_Set_TemperatureThresholds(obj);
+		}
+		else if (!strcmp(c->key, "FanSpeedPercentageOverrides")) {
 			e = array_of_FanSpeedPercentageOverride_FromJson(&obj->FanSpeedPercentageOverrides, c);
+			if (!e)
+				FanConfiguration_Set_FanSpeedPercentageOverrides(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);
@@ -282,45 +308,29 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 	return err_success();
 }
 
-struct ModelConfig ModelConfig_Unset = {
-	str_Unset,
-	str_Unset,
-	Boolean_Unset,
-	short_Unset,
-	short_Unset,
-	short_Unset,
-	Boolean_Unset,
-	{NULL, 0},
-	{NULL, 0},
-};
-
 Error* ModelConfig_ValidateFields(ModelConfig* self) {
-	if (self->NotebookModel == str_Unset)
+	if (! ModelConfig_IsSet_NotebookModel(self))
 		return err_stringf(0, "%s: %s", "NotebookModel", "Missing option");
 
-	if (self->Author == str_Unset)
+	if (! ModelConfig_IsSet_Author(self))
 		self->Author = Mem_Strdup("");
 
-	if (self->LegacyTemperatureThresholdsBehaviour == Boolean_Unset)
-		self->LegacyTemperatureThresholdsBehaviour = Boolean_False;
+	if (! ModelConfig_IsSet_LegacyTemperatureThresholdsBehaviour(self))
+		self->LegacyTemperatureThresholdsBehaviour = false;
 
-	if (self->EcPollInterval == short_Unset)
+	if (! ModelConfig_IsSet_EcPollInterval(self))
 		self->EcPollInterval = 3000;
-	else if (! (self->EcPollInterval > 0))
-		return err_stringf(0, "%s: %s", "EcPollInterval", "requires: parameter > 0");
 
-	if (self->CriticalTemperature == short_Unset)
+	if (! ModelConfig_IsSet_CriticalTemperature(self))
 		self->CriticalTemperature = 75;
 
-	if (self->CriticalTemperatureOffset == short_Unset)
+	if (! ModelConfig_IsSet_CriticalTemperatureOffset(self))
 		self->CriticalTemperatureOffset = 15;
-	else if (! (self->CriticalTemperatureOffset > 0))
-		return err_stringf(0, "%s: %s", "CriticalTemperatureOffset", "requires: parameter > 0");
 
-	if (self->ReadWriteWords == Boolean_Unset)
-		self->ReadWriteWords = Boolean_False;
+	if (! ModelConfig_IsSet_ReadWriteWords(self))
+		self->ReadWriteWords = false;
 
-	if (self->FanConfigurations.data == NULL)
+	if (! ModelConfig_IsSet_FanConfigurations(self))
 		return err_stringf(0, "%s: %s", "FanConfigurations", "Missing option");
 	else if (! (self->FanConfigurations.size > 0))
 		return err_stringf(0, "%s: %s", "FanConfigurations", "requires: parameter.size > 0");
@@ -331,32 +341,60 @@ Error* ModelConfig_ValidateFields(ModelConfig* self) {
 }
 
 Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = ModelConfig_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "NotebookModel"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "NotebookModel")) {
 			e = str_FromJson(&obj->NotebookModel, c);
-		else if (!strcmp(c->key, "Author"))
+			if (!e)
+				ModelConfig_Set_NotebookModel(obj);
+		}
+		else if (!strcmp(c->key, "Author")) {
 			e = str_FromJson(&obj->Author, c);
-		else if (!strcmp(c->key, "LegacyTemperatureThresholdsBehaviour"))
-			e = Boolean_FromJson(&obj->LegacyTemperatureThresholdsBehaviour, c);
-		else if (!strcmp(c->key, "EcPollInterval"))
-			e = short_FromJson(&obj->EcPollInterval, c);
-		else if (!strcmp(c->key, "CriticalTemperature"))
-			e = short_FromJson(&obj->CriticalTemperature, c);
-		else if (!strcmp(c->key, "CriticalTemperatureOffset"))
-			e = short_FromJson(&obj->CriticalTemperatureOffset, c);
-		else if (!strcmp(c->key, "ReadWriteWords"))
-			e = Boolean_FromJson(&obj->ReadWriteWords, c);
-		else if (!strcmp(c->key, "FanConfigurations"))
+			if (!e)
+				ModelConfig_Set_Author(obj);
+		}
+		else if (!strcmp(c->key, "LegacyTemperatureThresholdsBehaviour")) {
+			e = bool_FromJson(&obj->LegacyTemperatureThresholdsBehaviour, c);
+			if (!e)
+				ModelConfig_Set_LegacyTemperatureThresholdsBehaviour(obj);
+		}
+		else if (!strcmp(c->key, "EcPollInterval")) {
+			e = uint16_t_FromJson(&obj->EcPollInterval, c);
+			if (!e)
+				ModelConfig_Set_EcPollInterval(obj);
+		}
+		else if (!strcmp(c->key, "CriticalTemperature")) {
+			e = int16_t_FromJson(&obj->CriticalTemperature, c);
+			if (!e)
+				ModelConfig_Set_CriticalTemperature(obj);
+		}
+		else if (!strcmp(c->key, "CriticalTemperatureOffset")) {
+			e = uint16_t_FromJson(&obj->CriticalTemperatureOffset, c);
+			if (!e)
+				ModelConfig_Set_CriticalTemperatureOffset(obj);
+		}
+		else if (!strcmp(c->key, "ReadWriteWords")) {
+			e = bool_FromJson(&obj->ReadWriteWords, c);
+			if (!e)
+				ModelConfig_Set_ReadWriteWords(obj);
+		}
+		else if (!strcmp(c->key, "FanConfigurations")) {
 			e = array_of_FanConfiguration_FromJson(&obj->FanConfigurations, c);
-		else if (!strcmp(c->key, "RegisterWriteConfigurations"))
+			if (!e)
+				ModelConfig_Set_FanConfigurations(obj);
+		}
+		else if (!strcmp(c->key, "RegisterWriteConfigurations")) {
 			e = array_of_RegisterWriteConfiguration_FromJson(&obj->RegisterWriteConfigurations, c);
+			if (!e)
+				ModelConfig_Set_RegisterWriteConfigurations(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);
@@ -364,17 +402,9 @@ Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 	return err_success();
 }
 
-struct FanTemperatureSourceConfig FanTemperatureSourceConfig_Unset = {
-	int_Unset,
-	TemperatureAlgorithmType_Unset,
-	{NULL, 0},
-};
-
 Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* self) {
-	if (self->FanIndex == int_Unset)
+	if (! FanTemperatureSourceConfig_IsSet_FanIndex(self))
 		return err_stringf(0, "%s: %s", "FanIndex", "Missing option");
-	else if (! (self->FanIndex >= 0))
-		return err_stringf(0, "%s: %s", "FanIndex", "requires: parameter >= 0");
 
 	if (false)
 		return err_stringf(0, "%s: %s", "TemperatureAlgorithmType", "Missing option");
@@ -385,20 +415,30 @@ Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* sel
 }
 
 Error* FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = FanTemperatureSourceConfig_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "FanIndex"))
-			e = int_FromJson(&obj->FanIndex, c);
-		else if (!strcmp(c->key, "TemperatureAlgorithmType"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "FanIndex")) {
+			e = uint8_t_FromJson(&obj->FanIndex, c);
+			if (!e)
+				FanTemperatureSourceConfig_Set_FanIndex(obj);
+		}
+		else if (!strcmp(c->key, "TemperatureAlgorithmType")) {
 			e = TemperatureAlgorithmType_FromJson(&obj->TemperatureAlgorithmType, c);
-		else if (!strcmp(c->key, "Sensors"))
+			if (!e)
+				FanTemperatureSourceConfig_Set_TemperatureAlgorithmType(obj);
+		}
+		else if (!strcmp(c->key, "Sensors")) {
 			e = array_of_str_FromJson(&obj->Sensors, c);
+			if (!e)
+				FanTemperatureSourceConfig_Set_Sensors(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);
@@ -406,15 +446,8 @@ Error* FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, cons
 	return err_success();
 }
 
-struct ServiceConfig ServiceConfig_Unset = {
-	str_Unset,
-	EmbeddedControllerType_Unset,
-	{NULL, 0},
-	{NULL, 0},
-};
-
 Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
-	if (self->SelectedConfigId == str_Unset)
+	if (! ServiceConfig_IsSet_SelectedConfigId(self))
 		return err_stringf(0, "%s: %s", "SelectedConfigId", "Missing option");
 
 	if (false)
@@ -429,22 +462,35 @@ Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
 }
 
 Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = ServiceConfig_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "SelectedConfigId"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "SelectedConfigId")) {
 			e = str_FromJson(&obj->SelectedConfigId, c);
-		else if (!strcmp(c->key, "EmbeddedControllerType"))
+			if (!e)
+				ServiceConfig_Set_SelectedConfigId(obj);
+		}
+		else if (!strcmp(c->key, "EmbeddedControllerType")) {
 			e = EmbeddedControllerType_FromJson(&obj->EmbeddedControllerType, c);
-		else if (!strcmp(c->key, "TargetFanSpeeds"))
+			if (!e)
+				ServiceConfig_Set_EmbeddedControllerType(obj);
+		}
+		else if (!strcmp(c->key, "TargetFanSpeeds")) {
 			e = array_of_float_FromJson(&obj->TargetFanSpeeds, c);
-		else if (!strcmp(c->key, "FanTemperatureSources"))
+			if (!e)
+				ServiceConfig_Set_TargetFanSpeeds(obj);
+		}
+		else if (!strcmp(c->key, "FanTemperatureSources")) {
 			e = array_of_FanTemperatureSourceConfig_FromJson(&obj->FanTemperatureSources, c);
+			if (!e)
+				ServiceConfig_Set_FanTemperatureSources(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);
@@ -452,69 +498,83 @@ Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 	return err_success();
 }
 
-struct FanInfo FanInfo_Unset = {
-	str_Unset,
-	float_Unset,
-	Boolean_Unset,
-	Boolean_Unset,
-	float_Unset,
-	float_Unset,
-	float_Unset,
-	int_Unset,
-};
-
 Error* FanInfo_ValidateFields(FanInfo* self) {
-	if (self->Name == str_Unset)
+	if (! FanInfo_IsSet_Name(self))
 		return err_stringf(0, "%s: %s", "Name", "Missing option");
 
-	if (self->Temperature == float_Unset)
+	if (! FanInfo_IsSet_Temperature(self))
 		return err_stringf(0, "%s: %s", "Temperature", "Missing option");
 
-	if (self->AutoMode == Boolean_Unset)
+	if (! FanInfo_IsSet_AutoMode(self))
 		return err_stringf(0, "%s: %s", "AutoMode", "Missing option");
 
-	if (self->Critical == Boolean_Unset)
+	if (! FanInfo_IsSet_Critical(self))
 		return err_stringf(0, "%s: %s", "Critical", "Missing option");
 
-	if (self->CurrentSpeed == float_Unset)
+	if (! FanInfo_IsSet_CurrentSpeed(self))
 		return err_stringf(0, "%s: %s", "CurrentSpeed", "Missing option");
 
-	if (self->TargetSpeed == float_Unset)
+	if (! FanInfo_IsSet_TargetSpeed(self))
 		return err_stringf(0, "%s: %s", "TargetSpeed", "Missing option");
 
-	if (self->RequestedSpeed == float_Unset)
+	if (! FanInfo_IsSet_RequestedSpeed(self))
 		return err_stringf(0, "%s: %s", "RequestedSpeed", "Missing option");
 
-	if (self->SpeedSteps == int_Unset)
+	if (! FanInfo_IsSet_SpeedSteps(self))
 		return err_stringf(0, "%s: %s", "SpeedSteps", "Missing option");
 	return err_success();
 }
 
 Error* FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = FanInfo_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "Name"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "Name")) {
 			e = str_FromJson(&obj->Name, c);
-		else if (!strcmp(c->key, "Temperature"))
+			if (!e)
+				FanInfo_Set_Name(obj);
+		}
+		else if (!strcmp(c->key, "Temperature")) {
 			e = float_FromJson(&obj->Temperature, c);
-		else if (!strcmp(c->key, "AutoMode"))
-			e = Boolean_FromJson(&obj->AutoMode, c);
-		else if (!strcmp(c->key, "Critical"))
-			e = Boolean_FromJson(&obj->Critical, c);
-		else if (!strcmp(c->key, "CurrentSpeed"))
+			if (!e)
+				FanInfo_Set_Temperature(obj);
+		}
+		else if (!strcmp(c->key, "AutoMode")) {
+			e = bool_FromJson(&obj->AutoMode, c);
+			if (!e)
+				FanInfo_Set_AutoMode(obj);
+		}
+		else if (!strcmp(c->key, "Critical")) {
+			e = bool_FromJson(&obj->Critical, c);
+			if (!e)
+				FanInfo_Set_Critical(obj);
+		}
+		else if (!strcmp(c->key, "CurrentSpeed")) {
 			e = float_FromJson(&obj->CurrentSpeed, c);
-		else if (!strcmp(c->key, "TargetSpeed"))
+			if (!e)
+				FanInfo_Set_CurrentSpeed(obj);
+		}
+		else if (!strcmp(c->key, "TargetSpeed")) {
 			e = float_FromJson(&obj->TargetSpeed, c);
-		else if (!strcmp(c->key, "RequestedSpeed"))
+			if (!e)
+				FanInfo_Set_TargetSpeed(obj);
+		}
+		else if (!strcmp(c->key, "RequestedSpeed")) {
 			e = float_FromJson(&obj->RequestedSpeed, c);
-		else if (!strcmp(c->key, "SpeedSteps"))
-			e = int_FromJson(&obj->SpeedSteps, c);
+			if (!e)
+				FanInfo_Set_RequestedSpeed(obj);
+		}
+		else if (!strcmp(c->key, "SpeedSteps")) {
+			e = uint16_t_FromJson(&obj->SpeedSteps, c);
+			if (!e)
+				FanInfo_Set_SpeedSteps(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);
@@ -522,45 +582,51 @@ Error* FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 	return err_success();
 }
 
-struct ServiceInfo ServiceInfo_Unset = {
-	int_Unset,
-	str_Unset,
-	Boolean_Unset,
-	{NULL, 0},
-};
-
 Error* ServiceInfo_ValidateFields(ServiceInfo* self) {
-	if (self->PID == int_Unset)
+	if (! ServiceInfo_IsSet_PID(self))
 		return err_stringf(0, "%s: %s", "PID", "Missing option");
 
-	if (self->SelectedConfigId == str_Unset)
+	if (! ServiceInfo_IsSet_SelectedConfigId(self))
 		return err_stringf(0, "%s: %s", "SelectedConfigId", "Missing option");
 
-	if (self->ReadOnly == Boolean_Unset)
+	if (! ServiceInfo_IsSet_ReadOnly(self))
 		return err_stringf(0, "%s: %s", "ReadOnly", "Missing option");
 
-	if (self->Fans.data == NULL)
+	if (! ServiceInfo_IsSet_Fans(self))
 		return err_stringf(0, "%s: %s", "Fans", "Missing option");
 	return err_success();
 }
 
 Error* ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
-	Error* e = NULL;
-	*obj = ServiceInfo_Unset;
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
 		return err_string(0, "Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"));
-		else if (!strcmp(c->key, "PID"))
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "PID")) {
 			e = int_FromJson(&obj->PID, c);
-		else if (!strcmp(c->key, "SelectedConfigId"))
+			if (!e)
+				ServiceInfo_Set_PID(obj);
+		}
+		else if (!strcmp(c->key, "SelectedConfigId")) {
 			e = str_FromJson(&obj->SelectedConfigId, c);
-		else if (!strcmp(c->key, "ReadOnly"))
-			e = Boolean_FromJson(&obj->ReadOnly, c);
-		else if (!strcmp(c->key, "Fans"))
+			if (!e)
+				ServiceInfo_Set_SelectedConfigId(obj);
+		}
+		else if (!strcmp(c->key, "ReadOnly")) {
+			e = bool_FromJson(&obj->ReadOnly, c);
+			if (!e)
+				ServiceInfo_Set_ReadOnly(obj);
+		}
+		else if (!strcmp(c->key, "Fans")) {
 			e = array_of_FanInfo_FromJson(&obj->Fans, c);
+			if (!e)
+				ServiceInfo_Set_Fans(obj);
+		}
 		else
 			e = err_string(0, "Unknown option");
 		if (e) return err_string(e, c->key);

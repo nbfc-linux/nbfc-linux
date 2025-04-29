@@ -16,6 +16,9 @@ class StructDefinition:
         self.fields = fields
         self.help   = help
 
+    def __len__(self):
+        return len(self.fields)
+
     def __iter__(self):
         return iter(self.fields)
 
@@ -40,9 +43,8 @@ class FieldDefinition:
         self.type      = type_
         self.help      = optional.get('help', "")
         self.valid     = optional.get('valid', None)
-        self.unset     = optional.get('unset', '%s_Unset' % type)
+        self.required  = optional.get('required', True)
         self.default   = optional.get('default', None)
-        self.is_unset  = optional.get('is_unset', None)
         self.from_json = optional.get('from_json', '%s_FromJson' % type)
 
     def __repr__(self):
@@ -176,15 +178,23 @@ def parse_xml_file(file):
     xml_remove_comments(root)
     return handle_xml_node(root, structs['ModelConfig'])
 
+def get_set_field_for_struct(struct):
+    length = len(struct)
+    if length < 8:  return 'uint8_t'
+    if length < 16: return 'uint16_t'
+    return 'uint32_t'
 
 def write_header(fh):
     p = lambda *a,**kw: print(*a, **kw, file=fh)
 
     p('/* Auto generated code %r */\n' % sys.argv);
     for name, struct in structs.items():
+        _set_field_type = get_set_field_for_struct(struct)
+
         p(f'struct {name} {{')
         for field in struct:
             p(f'\t{field.type:<15} {field.var};')
+        p(f'\t{_set_field_type:<15} _set;')
         p('};')
         p('')
         p(f'typedef struct {name} {name};')
@@ -193,16 +203,22 @@ def write_header(fh):
         p(f'Error* {struct.name}_ValidateFields({struct.name}*);')
         p('')
 
+        for i, field in enumerate(struct):
+            p(f'static inline void {name}_Set_{field.var}({name}* o) {{')
+            p(f'\to->_set |= (1 << {i});')
+            p(f'}}')
+            p('')
+
+            p(f'static inline bool {name}_IsSet_{field.var}({name}* o) {{')
+            p(f'\treturn o->_set & (1 << {i});')
+            p(f'}}')
+            p('')
+
 def write_source(fh):
     p = lambda *a,**kw: print(*a, **kw, file=fh)
 
     p('/* Auto generated code %r */\n' % sys.argv);
     for struct in structs.values():
-        p(f'struct {struct.name} {struct.name}_Unset = {{')
-        for field in struct:
-            p(f'\t{field.unset},')
-        p('};\n')
-
         write_validate_fields(struct, fh)
         write_parse_struct(struct, fh)
         p('')
@@ -212,10 +228,10 @@ def write_validate_fields(struct, fh):
 
     p(f'Error* {struct.name}_ValidateFields({struct.name}* self) {{', end='')
     for field in struct:
-        if field.is_unset is not None:
-            is_unset = field.is_unset.replace('parameter', f'self->{field.var}')
+        if field.required == False:
+            is_unset = 'false'
         else:
-            is_unset = f'self->{field.var} == {field.unset}'
+            is_unset = f'! {struct.name}_IsSet_{field.var}(self)'
 
         if field.default is not None:
             set_or_throw = f'self->{field.var} = {field.default}'
@@ -239,18 +255,22 @@ def write_parse_struct(struct, fh):
     p = lambda *a,**kw: print(*a, **kw, file=fh)
 
     p(f'Error* {struct.name}_FromJson({struct.name}* obj, const nx_json* json) {{')
-    p( '\tError* e = NULL;')
-    p(f'\t*obj = {struct.name}_Unset;')
+    p( '\tError* e;')
+    p(f'\tmemset(obj, 0, sizeof(*obj));')
     p('')
     p( '\tif (!json || json->type != NX_JSON_OBJECT)')
     p( '\t\treturn err_string(0, "Not a JSON object");')
     p( '')
     p( '\tnx_json_for_each(c, json) {')
-    p( '\t\tif (!strcmp(c->key, "Comment"));')
+    p( '\t\tif (!strcmp(c->key, "Comment"))')
+    p( '\t\t\tcontinue;')
 
     for field in struct:
-        p(f'\t\telse if (!strcmp(c->key, "{field.name}"))')
+        p(f'\t\telse if (!strcmp(c->key, "{field.name}")) {{')
         p(f'\t\t\te = {field.from_json}(&obj->{field.var}, c);')
+        p(f'\t\t\tif (!e)')
+        p(f'\t\t\t\t{struct.name}_Set_{field.var}(obj);')
+        p(f'\t\t}}')
 
     p( '\t\telse')
     p( '\t\t\te = err_string(0, "Unknown option");')

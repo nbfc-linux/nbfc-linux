@@ -5,12 +5,12 @@
     "fields": [
       {
         "name": "UpThreshold",
-        "type": "short",
+        "type": "int16_t",
         "help": "NBFC will select the next upper threshold as soon as the temperature exceeds *UpThreshold*. in celsius"
       },
       {
         "name": "DownThreshold",
-        "type": "short",
+        "type": "int16_t",
         "help": "NBFC will select the next lower threshold as soon as the temperature falls below the *DownThreshold*. in celsius"
       },
       {
@@ -33,9 +33,8 @@
       },
       {
         "name": "FanSpeedValue",
-        "type": "int",
-        "help": "Fan fan speed value which will be written to WriteRegister",
-        "valid": "parameter >= 0 && parameter <= 65535"
+        "type": "uint16_t",
+        "help": "Fan fan speed value which will be written to WriteRegister"
       },
       {
         "name": "TargetOperation",
@@ -63,27 +62,24 @@
       },
       {
         "name": "Register",
-        "type": "short",
-        "help": "The register which will be manipulated.",
-        "valid": "parameter >= 0 && parameter <= 255"
+        "type": "uint8_t",
+        "help": "The register which will be manipulated."
       },
       {
         "name": "Value",
-        "type": "int",
-        "help": "The Value which will be written",
-        "valid": "parameter >= 0 && parameter <= 65535"
+        "type": "uint16_t",
+        "help": "The Value which will be written"
       },
       {
         "name": "ResetRequired",
-        "type": "Boolean",
-        "default": "Boolean_False",
+        "type": "bool",
+        "default": "false",
         "help": "Defines if the register should be reset before the service is shut down."
       },
       {
         "name": "ResetValue",
-        "type": "int",
-        "help": "The value which will be written upon reset.",
-        "valid": "parameter >= 0 && parameter <= 65535"
+        "type": "uint16_t",
+        "help": "The value which will be written upon reset."
       },
       {
         "name": "ResetWriteMode",
@@ -107,89 +103,78 @@
         "name": "FanDisplayName",
         "type": "const char*",
         "help": "Fan display name",
-        "is_unset": "false"
+        "required": false
       },
       {
         "name": "ReadRegister",
-        "type": "short",
-        "valid": "parameter >= 0 && parameter <= 255",
+        "type": "uint8_t",
         "help": "The register from which NBFC reads the fan speed."
       },
       {
         "name": "WriteRegister",
-        "type": "short",
-        "valid": "parameter >= 0 && parameter <= 255",
+        "type": "uint8_t",
         "help": "The register which NBFC uses to control the fan"
       },
       {
         "name": "MinSpeedValue",
-        "type": "int",
-        "help": "The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if ReadWriteWords is `true`. Note: MinSpeedValue does not necessarily have to be smaller than MaxSpeedValue",
-        "valid": "parameter >= 0 && parameter <= 65535"
+        "type": "uint16_t",
+        "help": "The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if ReadWriteWords is `true`. Note: MinSpeedValue does not necessarily have to be smaller than MaxSpeedValue"
       },
       {
         "name": "MaxSpeedValue",
-        "type": "int",
-        "help": "The value which puts the fan to the highest possible fan speed.",
-        "valid": "parameter >= 0 && parameter <= 65535"
+        "type": "uint16_t",
+        "help": "The value which puts the fan to the highest possible fan speed."
       },
       {
         "name": "MinSpeedValueRead",
-        "type": "int",
+        "type": "uint16_t",
         "default": 0,
-        "help": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`.",
-        "valid": "parameter >= 0 && parameter <= 65535"
+        "help": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
       },
       {
         "name": "MaxSpeedValueRead",
-        "type": "int",
+        "type": "uint16_t",
         "default": 0,
-        "help": "The value which  corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`.",
-        "valid": "parameter >= 0 && parameter <= 65535"
+        "help": "The value which corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
       },
       {
         "name": "IndependentReadMinMaxValues",
-        "type": "Boolean",
-        "default": "Boolean_False",
+        "type": "bool",
+        "default": "false",
         "help": "Defines if independent minimum/maximum values should be applied for read operations"
       },
       {
         "name": "ResetRequired",
-        "type": "Boolean",
-        "default": "Boolean_False",
+        "type": "bool",
+        "default": "false",
         "help": "Defines if the EC should be reset before the service is shut down."
       },
       {
         "name": "FanSpeedResetValue",
-        "type": "int",
+        "type": "uint16_t",
         "default": 0,
-        "help": "Defines the value which will be written to WriteRegister to reset the EC.",
-        "valid": "parameter >= 0 && parameter <= 65535"
+        "help": "Defines the value which will be written to WriteRegister to reset the EC."
       },
       {
         "name": "TemperatureAlgorithmType",
         "type": "TemperatureAlgorithmType",
         "help": "Either 'average', 'max' or 'min'",
-        "is_unset": "false"
+        "required": false
       },
       {
         "name": "Sensors",
         "type": "array_of(str)",
-        "unset": "{NULL, 0}",
-        "is_unset": "false",
+        "required": false,
         "help": "Array of sensor names (as in /sys/class/hwmon/hwmon*/name) or sensor files (like /sys/class/hwmon/hwmon1/temp1_input)"
       },
       {
         "name": "TemperatureThresholds",
         "type": "array_of(TemperatureThreshold)",
-        "unset": "{NULL, 0}",
-        "is_unset": "false"
+        "required": false
       },
       {
         "name": "FanSpeedPercentageOverrides",
         "type": "array_of(FanSpeedPercentageOverride)",
-        "unset": "{NULL, 0}",
-        "is_unset": "parameter.data == NULL",
         "default": "Config_DefaultFanSpeedPercentageOverrides"
       }
     ]
@@ -211,48 +196,43 @@
       },
       {
         "name": "LegacyTemperatureThresholdsBehaviour",
-        "type": "Boolean",
-        "default": "Boolean_False"
+        "type": "bool",
+        "default": "false"
       },
       {
         "name": "EcPollInterval",
-        "type": "short",
+        "type": "uint16_t",
         "default": "3000",
-        "valid": "parameter > 0",
         "help": "Defines how often NBFC polls the EC for changes (in miliseconds)."
       },
       {
         "name": "CriticalTemperature",
-        "type": "short",
+        "type": "int16_t",
         "default": "75",
         "help": "If the temperature exceeds this threshold, NBFC will ignore all Temperature threshold elements and set the fan to 100% speed until the temperature drops below (`CriticalTemperature` - `CriticalTemperatureOffset`)"
       },
       {
         "name": "CriticalTemperatureOffset",
-        "type": "short",
+        "type": "uint16_t",
         "default": "15",
-        "valid": "parameter > 0",
         "help": "See `CriticalTemperature`"
       },
       {
         "name": "ReadWriteWords",
-        "type": "Boolean",
+        "type": "bool",
         "help": "If `true`, NBFC will combine two 8 bit registers to one 16-bit register when reading from or writing to the EC registers.",
-        "default": "Boolean_False"
+        "default": "false"
       },
       {
         "name": "FanConfigurations",
         "type": "array_of(FanConfiguration)",
-        "unset": "{NULL, 0}",
-        "is_unset": "parameter.data == NULL",
         "valid": "parameter.size > 0",
         "help": "Array of at least one FanConfiguration"
       },
       {
         "name": "RegisterWriteConfigurations",
         "type": "array_of(RegisterWriteConfiguration)",
-        "unset": "{NULL, 0}",
-        "is_unset": "false",
+        "required": false,
         "help": "Array of RegisterWriteConfiguration"
       }
     ]
@@ -263,21 +243,19 @@
     "fields": [
       {
         "name": "FanIndex",
-        "type": "int",
-        "valid": "parameter >= 0",
+        "type": "uint8_t",
         "help": "Specify for which fan the config should be applied"
       },
       {
         "name": "TemperatureAlgorithmType",
         "type": "TemperatureAlgorithmType",
         "help": "Either 'average', 'max' or 'min'",
-        "is_unset": "false"
+        "required": false
       },
       {
         "name": "Sensors",
         "type": "array_of(str)",
-        "unset": "{NULL, 0}",
-        "is_unset": "false",
+        "required": false,
         "help": "Array of sensor names (as in /sys/class/hwmon/hwmon*/name) or sensor files (like /sys/class/hwmon/hwmon1/temp1_input)"
       }
     ]
@@ -295,21 +273,19 @@
         "name": "EmbeddedControllerType",
         "type": "EmbeddedControllerType",
         "help": "Either `ec_sys` for using the `ec_sys` kernel module, `acpi_ec` for using the `acpi_ec` kernel module, or `dev_port` for an alternative implementation using `/dev/port` without depending on kernel modules.",
-        "is_unset": "false"
+        "required": false
       },
       {
         "name": "TargetFanSpeeds",
         "type": "array_of(float)",
         "help": "This holds the fixed speed of the fans. A value of `-1` means the fan should be left in auto mode.",
-        "unset": "{NULL, 0}",
-        "is_unset": "false"
+        "required": false
       },
       {
         "name": "FanTemperatureSources",
         "type": "array_of(FanTemperatureSourceConfig)",
         "help": "TODO",
-        "unset": "{NULL, 0}",
-        "is_unset": "false"
+        "required": false
       }
     ]
   },
@@ -329,12 +305,12 @@
       },
       {
         "name": "AutoMode",
-        "type": "Boolean",
+        "type": "bool",
         "help": ""
       },
       {
         "name": "Critical",
-        "type": "Boolean",
+        "type": "bool",
         "help": ""
       },
       {
@@ -354,7 +330,7 @@
       },
       {
         "name": "SpeedSteps",
-        "type": "int",
+        "type": "uint16_t",
         "help": ""
       }
     ]
@@ -375,14 +351,12 @@
       },
       {
         "name": "ReadOnly",
-        "type": "Boolean",
+        "type": "bool",
         "help": ""
       },
       {
         "name": "Fans",
         "type": "array_of(FanInfo)",
-        "unset": "{NULL, 0}",
-        "is_unset": "parameter.data == NULL",
         "help": ""
       }
     ]

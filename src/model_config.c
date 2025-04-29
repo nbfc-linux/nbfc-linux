@@ -13,12 +13,7 @@
 #include <limits.h>  // INT_MIN, SHRT_MIN
 #include <math.h>    // NAN
 
-#define str_Unset   NULL
-#define int_Unset   INT_MIN
-#define short_Unset SHRT_MIN
-#define float_Unset NAN
-
-static inline Error* Boolean_FromJson(Boolean* out, const nx_json* node) {
+static inline Error* bool_FromJson(bool* out, const nx_json* node) {
   if (node->type == NX_JSON_BOOL) {
     *out = node->val.u;
     return err_success();
@@ -34,12 +29,42 @@ static inline Error* int_FromJson(int* out, const nx_json* node) {
   return err_string(0, "Not an integer");
 }
 
-static inline Error* short_FromJson(short* out, const nx_json* node) {
-  int val = 0;
+static inline Error* int8_t_FromJson(int8_t* out, const nx_json* node) {
+  int val; // NOLINT
   Error* e = int_FromJson(&val, node);
   e_check();
-  if (val < SHRT_MIN || val > SHRT_MAX)
-    return err_string(0, "Value not in range for short type");
+  if (val < INT8_MIN || val > INT8_MAX)
+    return err_stringf(0, "Value not in range (%d - %d): %d", INT8_MIN, INT8_MAX, val);
+  *out = val;
+  return err_success();
+}
+
+static inline Error* uint8_t_FromJson(uint8_t* out, const nx_json* node) {
+  int val; // NOLINT
+  Error* e = int_FromJson(&val, node);
+  e_check();
+  if (val < 0 || val > UINT8_MAX)
+    return err_stringf(0, "Value not in range (%d - %d): %d", 0, UINT8_MAX, val);
+  *out = val;
+  return err_success();
+}
+
+static inline Error* int16_t_FromJson(int16_t* out, const nx_json* node) {
+  int val; // NOLINT
+  Error* e = int_FromJson(&val, node);
+  e_check();
+  if (val < INT16_MIN || val > INT16_MAX)
+    return err_stringf(0, "Value not in range (%d - %d): %d", INT16_MIN, INT16_MAX, val);
+  *out = val;
+  return err_success();
+}
+
+static inline Error* uint16_t_FromJson(uint16_t* out, const nx_json* node) {
+  int val; // NOLINT
+  Error* e = int_FromJson(&val, node);
+  e_check();
+  if (val < 0 || val > UINT16_MAX)
+    return err_stringf(0, "Value not in range (%d - %d): %d", 0, UINT16_MAX, val);
   *out = val;
   return err_success();
 }
@@ -78,7 +103,7 @@ static Error* RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* 
   else if (!strcmp(s, "Set")) *out = RegisterWriteMode_Set;
   else if (!strcmp(s, "And")) *out = RegisterWriteMode_And;
   else if (!strcmp(s, "Or"))  *out = RegisterWriteMode_Or;
-  else return err_string(0, "Invalid value for RegisterWriteMode");
+  else return err_stringf(0, "Invalid value for %s: %s", "RegisterWriteMode", s);
   return e;
 }
 
@@ -88,7 +113,7 @@ static Error* RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const n
   if (e) return e;
   else if (!strcmp(s, "OnWriteFanSpeed"))  *out = RegisterWriteOccasion_OnWriteFanSpeed;
   else if (!strcmp(s, "OnInitialization")) *out = RegisterWriteOccasion_OnInitialization;
-  else return err_string(0, "Invalid value for RegisterWriteOccasion");
+  else return err_stringf(0, "Invalid value for %s: %s", "RegisterWriteOccasion", s);
   return e;
 }
 
@@ -99,7 +124,7 @@ static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* out, con
   else if (!strcmp(s, "Read"))       *out = OverrideTargetOperation_Read;
   else if (!strcmp(s, "Write"))      *out = OverrideTargetOperation_Write;
   else if (!strcmp(s, "ReadWrite"))  *out = OverrideTargetOperation_ReadWrite;
-  else return err_string(0, "Invalid value for OverrideTargetOperation");
+  else return err_stringf(0, "Invalid value for %s: %s", "OverrideTargetOperation", s);
   return e;
 }
 
@@ -110,7 +135,7 @@ static Error* TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, c
   else if (!strcmp(s, "Average"))    *out = TemperatureAlgorithmType_Average;
   else if (!strcmp(s, "Min"))        *out = TemperatureAlgorithmType_Min;
   else if (!strcmp(s, "Max"))        *out = TemperatureAlgorithmType_Max;
-  else return err_string(0, "Invalid value for TemperatureAlgorithmType");
+  else return err_stringf(0, "Invalid value for %s: %s", "TemperatureAlgorithmType", s);
   return e;
 }
 
@@ -120,7 +145,7 @@ static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const
   if (e) return e;
   EmbeddedControllerType t = EmbeddedControllerType_FromString(s);
   if (t == EmbeddedControllerType_Unset)
-    return err_string(0, "Invalid value for EmbeddedControllerType");
+    return err_stringf(0, "Invalid value for %s: %s", "EmbeddedControllerType", s);
   *out = t;
   return e;
 }
@@ -383,8 +408,9 @@ Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
     Trace_Push(trace, "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
 
     // Don't make the validation fail if `ResetRequired` is false and `ResetValue` was not set
-    if (r->ResetRequired == Boolean_False || r->ResetRequired == Boolean_Unset)
-      r->ResetValue = 0;
+    // This relies on the fact that all structs are zero-initialized, and that ResetRequired defaults to false.
+    if (r->ResetRequired == false)
+      RegisterWriteConfiguration_Set_ResetValue(r);
 
     e = RegisterWriteConfiguration_ValidateFields(r);
     e_check();
@@ -403,8 +429,9 @@ Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
     }
 
     // Don't make the validation fail if `ResetRequired` is false and `FanSpeedResetValue` was not set
-    if (f->ResetRequired == Boolean_False || f->ResetRequired == Boolean_Unset)
-      f->FanSpeedResetValue = 0;
+    // This relies on the fact that all structs are zero-initialized, and that ResetRequired defaults to false.
+    if (f->ResetRequired == false)
+      FanConfiguration_Set_FanSpeedResetValue(f);
 
     e = FanConfiguration_ValidateFields(f);
     e_check();

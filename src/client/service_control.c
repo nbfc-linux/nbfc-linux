@@ -85,7 +85,7 @@ error:
 
 void ServiceConfig_Load() {
   if (access(NBFC_SERVICE_CONFIG, F_OK) != 0) {
-    service_config = ServiceConfig_Unset; // Clear values
+    memset(&service_config, 0, sizeof(service_config)); // Clear values
     return;
   }
 
