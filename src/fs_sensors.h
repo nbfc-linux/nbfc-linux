@@ -7,6 +7,7 @@
 enum FS_TemperatureSource_Type {
   FS_TemperatureSource_File,
   FS_TemperatureSource_Command,
+  FS_TemperatureSource_Nvidia,
 };
 typedef enum FS_TemperatureSource_Type FS_TemperatureSource_Type;
 

@@ -35,6 +35,7 @@
 #include "stack_memory.c"
 #include "model_config.c"
 #include "nxjson.c"
+#include "nvidia.c"
 #include "program_name.c"
 #include "protocol.c"
 #include "pidfile.c"

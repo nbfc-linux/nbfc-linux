@@ -21,7 +21,7 @@ else
 endif
 
 LDLIBS_CLIENT = -lm -lcurl -lcrypto
-LDLIBS_SERVICE = -lm
+LDLIBS_SERVICE = -lm -ldl
 LDLIBS_EC_PROBE = -lm
 LDLIBS_TEST_MODEL_CONFIG = -lm
 

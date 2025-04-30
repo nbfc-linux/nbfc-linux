@@ -147,6 +147,8 @@ int main(int argc, char* const argv[])
   atexit(Server_Close);
 
   if (options.fork) {
+    Nvidia_Close();
+
     switch (fork()) {
     case -1:
       Log_Error("fork(): %s\n", strerror(errno));
@@ -171,6 +173,9 @@ int main(int argc, char* const argv[])
       close(STDIN_FILENO);
       close(STDOUT_FILENO);
       close(STDERR_FILENO);
+
+      // Re-initialize nvidia after fork
+      Nvidia_Init();
 
       break;
     default:

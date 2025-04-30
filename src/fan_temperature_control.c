@@ -11,7 +11,7 @@ static const char* const CPUSensorNames[] = {
 };
 
 static const char* const GPUSensorNames[] = {
-  "amdgpu", "nvidia", "nouveau", "radeon"
+  "amdgpu", "nvidia", "nvidia-ml", "nouveau", "radeon"
 };
 
 static inline int IsCPUSensorName(const char* s) {
@@ -38,6 +38,7 @@ static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, f
   for (int i = 0; i < ftc->TemperatureSourcesSize; ++i) {
     FS_TemperatureSource* ts = ftc->TemperatureSources[i];
     Error* e = FS_TemperatureSource_GetTemperature(ts, &tmp);
+    e_warn();
     if (! e) {
       min = min(min, tmp);
       max = max(max, tmp);

@@ -4,6 +4,7 @@
 #include "slurp_file.h"
 #include "log.h"
 #include "sleep.h"
+#include "nvidia.h"
 
 #include <errno.h>   // ENODATA, EINVAL
 #include <stdio.h>   // snprintf
@@ -28,6 +29,9 @@ Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* ou
 
   if (self->type == FS_TemperatureSource_File) {
     nread = slurp_file(buf, sizeof(buf), my.file);
+  }
+  else if (self->type == FS_TemperatureSource_Nvidia) {
+    return Nvidia_GetTemperature(out);
   }
   else {
     FILE* fh = popen(my.file, "r");
@@ -101,7 +105,6 @@ static Error* FS_Sensors_Init_HwMon() {
 #endif
         if (e)
           continue;
-        Log_Info("Available temperature source: '%s' (%s)\n", source->name, source->file);
         source->name = Mem_Strdup(source->name);
         source->file = Mem_Strdup(source->file);
         if (++source == sources_end)
@@ -121,6 +124,11 @@ end:
   return err_success();
 }
 
+static void FS_Sensors_Log() {
+  for_each_array(FS_TemperatureSource*, source, FS_Sensors_Sources)
+    Log_Info("Available temperature source: '%s' (%s)\n", source->name, source->file);
+}
+
 Error* FS_Sensors_Init() {
   Error* e;
   int slept;
@@ -135,13 +143,38 @@ Error* FS_Sensors_Init() {
     sleep_ms(1000);
   }
 
+  // Wait for nvidia module
+  for (; slept < sleep_time; ++slept) {
+    Nvidia_Error ne = Nvidia_Init();
+    if (ne == Nvidia_Error_DlOpen)
+      break;
+
+    if (ne == Nvidia_Error_API) {
+      Log_Info("Waiting for nvidia sensor ...\n");
+      sleep_ms(1000);
+      continue;
+    }
+
+    const size_t idx = FS_Sensors_Sources.size;
+    FS_Sensors_Sources.data = Mem_Realloc(FS_Sensors_Sources.data, (idx + 1) * sizeof(FS_TemperatureSource));
+    FS_Sensors_Sources.data[idx].name = Mem_Strdup("nvidia-ml");
+    FS_Sensors_Sources.data[idx].file = Mem_Strdup("none");
+    FS_Sensors_Sources.data[idx].multiplier = 1;
+    FS_Sensors_Sources.data[idx].type = FS_TemperatureSource_Nvidia;
+    FS_Sensors_Sources.size = idx + 1;
+    break;
+  }
+
   if (! FS_Sensors_Sources.size)
     return err_string(0, "No temperature sources found");
 
+  FS_Sensors_Log();
   return err_success();
 }
 
 void FS_Sensors_Cleanup() {
+  Nvidia_Close();
+
   for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources) {
     Mem_Free(s->name);
     Mem_Free(s->file);
@@ -150,4 +183,3 @@ void FS_Sensors_Cleanup() {
   FS_Sensors_Sources.size = 0;
   FS_Sensors_Sources.data = NULL;
 }
-
