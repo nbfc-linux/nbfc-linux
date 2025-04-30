@@ -26,9 +26,9 @@ enum Service_Initialization {
   Initialized_0_None,
   Initialized_1_Service_Config,
   Initialized_2_Model_Config,
-  Initialized_3_Fans,
-  Initialized_4_Embedded_Controller,
-  Initialized_5_Sensors,
+  Initialized_3_Sensors,
+  Initialized_4_Fans,
+  Initialized_5_Embedded_Controller,
   Initialized_6_Temperature_Filter,
 };
 
@@ -89,10 +89,16 @@ Error* Service_Init() {
 
   TemperatureThresholdManager_LegacyBehaviour = Service_Model_Config.LegacyTemperatureThresholdsBehaviour;
 
+  // Sensor ===================================================================
+  e = FS_Sensors_Init();
+  if (e)
+    goto error;
+  Service_State = Initialized_3_Sensors;
+
   // Fans =====================================================================
   Service_Fans.size = Service_Model_Config.FanConfigurations.size;
   Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
-  Service_State = Initialized_3_Fans;
+  Service_State = Initialized_4_Fans;
 
   for_enumerate_array(size_t, i, Service_Fans) {
     e = Fan_Init(
@@ -143,7 +149,7 @@ Error* Service_Init() {
 #endif
   }
 
-  Service_State = Initialized_4_Embedded_Controller;
+  Service_State = Initialized_5_Embedded_Controller;
 
   // Register Write configurations ============================================
   if (! options.read_only) {
@@ -151,12 +157,6 @@ Error* Service_Init() {
     if (e)
       goto error;
   }
-
-  // Sensor ===================================================================
-  e = FS_Sensors_Init();
-  if (e)
-    goto error;
-  Service_State = Initialized_5_Sensors;
 
   // Initialize fans with sensors and temperature filter ======================
   e = FanTemperatureControl_Init(&Service_Fans, &service_config, &Service_Model_Config);
@@ -322,14 +322,14 @@ void Service_Cleanup() {
     case Initialized_6_Temperature_Filter:
       for_each_array(FanTemperatureControl*, ftc, Service_Fans)
         TemperatureFilter_Close(&ftc->TemperatureFilter);
-    case Initialized_5_Sensors:
-      FS_Sensors_Cleanup();
-    case Initialized_4_Embedded_Controller:
+    case Initialized_5_Embedded_Controller:
       if (! options.read_only)
         ResetEC();
       ec->Close();
-    case Initialized_3_Fans:
+    case Initialized_4_Fans:
       Mem_Free(Service_Fans.data);
+    case Initialized_3_Sensors:
+      FS_Sensors_Cleanup();
     case Initialized_2_Model_Config:
       ModelConfig_Free(&Service_Model_Config);
     case Initialized_1_Service_Config:
