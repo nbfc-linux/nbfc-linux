@@ -1,5 +1,13 @@
 # Changelog
 
+## nbfc-linux-0.3.9 (2025-04-30)
+- Added support for temperature monitoring using the proprietary NVIDIA
+  kernel module through dynamic loading of `libnvidia-ml.so` via `dlopen()`.
+
+  Users can now enable this sensor by specifying `nvidia-ml` as the sensor name.
+
+  This sensor is also part of the `@GPU` sensor group.
+
 ## nbfc-linux-0.3.9 (2025-04-26)
 - Support for logging though syslog facility
 
