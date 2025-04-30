@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "slurp_file.h"
 #include "log.h"
+#include "sleep.h"
 
 #include <errno.h>   // ENODATA, EINVAL
 #include <stdio.h>   // snprintf
@@ -56,7 +57,7 @@ Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* ou
   return err_success();
 }
 
-Error* FS_Sensors_Init() {
+static Error* FS_Sensors_Init_HwMon() {
   Error* e;
   FS_TemperatureSource sources[64];
   FS_TemperatureSource *source = sources;
@@ -117,6 +118,26 @@ end:
   FS_Sensors_Sources.size = n_sources;
   FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Malloc(n_sources * sizeof(FS_TemperatureSource));
   memcpy(FS_Sensors_Sources.data, sources, n_sources * sizeof(FS_TemperatureSource));
+  return err_success();
+}
+
+Error* FS_Sensors_Init() {
+  Error* e;
+  int slept;
+  const int sleep_time = 30;
+
+  // Wait for /sys/class/hwmon/* sensors
+  for (slept = 0; slept < sleep_time; ++slept) {
+    e = FS_Sensors_Init_HwMon();
+    if (! e)
+      break;
+    Log_Info("Waiting for /sys/class/hwmon* sensors ...\n");
+    sleep_ms(1000);
+  }
+
+  if (! FS_Sensors_Sources.size)
+    return err_string(0, "No temperature sources found");
+
   return err_success();
 }
 

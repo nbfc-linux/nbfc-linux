@@ -2,7 +2,6 @@
 Description=NoteBook FanControl service
 
 [Service]
-ExecStartPre=@BINDIR@/nbfc wait-for-hwmon
 ExecStart=@BINDIR@/nbfc start
 ExecStop=@BINDIR@/nbfc stop
 Type=forking
