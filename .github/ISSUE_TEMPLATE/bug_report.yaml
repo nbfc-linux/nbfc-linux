@@ -1,0 +1,26 @@
+name: Bug Report
+description: Use this template to report bugs
+labels: bug
+
+# Form fields:
+fields:
+  - type: input
+    label: Describe the bug
+    description: Please provide a detailed description of the bug.
+    required: true
+  - type: input
+    label: Steps to Reproduce
+    description: List the steps to reproduce the bug.
+    required: true
+  - type: input
+    label: Expected behavior
+    description: What did you expect to happen?
+    required: true
+  - type: input
+    label: Actual behavior
+    description: What actually happened?
+    required: true
+  - type: input
+    label: Additional context
+    description: Any additional information that might be helpful.
+    required: false
