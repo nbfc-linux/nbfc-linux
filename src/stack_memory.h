@@ -8,7 +8,7 @@ struct StackMemory {
 };
 typedef struct StackMemory StackMemory;
 
-extern __thread StackMemory StackMemory_Memory;
+extern StackMemory StackMemory_Memory;
 
 static inline void StackMemory_Init(void* buf, size_t size) {
   StackMemory_Memory.start = buf;

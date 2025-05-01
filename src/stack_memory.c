@@ -8,7 +8,7 @@
 
 #define ALIGNMENT sizeof(void*)
 
-__thread StackMemory StackMemory_Memory = {0};
+StackMemory StackMemory_Memory = {0};
 
 static inline void* align_pointer(void* ptr) {
     uintptr_t p = (uintptr_t) ptr;

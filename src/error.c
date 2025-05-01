@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-__thread Error error_stack[16];
+Error error_stack[16];
 
 static void err_print(Error* e, StringBuf* s) {
   if (! e)

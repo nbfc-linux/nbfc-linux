@@ -21,7 +21,7 @@ struct Error {
   } value;
 };
 
-extern __thread Error error_stack[16];
+extern Error error_stack[16];
 
 #define e_warn()      do { if (e) { Log_Warn("%s\n", err_print_all(e)); } } while (0)
 #define e_die()       do { if (e) { Log_Error("%s\n", err_print_all(e)); exit(EXIT_FAILURE); } } while(0)

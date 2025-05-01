@@ -18,7 +18,7 @@
 static const char* Json_EscapeString(char*, const size_t, const char*);
 
 char *nx_json_to_string(const nx_json *nx, StringBuf* s, int indent) {
-  static __thread char buf[NBFC_MAX_FILE_SIZE];
+  static char buf[NBFC_MAX_FILE_SIZE];
 
   while (nx != NULL) {
     if (nx->type == NX_JSON_OBJECT) {
