@@ -9,6 +9,7 @@
 #include "temperature_filter.h"
 
 #include <stdbool.h>
+#include <linux/limits.h>
 
 typedef struct Service_Options Service_Options;
 struct Service_Options {
@@ -17,7 +18,7 @@ struct Service_Options {
   bool                   read_only;
   bool                   debug;
   bool                   python_hack;
-  const char*            service_config;
+  char                   service_config[PATH_MAX];
 };
 
 extern ModelConfig     Service_Model_Config;

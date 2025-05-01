@@ -14,7 +14,7 @@
 #include <string.h> // strerror
 #include <signal.h> // signal, SIGINT, SIGTERM
 #include <stdio.h>  // printf
-#include <stdlib.h> // exit, atexit
+#include <stdlib.h> // exit, atexit, realpath
 #include <locale.h> // setlocale, LC_NUMERIC
 #include <getopt.h> // getopt_long
 #include <unistd.h> // fork, setsid, chdir
@@ -59,11 +59,16 @@ static void parse_opts(int argc, char* const argv[]) {
       options.debug = 1;
       Log_LogLevel = LogLevel_Debug;
       break;
+    case 'c':
+      if (! realpath(optarg, options.service_config)) {
+        Log_Error("%s: %s: %s\n", "-c|--config-file", optarg, strerror(errno));
+        exit(NBFC_EXIT_CMDLINE);
+      }
+      break;
     case 'v':  printf("nbfc-linux " NBFC_VERSION "\n"); exit(0);   break;
     case 'h':  printf(NBFC_SERVICE_HELP_TEXT, argv[0]); exit(0);   break;
     case 'r':  options.read_only      = 1;                         break;
     case 'f':  options.fork           = 1;                         break;
-    case 'c':  options.service_config = optarg;                    break;
     case 'p':  /* --python-hack is not longer needed */            break;
     default:   exit(NBFC_EXIT_CMDLINE);
     }
@@ -92,8 +97,8 @@ int main(int argc, char* const argv[])
   // the unmounting of filesystems by holding a directory open.
   chdir("/");
 
-  options.service_config = NBFC_SERVICE_CONFIG;
   options.embedded_controller_type = EmbeddedControllerType_Unset;
+  snprintf(options.service_config, sizeof(options.service_config), "%s", NBFC_SERVICE_CONFIG);
   parse_opts(argc, argv);
 
   Log_Init(options.fork);
