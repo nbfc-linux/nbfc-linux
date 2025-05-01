@@ -3,13 +3,18 @@
 #include "stringbuf.h"
 #include "nxjson.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 
-Error error_stack[16];
+static Error error_stack[16];
 
-static void err_print(Error* e, StringBuf* s) {
+static inline Error* err_allocate(Error* e) {
+  return e ? ++e : error_stack;
+}
+
+static void err_print(const Error* e, StringBuf* s) {
   if (! e)
     return;
 
@@ -20,7 +25,7 @@ static void err_print(Error* e, StringBuf* s) {
   }
 }
 
-const char* err_print_all(Error* e) {
+const char* err_print_all(const Error* e) {
   static char buf[4096];
   StringBuf s = { buf, 0, sizeof(buf) - 1 };
 
@@ -76,4 +81,3 @@ Error* err_nxjson(Error* e, const char* message) {
     return err_string(e, message);
   return e;
 }
-
