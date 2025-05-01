@@ -2,6 +2,7 @@
 
 #include "memory.h"
 
+#include <errno.h>
 #include <string.h>
 
 Error* TemperatureFilter_Init(TemperatureFilter* self, int poll_interval, int timespan) {

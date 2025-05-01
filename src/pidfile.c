@@ -3,6 +3,7 @@
 #include "nbfc.h"
 #include "slurp_file.h"
 
+#include <stdio.h>  // snprintf
 #include <unistd.h> // getpid
 #include <sys/stat.h>
 

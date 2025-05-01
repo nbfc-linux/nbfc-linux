@@ -7,8 +7,6 @@
 
 #include <sys/socket.h>
 
-#define PROTOCOL_BUFFER_SIZE 4096
-
 Error* Protocol_Send(int socket, const char* buffer, size_t length) {
   size_t total_sent = 0;
 

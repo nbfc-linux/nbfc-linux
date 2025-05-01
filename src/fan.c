@@ -3,7 +3,8 @@
 #include "error.h"
 #include "ec.h"
 
-#include <math.h> // fabs, round
+#include <math.h>  // fabs, round
+#include <errno.h> // EINVAL
 
 extern EC_VTable* ec;
 

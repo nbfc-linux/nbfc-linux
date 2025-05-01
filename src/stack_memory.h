@@ -1,6 +1,8 @@
 #ifndef STACK_MEMORY_H_
 #define STACK_MEMORY_H_
 
+#include <stddef.h>
+
 struct StackMemory {
     void* start;
     void* current;

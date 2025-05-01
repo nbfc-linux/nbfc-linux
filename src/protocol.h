@@ -6,6 +6,7 @@
 
 #define PROTOCOL_END_MARKER     "\nEND"
 #define PROTOCOL_END_MARKER_LEN 4
+#define PROTOCOL_BUFFER_SIZE    4096
 
 Error* Protocol_Send(int, const char*, size_t);
 Error* Protocol_Send_Json(int, const nx_json*);

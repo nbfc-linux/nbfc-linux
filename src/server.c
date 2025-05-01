@@ -324,17 +324,20 @@ static void Server_HandleClient(Client* client) {
   Log_Debug("Server_HandleClient(fd=%d)\n", client->fd);
 
   if (Server_ReceiveMessage(client) == -1) {
-    if (errno == EAGAIN || errno == EWOULDBLOCK)
-      return;
-    else if (errno == EFBIG) {
-      e = err_string(0, "Message too large");
-      goto end;
-    }
-    else {
-      Log_Warn("Client %d read failed: %s\n", client->fd, strerror(errno));
-      close(client->fd);
-      client->active = false;
-      return;
+    switch (errno) {
+      case EAGAIN:
+      case EWOULDBLOCK:
+        return;
+
+      case EFBIG:
+        e = err_string(0, "Message too large");
+        goto end;
+
+      default:
+        Log_Warn("Client %d read failed: %s\n", client->fd, strerror(errno));
+        close(client->fd);
+        client->active = false;
+        return;
     }
   }
 

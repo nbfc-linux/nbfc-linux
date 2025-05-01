@@ -7,6 +7,8 @@
 #include "ec.h"
 #include "model_config.h"
 #include "pidfile.h"
+#include "program_name.h"
+#include "nvidia.h"
 #include "help/nbfc_service.help.h"
 #include "sleep.h"
 

@@ -15,6 +15,7 @@
 #include "model_config.h"
 
 #include <stdio.h>  // snprintf
+#include <unistd.h> // access, F_OK
 #include <math.h>   // fabs
 #include <linux/limits.h> // PATH_MAX
 
