@@ -1,14 +1,14 @@
 name: Feature Request
 description: Use this template to request new features
-labels: ["enhancement"]
 title: "[Feature Request]: "
+labels: ["enhancement"]
 
 # Form fields:
-fields:
+body:
   - type: textarea
     id: description
     attributes:
       label: Describe the Feature
-      description: Please provide a detailed description of the feature you want to request.
+      description: Please provide a detailed description of the feature you want to request. DO NOT request configurations for your notebook model!
     validations:
       required: true
