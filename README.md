@@ -27,7 +27,7 @@ Comparison of NBFC C# and NBFC Linux
 |What                             | NBFC Mono                             | NBFC Linux                                  |
 |---------------------------------|---------------------------------------|----------------------------------------------
 |Portability                      | Crossplatform                         | Linux                                       |
-|Configuration files              | XML (956KB)                           | [JSON](share/nbfc/configs) (840KB)          |
+|Configuration files              | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) ![Files](https://img.shields.io/github/directory-file-count/hirschmann/nbfc/Configs) | [JSON](share/nbfc/configs) ![Files](https://img.shields.io/github/directory-file-count/nbfc-linux/nbfc-linux/share%2Fnbfc%2Fconfigs) |
 |Model compatibility database     | No                                    | [Yes](share/nbfc/model_support.json)        |
 |Runtime                          | Mono                                  | Native                                      |
 |Memory consumption (ps\_mem)     | ~50MB                                 | ~280KB                                      |
