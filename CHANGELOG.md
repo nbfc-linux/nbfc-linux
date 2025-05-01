@@ -1,6 +1,9 @@
 # Changelog
 
-## nbfc-linux-0.3.9 (2025-04-30)
+## nbfc-linux-0.3.11 (2025-05-01)
+- Fix incorrect error message if TemperatureThresholds are missing
+
+## nbfc-linux-0.3.10 (2025-04-30)
 - Added support for temperature monitoring using the proprietary NVIDIA
   kernel module through dynamic loading of `libnvidia-ml.so` via `dlopen()`.
 

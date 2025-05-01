@@ -280,12 +280,12 @@ define_array_of_T_FromJson(FanTemperatureSourceConfig)
 // ============================================================================
 
 static TemperatureThreshold _Config_DefaultTemperatureThresholds[] = {
-  {60,  0,   0},
-  {63, 48,  10},
-  {66, 55,  20},
-  {68, 59,  50},
-  {71, 63,  70},
-  {75, 67, 100},
+  {60,  0,   0, 255},
+  {63, 48,  10, 255},
+  {66, 55,  20, 255},
+  {68, 59,  50, 255},
+  {71, 63,  70, 255},
+  {75, 67, 100, 255},
 };
 
 static array_of(TemperatureThreshold) Config_DefaultTemperatureThresholds = {
@@ -294,12 +294,12 @@ static array_of(TemperatureThreshold) Config_DefaultTemperatureThresholds = {
 };
 
 static TemperatureThreshold _Config_DefaultLegacyTemperatureThresholds[] = {
-  {0,   0,   0},
-  {60, 48,  10},
-  {63, 55,  20},
-  {66, 59,  50},
-  {68, 63,  70},
-  {71, 67, 100},
+  {0,   0,   0, 255},
+  {60, 48,  10, 255},
+  {63, 55,  20, 255},
+  {66, 59,  50, 255},
+  {68, 63,  70, 255},
+  {71, 67, 100, 255},
 };
 
 static array_of(TemperatureThreshold) Config_DefaultLegacyTemperatureThresholds = {
