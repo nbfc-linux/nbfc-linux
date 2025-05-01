@@ -1,18 +1,14 @@
 name: Feature Request
 description: Use this template to request new features
-labels: enhancement
+labels: ["enhancement"]
+title: "[Feature Request]: "
 
 # Form fields:
 fields:
-  - type: input
-    label: Feature description
-    description: Describe the feature you would like to see.
-    required: true
-  - type: input
-    label: Why is this feature needed?
-    description: Why do you think this feature is important?
-    required: true
-  - type: input
-    label: Additional context
-    description: Any additional information or use cases for this feature.
-    required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Feature
+      description: Please provide a detailed description of the feature you want to request.
+    validations:
+      required: true
