@@ -1,5 +1,2 @@
-- Make nbfc_service single threaded
-
 - src/optparse/
   - It works, but isn't finished yet
-

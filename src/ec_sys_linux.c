@@ -16,12 +16,15 @@
 #define EC_SysLinux_ACPI_Module_Cmd "modprobe acpi_ec write_support=1"
 #define EC_SysLinux_Module_Cmd      "modprobe ec_sys write_support=1"
 
-static int EC_SysLinux_FD = -1;
+static int         EC_SysLinux_FD = -1;
+static const char* EC_SysLinux_File = NULL;
 
 static inline Error* EC_SysLinux_LoadKernelModule();
 static inline Error* EC_SysLinux_LoadACPIKernelModule();
 
 Error* EC_SysLinux_Open() {
+  EC_SysLinux_File = EC_SysLinux_EC0_IO_Path;
+
   EC_SysLinux_FD = open(EC_SysLinux_EC0_IO_Path, O_RDWR);
   if (EC_SysLinux_FD != -1)
     return err_success();
@@ -37,6 +40,8 @@ Error* EC_SysLinux_Open() {
 }
 
 Error* EC_SysLinux_ACPI_Open() {
+  EC_SysLinux_File = EC_SysLinux_ACPI_EC_Path;
+
   EC_SysLinux_FD = open(EC_SysLinux_ACPI_EC_Path, O_RDWR);
   if (EC_SysLinux_FD != -1)
     return err_success();
@@ -60,21 +65,21 @@ void EC_SysLinux_Close() {
 
 Error* EC_SysLinux_WriteByte(int register_, uint8_t value) {
   if (1 != pwrite(EC_SysLinux_FD, &value, 1, register_))
-    return err_stdlib(0, EC_SysLinux_EC0_IO_Path);
+    return err_stdlib(0, EC_SysLinux_File);
   return err_success();
 }
 
 Error* EC_SysLinux_WriteWord(int register_, uint16_t value) {
   value = htole16(value);
   if (2 != pwrite(EC_SysLinux_FD, &value, 2, register_))
-    return err_stdlib(0, EC_SysLinux_EC0_IO_Path);
+    return err_stdlib(0, EC_SysLinux_File);
   return err_success();
 }
 
 Error* EC_SysLinux_ReadByte(int register_, uint8_t* out) {
   uint8_t value;
   if (1 != pread(EC_SysLinux_FD, &value, 1, register_))
-    return err_stdlib(0, EC_SysLinux_EC0_IO_Path);
+    return err_stdlib(0, EC_SysLinux_File);
   *out = value;
   return err_success();
 }
@@ -82,7 +87,7 @@ Error* EC_SysLinux_ReadByte(int register_, uint8_t* out) {
 Error* EC_SysLinux_ReadWord(int register_, uint16_t* out) {
   uint16_t value;
   if (2 != pread(EC_SysLinux_FD, &value, 2, register_))
-    return err_stdlib(0, EC_SysLinux_EC0_IO_Path);
+    return err_stdlib(0, EC_SysLinux_File);
   *out = le16toh(value);
   return err_success();
 }
