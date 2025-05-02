@@ -326,7 +326,9 @@ static void Server_HandleClient(Client* client) {
   if (Server_ReceiveMessage(client) == -1) {
     switch (errno) {
       case EAGAIN:
+#if EAGAIN != EWOULDBLOCK
       case EWOULDBLOCK:
+#endif
         return;
 
       case EFBIG:
