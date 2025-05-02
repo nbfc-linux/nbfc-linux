@@ -5,18 +5,19 @@
 
 #include <math.h>  // fabs, round
 #include <errno.h> // EINVAL
+#include <stdbool.h>
 
 extern EC_VTable* ec;
 
-Error* Fan_Init(Fan* self, FanConfiguration* cfg, int criticalTemperature, bool readWriteWords) {
+Error* Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.fanConfig            = cfg;
   my.mode                 = Fan_ModeAuto;
-  my.criticalTemperature  = criticalTemperature;
-  my.readWriteWords       = readWriteWords;
+  my.criticalTemperature  = modelCfg->CriticalTemperature;
+  my.criticalTemperatureOffset = modelCfg->CriticalTemperatureOffset;
+  my.readWriteWords       = modelCfg->ReadWriteWords;
   my.minSpeedValueWrite   = cfg->MinSpeedValue;
   my.maxSpeedValueWrite   = cfg->MaxSpeedValue;
-  my.criticalTemperatureOffset = 15;
-  const int same = ! cfg->IndependentReadMinMaxValues;
+  const bool same = ! cfg->IndependentReadMinMaxValues;
   my.minSpeedValueRead    = same ? my.minSpeedValueWrite : cfg->MinSpeedValueRead;
   my.maxSpeedValueRead    = same ? my.maxSpeedValueWrite : cfg->MaxSpeedValueRead;
   my.minSpeedValueReadAbs = min(my.minSpeedValueRead, my.maxSpeedValueRead);

@@ -105,8 +105,7 @@ Error* Service_Init() {
     e = Fan_Init(
         &Service_Fans.data[i].Fan,
         &Service_Model_Config.FanConfigurations.data[i],
-        Service_Model_Config.CriticalTemperature,
-        Service_Model_Config.ReadWriteWords
+        &Service_Model_Config
     );
     if (e)
       goto error;

@@ -4,6 +4,7 @@
 #include "macros.h"
 #include "error.h"
 #include "temperature_threshold_manager.h"
+#include "model_config.h"
 
 #include <stdbool.h>
 
@@ -34,7 +35,7 @@ struct Fan {
   bool isCritical;
 };
 
-Error* Fan_Init(Fan*, FanConfiguration*, int criticalTemperature, bool readWriteWords);
+Error* Fan_Init(Fan*, FanConfiguration*, ModelConfig*);
 
 Error* Fan_UpdateCurrentSpeed(Fan*);
 float  Fan_GetCurrentSpeed(const Fan*);

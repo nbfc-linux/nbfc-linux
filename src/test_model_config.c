@@ -94,8 +94,7 @@ int test_model_config(const char* file) {
     e = Fan_Init(
         &fan,
         &model_config.FanConfigurations.data[i],
-        model_config.CriticalTemperature,
-        model_config.ReadWriteWords
+        &model_config
     );
     e_die();
 
