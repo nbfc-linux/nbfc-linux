@@ -259,7 +259,7 @@ static Error* FanTemperatureControl_SetByServiceConfig(
   Error* e;
 
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config->FanTemperatureSources) {
-    if (ftsc->FanIndex < 0 || ftsc->FanIndex >= fans->size)
+    if (ftsc->FanIndex >= fans->size)
       return err_stringf(0, "Invalid FanIndex in FanTemperatureSources: %d", ftsc->FanIndex);
 
     FanTemperatureControl* ftc = &fans->data[ftsc->FanIndex];

@@ -323,18 +323,24 @@ void Service_Cleanup() {
     case Initialized_6_Temperature_Filter:
       for_each_array(FanTemperatureControl*, ftc, Service_Fans)
         TemperatureFilter_Close(&ftc->TemperatureFilter);
+      /* fall through */
     case Initialized_5_Embedded_Controller:
       if (! options.read_only)
         ResetEC();
       ec->Close();
+      /* fall through */
     case Initialized_4_Fans:
       Mem_Free(Service_Fans.data);
+      /* fall through */
     case Initialized_3_Sensors:
       FS_Sensors_Cleanup();
+      /* fall through */
     case Initialized_2_Model_Config:
       ModelConfig_Free(&Service_Model_Config);
+      /* fall through */
     case Initialized_1_Service_Config:
       ServiceConfig_Free(&service_config);
+      /* fall through */
     case Initialized_0_None:
       break;
   }

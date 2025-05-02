@@ -63,7 +63,7 @@ int main(int argc, char* const argv[]) {
 
   ec = NULL;
 
-  char* err;
+  const char* err;
   int o, option_index;
   while ((o = getopt_long(argc, argv, options_str, long_options, &option_index)) != -1) {
     switch (o) {
@@ -114,6 +114,7 @@ int main(int argc, char* const argv[]) {
         Log_Error("Invalid value for -s|--sleep: %s\n", optarg);
         return NBFC_EXIT_CMDLINE;
       }
+      break;
     default:
       return NBFC_EXIT_CMDLINE;
     }
@@ -157,7 +158,7 @@ int main(int argc, char* const argv[]) {
 }
 
 static int expand_ints(const char* s, array_of(int)* array) {
-  char* err;
+  const char* err;
 
   while (*s) {
     char* comma = strchr(s, ',');
