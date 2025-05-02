@@ -31,6 +31,7 @@
 #include "fan.c"
 #include "fan_temperature_control.c"
 #include "fs_sensors.c"
+#include "file_utils.c"
 #include "memory.c"
 #include "stack_memory.c"
 #include "model_config.c"

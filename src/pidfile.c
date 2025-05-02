@@ -1,8 +1,9 @@
 #include "pidfile.h"
 
 #include "nbfc.h"
-#include "slurp_file.h"
+#include "file_utils.h"
 
+#include <errno.h>  // errno, EEXIST
 #include <stdio.h>  // snprintf
 #include <unistd.h> // getpid
 #include <sys/stat.h>

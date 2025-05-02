@@ -1,7 +1,7 @@
 #include "fs_sensors.h"
 
 #include "memory.h"
-#include "slurp_file.h"
+#include "file_utils.h"
 #include "log.h"
 #include "sleep.h"
 #include "nvidia.h"

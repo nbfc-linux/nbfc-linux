@@ -4,7 +4,7 @@
 #include "../nbfc.h"
 #include "../macros.h"
 #include "../sleep.h"
-#include "../slurp_file.h"
+#include "../file_utils.h"
 
 #include "dmi.h"
 #include "service_control.h"

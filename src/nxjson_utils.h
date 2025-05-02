@@ -7,7 +7,7 @@
 
 #include "error.h"
 #include "nxjson.h"
-#include "slurp_file.h"
+#include "file_utils.h"
 
 #define nx_json_for_each(VAR, OBJECT) \
   for (const nx_json* VAR = OBJECT->val.children.first; VAR; VAR = VAR->next)

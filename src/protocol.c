@@ -5,6 +5,7 @@
 #include "nxjson_utils.h"
 #include "reverse_nxjson.h"
 
+#include <unistd.h>
 #include <sys/socket.h>
 
 Error* Protocol_Send(int socket, const char* buffer, size_t length) {

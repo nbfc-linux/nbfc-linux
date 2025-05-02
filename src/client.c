@@ -18,6 +18,7 @@
 
 #include "log.c"
 #include "error.c"
+#include "file_utils.c"
 #include "model_config.c"
 #include "memory.c"
 #include "program_name.c"

@@ -8,20 +8,19 @@
 #include <unistd.h> // access, F_OK, unlink
 #include <limits.h> // INT_MAX
 
-#include "../log.h"
-#include "../sleep.h"
-
 #include <sys/types.h>
 #include <sys/socket.h> // connect, socket
 #include <sys/un.h>     // sockaddr_un
 
 #include "client_global.h"
 
+#include "../log.h"
+#include "../sleep.h"
 #include "../nbfc.h"
 #include "../log.h"
 #include "../memory.h"
 #include "../parse_number.h"
-#include "../slurp_file.h"
+#include "../file_utils.h"
 #include "../protocol.h"
 #include "../nxjson_utils.h"
 #include "../service_config.h"

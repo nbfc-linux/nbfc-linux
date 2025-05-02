@@ -7,7 +7,7 @@
 
 #include "../nbfc.h"
 #include "../log.h"
-#include "../slurp_file.h"
+#include "../file_utils.h"
 #include "str_functions.h"
 
 #define DmiIdDirectoryPath "/sys/devices/virtual/dmi/id"
