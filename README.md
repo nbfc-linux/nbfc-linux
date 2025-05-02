@@ -49,11 +49,15 @@ Installation
   - Either via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
-- Debian / Ubuntu (untested):
+- Debian / Ubuntu:
   - [Latest Version 0.3.11](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.11/nbfc-linux_0.3.11_amd64.deb)
+  - Install libcurl: `apt install libcurl4`
+  - Install NBFC-Linux: `dpkg -i ./nbfc-linux_0.3.11_amd64.deb`
 
-- Fedora (untested)
+- Fedora:
   - [Latest Version 0.3.11](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.11/nbfc-linux-0.3.11-1.x86_64.rpm)
+  - Install libcurl: `dnf install libcurl`
+  - Install NBFC-Linux: `dnf install ./nbfc-linux-0.3.11-1.x86_64.rpm`
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)
