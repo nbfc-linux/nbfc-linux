@@ -42,7 +42,7 @@ int compare_config_by_diff(const void *a, const void *b) {
 
 // Return an array of ConfigFile for each file in `path`
 static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
-  size_t capacity = 512;
+  ssize_t capacity = 512;
   array_of(ConfigFile) files = {
     .data = Mem_Malloc(capacity * sizeof(ConfigFile)),
     .size = 0

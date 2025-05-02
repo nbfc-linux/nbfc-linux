@@ -5,7 +5,7 @@
 #include <fcntl.h>     // mode_t
 #include <sys/types.h> // ssize_t
 
-ssize_t slurp_file(char*, size_t, const char*);
-ssize_t write_file(const char*, int, mode_t, const char*, size_t);
+ssize_t slurp_file(char*, ssize_t, const char*);
+ssize_t write_file(const char*, int, mode_t, const char*, ssize_t);
 
 #endif

@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-ssize_t slurp_file(char* buf, size_t size, const char* file) {
+ssize_t slurp_file(char* buf, ssize_t size, const char* file) {
   ssize_t   nread = -1;
   const int fd = open(file, O_RDONLY);
   if (fd >= 0) {
@@ -22,7 +22,7 @@ ssize_t slurp_file(char* buf, size_t size, const char* file) {
   return nread;
 }
 
-ssize_t write_file(const char* file, int flags, mode_t mode, const char* content, size_t size) {
+ssize_t write_file(const char* file, int flags, mode_t mode, const char* content, ssize_t size) {
   const int fd = open(file, flags, mode);
   if (fd == -1)
     return -1;

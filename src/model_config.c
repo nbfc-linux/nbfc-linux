@@ -240,7 +240,7 @@ const char* TemperatureAlgorithmType_ToString(TemperatureAlgorithmType t) {
 
 typedef Error* (FromJson_Callback)(void*, const nx_json*);
 
-static Error* array_of_FromJson(FromJson_Callback callback, void** v_data, size_t* v_size, size_t size, const nx_json* json) {
+static Error* array_of_FromJson(FromJson_Callback callback, void** v_data, ssize_t* v_size, ssize_t size, const nx_json* json) {
   Error* e = nx_json_get_array(json);
   e_check();
 

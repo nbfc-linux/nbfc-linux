@@ -88,7 +88,7 @@ int test_model_config(const char* file) {
   Log_Info("TemperatureThresholdManager_LegacyBehaviour = %s\n",
     TemperatureThresholdManager_LegacyBehaviour ? "true" : "false");
 
-  for_enumerate_array(size_t, i, model_config.FanConfigurations) {
+  for_enumerate_array(ssize_t, i, model_config.FanConfigurations) {
     Fan fan;
 
     e = Fan_Init(

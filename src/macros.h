@@ -31,7 +31,7 @@
   typedef struct array_of(T) array_of(T);    \
   struct array_of(T) {                       \
     T*  data;                                \
-    size_t size;                             \
+    ssize_t size;                            \
   }
 
 declare_array_of(float);

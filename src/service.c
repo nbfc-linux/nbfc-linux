@@ -101,7 +101,7 @@ Error* Service_Init() {
   Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
   Service_State = Initialized_4_Fans;
 
-  for_enumerate_array(size_t, i, Service_Fans) {
+  for_enumerate_array(ssize_t, i, Service_Fans) {
     e = Fan_Init(
         &Service_Fans.data[i].Fan,
         &Service_Model_Config.FanConfigurations.data[i],
@@ -112,7 +112,7 @@ Error* Service_Init() {
       goto error;
   }
 
-  for_enumerate_array(size_t, i, service_config.TargetFanSpeeds) {
+  for_enumerate_array(ssize_t, i, service_config.TargetFanSpeeds) {
     if (service_config.TargetFanSpeeds.data[i] >= 0.0f) {
       e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, service_config.TargetFanSpeeds.data[i]);
       e_warn();
