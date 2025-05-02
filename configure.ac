@@ -1,7 +1,6 @@
 AC_INIT([nbfc-linux], [0.3.11], [braph93@gmx.de])
 
 # Checks for programs.
-AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 
