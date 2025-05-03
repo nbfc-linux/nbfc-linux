@@ -17,7 +17,6 @@ struct Service_Options {
   bool                   fork;
   bool                   read_only;
   bool                   debug;
-  bool                   python_hack;
   char                   service_config[PATH_MAX];
 };
 

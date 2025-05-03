@@ -1,13 +1,7 @@
 #ifndef CLIENT_GLOBAL_H_
 #define CLIENT_GLOBAL_H_
 
-#include <stdbool.h>
-
 #include "../optparse/optparse.h"
-
-struct Global_Options_ {
-  bool python_hack;
-};
 
 enum Option {
   Option_None = 0,
@@ -15,7 +9,6 @@ enum Option {
   // General options
   Option_Help,
   Option_Version,
-  Option_PythonHack,
 
   // Command
   Option_Command,
@@ -48,7 +41,6 @@ enum Option {
   Option_ShowVariable_Variable,
 };
 
-extern struct Global_Options_ Global_Options;
 extern const cli99_option main_options[];
 
 #endif

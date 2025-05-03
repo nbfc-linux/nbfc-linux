@@ -34,7 +34,7 @@ class NbfcClient:
                        The exception's text is the output written to STDERR.
         '''
 
-        command = ['nbfc', '--python-hack'] + args
+        command = ['nbfc'] + args
         result = subprocess.run(command, capture_output=True, text=True)
         if result.returncode != 0:
             raise Exception(result.stderr.rstrip())

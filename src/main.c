@@ -39,7 +39,6 @@ static struct option cli_options[] = {
   {"fork",                no_argument,       NULL, 'f'},
   {"debug",               no_argument,       NULL, 'd'},
   {"config-file",         required_argument, NULL, 'c'},
-  {"python-hack",         no_argument,       NULL, 'p'},
   {0,                     0,                 0,     0 },
 };
 
@@ -71,7 +70,6 @@ static void parse_opts(int argc, char* const argv[]) {
     case 'h':  printf(NBFC_SERVICE_HELP_TEXT, argv[0]); exit(0);   break;
     case 'r':  options.read_only      = 1;                         break;
     case 'f':  options.fork           = 1;                         break;
-    case 'p':  /* --python-hack is not longer needed */            break;
     default:   exit(NBFC_EXIT_CMDLINE);
     }
   }

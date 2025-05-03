@@ -15,6 +15,7 @@
 #include "nbfc.h"
 #include "parse_number.h"
 #include "parse_double.h"
+#include "client/client_global.h"
 
 #include "log.c"
 #include "error.c"
@@ -33,12 +34,9 @@
 #include "client/str_functions.c"
 #include "client/service_control.c"
 
-struct Global_Options_ Global_Options = {0};
-
 const cli99_option main_options[] = {
   {"-h|--help",     Option_Help,       0},
   {"-v|--version",  Option_Version,    0},
-  {"--python-hack", Option_PythonHack, 0},
   {"command",       Option_Command,    1 | cli99_required_option},
   cli99_options_end()
 };
@@ -136,10 +134,6 @@ int main(int argc, char *const argv[]) {
     case Option_Version:
       printf("nbfc " NBFC_VERSION "\n");
       return NBFC_EXIT_SUCCESS;
-
-    case Option_PythonHack:
-      Global_Options.python_hack = 1;
-      break;
 
     // ========================================================================
     // Command

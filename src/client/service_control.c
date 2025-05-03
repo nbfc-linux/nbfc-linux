@@ -12,8 +12,6 @@
 #include <sys/socket.h> // connect, socket
 #include <sys/un.h>     // sockaddr_un
 
-#include "client_global.h"
-
 #include "../log.h"
 #include "../sleep.h"
 #include "../nbfc.h"
@@ -162,8 +160,6 @@ int Service_Start(bool read_only) {
   }
 
   char cmd[64] = "nbfc_service -f";
-  if (Global_Options.python_hack)
-    strcat(cmd, " --python-hack");
   if (read_only)
     strcat(cmd, " -r");
 
