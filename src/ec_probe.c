@@ -41,6 +41,8 @@
 #include "memory.c"            // src
 #include "nxjson.c"            // src
 #include "model_config.c"      // src
+#include "stack_memory.c"      // src
+#include "trace.c"             // src
 
 #define Console_Black       "\033[0;30m"
 #define Console_Red         "\033[0;31m"

@@ -27,6 +27,8 @@
 #include "nxjson.c"
 #include "reverse_nxjson.c"
 #include "service_config.c"
+#include "stack_memory.c"
+#include "trace.c"
 #include "optparse/optparse.c"
 #include "client/mkdir_p.c"
 #include "client/dmi.c"
