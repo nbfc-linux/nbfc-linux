@@ -46,26 +46,26 @@ Installation
 ------------
 
 - Arch Linux:
-  - [Latest Version 0.3.12](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.12/nbfc-linux-git-0.3.11.r19.gb1a40c4-1-x86_64.pkg.tar.zst)
+  - [Latest Version %TAG%](%ARCHLINUX_URL%)
   - Install curl: `pacman -S curl`
-  - Install NBFC-Linux: `pacman -U ./nbfc-linux-git-0.3.11.r19.gb1a40c4-1-x86_64.pkg.tar.zst`
+  - Install NBFC-Linux: `pacman -U ./%ARCHLINUX_PACKAGE%`
   - Or via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - Debian / Ubuntu:
-  - [Latest Version 0.3.12](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.12/nbfc-linux_0.3.12_amd64.deb)
+  - [Latest Version %TAG%](%DEBIAN_URL%)
   - Install libcurl: `apt install libcurl4`
-  - Install NBFC-Linux: `dpkg -i ./nbfc-linux_0.3.12_amd64.deb`
+  - Install NBFC-Linux: `dpkg -i ./%DEBIAN_PACKAGE%`
 
 - Fedora:
-  - [Latest Version 0.3.12](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.12/fedora-nbfc-linux-0.3.12-1.x86_64.rpm)
+  - [Latest Version %TAG%](%FEDORA_URL%)
   - Install libcurl: `dnf install libcurl`
-  - Install NBFC-Linux: `dnf install ./fedora-nbfc-linux-0.3.12-1.x86_64.rpm`
+  - Install NBFC-Linux: `dnf install ./%FEDORA_PACKAGE%`
 
 - OpenSuse (Tumbleweed)
-  - [Latest Version 0.3.12](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.12/opensuse-nbfc-linux-0.3.12-1.x86_64.rpm)
+  - [Latest Version %TAG%](%OPENSUSE_URL%)
   - Install libcurl: `zypper install libcurl4`
-  - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.3.12-1.x86_64.rpm`
+  - Install NBFC-Linux: `zypper install ./%OPENSUSE_PACKAGE%`
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)
@@ -75,7 +75,7 @@ Installation
   - ensure, that podman is installed
     - docker should work also, but is currently not tested
   - edit [pkgbuilds/rpm/nbfc-linux.spec](./pkgbuilds/rpm/nbfc-linux.spec) and 
-    - set wanted Version (e.g. 0.3.12)
+    - set wanted Version (e.g. %TAG%)
     - set wanted Releasenumber (e.g. 1%{?dist} or 2%{?dist})
   - `./pkgbuilds/rpm/buildNBFC-LINUX`
   - the resulting rpm can be found in [pkgbuilds directory](./pkgbuilds/)
@@ -267,4 +267,3 @@ If you want to write a program that controls the NBFC service, see the [protocol
 Developers are welcome to try optimizing the code of the service for memory usage. However, be warned that it is likely a waste of time, as the author has already tried every possible approach. It seems that every line of code is necessary for the current functionality.
 
 See also the documentation about the [nbfc configuration](doc/nbfc_service.json.5.md).
-
