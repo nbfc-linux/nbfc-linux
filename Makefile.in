@@ -55,9 +55,6 @@ REPLACE_VARS = sed \
 	-e 's|@RUNSTATEDIR@|$(runstatedir)|g' \
 	-e 's|@VERSION@|$(version)|g'
 
-nbfc.py: nbfc.py.in
-	$(REPLACE_VARS) < $< > $@
-
 nbfc-gui/nbfc-qt.py: nbfc-gui/about.py nbfc-gui/common.py nbfc-gui/fs_sensors.py nbfc-gui/nbfc_client.py nbfc-gui/qt.py
 	(cd ./nbfc-gui; python3 ./include_files.py qt.py > nbfc-qt.py)
 	chmod +x ./nbfc-gui/nbfc-qt.py
@@ -204,7 +201,7 @@ uninstall:
 
 clean:
 	rm -rf __pycache__
-	rm -f $(CORE) nbfc.py src/*.o
+	rm -f $(CORE) src/*.o
 	rm -f $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 	rm -f $(SYSTEMD) $(OPEN_RC) $(SYSTEMV)
 	rm -f $(DOC)
