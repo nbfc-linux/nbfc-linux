@@ -4,7 +4,7 @@
 %global debug_package %{nil}
 
 Name:           nbfc-linux
-Version:        0.1.15
+Version:        0.3.12
 Release:        1%{?dist}
 Summary:        NoteBook FanControl
 
@@ -13,7 +13,7 @@ URL:            https://github.com/nbfc-linux/nbfc-linux
 Source0:        https://github.com/nbfc-linux/nbfc-linux/archive/refs/tags/%{version}.tar.gz
 
 BuildRequires:  clang autoconf
-Requires:  python3
+Requires:  python3 libcurl
 
 %description
 NoteBook FanControl
