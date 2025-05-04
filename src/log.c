@@ -44,7 +44,7 @@ void Log_Error(const char* fmt, ...) {
   if (Log_UseSyslog) {
     char buf[LOG_BUFFER_SIZE];
     vsnprintf(buf, sizeof(buf), fmt, args);
-    syslog(LOG_ERR, buf);
+    syslog(LOG_ERR, "%s", buf);
   }
   else
 #endif
@@ -67,7 +67,7 @@ void Log_Warn(const char* fmt, ...) {
   if (Log_UseSyslog) {
     char buf[LOG_BUFFER_SIZE];
     vsnprintf(buf, sizeof(buf), fmt, args);
-    syslog(LOG_WARNING, buf);
+    syslog(LOG_WARNING, "%s", buf);
   }
   else
 #endif
@@ -90,7 +90,7 @@ void Log_Info(const char* fmt, ...) {
   if (Log_UseSyslog) {
     char buf[LOG_BUFFER_SIZE];
     vsnprintf(buf, sizeof(buf), fmt, args);
-    syslog(LOG_INFO, buf);
+    syslog(LOG_INFO, "%s", buf);
   }
   else
 #endif
@@ -113,7 +113,7 @@ void Log_Debug(const char* fmt, ...) {
   if (Log_UseSyslog) {
     char buf[LOG_BUFFER_SIZE];
     vsnprintf(buf, sizeof(buf), fmt, args);
-    syslog(LOG_DEBUG, buf);
+    syslog(LOG_DEBUG, "%s", buf);
   }
   else
 #endif
