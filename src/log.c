@@ -37,90 +37,112 @@ void Log_Error(const char* fmt, ...) {
   if (Log_LogLevel < LogLevel_Error)
     return;
 
-  va_list args;
-  va_start(args, fmt);
-
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
+    va_list args;
+    va_start(args, fmt);
+
     char buf[LOG_BUFFER_SIZE];
     vsnprintf(buf, sizeof(buf), fmt, args);
     syslog(LOG_ERR, "%s", buf);
+
+    va_end(args);
   }
-  else
+  //else
 #endif
   {
+    va_list args;
+    va_start(args, fmt);
+
     fprintf(stderr, "%s: ERROR: ", Program_Name);
     vfprintf(stderr, fmt, args);
-  }
 
-  va_end(args);
+    va_end(args);
+  }
 }
 
 void Log_Warn(const char* fmt, ...) {
   if (Log_LogLevel < LogLevel_Warn)
     return;
 
-  va_list args;
-  va_start(args, fmt);
 
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
+    va_list args;
+    va_start(args, fmt);
+
     char buf[LOG_BUFFER_SIZE];
     vsnprintf(buf, sizeof(buf), fmt, args);
     syslog(LOG_WARNING, "%s", buf);
+
+    va_end(args);
   }
-  else
+  //else
 #endif
   {
+    va_list args;
+    va_start(args, fmt);
+
     fprintf(stderr, "%s: WARNING: ", Program_Name);
     vfprintf(stderr, fmt, args);
-  }
 
-  va_end(args);
+    va_end(args);
+  }
 }
 
 void Log_Info(const char* fmt, ...) {
   if (Log_LogLevel < LogLevel_Info)
     return;
 
-  va_list args;
-  va_start(args, fmt);
-
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
+    va_list args;
+    va_start(args, fmt);
+
     char buf[LOG_BUFFER_SIZE];
     vsnprintf(buf, sizeof(buf), fmt, args);
     syslog(LOG_INFO, "%s", buf);
+
+    va_end(args);
   }
-  else
+  //else
 #endif
   {
+    va_list args;
+    va_start(args, fmt);
+
     fprintf(stderr, "%s: INFO: ", Program_Name);
     vfprintf(stderr, fmt, args);
+
+    va_end(args);
   }
 
-  va_end(args);
 }
 
 void Log_Debug(const char* fmt, ...) {
   if (Log_LogLevel < LogLevel_Debug)
     return;
 
-  va_list args;
-  va_start(args, fmt);
-
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
+    va_list args;
+    va_start(args, fmt);
+
     char buf[LOG_BUFFER_SIZE];
     vsnprintf(buf, sizeof(buf), fmt, args);
     syslog(LOG_DEBUG, "%s", buf);
+
+    va_end(args);
   }
-  else
+  //else
 #endif
   {
+    va_list args;
+    va_start(args, fmt);
+
     fprintf(stderr, "%s: DEBUG: ", Program_Name);
     vfprintf(stderr, fmt, args);
-  }
 
-  va_end(args);
+    va_end(args);
+  }
 }
