@@ -31,7 +31,7 @@ override CPPFLAGS += \
 	-DRUNSTATEDIR=\"$(runstatedir)\"  \
 	-DVERSION=\"$(version)\"
 
-CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config nbfc-gui/nbfc-qt.py
+CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
 SYSTEMD = etc/systemd/system/nbfc_service.service
 OPEN_RC = etc/init.d/nbfc_service.openrc
@@ -46,7 +46,6 @@ install-core: $(CORE)
 	install -Dm 755 src/nbfc_service    $(DESTDIR)$(bindir)/nbfc_service
 	install -Dm 755 src/ec_probe        $(DESTDIR)$(bindir)/ec_probe
 	install -Dm 755 src/nbfc            $(DESTDIR)$(bindir)/nbfc
-	install -Dm 755 nbfc-gui/nbfc-qt.py $(DESTDIR)$(bindir)/nbfc-qt
 
 REPLACE_VARS = sed \
 	-e 's|@BINDIR@|$(bindir)|g'           \
@@ -54,10 +53,6 @@ REPLACE_VARS = sed \
 	-e 's|@SYSCONFDIR@|$(sysconfdir)|g'   \
 	-e 's|@RUNSTATEDIR@|$(runstatedir)|g' \
 	-e 's|@VERSION@|$(version)|g'
-
-nbfc-gui/nbfc-qt.py: nbfc-gui/about.py nbfc-gui/common.py nbfc-gui/fs_sensors.py nbfc-gui/nbfc_client.py nbfc-gui/qt.py
-	(cd ./nbfc-gui; python3 ./include_files.py qt.py > nbfc-qt.py)
-	chmod +x ./nbfc-gui/nbfc-qt.py
 
 # Documentation ###############################################################
 doc/ec_probe.1: doc/ec_probe.1.in
@@ -163,7 +158,6 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/nbfc_config
 	rm -f $(DESTDIR)$(bindir)/nbfc_service
 	rm -f $(DESTDIR)$(bindir)/ec_probe
-	rm -f $(DESTDIR)$(bindir)/nbfc-qt
 	
 	# /usr/local/lib/systemd/system
 	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service

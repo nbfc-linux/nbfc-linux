@@ -4,7 +4,7 @@
 %global debug_package %{nil}
 
 Name:           nbfc-linux
-Version:        0.3.12
+Version:        0.3.13
 Release:        1%{?dist}
 Summary:        NoteBook FanControl
 

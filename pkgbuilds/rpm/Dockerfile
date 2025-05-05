@@ -2,7 +2,7 @@ FROM fedora:39 AS buildcontainer
 
 ARG BUILD_NUMBER=1
 ARG PACKAGE=nbfc-linux
-ARG VERSION=0.3.12
+ARG VERSION=0.3.13
 RUN dnf install -y autoconf libcurl-devel openssl-devel dh-autoreconf clang make systemd-devel fedora-packager rpmdevtools ca-certificates
 RUN useradd rpmbuild -u 5002 -g users -p rpmbuild
 USER rpmbuild

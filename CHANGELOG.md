@@ -1,9 +1,13 @@
 # Changelog
 
+## nbfc-linux-0.3.14 (2025-05-05)
+- The GUI is no longer part of this project.
+  It has been moved to https://github.com/nbfc-linux/nbfc-qt
+
 ## nbfc-linux-0.3.12 (2025-05-04)
 - Fix possible bug while logging to syslog()
 - Log to STDERR even when run as a daemon
-- Hopefully fixing a bug whlie building with rpmbuild
+- Hopefully fixing a bug while building with rpmbuild
 
 ## nbfc-linux-0.3.11 (2025-05-01)
 - Fix incorrect error message if TemperatureThresholds are missing

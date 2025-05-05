@@ -40,8 +40,6 @@ Comparison of NBFC C# and NBFC Linux
 
 The [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probing tool](doc/ec_probe.1.md) are written in C.
 
-The GUI is written in Python and Qt5 (a GUI for GTK-3 will follow).
-
 Installation
 ------------
 
@@ -74,7 +72,7 @@ Installation
 - Fedora - this will not build the current working directory, but downloads a source archive from chosen release on github and builds an installable rpm:
   - ensure, that podman is installed
     - docker should work also, but is currently not tested
-  - edit [pkgbuilds/rpm/nbfc-linux.spec](./pkgbuilds/rpm/nbfc-linux.spec) and 
+  - edit [pkgbuilds/rpm/nbfc-linux.spec](./pkgbuilds/rpm/nbfc-linux.spec) and
     - set wanted Version (e.g. 0.3.12)
     - set wanted Releasenumber (e.g. 1%{?dist} or 2%{?dist})
   - `./pkgbuilds/rpm/buildNBFC-LINUX`
@@ -92,7 +90,9 @@ Installation
 Getting started with the GUI
 ----------------------------
 
-After installing NBFC-Linux you can configure it by running `sudo nbfc-qt`.
+A graphical user interface (GUI) is available as a separate project.
+
+You can find it on GitHub: [nbfc-qt](https://github.com/nbfc-linux/nbfc-qt)
 
 Getting started without the GUI
 -------------------------------
