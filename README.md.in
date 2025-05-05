@@ -40,8 +40,6 @@ Comparison of NBFC C# and NBFC Linux
 
 The [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probing tool](doc/ec_probe.1.md) are written in C.
 
-The GUI is written in Python and Qt5 (a GUI for GTK-3 will follow).
-
 Installation
 ------------
 
