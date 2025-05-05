@@ -43,6 +43,7 @@
 #include "model_config.c"      // src
 #include "stack_memory.c"      // src
 #include "trace.c"             // src
+#include "file_utils.c"        // src
 
 #define Console_Black       "\033[0;30m"
 #define Console_Red         "\033[0;31m"
@@ -395,7 +396,7 @@ static int Write() {
 }
 
 static int Dump() {
-  bool use_color;
+  bool use_color = false;
   RegisterBuf register_buf;
 
   Register_FromEC(&register_buf);
