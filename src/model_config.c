@@ -128,14 +128,21 @@ static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* out, con
   return e;
 }
 
+TemperatureAlgorithmType TemperatureAlgorithmType_FromString(const char* s) {
+  if (!strcmp(s, "Average")) return TemperatureAlgorithmType_Average;
+  if (!strcmp(s, "Min"))     return TemperatureAlgorithmType_Min;
+  if (!strcmp(s, "Max"))     return TemperatureAlgorithmType_Max;
+  return TemperatureAlgorithmType_Unset;
+}
+
 static Error* TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, const nx_json* json) {
   const char* s; // NOLINT
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
-  else if (!strcmp(s, "Average"))    *out = TemperatureAlgorithmType_Average;
-  else if (!strcmp(s, "Min"))        *out = TemperatureAlgorithmType_Min;
-  else if (!strcmp(s, "Max"))        *out = TemperatureAlgorithmType_Max;
-  else return err_stringf(0, "Invalid value for %s: %s", "TemperatureAlgorithmType", s);
+  TemperatureAlgorithmType a = TemperatureAlgorithmType_FromString(s);
+  if (a == TemperatureAlgorithmType_Unset)
+    return err_stringf(0, "Invalid value for %s: %s", "TemperatureAlgorithmType", s);
+  *out = a;
   return e;
 }
 

@@ -67,9 +67,10 @@ declare_array_of(str);
 
 #include "generated/model_config.generated.h"
 
-EmbeddedControllerType EmbeddedControllerType_FromString(const char*);
-const char*            EmbeddedControllerType_ToString(EmbeddedControllerType);
-const char*            TemperatureAlgorithmType_ToString(TemperatureAlgorithmType);
+EmbeddedControllerType    EmbeddedControllerType_FromString(const char*);
+const char*               EmbeddedControllerType_ToString(EmbeddedControllerType);
+TemperatureAlgorithmType  TemperatureAlgorithmType_FromString(const char*);
+const char*               TemperatureAlgorithmType_ToString(TemperatureAlgorithmType);
 
 Error* ModelConfig_Validate(Trace*, ModelConfig*);
 Error* ModelConfig_FromFile(ModelConfig*, const char*);
