@@ -94,6 +94,7 @@ Error* Service_Init() {
   e = FS_Sensors_Init();
   if (e)
     goto error;
+  FS_Sensors_Log();
   Service_State = Initialized_3_Sensors;
 
   // Fans =====================================================================

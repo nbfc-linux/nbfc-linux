@@ -22,6 +22,7 @@ declare_array_of(FS_TemperatureSource);
 
 Error* FS_Sensors_Init();
 void   FS_Sensors_Cleanup();
+void   FS_Sensors_Log();
 Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource*, float*);
 
 extern array_of(FS_TemperatureSource) FS_Sensors_Sources;

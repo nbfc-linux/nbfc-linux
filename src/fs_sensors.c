@@ -124,7 +124,7 @@ end:
   return err_success();
 }
 
-static void FS_Sensors_Log() {
+void FS_Sensors_Log() {
   for_each_array(FS_TemperatureSource*, source, FS_Sensors_Sources)
     Log_Info("Available temperature source: '%s' (%s)\n", source->name, source->file);
 }
@@ -168,7 +168,6 @@ Error* FS_Sensors_Init() {
   if (! FS_Sensors_Sources.size)
     return err_string(0, "No temperature sources found");
 
-  FS_Sensors_Log();
   return err_success();
 }
 
