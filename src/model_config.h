@@ -74,6 +74,7 @@ const char*               TemperatureAlgorithmType_ToString(TemperatureAlgorithm
 
 Error* ModelConfig_Validate(Trace*, ModelConfig*);
 Error* ModelConfig_FromFile(ModelConfig*, const char*);
+Error* ModelConfig_FindAndLoad(ModelConfig*, char*, const char*);
 void   ModelConfig_Free(ModelConfig*);
 
 #endif

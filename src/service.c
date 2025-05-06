@@ -15,7 +15,6 @@
 #include "model_config.h"
 
 #include <stdio.h>  // snprintf
-#include <unistd.h> // access, F_OK
 #include <math.h>   // fabs
 #include <linux/limits.h> // PATH_MAX
 
@@ -59,21 +58,7 @@ Error* Service_Init() {
 
   // Model config =============================================================
   Log_Info("Using '%s' as model config\n", service_config.SelectedConfigId);
-
-  if (service_config.SelectedConfigId[0] == '/') {
-    e = ModelConfig_FromFile(&Service_Model_Config, service_config.SelectedConfigId);
-  }
-  else {
-    snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR_MUTABLE, service_config.SelectedConfigId);
-
-    if (access(path, F_OK) == 0)
-      e = ModelConfig_FromFile(&Service_Model_Config, path);
-    else {
-      snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, service_config.SelectedConfigId);
-      e = ModelConfig_FromFile(&Service_Model_Config, path);
-    }
-  }
-
+  e = ModelConfig_FindAndLoad(&Service_Model_Config, path, service_config.SelectedConfigId);
   if (e) {
     e = err_string(e, path);
     goto error;

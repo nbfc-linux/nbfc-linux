@@ -9,9 +9,11 @@
 
 #include <assert.h>  // assert
 #include <string.h>  // strcmp
+#include <unistd.h>  // access, F_OK
 #include <stdbool.h> // bool
 #include <limits.h>  // INT_MIN, SHRT_MIN
 #include <math.h>    // NAN
+#include <linux/limits.h>
 
 static inline Error* bool_FromJson(bool* out, const nx_json* node) {
   if (node->type == NX_JSON_BOOL) {
@@ -507,4 +509,18 @@ err:
   nx_json_free(js);
   StackMemory_Destroy();
   return e;
+}
+
+Error* ModelConfig_FindAndLoad(ModelConfig* config, char* resolved, const char* file) {
+  if (file[0] == '/') {
+    snprintf(resolved, PATH_MAX, "%s", file);
+    return ModelConfig_FromFile(config, file);
+  }
+
+  snprintf(resolved, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR_MUTABLE, file);
+  if (access(resolved, F_OK) == 0)
+    return ModelConfig_FromFile(config, resolved);
+
+  snprintf(resolved, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, file);
+  return ModelConfig_FromFile(config, resolved);
 }
