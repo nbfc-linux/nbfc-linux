@@ -99,19 +99,39 @@ Getting started without the GUI
 
 When running NBFC for the first time, you need to give it a configuration file for your laptop model.
 
-First, you should fetch new configuration files using `sudo nbfc update`.
+Follow the steps below:
 
-If you are lucky, `sudo nbfc config --set auto` will find a matching one and set it.
+1. `sudo nbfc update` will download the latest configuration files from the internet.
 
-`sudo nbfc config --recommend` will compare your DMI system-product-name to the available configuration file names and print a list of descending similarity.
+2. `sudo nbfc config --set auto` will try to set a configuration automatically.
 
-With `sudo nbfc config --set <MODEL>` a configuration is selected.
+   If this succeeds, skip to *Step 5*.
 
-`sudo nbfc start` will start the service.
+3. `nbfc config --recommend` will compare your DMI system-product-name to the available configuration file names and print a list of descending similarity.
 
-It can be queried by `nbfc status -a`.
+4. Repeat the following until you found a working configuration:
 
-If you wish `nbfc_service` to get started on boot, use `sudo systemctl enable nbfc_service`.
+  - `sudo nbfc config --set "<MODEL>"` -- set a configuration
+
+  - `sudo nbfc restart -r` -- (re-)start the service in *read only* mode
+
+  - `nbfc status` -- show the fan status
+
+  - Let the fan turn up (and down) (e.g. using `stress`) and observe if `nbfc status` shows fan speed changes
+
+  - If speeds are reported correctly, the config is likely valid. Proceed to *Step 5*.
+
+5. `sudo nbfc restart` will (re-)start the service in *write mode* (enabling fan control)
+
+6. Test fan control manually
+
+  - `nbfc set -s <SPEED>` will set the fan speed. (`0`=off, `100`=full speed)
+
+    If this does not work, the specified configuration is invalid. Go back to *Step 4*.
+
+7. `nbfc set --auto` will enable *auto mode* (temperature-based automatic fan speed control as specified in configuration)
+
+8. `sudo systemctl enable nbfc_service` will enable the service to start automatically on boot
 
 Advanced configuration
 ----------------------
