@@ -1,5 +1,8 @@
 # Changelog
 
+## nbfc-linux-0.3.15 (2025-05-08)
+- Added `nbfc warranty` and `nbfc donate` commands
+
 ## nbfc-linux-0.3.14 (2025-05-05)
 - The GUI is no longer part of this project.
   It has been moved to https://github.com/nbfc-linux/nbfc-qt
