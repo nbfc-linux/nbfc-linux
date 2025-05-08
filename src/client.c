@@ -55,6 +55,7 @@ const cli99_option main_options[] = {
 #include "client/cmd_show_variable.c"
 #include "client/cmd_misc.c"
 #include "client/cmd_warranty.c"
+#include "client/cmd_donate.c"
 
 #define NBFC_CLIENT_COMMANDS \
   o("start",          Start,          START,           start)         \
@@ -69,6 +70,7 @@ const cli99_option main_options[] = {
   o("complete-fans",  Complete_Fans,  COMPLETE_FANS,   main)          \
   o("show-variable",  Show_Variable,  SHOW_VARIABLE,   show_variable) \
   o("warranty",       Warranty,       WARRANTY,        main)          \
+  o("donate",         Donate,         DONATE,          main)          \
   o("help",           Help,           HELP,            main)
 
 enum Command {
@@ -308,6 +310,7 @@ int main(int argc, char *const argv[]) {
   case Command_Show_Variable:  return Show_Variable();
   case Command_Complete_Fans:  return Complete_Fans();
   case Command_Warranty:       return Warranty();
+  case Command_Donate:         return Donate();
   default:                     return NBFC_EXIT_FAILURE;
   }
 }

@@ -18,6 +18,7 @@
  "    wait-for-hwmon      Wait for /sys/class/hwmon/hwmon* files\n"            \
  "    get-model-name      Print out model name\n"                              \
  "    help                Show help\n"                                         \
+ "    donate              Show how to support the project\n"                   \
  "    warranty            Show warranty\n"                                     \
  ""
 
@@ -147,6 +148,15 @@
  "Usage: nbfc warranty [-h]\n"                                                 \
  "\n"                                                                          \
  "Print legal disclaimer and warranty info.\n"                                 \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
+#define CLIENT_DONATE_HELP_TEXT                                                \
+ "Usage: nbfc donate [-h]\n"                                                   \
+ "\n"                                                                          \
+ "Displays information on how to support the project through a donation.\n"    \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Shows this message and exit\n"                       \
