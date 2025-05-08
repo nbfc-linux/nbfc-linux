@@ -18,6 +18,7 @@
  "    wait-for-hwmon      Wait for /sys/class/hwmon/hwmon* files\n"            \
  "    get-model-name      Print out model name\n"                              \
  "    help                Show help\n"                                         \
+ "    warranty            Show warranty\n"                                     \
  ""
 
 #define CLIENT_START_HELP_TEXT                                                 \
@@ -137,6 +138,15 @@
  "Usage: nbfc complete-fans [-h]\n"                                            \
  "\n"                                                                          \
  "Used for completing shell command lines.\n"                                  \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
+#define CLIENT_WARRANTY_HELP_TEXT                                              \
+ "Usage: nbfc warranty [-h]\n"                                                 \
+ "\n"                                                                          \
+ "Print legal disclaimer and warranty info.\n"                                 \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Shows this message and exit\n"                       \

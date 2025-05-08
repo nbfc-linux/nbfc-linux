@@ -104,6 +104,7 @@ int main(int argc, char* const argv[])
   Log_Init(options.fork);
   atexit(Log_Close);
 
+  Log_Info("NBFC-Linux comes with no warranty. Run `nbfc warranty` for details.\n");
   Log_Info("Running version " NBFC_VERSION "\n");
   Log_Info("SYSCONFDIR is '%s'\n", SYSCONFDIR);
   Log_Info("DATADIR is '%s'\n", DATADIR);
