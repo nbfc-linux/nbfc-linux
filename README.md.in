@@ -5,6 +5,8 @@ This is a C port of [Stefan Hirschmann's](https://github.com/hirschmann) [NoteBo
 
 It provides the same utilities with the same interfaces as the original NBFC, although the implementation differs.
 
+To check if your laptop is supported, use the [Configuration Search](https://nbfc-linux.github.io/configs/).
+
 If you find my work helpful, you can show your appreciation by [buying me a coffee](https://paypal.me/BenjaminAbendroth).
 
 Table of Contents
@@ -245,6 +247,8 @@ Pass the following flags to `./configure` to disable specific components.
 - `--disable-ec-dev-port`: Disable the /dev/port embedded controller implementation
 - `--disable-ec-sys`: Disable the embedded controller implementation that relies on `ec_sys` kernel module
 - `--disable-ec-acpi`: Disable the embedded controllern implementation that relies on the `acpi_ec` kernel module
+
+See [Configure Command Generator](https://nbfc-linux.github.io/compile/) for an interactive interface to generate the `./configure` command.
 
 Shell autocompletion
 --------------------
