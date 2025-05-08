@@ -16,6 +16,10 @@ static inline void TemperatureThreshold_Set_UpThreshold(TemperatureThreshold* o)
 	o->_set |= (1 << 0);
 }
 
+static inline void TemperatureThreshold_UnSet_UpThreshold(TemperatureThreshold* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool TemperatureThreshold_IsSet_UpThreshold(TemperatureThreshold* o) {
 	return o->_set & (1 << 0);
 }
@@ -24,12 +28,20 @@ static inline void TemperatureThreshold_Set_DownThreshold(TemperatureThreshold* 
 	o->_set |= (1 << 1);
 }
 
+static inline void TemperatureThreshold_UnSet_DownThreshold(TemperatureThreshold* o) {
+	o->_set &= ~(1 << 1);
+}
+
 static inline bool TemperatureThreshold_IsSet_DownThreshold(TemperatureThreshold* o) {
 	return o->_set & (1 << 1);
 }
 
 static inline void TemperatureThreshold_Set_FanSpeed(TemperatureThreshold* o) {
 	o->_set |= (1 << 2);
+}
+
+static inline void TemperatureThreshold_UnSet_FanSpeed(TemperatureThreshold* o) {
+	o->_set &= ~(1 << 2);
 }
 
 static inline bool TemperatureThreshold_IsSet_FanSpeed(TemperatureThreshold* o) {
@@ -52,6 +64,10 @@ static inline void FanSpeedPercentageOverride_Set_FanSpeedPercentage(FanSpeedPer
 	o->_set |= (1 << 0);
 }
 
+static inline void FanSpeedPercentageOverride_UnSet_FanSpeedPercentage(FanSpeedPercentageOverride* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool FanSpeedPercentageOverride_IsSet_FanSpeedPercentage(FanSpeedPercentageOverride* o) {
 	return o->_set & (1 << 0);
 }
@@ -60,12 +76,20 @@ static inline void FanSpeedPercentageOverride_Set_FanSpeedValue(FanSpeedPercenta
 	o->_set |= (1 << 1);
 }
 
+static inline void FanSpeedPercentageOverride_UnSet_FanSpeedValue(FanSpeedPercentageOverride* o) {
+	o->_set &= ~(1 << 1);
+}
+
 static inline bool FanSpeedPercentageOverride_IsSet_FanSpeedValue(FanSpeedPercentageOverride* o) {
 	return o->_set & (1 << 1);
 }
 
 static inline void FanSpeedPercentageOverride_Set_TargetOperation(FanSpeedPercentageOverride* o) {
 	o->_set |= (1 << 2);
+}
+
+static inline void FanSpeedPercentageOverride_UnSet_TargetOperation(FanSpeedPercentageOverride* o) {
+	o->_set &= ~(1 << 2);
 }
 
 static inline bool FanSpeedPercentageOverride_IsSet_TargetOperation(FanSpeedPercentageOverride* o) {
@@ -93,12 +117,20 @@ static inline void RegisterWriteConfiguration_Set_WriteMode(RegisterWriteConfigu
 	o->_set |= (1 << 0);
 }
 
+static inline void RegisterWriteConfiguration_UnSet_WriteMode(RegisterWriteConfiguration* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool RegisterWriteConfiguration_IsSet_WriteMode(RegisterWriteConfiguration* o) {
 	return o->_set & (1 << 0);
 }
 
 static inline void RegisterWriteConfiguration_Set_WriteOccasion(RegisterWriteConfiguration* o) {
 	o->_set |= (1 << 1);
+}
+
+static inline void RegisterWriteConfiguration_UnSet_WriteOccasion(RegisterWriteConfiguration* o) {
+	o->_set &= ~(1 << 1);
 }
 
 static inline bool RegisterWriteConfiguration_IsSet_WriteOccasion(RegisterWriteConfiguration* o) {
@@ -109,12 +141,20 @@ static inline void RegisterWriteConfiguration_Set_Register(RegisterWriteConfigur
 	o->_set |= (1 << 2);
 }
 
+static inline void RegisterWriteConfiguration_UnSet_Register(RegisterWriteConfiguration* o) {
+	o->_set &= ~(1 << 2);
+}
+
 static inline bool RegisterWriteConfiguration_IsSet_Register(RegisterWriteConfiguration* o) {
 	return o->_set & (1 << 2);
 }
 
 static inline void RegisterWriteConfiguration_Set_Value(RegisterWriteConfiguration* o) {
 	o->_set |= (1 << 3);
+}
+
+static inline void RegisterWriteConfiguration_UnSet_Value(RegisterWriteConfiguration* o) {
+	o->_set &= ~(1 << 3);
 }
 
 static inline bool RegisterWriteConfiguration_IsSet_Value(RegisterWriteConfiguration* o) {
@@ -125,12 +165,20 @@ static inline void RegisterWriteConfiguration_Set_ResetRequired(RegisterWriteCon
 	o->_set |= (1 << 4);
 }
 
+static inline void RegisterWriteConfiguration_UnSet_ResetRequired(RegisterWriteConfiguration* o) {
+	o->_set &= ~(1 << 4);
+}
+
 static inline bool RegisterWriteConfiguration_IsSet_ResetRequired(RegisterWriteConfiguration* o) {
 	return o->_set & (1 << 4);
 }
 
 static inline void RegisterWriteConfiguration_Set_ResetValue(RegisterWriteConfiguration* o) {
 	o->_set |= (1 << 5);
+}
+
+static inline void RegisterWriteConfiguration_UnSet_ResetValue(RegisterWriteConfiguration* o) {
+	o->_set &= ~(1 << 5);
 }
 
 static inline bool RegisterWriteConfiguration_IsSet_ResetValue(RegisterWriteConfiguration* o) {
@@ -141,12 +189,20 @@ static inline void RegisterWriteConfiguration_Set_ResetWriteMode(RegisterWriteCo
 	o->_set |= (1 << 6);
 }
 
+static inline void RegisterWriteConfiguration_UnSet_ResetWriteMode(RegisterWriteConfiguration* o) {
+	o->_set &= ~(1 << 6);
+}
+
 static inline bool RegisterWriteConfiguration_IsSet_ResetWriteMode(RegisterWriteConfiguration* o) {
 	return o->_set & (1 << 6);
 }
 
 static inline void RegisterWriteConfiguration_Set_Description(RegisterWriteConfiguration* o) {
 	o->_set |= (1 << 7);
+}
+
+static inline void RegisterWriteConfiguration_UnSet_Description(RegisterWriteConfiguration* o) {
+	o->_set &= ~(1 << 7);
 }
 
 static inline bool RegisterWriteConfiguration_IsSet_Description(RegisterWriteConfiguration* o) {
@@ -180,12 +236,20 @@ static inline void FanConfiguration_Set_FanDisplayName(FanConfiguration* o) {
 	o->_set |= (1 << 0);
 }
 
+static inline void FanConfiguration_UnSet_FanDisplayName(FanConfiguration* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool FanConfiguration_IsSet_FanDisplayName(FanConfiguration* o) {
 	return o->_set & (1 << 0);
 }
 
 static inline void FanConfiguration_Set_ReadRegister(FanConfiguration* o) {
 	o->_set |= (1 << 1);
+}
+
+static inline void FanConfiguration_UnSet_ReadRegister(FanConfiguration* o) {
+	o->_set &= ~(1 << 1);
 }
 
 static inline bool FanConfiguration_IsSet_ReadRegister(FanConfiguration* o) {
@@ -196,12 +260,20 @@ static inline void FanConfiguration_Set_WriteRegister(FanConfiguration* o) {
 	o->_set |= (1 << 2);
 }
 
+static inline void FanConfiguration_UnSet_WriteRegister(FanConfiguration* o) {
+	o->_set &= ~(1 << 2);
+}
+
 static inline bool FanConfiguration_IsSet_WriteRegister(FanConfiguration* o) {
 	return o->_set & (1 << 2);
 }
 
 static inline void FanConfiguration_Set_MinSpeedValue(FanConfiguration* o) {
 	o->_set |= (1 << 3);
+}
+
+static inline void FanConfiguration_UnSet_MinSpeedValue(FanConfiguration* o) {
+	o->_set &= ~(1 << 3);
 }
 
 static inline bool FanConfiguration_IsSet_MinSpeedValue(FanConfiguration* o) {
@@ -212,12 +284,20 @@ static inline void FanConfiguration_Set_MaxSpeedValue(FanConfiguration* o) {
 	o->_set |= (1 << 4);
 }
 
+static inline void FanConfiguration_UnSet_MaxSpeedValue(FanConfiguration* o) {
+	o->_set &= ~(1 << 4);
+}
+
 static inline bool FanConfiguration_IsSet_MaxSpeedValue(FanConfiguration* o) {
 	return o->_set & (1 << 4);
 }
 
 static inline void FanConfiguration_Set_MinSpeedValueRead(FanConfiguration* o) {
 	o->_set |= (1 << 5);
+}
+
+static inline void FanConfiguration_UnSet_MinSpeedValueRead(FanConfiguration* o) {
+	o->_set &= ~(1 << 5);
 }
 
 static inline bool FanConfiguration_IsSet_MinSpeedValueRead(FanConfiguration* o) {
@@ -228,12 +308,20 @@ static inline void FanConfiguration_Set_MaxSpeedValueRead(FanConfiguration* o) {
 	o->_set |= (1 << 6);
 }
 
+static inline void FanConfiguration_UnSet_MaxSpeedValueRead(FanConfiguration* o) {
+	o->_set &= ~(1 << 6);
+}
+
 static inline bool FanConfiguration_IsSet_MaxSpeedValueRead(FanConfiguration* o) {
 	return o->_set & (1 << 6);
 }
 
 static inline void FanConfiguration_Set_IndependentReadMinMaxValues(FanConfiguration* o) {
 	o->_set |= (1 << 7);
+}
+
+static inline void FanConfiguration_UnSet_IndependentReadMinMaxValues(FanConfiguration* o) {
+	o->_set &= ~(1 << 7);
 }
 
 static inline bool FanConfiguration_IsSet_IndependentReadMinMaxValues(FanConfiguration* o) {
@@ -244,12 +332,20 @@ static inline void FanConfiguration_Set_ResetRequired(FanConfiguration* o) {
 	o->_set |= (1 << 8);
 }
 
+static inline void FanConfiguration_UnSet_ResetRequired(FanConfiguration* o) {
+	o->_set &= ~(1 << 8);
+}
+
 static inline bool FanConfiguration_IsSet_ResetRequired(FanConfiguration* o) {
 	return o->_set & (1 << 8);
 }
 
 static inline void FanConfiguration_Set_FanSpeedResetValue(FanConfiguration* o) {
 	o->_set |= (1 << 9);
+}
+
+static inline void FanConfiguration_UnSet_FanSpeedResetValue(FanConfiguration* o) {
+	o->_set &= ~(1 << 9);
 }
 
 static inline bool FanConfiguration_IsSet_FanSpeedResetValue(FanConfiguration* o) {
@@ -260,12 +356,20 @@ static inline void FanConfiguration_Set_TemperatureAlgorithmType(FanConfiguratio
 	o->_set |= (1 << 10);
 }
 
+static inline void FanConfiguration_UnSet_TemperatureAlgorithmType(FanConfiguration* o) {
+	o->_set &= ~(1 << 10);
+}
+
 static inline bool FanConfiguration_IsSet_TemperatureAlgorithmType(FanConfiguration* o) {
 	return o->_set & (1 << 10);
 }
 
 static inline void FanConfiguration_Set_Sensors(FanConfiguration* o) {
 	o->_set |= (1 << 11);
+}
+
+static inline void FanConfiguration_UnSet_Sensors(FanConfiguration* o) {
+	o->_set &= ~(1 << 11);
 }
 
 static inline bool FanConfiguration_IsSet_Sensors(FanConfiguration* o) {
@@ -276,12 +380,20 @@ static inline void FanConfiguration_Set_TemperatureThresholds(FanConfiguration* 
 	o->_set |= (1 << 12);
 }
 
+static inline void FanConfiguration_UnSet_TemperatureThresholds(FanConfiguration* o) {
+	o->_set &= ~(1 << 12);
+}
+
 static inline bool FanConfiguration_IsSet_TemperatureThresholds(FanConfiguration* o) {
 	return o->_set & (1 << 12);
 }
 
 static inline void FanConfiguration_Set_FanSpeedPercentageOverrides(FanConfiguration* o) {
 	o->_set |= (1 << 13);
+}
+
+static inline void FanConfiguration_UnSet_FanSpeedPercentageOverrides(FanConfiguration* o) {
+	o->_set &= ~(1 << 13);
 }
 
 static inline bool FanConfiguration_IsSet_FanSpeedPercentageOverrides(FanConfiguration* o) {
@@ -310,12 +422,20 @@ static inline void ModelConfig_Set_NotebookModel(ModelConfig* o) {
 	o->_set |= (1 << 0);
 }
 
+static inline void ModelConfig_UnSet_NotebookModel(ModelConfig* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool ModelConfig_IsSet_NotebookModel(ModelConfig* o) {
 	return o->_set & (1 << 0);
 }
 
 static inline void ModelConfig_Set_Author(ModelConfig* o) {
 	o->_set |= (1 << 1);
+}
+
+static inline void ModelConfig_UnSet_Author(ModelConfig* o) {
+	o->_set &= ~(1 << 1);
 }
 
 static inline bool ModelConfig_IsSet_Author(ModelConfig* o) {
@@ -326,12 +446,20 @@ static inline void ModelConfig_Set_LegacyTemperatureThresholdsBehaviour(ModelCon
 	o->_set |= (1 << 2);
 }
 
+static inline void ModelConfig_UnSet_LegacyTemperatureThresholdsBehaviour(ModelConfig* o) {
+	o->_set &= ~(1 << 2);
+}
+
 static inline bool ModelConfig_IsSet_LegacyTemperatureThresholdsBehaviour(ModelConfig* o) {
 	return o->_set & (1 << 2);
 }
 
 static inline void ModelConfig_Set_EcPollInterval(ModelConfig* o) {
 	o->_set |= (1 << 3);
+}
+
+static inline void ModelConfig_UnSet_EcPollInterval(ModelConfig* o) {
+	o->_set &= ~(1 << 3);
 }
 
 static inline bool ModelConfig_IsSet_EcPollInterval(ModelConfig* o) {
@@ -342,12 +470,20 @@ static inline void ModelConfig_Set_CriticalTemperature(ModelConfig* o) {
 	o->_set |= (1 << 4);
 }
 
+static inline void ModelConfig_UnSet_CriticalTemperature(ModelConfig* o) {
+	o->_set &= ~(1 << 4);
+}
+
 static inline bool ModelConfig_IsSet_CriticalTemperature(ModelConfig* o) {
 	return o->_set & (1 << 4);
 }
 
 static inline void ModelConfig_Set_CriticalTemperatureOffset(ModelConfig* o) {
 	o->_set |= (1 << 5);
+}
+
+static inline void ModelConfig_UnSet_CriticalTemperatureOffset(ModelConfig* o) {
+	o->_set &= ~(1 << 5);
 }
 
 static inline bool ModelConfig_IsSet_CriticalTemperatureOffset(ModelConfig* o) {
@@ -358,6 +494,10 @@ static inline void ModelConfig_Set_ReadWriteWords(ModelConfig* o) {
 	o->_set |= (1 << 6);
 }
 
+static inline void ModelConfig_UnSet_ReadWriteWords(ModelConfig* o) {
+	o->_set &= ~(1 << 6);
+}
+
 static inline bool ModelConfig_IsSet_ReadWriteWords(ModelConfig* o) {
 	return o->_set & (1 << 6);
 }
@@ -366,12 +506,20 @@ static inline void ModelConfig_Set_FanConfigurations(ModelConfig* o) {
 	o->_set |= (1 << 7);
 }
 
+static inline void ModelConfig_UnSet_FanConfigurations(ModelConfig* o) {
+	o->_set &= ~(1 << 7);
+}
+
 static inline bool ModelConfig_IsSet_FanConfigurations(ModelConfig* o) {
 	return o->_set & (1 << 7);
 }
 
 static inline void ModelConfig_Set_RegisterWriteConfigurations(ModelConfig* o) {
 	o->_set |= (1 << 8);
+}
+
+static inline void ModelConfig_UnSet_RegisterWriteConfigurations(ModelConfig* o) {
+	o->_set &= ~(1 << 8);
 }
 
 static inline bool ModelConfig_IsSet_RegisterWriteConfigurations(ModelConfig* o) {
@@ -394,6 +542,10 @@ static inline void FanTemperatureSourceConfig_Set_FanIndex(FanTemperatureSourceC
 	o->_set |= (1 << 0);
 }
 
+static inline void FanTemperatureSourceConfig_UnSet_FanIndex(FanTemperatureSourceConfig* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool FanTemperatureSourceConfig_IsSet_FanIndex(FanTemperatureSourceConfig* o) {
 	return o->_set & (1 << 0);
 }
@@ -402,12 +554,20 @@ static inline void FanTemperatureSourceConfig_Set_TemperatureAlgorithmType(FanTe
 	o->_set |= (1 << 1);
 }
 
+static inline void FanTemperatureSourceConfig_UnSet_TemperatureAlgorithmType(FanTemperatureSourceConfig* o) {
+	o->_set &= ~(1 << 1);
+}
+
 static inline bool FanTemperatureSourceConfig_IsSet_TemperatureAlgorithmType(FanTemperatureSourceConfig* o) {
 	return o->_set & (1 << 1);
 }
 
 static inline void FanTemperatureSourceConfig_Set_Sensors(FanTemperatureSourceConfig* o) {
 	o->_set |= (1 << 2);
+}
+
+static inline void FanTemperatureSourceConfig_UnSet_Sensors(FanTemperatureSourceConfig* o) {
+	o->_set &= ~(1 << 2);
 }
 
 static inline bool FanTemperatureSourceConfig_IsSet_Sensors(FanTemperatureSourceConfig* o) {
@@ -431,12 +591,20 @@ static inline void ServiceConfig_Set_SelectedConfigId(ServiceConfig* o) {
 	o->_set |= (1 << 0);
 }
 
+static inline void ServiceConfig_UnSet_SelectedConfigId(ServiceConfig* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool ServiceConfig_IsSet_SelectedConfigId(ServiceConfig* o) {
 	return o->_set & (1 << 0);
 }
 
 static inline void ServiceConfig_Set_EmbeddedControllerType(ServiceConfig* o) {
 	o->_set |= (1 << 1);
+}
+
+static inline void ServiceConfig_UnSet_EmbeddedControllerType(ServiceConfig* o) {
+	o->_set &= ~(1 << 1);
 }
 
 static inline bool ServiceConfig_IsSet_EmbeddedControllerType(ServiceConfig* o) {
@@ -447,12 +615,20 @@ static inline void ServiceConfig_Set_TargetFanSpeeds(ServiceConfig* o) {
 	o->_set |= (1 << 2);
 }
 
+static inline void ServiceConfig_UnSet_TargetFanSpeeds(ServiceConfig* o) {
+	o->_set &= ~(1 << 2);
+}
+
 static inline bool ServiceConfig_IsSet_TargetFanSpeeds(ServiceConfig* o) {
 	return o->_set & (1 << 2);
 }
 
 static inline void ServiceConfig_Set_FanTemperatureSources(ServiceConfig* o) {
 	o->_set |= (1 << 3);
+}
+
+static inline void ServiceConfig_UnSet_FanTemperatureSources(ServiceConfig* o) {
+	o->_set &= ~(1 << 3);
 }
 
 static inline bool ServiceConfig_IsSet_FanTemperatureSources(ServiceConfig* o) {
@@ -480,12 +656,20 @@ static inline void FanInfo_Set_Name(FanInfo* o) {
 	o->_set |= (1 << 0);
 }
 
+static inline void FanInfo_UnSet_Name(FanInfo* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool FanInfo_IsSet_Name(FanInfo* o) {
 	return o->_set & (1 << 0);
 }
 
 static inline void FanInfo_Set_Temperature(FanInfo* o) {
 	o->_set |= (1 << 1);
+}
+
+static inline void FanInfo_UnSet_Temperature(FanInfo* o) {
+	o->_set &= ~(1 << 1);
 }
 
 static inline bool FanInfo_IsSet_Temperature(FanInfo* o) {
@@ -496,12 +680,20 @@ static inline void FanInfo_Set_AutoMode(FanInfo* o) {
 	o->_set |= (1 << 2);
 }
 
+static inline void FanInfo_UnSet_AutoMode(FanInfo* o) {
+	o->_set &= ~(1 << 2);
+}
+
 static inline bool FanInfo_IsSet_AutoMode(FanInfo* o) {
 	return o->_set & (1 << 2);
 }
 
 static inline void FanInfo_Set_Critical(FanInfo* o) {
 	o->_set |= (1 << 3);
+}
+
+static inline void FanInfo_UnSet_Critical(FanInfo* o) {
+	o->_set &= ~(1 << 3);
 }
 
 static inline bool FanInfo_IsSet_Critical(FanInfo* o) {
@@ -512,12 +704,20 @@ static inline void FanInfo_Set_CurrentSpeed(FanInfo* o) {
 	o->_set |= (1 << 4);
 }
 
+static inline void FanInfo_UnSet_CurrentSpeed(FanInfo* o) {
+	o->_set &= ~(1 << 4);
+}
+
 static inline bool FanInfo_IsSet_CurrentSpeed(FanInfo* o) {
 	return o->_set & (1 << 4);
 }
 
 static inline void FanInfo_Set_TargetSpeed(FanInfo* o) {
 	o->_set |= (1 << 5);
+}
+
+static inline void FanInfo_UnSet_TargetSpeed(FanInfo* o) {
+	o->_set &= ~(1 << 5);
 }
 
 static inline bool FanInfo_IsSet_TargetSpeed(FanInfo* o) {
@@ -528,12 +728,20 @@ static inline void FanInfo_Set_RequestedSpeed(FanInfo* o) {
 	o->_set |= (1 << 6);
 }
 
+static inline void FanInfo_UnSet_RequestedSpeed(FanInfo* o) {
+	o->_set &= ~(1 << 6);
+}
+
 static inline bool FanInfo_IsSet_RequestedSpeed(FanInfo* o) {
 	return o->_set & (1 << 6);
 }
 
 static inline void FanInfo_Set_SpeedSteps(FanInfo* o) {
 	o->_set |= (1 << 7);
+}
+
+static inline void FanInfo_UnSet_SpeedSteps(FanInfo* o) {
+	o->_set &= ~(1 << 7);
 }
 
 static inline bool FanInfo_IsSet_SpeedSteps(FanInfo* o) {
@@ -557,12 +765,20 @@ static inline void ServiceInfo_Set_PID(ServiceInfo* o) {
 	o->_set |= (1 << 0);
 }
 
+static inline void ServiceInfo_UnSet_PID(ServiceInfo* o) {
+	o->_set &= ~(1 << 0);
+}
+
 static inline bool ServiceInfo_IsSet_PID(ServiceInfo* o) {
 	return o->_set & (1 << 0);
 }
 
 static inline void ServiceInfo_Set_SelectedConfigId(ServiceInfo* o) {
 	o->_set |= (1 << 1);
+}
+
+static inline void ServiceInfo_UnSet_SelectedConfigId(ServiceInfo* o) {
+	o->_set &= ~(1 << 1);
 }
 
 static inline bool ServiceInfo_IsSet_SelectedConfigId(ServiceInfo* o) {
@@ -573,12 +789,20 @@ static inline void ServiceInfo_Set_ReadOnly(ServiceInfo* o) {
 	o->_set |= (1 << 2);
 }
 
+static inline void ServiceInfo_UnSet_ReadOnly(ServiceInfo* o) {
+	o->_set &= ~(1 << 2);
+}
+
 static inline bool ServiceInfo_IsSet_ReadOnly(ServiceInfo* o) {
 	return o->_set & (1 << 2);
 }
 
 static inline void ServiceInfo_Set_Fans(ServiceInfo* o) {
 	o->_set |= (1 << 3);
+}
+
+static inline void ServiceInfo_UnSet_Fans(ServiceInfo* o) {
+	o->_set &= ~(1 << 3);
 }
 
 static inline bool ServiceInfo_IsSet_Fans(ServiceInfo* o) {

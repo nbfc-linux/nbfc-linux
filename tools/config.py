@@ -209,6 +209,11 @@ def write_header(fh):
             p(f'}}')
             p('')
 
+            p(f'static inline void {name}_UnSet_{field.var}({name}* o) {{')
+            p(f'\to->_set &= ~(1 << {i});')
+            p(f'}}')
+            p('')
+
             p(f'static inline bool {name}_IsSet_{field.var}({name}* o) {{')
             p(f'\treturn o->_set & (1 << {i});')
             p(f'}}')
