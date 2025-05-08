@@ -102,5 +102,11 @@ help: "Wait for /sys/class/hwmon/hwmon* files"
 prog: "nbfc get-model-name"
 help: "Print model name for notebook"
 ---
+prog: "nbfc warranty"
+help: "Show warranty"
+---
+prog: "nbfc donate"
+help: "Show how to support the project"
+---
 prog: "nbfc help"
 help: "Show help"

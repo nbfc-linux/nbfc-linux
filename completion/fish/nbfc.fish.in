@@ -13,6 +13,8 @@ function _nbfc__command
     update 'Download new configuration files' \
     wait-for-hwmon 'Wait for /sys/class/hwmon/hwmon* files' \
     get-model-name 'Print model name for notebook' \
+    warranty 'Show warranty' \
+    donate 'Show how to support the project' \
     help 'Show help'
 end
 
@@ -349,6 +351,12 @@ complete -c $prog -n $C001 -s q -l quiet -d 'Enable quiet mode' -f
 set -l opts "-h,--help,--version"
 
 # command nbfc get-model-name
+set -l opts "-h,--help,--version"
+
+# command nbfc warranty
+set -l opts "-h,--help,--version"
+
+# command nbfc donate
 set -l opts "-h,--help,--version"
 
 # command nbfc help

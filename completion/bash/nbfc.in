@@ -248,6 +248,10 @@ _nbfc_parse_commandline() {
               cmd+=" wait-for-hwmon";;
             get-model-name)
               cmd+=" get-model-name";;
+            warranty)
+              cmd+=" warranty";;
+            donate)
+              cmd+=" donate";;
             help)
               cmd+=" help";;
             *) cmd+=" $arg";;
@@ -307,6 +311,8 @@ _nbfc() {
       update) _nbfc_update && return 0 || return 1;;
       wait-for-hwmon) _nbfc_wait_for_hwmon && return 0 || return 1;;
       get-model-name) _nbfc_get_model_name && return 0 || return 1;;
+      warranty) _nbfc_warranty && return 0 || return 1;;
+      donate) _nbfc_donate && return 0 || return 1;;
       help) _nbfc_help && return 0 || return 1;;
     esac
   fi
@@ -321,7 +327,7 @@ _nbfc() {
   fi
 
   test "$POSITIONAL_NUM" -eq 1 && {
-    COMPREPLY=($(compgen -W 'start stop restart status config set update wait-for-hwmon get-model-name help' -- "$cur"))
+    COMPREPLY=($(compgen -W 'start stop restart status config set update wait-for-hwmon get-model-name warranty donate help' -- "$cur"))
     return 0;
   }
 
@@ -614,6 +620,14 @@ _nbfc_wait_for_hwmon() {
 }
 
 _nbfc_get_model_name() {
+  return 0
+}
+
+_nbfc_warranty() {
+  return 0
+}
+
+_nbfc_donate() {
   return 0
 }
 

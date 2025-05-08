@@ -252,6 +252,8 @@ _nbfc__command() {
     update:'Download new configuration files'
     wait-for-hwmon:'Wait for /sys/class/hwmon/hwmon* files'
     get-model-name:'Print model name for notebook'
+    warranty:'Show warranty'
+    donate:'Show how to support the project'
     help:'Show help'
   )
 
@@ -285,6 +287,8 @@ _nbfc() {
     (update) _nbfc_update; return $?;;
     (wait-for-hwmon) _nbfc_wait_for_hwmon; return $?;;
     (get-model-name) _nbfc_get_model_name; return $?;;
+    (warranty) _nbfc_warranty; return $?;;
+    (donate) _nbfc_donate; return $?;;
     (help) _nbfc_help; return $?;;
   esac
 
@@ -368,6 +372,20 @@ _nbfc_wait_for_hwmon() {
 }
 
 _nbfc_get_model_name() {
+  local -a args=(
+    1:command1:_nbfc__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_warranty() {
+  local -a args=(
+    1:command1:_nbfc__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_donate() {
   local -a args=(
     1:command1:_nbfc__command
   )
