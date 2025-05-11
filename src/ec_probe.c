@@ -436,8 +436,10 @@ static int Load() {
 }
 
 static int Monitor() {
-  const int max_loops = (!options.timespan) ? INT_MAX :
-    (options.timespan / options.interval);
+  int max_loops = INT_MAX;
+
+  if (options.timespan)
+    max_loops = options.timespan / options.interval;
 
   RegisterBuf* regs = Registers_Log;
   int size = ARRAY_SSIZE(Registers_Log);
@@ -462,8 +464,10 @@ static int Monitor() {
 }
 
 static int Watch() {
-  const int max_loops = (!options.timespan) ? INT_MAX :
-    (options.timespan / options.interval);
+  int max_loops = INT_MAX;
+
+  if (options.timespan)
+    max_loops = options.timespan / options.interval;
 
   int size = ARRAY_SSIZE(Registers_Log);
   RegisterBuf* regs = Registers_Log;
