@@ -179,7 +179,7 @@ int main(int argc, char *const argv[]) {
       {
         const int fan = parse_number(p.optarg, 0, INT_MAX, &err);
         if (err) {
-          Log_Error("-f|--fan: %s\n", err);
+          Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
           return NBFC_EXIT_FAILURE;
         }
 
@@ -193,7 +193,7 @@ int main(int argc, char *const argv[]) {
     case Option_Status_Watch:
       Status_Options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
-        Log_Error("-w|--watch: %s\n", err);
+        Log_Error("%s: %s: %s\n", "-w|--watch", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -286,7 +286,7 @@ int main(int argc, char *const argv[]) {
 
       Set_Options.speed = parse_double(p.optarg, 0, 100, &err);
       if (err) {
-        Log_Error("-s|--speed: %s\n", err);
+        Log_Error("%s: %s: %s\n", "-s|--speed", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -299,7 +299,7 @@ int main(int argc, char *const argv[]) {
 
       Set_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("-f|--fan: %s\n", err);
+        Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -311,7 +311,7 @@ int main(int argc, char *const argv[]) {
     case Option_Update_Parallel:
       Update_Options.parallel = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("-p|--parallel: %s\n", err);
+        Log_Error("%s: %s: %s\n", "-p|--parallel", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
