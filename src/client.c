@@ -90,7 +90,7 @@ static const char *HelpTexts[] = {
 #undef o
 };
 
-static enum Command Command_From_String(const char* s) {
+static enum Command Command_FromString(const char* s) {
   const char* commands[] = {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  COMMAND,
     NBFC_CLIENT_COMMANDS
@@ -150,7 +150,7 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Command:
-      cmd = Command_From_String(p.optarg);
+      cmd = Command_FromString(p.optarg);
       if (cmd == Command_End) {
         Log_Error("Invalid command: %s\n", p.optarg);
         return NBFC_EXIT_CMDLINE;

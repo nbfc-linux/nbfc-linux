@@ -104,7 +104,7 @@ enum Command {
   Command_End
 };
 
-static enum Command Command_From_String(const char* s) {
+static enum Command Command_FromString(const char* s) {
   const char* cmds[] = { "read", "write", "dump", "load", "monitor", "watch", "help" };
 
   for (int i = 0; i < ARRAY_SSIZE(cmds); ++i)
@@ -251,7 +251,7 @@ int main(int argc, char* const argv[]) {
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
     case Option_Command:
-      cmd = Command_From_String(p.optarg);
+      cmd = Command_FromString(p.optarg);
 
       if (cmd == Command_End) {
         Log_Error("Invalid command: %s\n", p.optarg);
