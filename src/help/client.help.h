@@ -174,6 +174,15 @@
  "  -h, --help            Shows this message and exit\n"                       \
  ""
 
+#define CLIENT_COMPLETE_SENSORS_HELP_TEXT                                      \
+ "Usage: nbfc complete-sensors [-h]\n"                                         \
+ "\n"                                                                          \
+ "Used for completing shell command lines.\n"                                  \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
 #define CLIENT_WARRANTY_HELP_TEXT                                              \
  "Usage: nbfc warranty [-h]\n"                                                 \
  "\n"                                                                          \

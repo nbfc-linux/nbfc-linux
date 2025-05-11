@@ -6,6 +6,7 @@
 #include "../macros.h"
 #include "../sleep.h"
 #include "../file_utils.h"
+#include "../fs_sensors.h"
 
 #include "dmi.h"
 #include "service_control.h"
@@ -61,6 +62,41 @@ static int Complete_Fans() {
   int idx = 0;
   for_each_array(const FanConfiguration*, fc, model_config.FanConfigurations)
     printf("%d\t%s\n", idx++, fc->FanDisplayName);
+
+  return NBFC_EXIT_SUCCESS;
+}
+
+static int Complete_Sensors() {
+  FS_Sensors_Init();
+
+  const char* having[4096];
+  ssize_t     having_size = 0;
+
+  printf("%s\t%s\n", "@CPU", "group");
+  printf("%s\t%s\n", "@GPU", "group");
+
+  for_each_array(FS_TemperatureSource*, source, FS_Sensors_Sources) {
+    bool sensor_printed = false;
+
+    for (ssize_t i = 0; i < having_size; ++i) {
+      if (! strcmp(having[i], source->name)) {
+        sensor_printed = true;
+        break;
+      }
+    }
+
+    if (sensor_printed)
+      continue;
+
+    having[having_size++] = source->name;
+
+    printf("%s\tsensor\n", source->name);
+
+    for_each_array(FS_TemperatureSource*, source2, FS_Sensors_Sources) {
+      if (! strcmp(source->name, source2->name))
+        printf("%s\t%s\n", source2->file, source->name);
+    }
+  }
 
   return NBFC_EXIT_SUCCESS;
 }

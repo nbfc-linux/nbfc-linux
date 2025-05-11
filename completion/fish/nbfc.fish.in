@@ -367,7 +367,7 @@ set -l C002 "$query '$opts' positional_contains 1 sensors && $query '$opts' posi
 set -l C003 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set && not $query '$opts' has_option --force"
 complete -c $prog -n $C000 -s f -l fan -d 'Fan index (zero based)' -x -a '(nbfc complete-fans)'
 complete -c $prog -n $C001 -s a -l algorithm -d 'Set the algorithm type' -x -a 'Average Min Max'
-complete -c $prog -n $C002 -s s -l sensor -d 'Set sensor' -x -a '@CPU @GPU'
+complete -c $prog -n $C002 -s s -l sensor -d 'Set sensor' -x -a '(nbfc complete-sensors)'
 complete -c $prog -n $C003 -l force -d 'Force applying sensors' -f
 
 # command nbfc update

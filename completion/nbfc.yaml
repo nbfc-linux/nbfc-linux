@@ -111,7 +111,7 @@ options:
     metavar: "SENSOR"
     help: "Set sensor"
     repeatable: true
-    complete: ["choices", ["@CPU", "@GPU"]] # TODO: add `nbfc complete-sensors`
+    complete: ["exec", "nbfc complete-sensors"]
 
   - option_strings: ["--force"]
     help: "Force applying sensors"

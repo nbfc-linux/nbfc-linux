@@ -674,7 +674,7 @@ _nbfc_sensors_set() {
         COMPREPLY=($(compgen -W 'Average Min Max' -- "$cur"))
         return 0;;
       --sensor|-s)
-        COMPREPLY=($(compgen -W '@CPU @GPU' -- "$cur"))
+        _nbfc_exec 'nbfc complete-sensors'
         return 0;;
     esac
 

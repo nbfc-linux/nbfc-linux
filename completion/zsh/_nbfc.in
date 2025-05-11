@@ -405,7 +405,7 @@ _nbfc_sensors_set() {
   local -a args=(
     '(--fan -f)'{-f+,--fan=}'[Fan index (zero based)]':'FAN INDEX':"{_nbfc_exec 'nbfc complete-fans'}"
     '(--algorithm -a)'{-a+,--algorithm=}'[Set the algorithm type]':ALGORITHM:'(Average Min Max)'
-    '*'{-s+,--sensor=}'[Set sensor]':SENSOR:'(@CPU @GPU)'
+    '*'{-s+,--sensor=}'[Set sensor]':SENSOR:"{_nbfc_exec 'nbfc complete-sensors'}"
     '(--force)'--force'[Force applying sensors]'
     1:command1:_nbfc__command
     2:command2:_nbfc_sensors_command

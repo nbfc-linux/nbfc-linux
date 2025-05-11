@@ -61,21 +61,22 @@ const cli99_option main_options[] = {
 #include "client/cmd_donate.c"
 
 #define NBFC_CLIENT_COMMANDS \
-  o("start",          Start,          START,           start)         \
-  o("stop",           Stop,           STOP,            main)          \
-  o("restart",        Restart,        RESTART,         start)         \
-  o("status",         Status,         STATUS,          status)        \
-  o("sensors",        Sensors,        SENSORS,         sensors)       \
-  o("config",         Config,         CONFIG,          config)        \
-  o("set",            Set,            SET,             set)           \
-  o("update",         Update,         UPDATE,          update)        \
-  o("wait-for-hwmon", Wait_For_Hwmon, WAIT_FOR_HWMON,  main)          \
-  o("get-model-name", Get_Model_Name, GET_MODEL,       main)          \
-  o("complete-fans",  Complete_Fans,  COMPLETE_FANS,   main)          \
-  o("show-variable",  Show_Variable,  SHOW_VARIABLE,   show_variable) \
-  o("warranty",       Warranty,       WARRANTY,        main)          \
-  o("donate",         Donate,         DONATE,          main)          \
-  o("help",           Help,           HELP,            main)
+  o("start",            Start,            START,            start)         \
+  o("stop",             Stop,             STOP,             main)          \
+  o("restart",          Restart,          RESTART,          start)         \
+  o("status",           Status,           STATUS,           status)        \
+  o("sensors",          Sensors,          SENSORS,          sensors)       \
+  o("config",           Config,           CONFIG,           config)        \
+  o("set",              Set,              SET,              set)           \
+  o("update",           Update,           UPDATE,           update)        \
+  o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   main)          \
+  o("get-model-name",   Get_Model_Name,   GET_MODEL,        main)          \
+  o("complete-fans",    Complete_Fans,    COMPLETE_FANS,    main)          \
+  o("complete-sensors", Complete_Sensors, COMPLETE_SENSORS, main)          \
+  o("show-variable",    Show_Variable,    SHOW_VARIABLE,    show_variable) \
+  o("warranty",         Warranty,         WARRANTY,         main)          \
+  o("donate",           Donate,           DONATE,           main)          \
+  o("help",             Help,             HELP,             main)
 
 enum Command {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
@@ -347,20 +348,21 @@ int main(int argc, char *const argv[]) {
   }
 
   switch (cmd) {
-  case Command_Start:          return Start();
-  case Command_Stop:           return Stop();
-  case Command_Restart:        return Restart();
-  case Command_Config:         return Config();
-  case Command_Set:            return Set();
-  case Command_Status:         return Status();
-  case Command_Sensors:        return Sensors();
-  case Command_Update:         return Update();
-  case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
-  case Command_Get_Model_Name: return Get_Model_Name();
-  case Command_Show_Variable:  return Show_Variable();
-  case Command_Complete_Fans:  return Complete_Fans();
-  case Command_Warranty:       return Warranty();
-  case Command_Donate:         return Donate();
-  default:                     return NBFC_EXIT_FAILURE;
+  case Command_Start:             return Start();
+  case Command_Stop:              return Stop();
+  case Command_Restart:           return Restart();
+  case Command_Config:            return Config();
+  case Command_Set:               return Set();
+  case Command_Status:            return Status();
+  case Command_Sensors:           return Sensors();
+  case Command_Update:            return Update();
+  case Command_Wait_For_Hwmon:    return Wait_For_Hwmon();
+  case Command_Get_Model_Name:    return Get_Model_Name();
+  case Command_Show_Variable:     return Show_Variable();
+  case Command_Complete_Fans:     return Complete_Fans();
+  case Command_Complete_Sensors:  return Complete_Sensors();
+  case Command_Warranty:          return Warranty();
+  case Command_Donate:            return Donate();
+  default:                        return NBFC_EXIT_FAILURE;
   }
 }
