@@ -13,10 +13,11 @@
        "MaxSpeedValue": 100,
        "IndependentReadMinMaxValues": true,
        "MinSpeedValueRead": 0,
-       "MaxSpeedValueRead": 32,
+       "MaxSpeedValueRead": 21,
        "ResetRequired": true,
        "FanSpeedResetValue": 255,
        "FanDisplayName": "Fan1",
+       "Sensors": ["@CPU","@GPU"],
        "TemperatureAlgorithmType": "Max",
        "TemperatureThresholds": [
         {
@@ -70,10 +71,11 @@
        "MaxSpeedValue": 100,
        "IndependentReadMinMaxValues": true,
        "MinSpeedValueRead": 0,
-       "MaxSpeedValueRead": 33,
+       "MaxSpeedValueRead": 21,
        "ResetRequired": true,
        "FanSpeedResetValue": 255,
        "FanDisplayName": "Fan2",
+       "Sensors": ["@CPU","@GPU"],
        "TemperatureAlgorithmType": "Max",
        "TemperatureThresholds": [
          {
