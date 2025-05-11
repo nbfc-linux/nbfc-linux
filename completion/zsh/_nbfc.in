@@ -249,6 +249,7 @@ _nbfc__command() {
     status:'Show the service status'
     config:'List or apply configs'
     set:'Control fan speed'
+    sensors:'Configure fan sensors'
     update:'Download new configuration files'
     wait-for-hwmon:'Wait for /sys/class/hwmon/hwmon* files'
     get-model-name:'Print model name for notebook'
@@ -272,6 +273,16 @@ _nbfc_exec() {
   _describe '' describe
 }
 
+_nbfc_sensors_command() {
+  local -a items=(
+    list:'List available sensors and temperature files'
+    show:'Show all available fans with their configuration'
+    set:'Configure sensors and algorithm type for a fan'
+  )
+
+  _describe -- command items
+}
+
 _nbfc() {
   local opts=-h,--help,--version
   local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
@@ -284,6 +295,7 @@ _nbfc() {
     (status) _nbfc_status; return $?;;
     (config) _nbfc_config; return $?;;
     (set) _nbfc_set; return $?;;
+    (sensors) _nbfc_sensors; return $?;;
     (update) _nbfc_update; return $?;;
     (wait-for-hwmon) _nbfc_wait_for_hwmon; return $?;;
     (get-model-name) _nbfc_get_model_name; return $?;;
@@ -351,6 +363,52 @@ _nbfc_set() {
     '(--auto -a --speed -s)'{-s+,--speed=}'[Set fan speed to PERCENT]':PERCENT:"_numbers -f"
     '(--fan -f)'{-f+,--fan=}'[Fan index (zero based)]':'FAN INDEX':"{_nbfc_exec 'nbfc complete-fans'}"
     1:command1:_nbfc__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_sensors() {
+  local opts=-h,--help,--version
+  local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
+  _nbfc_zsh_query init "$opts" "${words[@]}"
+
+  case "$(_nbfc_zsh_query get_positional 2)" in
+    (list) _nbfc_sensors_list; return $?;;
+    (show) _nbfc_sensors_show; return $?;;
+    (set) _nbfc_sensors_set; return $?;;
+  esac
+
+  local -a args=(
+    1:command1:_nbfc__command
+    2:command2:_nbfc_sensors_command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_sensors_list() {
+  local -a args=(
+    1:command1:_nbfc__command
+    2:command2:_nbfc_sensors_command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_sensors_show() {
+  local -a args=(
+    1:command1:_nbfc__command
+    2:command2:_nbfc_sensors_command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_sensors_set() {
+  local -a args=(
+    '(--fan -f)'{-f+,--fan=}'[Fan index (zero based)]':'FAN INDEX':"{_nbfc_exec 'nbfc complete-fans'}"
+    '(--algorithm -a)'{-a+,--algorithm=}'[Set the algorithm type]':ALGORITHM:'(Average Min Max)'
+    '*'{-s+,--sensor=}'[Set sensor]':SENSOR:'(@CPU @GPU)'
+    '(--force)'--force'[Force applying sensors]'
+    1:command1:_nbfc__command
+    2:command2:_nbfc_sensors_command
   )
   _arguments -S -s -w "${args[@]}"
 }

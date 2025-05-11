@@ -1,5 +1,8 @@
 # Changelog
 
+## nbfc-linux-0.3.16 (2025-05-10)
+- Added `nbfc sensors` command
+
 ## nbfc-linux-0.3.15 (2025-05-08)
 - Added `nbfc warranty` and `nbfc donate` commands
 

@@ -142,6 +142,8 @@ NBFC-Linux allows you to specify which temperature sources to use for controllin
 
 > NOTE: Since version 0.3.3 NBFC-Linux also allows you to specify sensors in FanConfigurations using the `Sensors` field
 
+> NOTE: The command `nbfc sensors` is available since version 0.3.16. If you are running a previous version, you can still [configure it by hand](doc/advanced_configuration.md).
+
 **Default Configuration**
 
 If no configuration is specified, NBFC uses the "Average" algorithm and utilizes all sensor files named "coretemp", "k10temp", or "zenpower".
@@ -154,7 +156,7 @@ You can choose from three different algorithms to compute the temperature:
 - *"Min"*: Selects the lowest temperature among all specified sources.
 - *"Max"*: Selects the highest temperature among all specified sources.
 
-**Specifying Temperature Sources**
+**Temperature Sources**
 
 You can specify temperature sources either by a
 - *sensor name* (which may result in multiple temperature sources)
@@ -164,49 +166,32 @@ You can specify temperature sources either by a
   - *@CPU*: Uses all sensors named "coretemp", "k10temp" or "zenpower"
   - *@GPU*: Uses all sensors named "amdgpu", "nvidia", "nouveau" or "radeon"
 
-**Example Configuration**
+**Specyfing Temperature Sources**
 
-Here is a fictional example demonstrating how to configure NBFC-Linux:
+1. `nbfc sensors list` will output all available sensors
 
-```
-{
-    "SelectedConfigId": "Asus G53SX",
-    "TargetFanSpeeds": [ -1.000000 ],
-    "FanTemperatureSources": [
-        {
-            "FanIndex": 0,
-            "TemperatureAlgorithmType": "Min",
-            "Sensors": [ "coretemp" ]
-        },
-        {
-            "FanIndex": 1,
-            "TemperatureAlgorithmType": "Average",
-            "Sensors": [ "nouveau" ]
-        },
-        {
-            "FanIndex": 2,
-            "TemperatureAlgorithmType": "Average",
-            "Sensors": [ "/sys/class/hwmon/hwmon4/temp2_input", "/sys/class/hwmon/hwmon4/temp3_input" ]
-        },
-        {
-            "FanIndex": 3,
-            "Sensors": [ "$ echo 42" ]
-        },
-        {
-            "FanIndex": 4,
-            "Sensors": [ "@GPU" ]
-        }
-    ]
-}
-```
+2. `nbfc sensors show` will show all available fans and their configured sensors
 
-In this example:
+3. `sudo nbfc sensors set -f <FAN_INDEX> [-s <SENSOR>...] [-a <ALGORITHM>]` will set the specified sensors and the algorithm for a fan.
 
-- *Fan 0* uses the "Min" algorithm with sensors named "coretemp".
-- *Fan 1* uses the "Average" algorithm with sensors named "nouveau".
-- *Fan 2* uses the "Average" algorithm with specific sensor file paths.
-- *Fan 3* uses the output of `echo 42` as temperature
-- *Fan 4* uses all sensors found in the `@GPU` group ("amdgpu", "nvidia", "nouveau" or "radeon")
+**Examples**
+
+- `sudo nbfc sensors set -f 0 -s coretemp -a Min`
+
+  *Fan 0* uses the "*Min*" algorithm with all sensors named "*coretemp*".
+
+- `sudo nbfc sensors set -f 0 -s /sys/class/hwmon/hwmon4/temp1_input -s /sys/class/hwmon/hwmon4/temp2_input`
+
+  *Fan 0* uses the default algorithm with the specific *sensor file paths*.
+
+- `sudo nbfc sensors set -f 0 -s '$ echo 42'`
+
+  *Fan 0* uses the output of *echo 42* as temperature
+
+- `sudo nbfc sensors set -f 1 -s @GPU`
+
+  *Fan 1* uses all sensors in the `@GPU` group ("amdgpu", "nvidia", "nouveau", "radeon")
+
 
 Differences in detail
 ---------------------

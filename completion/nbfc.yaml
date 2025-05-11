@@ -85,6 +85,37 @@ options:
     help: "Fan index (zero based)"
     complete: ["exec", "nbfc complete-fans"]
 ---
+prog: "nbfc sensors"
+help: "Configure fan sensors"
+---
+prog: "nbfc sensors list"
+help: "List available sensors and temperature files"
+---
+prog: "nbfc sensors show"
+help: "Show all available fans with their configuration"
+---
+prog: "nbfc sensors set"
+help: "Configure sensors and algorithm type for a fan"
+options:
+  - option_strings: ["-f", "--fan"]
+    metavar: "FAN INDEX"
+    help: "Fan index (zero based)"
+    complete: ["exec", "nbfc complete-fans"]
+
+  - option_strings: ["-a", "--algorithm"]
+    metavar: "ALGORITHM"
+    help: "Set the algorithm type"
+    complete: ["choices", ["Average", "Min", "Max"]]
+
+  - option_strings: ["-s", "--sensor"]
+    metavar: "SENSOR"
+    help: "Set sensor"
+    repeatable: true
+    complete: ["choices", ["@CPU", "@GPU"]] # TODO: add `nbfc complete-sensors`
+
+  - option_strings: ["--force"]
+    help: "Force applying sensors"
+---
 prog: "nbfc update"
 help: "Download new configuration files"
 options:

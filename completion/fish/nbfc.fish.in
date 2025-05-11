@@ -10,6 +10,7 @@ function _nbfc__command
     status 'Show the service status' \
     config 'List or apply configs' \
     set 'Control fan speed' \
+    sensors 'Configure fan sensors' \
     update 'Download new configuration files' \
     wait-for-hwmon 'Wait for /sys/class/hwmon/hwmon* files' \
     get-model-name 'Print model name for notebook' \
@@ -278,6 +279,13 @@ function _nbfc_fish_complete_filedir
   end
 end
 
+function _nbfc_sensors_command
+  printf "%s\t%s\n" \
+    list 'List available sensors and temperature files' \
+    show 'Show all available fans with their configuration' \
+    set 'Configure sensors and algorithm type for a fan'
+end
+
 set -l prog "nbfc"
 set -l query "_nbfc_fish_query"
 
@@ -339,6 +347,28 @@ set -l C002 "$query '$opts' positional_contains 1 set && not $query '$opts' has_
 complete -c $prog -n $C000 -s a -l auto -d "Set fan speed to 'auto'" -f
 complete -c $prog -n $C001 -s s -l speed -d 'Set fan speed to PERCENT' -x
 complete -c $prog -n $C002 -s f -l fan -d 'Fan index (zero based)' -x -a '(nbfc complete-fans)'
+
+# command nbfc sensors
+set -l opts "-h,--help,--version"
+set -l C000 "$query '$opts' positional_contains 1 sensors && $query '$opts' num_of_positionals -eq 1"
+complete -c $prog -n $C000 -d Commands -f -a '(_nbfc_sensors_command)'
+
+# command nbfc sensors list
+set -l opts "-h,--help,--version"
+
+# command nbfc sensors show
+set -l opts "-h,--help,--version"
+
+# command nbfc sensors set
+set -l opts "-f=,--fan=,-a=,--algorithm=,-s=,--sensor=,--force,-h,--help,--version"
+set -l C000 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set && not $query '$opts' has_option -f --fan"
+set -l C001 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set && not $query '$opts' has_option -a --algorithm"
+set -l C002 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set"
+set -l C003 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set && not $query '$opts' has_option --force"
+complete -c $prog -n $C000 -s f -l fan -d 'Fan index (zero based)' -x -a '(nbfc complete-fans)'
+complete -c $prog -n $C001 -s a -l algorithm -d 'Set the algorithm type' -x -a 'Average Min Max'
+complete -c $prog -n $C002 -s s -l sensor -d 'Set sensor' -x -a '@CPU @GPU'
+complete -c $prog -n $C003 -l force -d 'Force applying sensors' -f
 
 # command nbfc update
 set -l opts "-p=,--parallel=,-q,--quiet,-h,--help,--version"

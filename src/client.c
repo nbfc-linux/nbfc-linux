@@ -21,6 +21,8 @@
 #include "error.c"
 #include "file_utils.c"
 #include "model_config.c"
+#include "fs_sensors.c"
+#include "nvidia.c"
 #include "memory.c"
 #include "program_name.c"
 #include "protocol.c"
@@ -49,6 +51,7 @@ const cli99_option main_options[] = {
 
 #include "client/cmd_start_stop.c"
 #include "client/cmd_status.c"
+#include "client/cmd_sensors.c"
 #include "client/cmd_config.c"
 #include "client/cmd_set.c"
 #include "client/cmd_update.c"
@@ -62,6 +65,7 @@ const cli99_option main_options[] = {
   o("stop",           Stop,           STOP,            main)          \
   o("restart",        Restart,        RESTART,         start)         \
   o("status",         Status,         STATUS,          status)        \
+  o("sensors",        Sensors,        SENSORS,         sensors)       \
   o("config",         Config,         CONFIG,          config)        \
   o("set",            Set,            SET,             set)           \
   o("update",         Update,         UPDATE,          update)        \
@@ -195,6 +199,51 @@ int main(int argc, char *const argv[]) {
       break;
 
     // ========================================================================
+    // Sensors options
+    // ========================================================================
+
+    case Option_Sensors_Command:
+      Sensors_Options.command = Sensors_Command_FromString(p.optarg);
+      if (Sensors_Options.command == Sensors_Command_End) {
+        Log_Error("Invalid command: sensors %s\n", p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      if (Sensors_Options.command == Sensors_Command_Set)
+        cli99_SetOptions(&p, sensors_set_options, false);
+
+      break;
+
+    case Option_Sensors_Fan:
+      Sensors_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
+      if (err) {
+        Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
+        return NBFC_EXIT_FAILURE;
+      }
+      break;
+
+    case Option_Sensors_Sensor:
+      {
+        array_of(str)* sensors = &Sensors_Options.sensors;
+        sensors->size++;
+        sensors->data = Mem_Realloc(sensors->data, sensors->size * sizeof(str));
+        sensors->data[sensors->size - 1] = p.optarg;
+      }
+      break;
+
+    case Option_Sensors_Algorithm:
+      Sensors_Options.algorithm = TemperatureAlgorithmType_FromString(p.optarg);
+      if (Sensors_Options.algorithm == TemperatureAlgorithmType_Unset) {
+        Log_Error("%s: %s: %s\n", "-a|--algorithm", "Invalid value", p.optarg);
+        return NBFC_EXIT_FAILURE;
+      }
+      break;
+
+    case Option_Sensors_Force:
+      Sensors_Options.force = true;
+      break;
+
+    // ========================================================================
     // Config options
     // ========================================================================
 
@@ -304,6 +353,7 @@ int main(int argc, char *const argv[]) {
   case Command_Config:         return Config();
   case Command_Set:            return Set();
   case Command_Status:         return Status();
+  case Command_Sensors:        return Sensors();
   case Command_Update:         return Update();
   case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
   case Command_Get_Model_Name: return Get_Model_Name();
