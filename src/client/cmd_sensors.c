@@ -10,8 +10,6 @@
 #include "../help/client.help.h"
 #include "../nxjson_utils.h"
 #include "../fs_sensors.h"
-#include "../model_config.h"
-#include "../service_config.h"
 
 /* nbfc sensors API:
  *
@@ -63,34 +61,6 @@ struct {
   TemperatureAlgorithmType_Unset,
   false,
 };
-
-static void Sensors_LoadAllConfigFiles(ModelConfig* model_config) {
-  Error* e;
-  Trace trace = {0};
-  char path[PATH_MAX];
-
-  e = ServiceConfig_Init(NBFC_SERVICE_CONFIG);
-  if (e) {
-    Log_Error("%s\n", err_print_all(e));
-    Log_Error("This command needs a valid and configured `%s`\n", NBFC_SERVICE_CONFIG);
-    exit(NBFC_EXIT_FAILURE);
-  }
-
-  e = ModelConfig_FindAndLoad(model_config, path, service_config.SelectedConfigId);
-  if (e) {
-    Log_Error("%s\n", err_print_all(e));
-    Log_Error("This command needs a valid model configuration (%s)\n", path);
-    exit(NBFC_EXIT_FAILURE);
-  }
-
-  Trace_Push(&trace, path);
-  e = ModelConfig_Validate(&trace, model_config);
-  if (e) {
-    Log_Error("%s: %s\n", trace.buf, err_print_all(e));
-    Log_Error("This command needs a valid model configuration (%s)\n", path);
-    exit(NBFC_EXIT_FAILURE);
-  }
-}
 
 static Error* Sensors_IsValidSensor(const char* sensor) {
   switch (sensor[0]) {
@@ -146,7 +116,7 @@ static int Sensors_Set() {
   }
 
   FS_Sensors_Init();
-  Sensors_LoadAllConfigFiles(&model_config);
+  Service_LoadAllConfigFiles(&model_config);
 
   if (Sensors_Options.fan >= model_config.FanConfigurations.size) {
     Log_Error("%s: No such fan: %d\n", "-f|--fan", Sensors_Options.fan);
@@ -195,7 +165,7 @@ static int Sensors_Set() {
 static int Sensors_Show() {
   ModelConfig model_config = {0};
 
-  Sensors_LoadAllConfigFiles(&model_config);
+  Service_LoadAllConfigFiles(&model_config);
 
   struct FanWithTrace {
     const char*              FanName;

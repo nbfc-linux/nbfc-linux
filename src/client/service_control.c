@@ -152,6 +152,34 @@ error:
   return e;
 }
 
+void Service_LoadAllConfigFiles(ModelConfig* model_config) {
+  Error* e;
+  Trace trace = {0};
+  char path[PATH_MAX];
+
+  e = ServiceConfig_Init(NBFC_SERVICE_CONFIG);
+  if (e) {
+    Log_Error("%s\n", err_print_all(e));
+    Log_Error("This command needs a valid and configured `%s`\n", NBFC_SERVICE_CONFIG);
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  e = ModelConfig_FindAndLoad(model_config, path, service_config.SelectedConfigId);
+  if (e) {
+    Log_Error("%s\n", err_print_all(e));
+    Log_Error("This command needs a valid model configuration (%s)\n", path);
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  Trace_Push(&trace, path);
+  e = ModelConfig_Validate(&trace, model_config);
+  if (e) {
+    Log_Error("%s: %s\n", trace.buf, err_print_all(e));
+    Log_Error("This command needs a valid model configuration (%s)\n", path);
+    exit(NBFC_EXIT_FAILURE);
+  }
+}
+
 int Service_Start(bool read_only) {
   int pid = Service_Get_PID();
   if (pid != -1) {

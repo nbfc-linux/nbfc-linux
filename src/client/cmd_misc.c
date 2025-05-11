@@ -1,5 +1,6 @@
 #include <stdio.h>  // printf, snprintf
 #include <string.h> // strcmp, strcspn
+#include <unistd.h> // close
 
 #include "../nbfc.h"
 #include "../macros.h"
@@ -51,15 +52,15 @@ static int Get_Model_Name() {
 }
 
 static int Complete_Fans() {
-  ServiceInfo service_info = {0};
+  ModelConfig model_config = {0};
 
-  Error* e = ServiceInfo_TryLoad(&service_info);
-  if (e)
-    return NBFC_EXIT_FAILURE;
+  close(STDERR_FILENO);
+
+  Service_LoadAllConfigFiles(&model_config);
 
   int idx = 0;
-  for_each_array(const FanInfo*, f, service_info.Fans)
-    printf("%d\t%s\n", idx++, f->Name);
+  for_each_array(const FanConfiguration*, fc, model_config.FanConfigurations)
+    printf("%d\t%s\n", idx++, fc->FanDisplayName);
 
   return NBFC_EXIT_SUCCESS;
 }
