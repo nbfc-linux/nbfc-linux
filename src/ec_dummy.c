@@ -22,20 +22,20 @@ void EC_Dummy_Close() {
   EC_Dummy_FakeRegisters = NULL;
 }
 
-Error* EC_Dummy_ReadByte(int register_, uint8_t* out) {
+Error* EC_Dummy_ReadByte(uint8_t register_, uint8_t* out) {
   *out = 0;
   if (register_ < EC_Dummy_FakeRegistersSize)
     *out = EC_Dummy_FakeRegisters[register_];
   return err_success();
 }
 
-Error* EC_Dummy_WriteByte(int register_, uint8_t value) {
+Error* EC_Dummy_WriteByte(uint8_t register_, uint8_t value) {
   if (register_ < EC_Dummy_FakeRegistersSize)
     EC_Dummy_FakeRegisters[register_] = value;
   return err_success();
 }
 
-Error* EC_Dummy_ReadWord(int register_, uint16_t* out) {
+Error* EC_Dummy_ReadWord(uint8_t register_, uint16_t* out) {
   if (register_ + 1 < EC_Dummy_FakeRegistersSize) {
     *out = ((uint16_t) EC_Dummy_FakeRegisters[register_]) |
           (((uint16_t) EC_Dummy_FakeRegisters[register_+1]) << 8);
@@ -43,7 +43,7 @@ Error* EC_Dummy_ReadWord(int register_, uint16_t* out) {
   return err_success();
 }
 
-Error* EC_Dummy_WriteWord(int register_, uint16_t value) {
+Error* EC_Dummy_WriteWord(uint8_t register_, uint16_t value) {
   value = htole16(value);
 
   uint8_t msb = value >> 8;
