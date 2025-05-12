@@ -10,12 +10,14 @@
 #include "../file_utils.h"
 #include "str_functions.h"
 
-#define DmiIdDirectoryPath "/sys/devices/virtual/dmi/id"
+#define DMI_Directory       "/sys/devices/virtual/dmi/id"
+#define DMI_ProductNameFile DMI_Directory "/product_name"
+#define DMI_SysVendorFile   DMI_Directory "/sys_vendor"
 
-const char* get_system_product() {
+const char* DMI_Get_System_Product() {
   static char buf[128];
 
-  if (slurp_file(buf, sizeof(buf), DmiIdDirectoryPath "/product_name") == -1)
+  if (slurp_file(buf, sizeof(buf), DMI_ProductNameFile) == -1)
     goto error;
 
   buf[strcspn(buf, "\n")] = '\0';
@@ -28,14 +30,14 @@ const char* get_system_product() {
   return buf;
 
 error:
-  Log_Error("Could not get product name. Failed to read " DmiIdDirectoryPath "/product_name: %s\n", strerror(errno));
+  Log_Error("Could not get product name. Failed to read " DMI_ProductNameFile ": %s\n", strerror(errno));
   exit(NBFC_EXIT_FAILURE);
 }
 
-const char* get_system_vendor() {
+const char* DMI_Get_System_Vendor() {
   static char buf[128];
 
-  if (slurp_file(buf, sizeof(buf), DmiIdDirectoryPath "/sys_vendor") == -1)
+  if (slurp_file(buf, sizeof(buf), DMI_SysVendorFile) == -1)
     goto error;
 
   buf[strcspn(buf, "\n")] = '\0';
@@ -48,11 +50,11 @@ const char* get_system_vendor() {
   return buf;
 
 error:
-  Log_Error("Could not get system vendor. Failed to read " DmiIdDirectoryPath "/sys_vendor: %s\n", strerror(errno));
+  Log_Error("Could not get system vendor. Failed to read " DMI_SysVendorFile ": %s\n", strerror(errno));
   exit(NBFC_EXIT_FAILURE);
 }
 
-const char* get_model_name() {
+const char* DMI_Get_Model_Name() {
   static char model_name[256];
 
   struct vendor_alias { const char* key; const char* value; };
@@ -62,8 +64,8 @@ const char* get_model_name() {
     { NULL, NULL }
   };
 
-  const char* product = get_system_product();
-  const char* vendor = get_system_vendor();
+  const char* product = DMI_Get_System_Product();
+  const char* vendor  = DMI_Get_System_Vendor();
 
   for (const struct vendor_alias* alias = vendor_aliases; alias->key; ++alias) {
     if (! strcmp(vendor, alias->key)) {

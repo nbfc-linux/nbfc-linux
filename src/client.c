@@ -8,7 +8,6 @@
 #include <locale.h>   // setlocale, LC_NUMERIC
 #include <stdio.h>    // printf
 #include <string.h>   // strcmp
-#include <sys/stat.h> // mkdir
 
 #include "help/client.help.h"
 #include "log.h"

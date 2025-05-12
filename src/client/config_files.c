@@ -118,7 +118,7 @@ array_of(ConfigFile) List_All_Configs() {
 // List all configs (in the static config directory as well as in the mutable config directory).
 // The `diff` field of the ConfigFile structure will also be set.
 array_of(ConfigFile) List_Recommended_Configs() {
-  const char* model_name = get_model_name();
+  const char* model_name = DMI_Get_Model_Name();
   array_of(ConfigFile) files = List_All_Configs();
   for_each_array(ConfigFile*, file, files) {
     file->diff = str_similarity(model_name, file->config_name);

@@ -48,7 +48,7 @@ static int Wait_For_Hwmon() {
 }
 
 static int Get_Model_Name() {
-  printf("%s\n", get_model_name());
+  printf("%s\n", DMI_Get_Model_Name());
   return NBFC_EXIT_SUCCESS;
 }
 

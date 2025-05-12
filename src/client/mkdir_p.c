@@ -1,6 +1,6 @@
+#include <errno.h>     // errno, EEXIST
 #include <sys/stat.h>  // mkdir
 #include <sys/types.h> // mode_t
-#include <errno.h>     // errno, EEXIST
 
 #include "../memory.h"
 
