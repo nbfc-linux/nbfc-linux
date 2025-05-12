@@ -101,4 +101,3 @@ Error* Protocol_Send_Error(int socket, const char* message) {
 
   return Protocol_Send_Json(socket, &obj);
 }
-

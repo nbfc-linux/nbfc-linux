@@ -125,4 +125,3 @@ EC_VTable EC_SysLinux_ACPI_VTable = {
   EC_SysLinux_WriteByte,
   EC_SysLinux_WriteWord,
 };
-

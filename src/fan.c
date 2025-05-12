@@ -198,4 +198,3 @@ Error* Fan_ECFlush(Fan* self) {
   const int   value = Fan_PercentageToFanSpeed(self, speed);
   return Fan_ECWriteValue(self, value);
 }
-

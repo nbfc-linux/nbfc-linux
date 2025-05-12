@@ -82,4 +82,3 @@ static const char* Json_EscapeString(char* buf, const size_t n, const char* s) {
   buf[i] = '\0';
   return buf;
 }
-

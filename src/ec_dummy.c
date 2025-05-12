@@ -64,4 +64,3 @@ EC_VTable EC_Dummy_VTable = {
   EC_Dummy_WriteByte,
   EC_Dummy_WriteWord,
 };
-

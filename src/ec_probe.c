@@ -27,7 +27,7 @@
 
 #include "error.c"             // src
 #include "ec.c"                // src
-                               //
+
 #if ENABLE_EC_DEV_PORT
 #include "ec_linux.c"          // src
 #endif

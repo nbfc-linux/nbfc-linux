@@ -48,4 +48,3 @@ EC_VTable EC_Debug_VTable = {
   EC_Debug_WriteByte,
   EC_Debug_WriteWord,
 };
-
