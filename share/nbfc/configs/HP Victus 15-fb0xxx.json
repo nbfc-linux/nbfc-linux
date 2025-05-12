@@ -1,0 +1,127 @@
+{
+    
+   "NotebookModel": "HP Victus 15-fb0xxx",
+   "Author": "subhojit131",
+   "EcPollInterval": 1000,
+   "ReadWriteWords": false,
+   "CriticalTemperature": 85,
+   "FanConfigurations": [
+      {
+       "ReadRegister": 179,
+       "WriteRegister": 45,
+       "MinSpeedValue": 0,
+       "MaxSpeedValue": 100,
+       "IndependentReadMinMaxValues": true,
+       "MinSpeedValueRead": 0,
+       "MaxSpeedValueRead": 21,
+       "ResetRequired": true,
+       "FanSpeedResetValue": 255,
+       "FanDisplayName": "Fan1",
+       "Sensors": ["@CPU","@GPU"],
+       "TemperatureAlgorithmType": "Max",
+       "TemperatureThresholds": [
+        {
+         "UpThreshold": 0,
+         "DownThreshold": 0,
+         "FanSpeed": 0.0
+        },
+        {
+         "UpThreshold": 55,
+         "DownThreshold": 45,
+         "FanSpeed": 10.0
+        },
+        {
+         "UpThreshold": 63,
+         "DownThreshold": 55,
+         "FanSpeed": 20.0
+        },
+        {
+         "UpThreshold": 68,
+         "DownThreshold": 63,
+         "FanSpeed": 50.0
+        },
+        {
+         "UpThreshold": 71,
+         "DownThreshold": 68,
+         "FanSpeed": 70.0
+        },
+        {
+         "UpThreshold": 79,
+         "DownThreshold": 71,
+         "FanSpeed": 80.0
+        },
+        {
+         "UpThreshold": 82,
+         "DownThreshold": 79,
+         "FanSpeed": 100.0
+        }
+       ],
+       "FanSpeedPercentageOverrides": [
+        {
+         "FanSpeedPercentage": 0.0,
+         "FanSpeedValue": 255,
+         "TargetOperation": "Write"
+        }
+       ]
+      },
+      {
+       "ReadRegister": 177,
+       "WriteRegister": 44,
+       "MinSpeedValue": 0,
+       "MaxSpeedValue": 100,
+       "IndependentReadMinMaxValues": true,
+       "MinSpeedValueRead": 0,
+       "MaxSpeedValueRead": 21,
+       "ResetRequired": true,
+       "FanSpeedResetValue": 255,
+       "FanDisplayName": "Fan2",
+       "Sensors": ["@CPU","@GPU"],
+       "TemperatureAlgorithmType": "Max",
+       "TemperatureThresholds": [
+         {
+            "UpThreshold": 0,
+            "DownThreshold": 0,
+            "FanSpeed": 0.0
+           },
+           {
+            "UpThreshold": 55,
+            "DownThreshold": 45,
+            "FanSpeed": 10.0
+           },
+           {
+            "UpThreshold": 63,
+            "DownThreshold": 55,
+            "FanSpeed": 20.0
+           },
+           {
+            "UpThreshold": 68,
+            "DownThreshold": 63,
+            "FanSpeed": 50.0
+           },
+           {
+            "UpThreshold": 71,
+            "DownThreshold": 68,
+            "FanSpeed": 70.0
+           },
+           {
+            "UpThreshold": 79,
+            "DownThreshold": 71,
+            "FanSpeed": 80.0
+           },
+           {
+            "UpThreshold": 82,
+            "DownThreshold": 79,
+            "FanSpeed": 100.0
+           }
+       ],
+       "FanSpeedPercentageOverrides": [
+        {
+         "FanSpeedPercentage": 0.0,
+         "FanSpeedValue": 255,
+         "TargetOperation": "Write"
+        }
+       ]
+      }
+   ],
+   "RegisterWriteConfigurations": []
+  }
