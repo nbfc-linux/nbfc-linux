@@ -36,6 +36,32 @@ _nbfc_parse_commandline() {
           esac
         esac
 
+        case "$cmd" in 'nbfc sensors set')
+          case "$arg" in
+            --fan)
+              OPT_fan+=("${words[++argi]}")
+              continue;;
+            --fan=*)
+              OPT_fan+=("${arg#*=}")
+              continue;;
+            --algorithm)
+              OPT_algorithm+=("${words[++argi]}")
+              continue;;
+            --algorithm=*)
+              OPT_algorithm+=("${arg#*=}")
+              continue;;
+            --sensor)
+              OPT_sensor+=("${words[++argi]}")
+              continue;;
+            --sensor=*)
+              OPT_sensor+=("${arg#*=}")
+              continue;;
+            --force)
+              OPT_force+=(_OPT_ISSET_)
+              continue;;
+          esac
+        esac
+
         case "$cmd" in 'nbfc set')
           case "$arg" in
             --auto)
@@ -144,6 +170,29 @@ _nbfc_parse_commandline() {
             esac
           esac
 
+          case "$cmd" in 'nbfc sensors set')
+            case "$char" in
+              f)
+                if [[ -n "$trailing_chars" ]]
+                then OPT_fan+=("$trailing_chars")
+                else OPT_fan+=("${words[++argi]}")
+                fi
+                continue 2;;
+              a)
+                if [[ -n "$trailing_chars" ]]
+                then OPT_algorithm+=("$trailing_chars")
+                else OPT_algorithm+=("${words[++argi]}")
+                fi
+                continue 2;;
+              s)
+                if [[ -n "$trailing_chars" ]]
+                then OPT_sensor+=("$trailing_chars")
+                else OPT_sensor+=("${words[++argi]}")
+                fi
+                continue 2;;
+            esac
+          esac
+
           case "$cmd" in 'nbfc set')
             case "$char" in
               a)
@@ -228,6 +277,18 @@ _nbfc_parse_commandline() {
         done;;
       *)
         POSITIONALS[POSITIONAL_NUM++]="$arg"
+        if (( POSITIONAL_NUM == 2 )); then
+          case "$arg" in
+            list)
+              cmd+=" list";;
+            show)
+              cmd+=" show";;
+            set)
+              cmd+=" set";;
+            *) cmd+=" $arg";;
+          esac
+        fi
+
         if (( POSITIONAL_NUM == 1 )); then
           case "$arg" in
             start)
@@ -242,6 +303,8 @@ _nbfc_parse_commandline() {
               cmd+=" config";;
             set)
               cmd+=" set";;
+            sensors)
+              cmd+=" sensors";;
             update)
               cmd+=" update";;
             wait-for-hwmon)
@@ -308,6 +371,7 @@ _nbfc() {
       status) _nbfc_status && return 0 || return 1;;
       config) _nbfc_config && return 0 || return 1;;
       set) _nbfc_set && return 0 || return 1;;
+      sensors) _nbfc_sensors && return 0 || return 1;;
       update) _nbfc_update && return 0 || return 1;;
       wait-for-hwmon) _nbfc_wait_for_hwmon && return 0 || return 1;;
       get-model-name) _nbfc_get_model_name && return 0 || return 1;;
@@ -327,7 +391,7 @@ _nbfc() {
   fi
 
   test "$POSITIONAL_NUM" -eq 1 && {
-    COMPREPLY=($(compgen -W 'start stop restart status config set update wait-for-hwmon get-model-name warranty donate help' -- "$cur"))
+    COMPREPLY=($(compgen -W 'start stop restart status config set sensors update wait-for-hwmon get-model-name warranty donate help' -- "$cur"))
     return 0;
   }
 
@@ -551,6 +615,103 @@ _nbfc_set() {
     (( ! ${#OPT_speed} && ! ${#OPT_auto} )) && opts+=(-a --auto)
     (( ! ${#OPT_auto} && ! ${#OPT_speed} )) && opts+=(-s --speed=)
     (( ! ${#OPT_fan} )) && opts+=(-f --fan=)
+    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  return 1
+}
+
+_nbfc_sensors() {
+  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
+  local -a OPT_help OPT_version
+
+  _nbfc_parse_commandline
+
+  local COMP_WORDBREAKS=''
+
+  if (( 1 < POSITIONAL_NUM )); then
+    case "${POSITIONALS[1]}" in
+      list) _nbfc_sensors_list && return 0 || return 1;;
+      show) _nbfc_sensors_show && return 0 || return 1;;
+      set) _nbfc_sensors_set && return 0 || return 1;;
+    esac
+  fi
+
+  test "$POSITIONAL_NUM" -eq 2 && {
+    COMPREPLY=($(compgen -W 'list show set' -- "$cur"))
+    return 0;
+  }
+
+  return 1
+}
+
+_nbfc_sensors_list() {
+  return 0
+}
+
+_nbfc_sensors_show() {
+  return 0
+}
+
+_nbfc_sensors_set() {
+  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
+  local -a OPT_fan OPT_algorithm OPT_sensor OPT_force OPT_help OPT_version
+
+  _nbfc_parse_commandline
+
+  local COMP_WORDBREAKS=''
+
+  __complete_option() {
+    local opt="$1" cur="$2" mode="$3"
+
+    case "$opt" in
+      --fan|-f)
+        _nbfc_exec 'nbfc complete-fans'
+        return 0;;
+      --algorithm|-a)
+        COMPREPLY=($(compgen -W 'Average Min Max' -- "$cur"))
+        return 0;;
+      --sensor|-s)
+        _nbfc_exec 'nbfc complete-sensors'
+        return 0;;
+    esac
+
+    return 1
+  }
+
+  case "$prev" in
+    --*)
+      __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0;;
+    -*)
+      case "$prev" in -*([h])[fas])
+        __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONALS && return 0
+      esac;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0;;
+    -*=*);;
+    --*);;
+    -*)
+        local i
+        for ((i=2; i <= ${#cur}; ++i)); do
+          local pre="${cur:0:$i}" value="${cur:$i}"
+          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {
+            _nbfc_prefix_compreply "$pre"
+            return 0
+          }
+        done;;
+  esac
+
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts=()
+    (( ! ${#OPT_fan} )) && opts+=(-f --fan=)
+    (( ! ${#OPT_algorithm} )) && opts+=(-a --algorithm=)
+    opts+=(-s --sensor=)
+    (( ! ${#OPT_force} )) && opts+=(--force)
     COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1

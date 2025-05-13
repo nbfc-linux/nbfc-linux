@@ -61,7 +61,7 @@ int List() {
 }
 
 int Recommend() {
-  const char* model_name = get_model_name();
+  const char* model_name = DMI_Get_Model_Name();
   array_of(ConfigFile) files = List_Recommended_Configs();
   char* config = Get_Supported_Config(&files, model_name);
 
@@ -103,7 +103,7 @@ int Set_Or_Apply() {
 
   // "auto" ===================================================================
   if (! strcmp(Config_Options.config, "auto")) {
-    config = Get_Supported_Config(&files, get_model_name());
+    config = Get_Supported_Config(&files, DMI_Get_Model_Name());
 
     if (! config) {
       Log_Error("No config found to apply automatically\n");

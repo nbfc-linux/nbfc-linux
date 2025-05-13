@@ -63,20 +63,20 @@ void EC_SysLinux_Close() {
   }
 }
 
-Error* EC_SysLinux_WriteByte(int register_, uint8_t value) {
+Error* EC_SysLinux_WriteByte(uint8_t register_, uint8_t value) {
   if (1 != pwrite(EC_SysLinux_FD, &value, 1, register_))
     return err_stdlib(0, EC_SysLinux_File);
   return err_success();
 }
 
-Error* EC_SysLinux_WriteWord(int register_, uint16_t value) {
+Error* EC_SysLinux_WriteWord(uint8_t register_, uint16_t value) {
   value = htole16(value);
   if (2 != pwrite(EC_SysLinux_FD, &value, 2, register_))
     return err_stdlib(0, EC_SysLinux_File);
   return err_success();
 }
 
-Error* EC_SysLinux_ReadByte(int register_, uint8_t* out) {
+Error* EC_SysLinux_ReadByte(uint8_t register_, uint8_t* out) {
   uint8_t value;
   if (1 != pread(EC_SysLinux_FD, &value, 1, register_))
     return err_stdlib(0, EC_SysLinux_File);
@@ -84,7 +84,7 @@ Error* EC_SysLinux_ReadByte(int register_, uint8_t* out) {
   return err_success();
 }
 
-Error* EC_SysLinux_ReadWord(int register_, uint16_t* out) {
+Error* EC_SysLinux_ReadWord(uint8_t register_, uint16_t* out) {
   uint16_t value;
   if (2 != pread(EC_SysLinux_FD, &value, 2, register_))
     return err_stdlib(0, EC_SysLinux_File);
@@ -125,4 +125,3 @@ EC_VTable EC_SysLinux_ACPI_VTable = {
   EC_SysLinux_WriteByte,
   EC_SysLinux_WriteWord,
 };
-

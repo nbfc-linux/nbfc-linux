@@ -100,4 +100,3 @@
  "  -t seconds, --timespan SECONDS\n"                                          \
  "                        Sets how many seconds the program will run\n"        \
  ""
-

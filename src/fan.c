@@ -34,11 +34,11 @@ Error* Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
 // PRIVATE
 // ============================================================================
 
-static inline int float_eq(const float a, const float b) {
+static inline bool float_eq(const float a, const float b) {
   return fabs(a - b) < 0.06; /* ~ 0.05 */
 }
 
-static FanSpeedPercentageOverride* Fan_OverrideByValue(const Fan* self, int value) {
+static FanSpeedPercentageOverride* Fan_OverrideByValue(const Fan* self, uint16_t value) {
   for_each_array(FanSpeedPercentageOverride*, o, my.fanConfig->FanSpeedPercentageOverrides)
     if ((o->TargetOperation & OverrideTargetOperation_Read) &&
          o->FanSpeedValue == value)
@@ -56,7 +56,7 @@ static FanSpeedPercentageOverride* Fan_OverrideByPercentage(const Fan* self, flo
   return NULL;
 }
 
-static int Fan_PercentageToFanSpeed(const Fan* self, float percentage) {
+static uint16_t Fan_PercentageToFanSpeed(const Fan* self, float percentage) {
   if (percentage > 100.0f)
     percentage = 100.0f;
   else if (percentage < 0.0f)
@@ -70,7 +70,7 @@ static int Fan_PercentageToFanSpeed(const Fan* self, float percentage) {
       + (((my.maxSpeedValueWrite - my.minSpeedValueWrite) * percentage) / 100.0f));
 }
 
-static float Fan_FanSpeedToPercentage(const Fan* self, int fanSpeed) {
+static float Fan_FanSpeedToPercentage(const Fan* self, uint16_t fanSpeed) {
   FanSpeedPercentageOverride* override = Fan_OverrideByValue(self, fanSpeed);
   if (override)
     return override->FanSpeedPercentage;
@@ -86,13 +86,13 @@ static float Fan_FanSpeedToPercentage(const Fan* self, int fanSpeed) {
      (my.maxSpeedValueRead - my.minSpeedValueRead)) * 100.0f;
 }
 
-static Error* Fan_ECWriteValue(Fan* self, int value) {
+static Error* Fan_ECWriteValue(Fan* self, uint16_t value) {
   return my.readWriteWords
     ? ec->WriteWord(my.fanConfig->WriteRegister, value)
     : ec->WriteByte(my.fanConfig->WriteRegister, value);
 }
 
-static Error* Fan_ECReadValue(const Fan* self, int* out) {
+static Error* Fan_ECReadValue(const Fan* self, uint16_t* out) {
   if (my.readWriteWords) {
     uint16_t word;
     Error* e = ec->ReadWord(my.fanConfig->ReadRegister, &word);
@@ -165,7 +165,7 @@ float Fan_GetCurrentSpeed(const Fan* self) {
 }
 
 Error* Fan_UpdateCurrentSpeed(Fan* self) {
-  int speed;
+  uint16_t speed;
 
   // If the value is out of range 3 or more times,
   // minFanSpeed and/or maxFanSpeed are probably wrong.
@@ -183,7 +183,7 @@ Error* Fan_UpdateCurrentSpeed(Fan* self) {
   return err_success();
 }
 
-int Fan_GetSpeedSteps(const Fan* self) {
+uint16_t Fan_GetSpeedSteps(const Fan* self) {
   return my.fanSpeedSteps;
 }
 
@@ -195,7 +195,6 @@ Error* Fan_ECReset(Fan* self) {
 
 Error* Fan_ECFlush(Fan* self) {
   const float speed = Fan_GetTargetSpeed(self);
-  const int   value = Fan_PercentageToFanSpeed(self, speed);
+  const uint16_t value = Fan_PercentageToFanSpeed(self, speed);
   return Fan_ECWriteValue(self, value);
 }
-

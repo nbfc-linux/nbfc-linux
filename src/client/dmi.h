@@ -1,8 +1,8 @@
 #ifndef DMI_H_
 #define DMI_H_
 
-const char* get_system_product();
-const char* get_system_vendor();
-const char* get_model_name();
+const char* DMI_Get_System_Product();
+const char* DMI_Get_System_Vendor();
+const char* DMI_Get_Model_Name();
 
 #endif

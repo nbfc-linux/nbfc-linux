@@ -332,4 +332,3 @@ void Service_Cleanup() {
 
   Service_State = Initialized_0_None;
 }
-

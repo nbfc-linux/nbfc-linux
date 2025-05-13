@@ -15,17 +15,17 @@ typedef enum {
 
 typedef struct Fan Fan;
 struct Fan {
-  FanConfiguration* fanConfig; /*const*/
-  bool  readWriteWords;        /*const*/
-  int   criticalTemperature;   /*const*/
-  int   minSpeedValueWrite;    /*const*/
-  int   maxSpeedValueWrite;    /*const*/
-  int   minSpeedValueRead;     /*const*/
-  int   maxSpeedValueRead;     /*const*/
-  int   minSpeedValueReadAbs;  /*const*/
-  int   maxSpeedValueReadAbs;  /*const*/
-  int   fanSpeedSteps;         /*const*/
-  int   criticalTemperatureOffset;
+  FanConfiguration* fanConfig;        /*const*/
+  bool     readWriteWords;            /*const*/
+  int      criticalTemperature;       /*const*/
+  int      criticalTemperatureOffset; /*const*/
+  uint16_t minSpeedValueWrite;        /*const*/
+  uint16_t maxSpeedValueWrite;        /*const*/
+  uint16_t minSpeedValueRead;         /*const*/
+  uint16_t maxSpeedValueRead;         /*const*/
+  uint16_t minSpeedValueReadAbs;      /*const*/
+  uint16_t maxSpeedValueReadAbs;      /*const*/
+  uint16_t fanSpeedSteps;             /*const*/
 
   ThresholdManager threshMan;
   float targetFanSpeed;
@@ -35,20 +35,20 @@ struct Fan {
   bool isCritical;
 };
 
-Error* Fan_Init(Fan*, FanConfiguration*, ModelConfig*);
+Error*   Fan_Init(Fan*, FanConfiguration*, ModelConfig*);
 
-Error* Fan_UpdateCurrentSpeed(Fan*);
-float  Fan_GetCurrentSpeed(const Fan*);
-float  Fan_GetTargetSpeed(const Fan*);
-float  Fan_GetRequestedSpeed(const Fan*);
-int    Fan_GetSpeedSteps(const Fan*);
+Error*   Fan_UpdateCurrentSpeed(Fan*);
+float    Fan_GetCurrentSpeed(const Fan*);
+float    Fan_GetTargetSpeed(const Fan*);
+float    Fan_GetRequestedSpeed(const Fan*);
+uint16_t Fan_GetSpeedSteps(const Fan*);
 
-void   Fan_SetTemperature(Fan*, float temperature);
-Error* Fan_SetFixedSpeed(Fan*, float speed);
-void   Fan_SetAutoSpeed(Fan*);
+void     Fan_SetTemperature(Fan*, float temperature);
+Error*   Fan_SetFixedSpeed(Fan*, float speed);
+void     Fan_SetAutoSpeed(Fan*);
 
-Error* Fan_ECReset(Fan*);
-Error* Fan_ECFlush(Fan*);
+Error*   Fan_ECReset(Fan*);
+Error*   Fan_ECFlush(Fan*);
 
 declare_array_of(Fan);
 

@@ -11,10 +11,10 @@ typedef struct EC_VTable EC_VTable;
 struct EC_VTable {
   Error* (*Open)();
   void   (*Close)();
-  Error* (*ReadByte)(int, uint8_t*);
-  Error* (*ReadWord)(int, uint16_t*);
-  Error* (*WriteByte)(int, uint8_t);
-  Error* (*WriteWord)(int, uint16_t);
+  Error* (*ReadByte)(uint8_t, uint8_t*);
+  Error* (*ReadWord)(uint8_t, uint16_t*);
+  Error* (*WriteByte)(uint8_t, uint8_t);
+  Error* (*WriteWord)(uint8_t, uint16_t);
 };
 
 bool   EC_CheckWorking(EC_VTable*);

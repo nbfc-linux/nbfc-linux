@@ -9,4 +9,3 @@ void Program_Name_Set(const char* path) {
 
   Program_Name = path;
 }
-

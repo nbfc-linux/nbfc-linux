@@ -19,6 +19,13 @@ enum Option {
   Option_Status_Fan,
   Option_Status_Watch,
 
+  // Sensors options
+  Option_Sensors_Command,
+  Option_Sensors_Fan,
+  Option_Sensors_Sensor,
+  Option_Sensors_Algorithm,
+  Option_Sensors_Force,
+
   // Config options
   Option_Config_List,
   Option_Config_Recommend,

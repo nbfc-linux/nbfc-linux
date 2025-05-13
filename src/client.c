@@ -8,7 +8,6 @@
 #include <locale.h>   // setlocale, LC_NUMERIC
 #include <stdio.h>    // printf
 #include <string.h>   // strcmp
-#include <sys/stat.h> // mkdir
 
 #include "help/client.help.h"
 #include "log.h"
@@ -21,6 +20,8 @@
 #include "error.c"
 #include "file_utils.c"
 #include "model_config.c"
+#include "fs_sensors.c"
+#include "nvidia.c"
 #include "memory.c"
 #include "program_name.c"
 #include "protocol.c"
@@ -49,6 +50,7 @@ const cli99_option main_options[] = {
 
 #include "client/cmd_start_stop.c"
 #include "client/cmd_status.c"
+#include "client/cmd_sensors.c"
 #include "client/cmd_config.c"
 #include "client/cmd_set.c"
 #include "client/cmd_update.c"
@@ -58,20 +60,22 @@ const cli99_option main_options[] = {
 #include "client/cmd_donate.c"
 
 #define NBFC_CLIENT_COMMANDS \
-  o("start",          Start,          START,           start)         \
-  o("stop",           Stop,           STOP,            main)          \
-  o("restart",        Restart,        RESTART,         start)         \
-  o("status",         Status,         STATUS,          status)        \
-  o("config",         Config,         CONFIG,          config)        \
-  o("set",            Set,            SET,             set)           \
-  o("update",         Update,         UPDATE,          update)        \
-  o("wait-for-hwmon", Wait_For_Hwmon, WAIT_FOR_HWMON,  main)          \
-  o("get-model-name", Get_Model_Name, GET_MODEL,       main)          \
-  o("complete-fans",  Complete_Fans,  COMPLETE_FANS,   main)          \
-  o("show-variable",  Show_Variable,  SHOW_VARIABLE,   show_variable) \
-  o("warranty",       Warranty,       WARRANTY,        main)          \
-  o("donate",         Donate,         DONATE,          main)          \
-  o("help",           Help,           HELP,            main)
+  o("start",            Start,            START,            start)         \
+  o("stop",             Stop,             STOP,             main)          \
+  o("restart",          Restart,          RESTART,          start)         \
+  o("status",           Status,           STATUS,           status)        \
+  o("sensors",          Sensors,          SENSORS,          sensors)       \
+  o("config",           Config,           CONFIG,           config)        \
+  o("set",              Set,              SET,              set)           \
+  o("update",           Update,           UPDATE,           update)        \
+  o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   main)          \
+  o("get-model-name",   Get_Model_Name,   GET_MODEL,        main)          \
+  o("complete-fans",    Complete_Fans,    COMPLETE_FANS,    main)          \
+  o("complete-sensors", Complete_Sensors, COMPLETE_SENSORS, main)          \
+  o("show-variable",    Show_Variable,    SHOW_VARIABLE,    show_variable) \
+  o("warranty",         Warranty,         WARRANTY,         main)          \
+  o("donate",           Donate,           DONATE,           main)          \
+  o("help",             Help,             HELP,             main)
 
 enum Command {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
@@ -86,7 +90,7 @@ static const char *HelpTexts[] = {
 #undef o
 };
 
-static enum Command Command_From_String(const char* s) {
+static enum Command Command_FromString(const char* s) {
   const char* commands[] = {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  COMMAND,
     NBFC_CLIENT_COMMANDS
@@ -146,7 +150,7 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Command:
-      cmd = Command_From_String(p.optarg);
+      cmd = Command_FromString(p.optarg);
       if (cmd == Command_End) {
         Log_Error("Invalid command: %s\n", p.optarg);
         return NBFC_EXIT_CMDLINE;
@@ -175,7 +179,7 @@ int main(int argc, char *const argv[]) {
       {
         const int fan = parse_number(p.optarg, 0, INT_MAX, &err);
         if (err) {
-          Log_Error("-f|--fan: %s\n", err);
+          Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
           return NBFC_EXIT_FAILURE;
         }
 
@@ -189,9 +193,54 @@ int main(int argc, char *const argv[]) {
     case Option_Status_Watch:
       Status_Options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
-        Log_Error("-w|--watch: %s\n", err);
+        Log_Error("%s: %s: %s\n", "-w|--watch", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
+      break;
+
+    // ========================================================================
+    // Sensors options
+    // ========================================================================
+
+    case Option_Sensors_Command:
+      Sensors_Options.command = Sensors_Command_FromString(p.optarg);
+      if (Sensors_Options.command == Sensors_Command_End) {
+        Log_Error("Invalid command: sensors %s\n", p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      if (Sensors_Options.command == Sensors_Command_Set)
+        cli99_SetOptions(&p, sensors_set_options, false);
+
+      break;
+
+    case Option_Sensors_Fan:
+      Sensors_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
+      if (err) {
+        Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
+        return NBFC_EXIT_FAILURE;
+      }
+      break;
+
+    case Option_Sensors_Sensor:
+      {
+        array_of(str)* sensors = &Sensors_Options.sensors;
+        sensors->size++;
+        sensors->data = Mem_Realloc(sensors->data, sensors->size * sizeof(str));
+        sensors->data[sensors->size - 1] = p.optarg;
+      }
+      break;
+
+    case Option_Sensors_Algorithm:
+      Sensors_Options.algorithm = TemperatureAlgorithmType_FromString(p.optarg);
+      if (Sensors_Options.algorithm == TemperatureAlgorithmType_Unset) {
+        Log_Error("%s: %s: %s\n", "-a|--algorithm", "Invalid value", p.optarg);
+        return NBFC_EXIT_FAILURE;
+      }
+      break;
+
+    case Option_Sensors_Force:
+      Sensors_Options.force = true;
       break;
 
     // ========================================================================
@@ -237,7 +286,7 @@ int main(int argc, char *const argv[]) {
 
       Set_Options.speed = parse_double(p.optarg, 0, 100, &err);
       if (err) {
-        Log_Error("-s|--speed: %s\n", err);
+        Log_Error("%s: %s: %s\n", "-s|--speed", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -250,7 +299,7 @@ int main(int argc, char *const argv[]) {
 
       Set_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("-f|--fan: %s\n", err);
+        Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -262,7 +311,7 @@ int main(int argc, char *const argv[]) {
     case Option_Update_Parallel:
       Update_Options.parallel = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("-p|--parallel: %s\n", err);
+        Log_Error("%s: %s: %s\n", "-p|--parallel", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -298,19 +347,21 @@ int main(int argc, char *const argv[]) {
   }
 
   switch (cmd) {
-  case Command_Start:          return Start();
-  case Command_Stop:           return Stop();
-  case Command_Restart:        return Restart();
-  case Command_Config:         return Config();
-  case Command_Set:            return Set();
-  case Command_Status:         return Status();
-  case Command_Update:         return Update();
-  case Command_Wait_For_Hwmon: return Wait_For_Hwmon();
-  case Command_Get_Model_Name: return Get_Model_Name();
-  case Command_Show_Variable:  return Show_Variable();
-  case Command_Complete_Fans:  return Complete_Fans();
-  case Command_Warranty:       return Warranty();
-  case Command_Donate:         return Donate();
-  default:                     return NBFC_EXIT_FAILURE;
+  case Command_Start:             return Start();
+  case Command_Stop:              return Stop();
+  case Command_Restart:           return Restart();
+  case Command_Config:            return Config();
+  case Command_Set:               return Set();
+  case Command_Status:            return Status();
+  case Command_Sensors:           return Sensors();
+  case Command_Update:            return Update();
+  case Command_Wait_For_Hwmon:    return Wait_For_Hwmon();
+  case Command_Get_Model_Name:    return Get_Model_Name();
+  case Command_Show_Variable:     return Show_Variable();
+  case Command_Complete_Fans:     return Complete_Fans();
+  case Command_Complete_Sensors:  return Complete_Sensors();
+  case Command_Warranty:          return Warranty();
+  case Command_Donate:            return Donate();
+  default:                        return NBFC_EXIT_FAILURE;
   }
 }

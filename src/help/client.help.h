@@ -72,6 +72,36 @@
  "                        Show status periodically\n"                          \
  ""
 
+#define CLIENT_SENSORS_HELP_TEXT                                               \
+ "Usage: nbfc sensors (list | set | show) [OPTIONS...]\n"                      \
+ "\n"                                                                          \
+ "Configure fan sensors\n"                                                     \
+ "\n"                                                                          \
+ "  list\n"                                                                    \
+ "    List all available sensors and their temperature files.\n"               \
+ "\n"                                                                          \
+ "  show\n"                                                                    \
+ "    Show all available fans and their sensor configuration.\n"               \
+ "\n"                                                                          \
+ "  set -f FAN INDEX [-s SENSOR...] [-a ALGORITHM]\n"                          \
+ "    Configure sensors and algorithm for a fan.\n"                            \
+ "\n"                                                                          \
+ "      -f FAN INDEX, --fan FAN INDEX\n"                                       \
+ "                        Fan to configure\n"                                  \
+ "      -s SENSOR, --sensor SENSOR\n"                                          \
+ "                        Sensor to add. Can be specified multiple times\n"    \
+ "      -a ALGORITHM, --algorithm ALGORITHM\n"                                 \
+ "                        Algorithm (Average, Min, Max)\n"                     \
+ "      --force\n"                                                             \
+ "                        Force applying sensors if not found\n"               \
+ "\n"                                                                          \
+ "    If no sensors are specified, the sensors in the fan config will be\n"    \
+ "    cleared and defaults will be used.\n"                                    \
+ "\n"                                                                          \
+ "    If no algorithm is specified, the algorithm in the fan config will be\n" \
+ "    cleared and the default will be used.\n"                                 \
+ ""
+
 #define CLIENT_SET_HELP_TEXT                                                   \
  "Usage: nbfc set [-h] (-a | -s PERCENT) [-f FAN INDEX]\n"                     \
  "\n"                                                                          \
@@ -137,6 +167,15 @@
 
 #define CLIENT_COMPLETE_FANS_HELP_TEXT                                         \
  "Usage: nbfc complete-fans [-h]\n"                                            \
+ "\n"                                                                          \
+ "Used for completing shell command lines.\n"                                  \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ ""
+
+#define CLIENT_COMPLETE_SENSORS_HELP_TEXT                                      \
+ "Usage: nbfc complete-sensors [-h]\n"                                         \
  "\n"                                                                          \
  "Used for completing shell command lines.\n"                                  \
  "\n"                                                                          \

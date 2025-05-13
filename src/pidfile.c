@@ -30,4 +30,3 @@ Error* PID_Write(bool acquire_lock) {
 void PID_Cleanup() {
   unlink(NBFC_PID_FILE);
 }
-

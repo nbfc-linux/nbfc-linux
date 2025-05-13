@@ -182,21 +182,21 @@ static bool EC_Linux_TryWriteWord(int register_, uint16_t value)
 // PUBLIC
 // ============================================================================
 
-Error* EC_Linux_WriteByte(int register_, uint8_t val) {
+Error* EC_Linux_WriteByte(uint8_t register_, uint8_t val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryWriteByte(register_, val))
       return err_success();
   return err_stdlib(0, "EC_Linux_WriteByte");
 }
 
-Error* EC_Linux_WriteWord(int register_, uint16_t val) {
+Error* EC_Linux_WriteWord(uint8_t register_, uint16_t val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryWriteWord(register_, val))
       return err_success();
   return err_stdlib(0, "EC_Linux_WriteWord");
 }
 
-Error* EC_Linux_ReadByte(int register_, uint8_t* val) {
+Error* EC_Linux_ReadByte(uint8_t register_, uint8_t* val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryReadByte(register_, val))
       return err_success();
@@ -204,7 +204,7 @@ Error* EC_Linux_ReadByte(int register_, uint8_t* val) {
   return err_stdlib(0, "EC_Linux_ReadByte");
 }
 
-Error* EC_Linux_ReadWord(int register_, uint16_t* val) {
+Error* EC_Linux_ReadWord(uint8_t register_, uint16_t* val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryReadWord(register_, val))
       return err_success();
