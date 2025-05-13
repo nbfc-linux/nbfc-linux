@@ -1,5 +1,5 @@
 {
-   "NotebookModel" : "HP Omen 16 n0xxx (real MaxSpeedValue is 60, but it is too loud)",
+   "NotebookModel" : "HP Omen 16 n0xxx",
    "ReadWriteWords" : false,
    "Author" : "Max Buglakov",
    "CriticalTemperature" : 97,
@@ -14,6 +14,7 @@
 
 	 "WriteRegister" : 52,
          "MinSpeedValue" : 0,
+         "Comment" : "real MaxSpeedValue is 60, but it is too loud",
          "MaxSpeedValue" : 50,
 
 	 "IndependentReadMinMaxValues" : true,
@@ -67,6 +68,7 @@
       },
       {
          "FanDisplayName" : "GPU Fan",
+	 "Sensors": ["@GPU"],
          "FanSpeedResetValue" : 0,
          "ResetRequired" : true,
 
