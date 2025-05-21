@@ -11,6 +11,7 @@
 #include "nvidia.h"
 #include "help/nbfc_service.help.h"
 #include "sleep.h"
+#include "mkdir_p.h"
 
 #include <errno.h>  // errno
 #include <string.h> // strerror
@@ -19,7 +20,7 @@
 #include <stdlib.h> // exit, atexit, realpath
 #include <locale.h> // setlocale, LC_NUMERIC
 #include <getopt.h> // getopt_long
-#include <unistd.h> // fork, setsid, chdir
+#include <unistd.h> // fork, setsid, chdir, geteuid
 #include <sys/time.h> // gettimeofday
 
 EC_VTable* ec;
@@ -93,13 +94,21 @@ int main(int argc, char* const argv[])
   signal(SIGUSR1, sig_handler);
   signal(SIGUSR2, sig_handler);
 
+  options.embedded_controller_type = EmbeddedControllerType_Unset;
+  snprintf(options.service_config, sizeof(options.service_config), "%s", NBFC_SERVICE_CONFIG);
+  parse_opts(argc, argv);
+
   // Change working directory to root to ensure that the process doesn't block
   // the unmounting of filesystems by holding a directory open.
   chdir("/");
 
-  options.embedded_controller_type = EmbeddedControllerType_Unset;
-  snprintf(options.service_config, sizeof(options.service_config), "%s", NBFC_SERVICE_CONFIG);
-  parse_opts(argc, argv);
+  if (geteuid() != 0) {
+    Log_Error("This program must be run as root\n");
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  mkdir_p(NBFC_CONFIG_DIR, 0755);
+  mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755);
 
   Log_Init(options.fork);
   atexit(Log_Close);

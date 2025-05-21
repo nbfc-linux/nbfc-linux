@@ -8,6 +8,7 @@
 #include <locale.h>   // setlocale, LC_NUMERIC
 #include <stdio.h>    // printf
 #include <string.h>   // strcmp
+#include <unistd.h>   // geteuid
 
 #include "help/client.help.h"
 #include "log.h"
@@ -31,7 +32,7 @@
 #include "stack_memory.c"
 #include "trace.c"
 #include "optparse/optparse.c"
-#include "client/mkdir_p.c"
+#include "mkdir_p.c"
 #include "client/dmi.c"
 #include "client/config_files.c"
 #include "client/str_functions.c"
@@ -115,6 +116,11 @@ static const cli99_option *Options[] = {
 // ============================================================================
 
 int main(int argc, char *const argv[]) {
+  if (geteuid() == 0) {
+    mkdir_p(NBFC_CONFIG_DIR, 0755);
+    mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755);
+  }
+
   if (argc == 1) {
     printf(CLIENT_HELP_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
@@ -122,8 +128,6 @@ int main(int argc, char *const argv[]) {
 
   Program_Name_Set(argv[0]);
   setlocale(LC_NUMERIC, "C"); // for json floats
-  mkdir_p(NBFC_CONFIG_DIR, 0755);
-  mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755);
 
   int o;
   const char* err;

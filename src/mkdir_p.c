@@ -1,8 +1,9 @@
+#include "mkdir_p.h"
+
 #include <errno.h>     // errno, EEXIST
 #include <sys/stat.h>  // mkdir
-#include <sys/types.h> // mode_t
 
-#include "../memory.h"
+#include "memory.h"
 
 int mkdir_p(const char *path, mode_t mode) {
   char *tmp = Mem_Strdup(path);
