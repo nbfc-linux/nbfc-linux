@@ -1,4 +1,4 @@
-version     = 0.3.16
+version     = 0.3.17
 
 PREFIX      = /usr
 
@@ -225,6 +225,7 @@ src/nbfc_service: \
 	src/macros.h \
 	src/main.c \
 	src/memory.c src/memory.h \
+	src/mkdir_p.c src/mkdir_p.h \
 	src/model_config.c src/model_config.h \
 	src/nbfc.h \
 	src/nxjson.c src/nxjson.h \
@@ -234,6 +235,7 @@ src/nbfc_service: \
 	src/server.c src/server.h \
 	src/service.c src/service.h \
 	src/service_config.c src/service_config.h \
+	src/service_state.c src/service_state.h \
 	src/temperature_filter.c src/temperature_filter.h \
 	src/temperature_threshold_manager.c src/temperature_threshold_manager.h \
 	src/optparse/optparse.h src/optparse/optparse.c
@@ -253,8 +255,29 @@ src/ec_probe: \
 src/nbfc: \
 	src/config.h \
 	src/client.c \
+	src/client/check_root.h \
+	src/client/client_global.h \
+	src/client/cmd_config.c \
+	src/client/cmd_donate.c \
+	src/client/cmd_misc.c \
+	src/client/cmd_sensors.c \
+	src/client/cmd_set.c \
+	src/client/cmd_show_variable.c \
+	src/client/cmd_start_stop.c \
+	src/client/cmd_status.c \
+	src/client/cmd_update.c \
+	src/client/cmd_warranty.c \
+	src/client/config_files.c \
+	src/client/config_files.h \
+	src/client/dmi.c \
+	src/client/dmi.h \
+	src/client/service_control.c \
+	src/client/service_control.h \
+	src/client/str_functions.c \
+	src/client/str_functions.h \
 	src/error.h src/error.c \
 	src/help/ec_probe.help.h \
+	src/mkdir_p.c src/mkdir_p.h \
 	src/optparse/optparse.h src/optparse/optparse.c \
 	src/protocol.c src/protocol.h \
 	src/nxjson.c src/reverse_nxjson.c src/nxjson.h \

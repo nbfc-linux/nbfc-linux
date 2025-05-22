@@ -1,5 +1,17 @@
 # Changelog
 
+## nbfc-linux-0.3.17 (2025-05-22)
+- Using state file to store fan speeds
+
+  Previously, `TargetFanSpeeds` were stored in the main configuration file,
+  which required rewriting the file whenever fan speeds changed.
+
+  This could lead to conflicts if the configuration was being edited
+  simultaneously via the GUI.
+
+  Fan speeds are now stored in a separate state file to avoid these issues
+  and ensure safe, concurrent updates.
+
 ## nbfc-linux-0.3.16 (2025-05-10)
 - Added `nbfc sensors` command
 
