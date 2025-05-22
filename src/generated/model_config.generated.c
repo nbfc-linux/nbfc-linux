@@ -498,6 +498,34 @@ Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 	return err_success();
 }
 
+Error* ServiceState_ValidateFields(ServiceState* self) {
+	if (false)
+		return err_stringf(0, "%s: %s", "TargetFanSpeeds", "Missing option");
+	return err_success();
+}
+
+Error* ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
+
+	if (!json || json->type != NX_JSON_OBJECT)
+		return err_string(0, "Not a JSON object");
+
+	nx_json_for_each(c, json) {
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "TargetFanSpeeds")) {
+			e = array_of_float_FromJson(&obj->TargetFanSpeeds, c);
+			if (!e)
+				ServiceState_Set_TargetFanSpeeds(obj);
+		}
+		else
+			e = err_string(0, "Unknown option");
+		if (e) return err_string(e, c->key);
+	}
+	return err_success();
+}
+
 Error* FanInfo_ValidateFields(FanInfo* self) {
 	if (! FanInfo_IsSet_Name(self))
 		return err_stringf(0, "%s: %s", "Name", "Missing option");

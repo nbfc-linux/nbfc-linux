@@ -106,15 +106,13 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
     }
   }
 
-  Error* e = Service_WriteTargetFanSpeedsToConfig();
-  if (e)
-    return e;
+  Service_WriteTargetFanSpeedsToState();
 
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
   create_json_string("Status", o, "OK");
 
-  e = Protocol_Send_Json(socket, o);
+  Error* e = Protocol_Send_Json(socket, o);
   nx_json_free(o);
   return e;
 }

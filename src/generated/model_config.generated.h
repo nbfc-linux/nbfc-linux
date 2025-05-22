@@ -635,6 +635,28 @@ static inline bool ServiceConfig_IsSet_FanTemperatureSources(ServiceConfig* o) {
 	return o->_set & (1 << 3);
 }
 
+struct ServiceState {
+	array_of(float) TargetFanSpeeds;
+	uint8_t         _set;
+};
+
+typedef struct ServiceState ServiceState;
+declare_array_of(ServiceState);
+Error* ServiceState_FromJson(ServiceState*, const nx_json*);
+Error* ServiceState_ValidateFields(ServiceState*);
+
+static inline void ServiceState_Set_TargetFanSpeeds(ServiceState* o) {
+	o->_set |= (1 << 0);
+}
+
+static inline void ServiceState_UnSet_TargetFanSpeeds(ServiceState* o) {
+	o->_set &= ~(1 << 0);
+}
+
+static inline bool ServiceState_IsSet_TargetFanSpeeds(ServiceState* o) {
+	return o->_set & (1 << 0);
+}
+
 struct FanInfo {
 	const char*     Name;
 	float           Temperature;

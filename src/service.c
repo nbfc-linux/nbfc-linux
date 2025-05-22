@@ -8,6 +8,7 @@
 #include "fan.h"
 #include "fs_sensors.h"
 #include "service_config.h"
+#include "service_state.h"
 #include "nbfc.h"
 #include "trace.h"
 #include "memory.h"
@@ -54,6 +55,21 @@ Error* Service_Init() {
   if (e) {
     goto error;
   }
+
+  // Service state ============================================================
+  ServiceState_Init(); // we don't care if this fails
+
+  // Be backwards compatible
+  if (ServiceConfig_IsSet_TargetFanSpeeds(&service_config)) {
+    ServiceState_Set_TargetFanSpeeds(&service_state);
+    service_state.TargetFanSpeeds = service_config.TargetFanSpeeds;
+
+    ServiceConfig_UnSet_TargetFanSpeeds(&service_config);
+    service_config.TargetFanSpeeds.data = NULL;
+    service_config.TargetFanSpeeds.size = 0;
+    ServiceConfig_Write(options.service_config);
+  }
+
   Service_State = Initialized_1_Service_Config;
 
   // Model config =============================================================
@@ -97,9 +113,12 @@ Error* Service_Init() {
       goto error;
   }
 
-  for_enumerate_array(ssize_t, i, service_config.TargetFanSpeeds) {
-    if (service_config.TargetFanSpeeds.data[i] >= 0.0f) {
-      e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, service_config.TargetFanSpeeds.data[i]);
+  for_enumerate_array(ssize_t, i, service_state.TargetFanSpeeds) {
+    if (i >= Service_Fans.size)
+      continue;
+
+    if (service_state.TargetFanSpeeds.data[i] >= 0.0f) {
+      e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, service_state.TargetFanSpeeds.data[i]);
       e_warn();
     }
     else
@@ -286,21 +305,19 @@ static Error* ApplyRegisterWriteConfgurations(bool initializing) {
   return err_success();
 }
 
-Error* Service_WriteTargetFanSpeedsToConfig() {
+void Service_WriteTargetFanSpeedsToState() {
   const int fancount = Service_Model_Config.FanConfigurations.size;
 
-  service_config.TargetFanSpeeds.data = Mem_Realloc(service_config.TargetFanSpeeds.data, sizeof(float) * fancount);
-  service_config.TargetFanSpeeds.size = fancount;
+  service_state.TargetFanSpeeds.data = Mem_Realloc(service_state.TargetFanSpeeds.data, sizeof(float) * fancount);
+  service_state.TargetFanSpeeds.size = fancount;
 
   for_enumerate_array(int, i, Service_Fans) {
     Fan* fan = &Service_Fans.data[i].Fan;
     if (fan->mode == Fan_ModeAuto)
-      service_config.TargetFanSpeeds.data[i] = -1;
+      service_state.TargetFanSpeeds.data[i] = -1;
     else
-      service_config.TargetFanSpeeds.data[i] = Fan_GetRequestedSpeed(fan);
+      service_state.TargetFanSpeeds.data[i] = Fan_GetRequestedSpeed(fan);
   }
-
-  return ServiceConfig_Write(options.service_config);
 }
 
 void Service_Cleanup() {
@@ -324,6 +341,8 @@ void Service_Cleanup() {
       ModelConfig_Free(&Service_Model_Config);
       /* fall through */
     case Initialized_1_Service_Config:
+      ServiceState_Write();
+      ServiceState_Free();
       ServiceConfig_Free(&service_config);
       /* fall through */
     case Initialized_0_None:

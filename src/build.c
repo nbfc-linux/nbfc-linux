@@ -43,6 +43,7 @@
 #include "reverse_nxjson.c"
 #include "service.c"
 #include "service_config.c"
+#include "service_state.c"
 #include "server.c"
 #include "temperature_filter.c"
 #include "temperature_threshold_manager.c"

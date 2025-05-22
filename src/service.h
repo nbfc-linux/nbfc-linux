@@ -27,6 +27,6 @@ extern Service_Options options;
 Error* Service_Init();
 Error* Service_Loop();
 void   Service_Cleanup();
-Error* Service_WriteTargetFanSpeedsToConfig();
+void   Service_WriteTargetFanSpeedsToState();
 
 #endif

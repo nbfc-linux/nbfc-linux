@@ -290,6 +290,18 @@
     ]
   },
   {
+    "name": "ServiceState",
+    "help": "State file of the service",
+    "fields": [
+      {
+        "name": "TargetFanSpeeds",
+        "type": "array_of(float)",
+        "help": "This holds the fixed speed of the fans. A value of `-1` means the fan should be left in auto mode.",
+        "required": false
+      }
+    ]
+  },
+  {
     "name": "FanInfo",
     "help": "",
     "fields": [
