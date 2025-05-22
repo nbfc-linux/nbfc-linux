@@ -53,6 +53,11 @@ NoteBook FanControl service
 
 # FILES
 
+*/etc/nbfc.json*
+
+> The main configuration file for nbfc_service. See
+> **nbfc_service.json**(5) for further details.
+
 */var/run/nbfc_service.pid*
 
 > File containing the PID of current running nbfc_service.
@@ -65,6 +70,26 @@ NoteBook FanControl service
 
 > Configuration files for various notebook models. See
 > **nbfc_service.json**(5) for further details.
+
+*/usr/share/nbfc/model_support.json*
+
+> Model support database. This file maps notebook model names to
+> configuration files.
+
+*/var/lib/nbfc/configs/\*.json*
+
+> Configuration files downloaded from the internet. Files in this
+> directory take precedence over those in */usr/share/nbfc/configs*.
+
+*/var/lib/nbfc/model_support.json*
+
+> Model support database downloaded from the internet. Both
+> */var/lib/nbfc/model_support.json* and
+> */usr/share/nbfc/model_support.json* are taken into account.
+
+*/var/lib/nbfc/state.json*
+
+> State file of nbfc_service. This holds the current fan speeds.
 
 # EXIT STATUS
 

@@ -46,6 +46,11 @@ all.</p></li>
 </ul>
 </blockquote>
 <h1>FILES</h1>
+<p><em>/etc/nbfc.json</em></p>
+<blockquote>
+<p>The main configuration file for nbfc_service. See
+<strong>nbfc_service.json</strong>(5) for further details.</p>
+</blockquote>
 <p><em>/var/run/nbfc_service.pid</em></p>
 <blockquote>
 <p>File containing the PID of current running nbfc_service.</p>
@@ -58,6 +63,27 @@ all.</p></li>
 <blockquote>
 <p>Configuration files for various notebook models. See
 <strong>nbfc_service.json</strong>(5) for further details.</p>
+</blockquote>
+<p><em>/usr/share/nbfc/model_support.json</em></p>
+<blockquote>
+<p>Model support database. This file maps notebook model names to
+configuration files.</p>
+</blockquote>
+<p><em>/var/lib/nbfc/configs/*.json</em></p>
+<blockquote>
+<p>Configuration files downloaded from the internet. Files in this
+directory take precedence over those in
+<em>/usr/share/nbfc/configs</em>.</p>
+</blockquote>
+<p><em>/var/lib/nbfc/model_support.json</em></p>
+<blockquote>
+<p>Model support database downloaded from the internet. Both
+<em>/var/lib/nbfc/model_support.json</em> and
+<em>/usr/share/nbfc/model_support.json</em> are taken into account.</p>
+</blockquote>
+<p><em>/var/lib/nbfc/state.json</em></p>
+<blockquote>
+<p>State file of nbfc_service. This holds the current fan speeds.</p>
 </blockquote>
 <h1>EXIT STATUS</h1>
 <blockquote>

@@ -1,5 +1,5 @@
 .nh
-.TH "NBFC-SERVICE.JSON" 5 "FEBRUARY 2024" "Notebook FanControl @VERSION@"
+.TH "NBFC-SERVICE.JSON" 5 "MAY 2025" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 nbfc_service.json \- Notebook FanControl service configuration
@@ -413,21 +413,51 @@ The fan speed in percent.
 
 .SH FILES
 .PP
+.PP
+.I @SYSCONFDIR@/nbfc.json
+.RS
+The main configuration file for nbfc_service.
+.RE
+
+.I @RUNSTATEDIR@/nbfc_service.pid
+.RS
+File containing the PID of current running nbfc_service.
+.RE
+
 .I @RUNSTATEDIR@/nbfc_service.socket
 .RS
 Socket file of nbfc_service.
 .RE
 
 .PP
-.I @SYSCONFDIR@/nbfc.json
-.RS
-The system wide configuration file.
-.RE
-
-.PP
 .I @DATADIR@/nbfc/configs/*.json
 .RS
 Configuration files for various notebook models.
+.RE
+
+.I @DATADIR@/nbfc/model_support.json
+.RS
+Model support database. This file maps notebook model names to configuration files.
+.RE
+
+.I /var/lib/nbfc/configs/*.json
+.RS
+Configuration files downloaded from the internet. Files in this directory take precedence over those in
+.IR @DATADIR@/nbfc/configs .
+.RE
+
+.I /var/lib/nbfc/model_support.json
+.RS
+Model support database downloaded from the internet. Both
+.I /var/lib/nbfc/model_support.json
+and
+.I @DATADIR@/nbfc/model_support.json
+are taken into account.
+.RE
+
+.I /var/lib/nbfc/state.json
+.RS
+State file of nbfc_service. This holds the current fan speeds.
 .RE
 
 .SH AUTHOR

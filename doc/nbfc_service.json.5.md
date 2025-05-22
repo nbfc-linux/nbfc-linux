@@ -262,17 +262,41 @@ Defines how fast the fan runs at different temperatures.
 
 # FILES
 
+*/etc/nbfc.json*
+
+> The main configuration file for nbfc_service.
+
+*/var/run/nbfc_service.pid*
+
+> File containing the PID of current running nbfc_service.
+
 */var/run/nbfc_service.socket*
 
 > Socket file of nbfc_service.
 
-*/etc/nbfc.json*
-
-> The system wide configuration file.
-
 */usr/share/nbfc/configs/\*.json*
 
 > Configuration files for various notebook models.
+
+*/usr/share/nbfc/model_support.json*
+
+> Model support database. This file maps notebook model names to
+> configuration files.
+
+*/var/lib/nbfc/configs/\*.json*
+
+> Configuration files downloaded from the internet. Files in this
+> directory take precedence over those in */usr/share/nbfc/configs*.
+
+*/var/lib/nbfc/model_support.json*
+
+> Model support database downloaded from the internet. Both
+> */var/lib/nbfc/model_support.json* and
+> */usr/share/nbfc/model_support.json* are taken into account.
+
+*/var/lib/nbfc/state.json*
+
+> State file of nbfc_service. This holds the current fan speeds.
 
 # AUTHOR
 

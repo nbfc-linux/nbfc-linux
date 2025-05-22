@@ -1,5 +1,5 @@
 .nh
-.TH "EC_PROBE" "1" "FEBRUARY 2024" "Notebook FanControl @VERSION@"
+.TH "EC_PROBE" "1" "MAY 2025" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 ec_probe \- probing tool for the embedded controller

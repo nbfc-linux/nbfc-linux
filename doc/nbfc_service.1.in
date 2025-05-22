@@ -1,5 +1,5 @@
 .nh
-.TH "NBFC-SERVICE" "1" "FEBRUARY 2024" "Notebook FanControl @VERSION@"
+.TH "NBFC-SERVICE" "1" "MAY 2025" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 nbfc_service \- Notebook FanControl service
@@ -73,6 +73,14 @@ Don't write to the embedded controller at all.
 
 .SH FILES
 .PP
+.I @SYSCONFDIR@/nbfc.json
+.RS
+The main configuration file for nbfc_service. See
+.BR nbfc_service.json (5)
+for further details.
+.RE
+
+.PP
 .I @RUNSTATEDIR@/nbfc_service.pid
 .RS
 File containing the PID of current running nbfc_service.
@@ -90,6 +98,31 @@ Socket file of nbfc_service.
 Configuration files for various notebook models. See
 .BR nbfc_service.json (5)
 for further details.
+.RE
+
+.I @DATADIR@/nbfc/model_support.json
+.RS
+Model support database. This file maps notebook model names to configuration files.
+.RE
+
+.I /var/lib/nbfc/configs/*.json
+.RS
+Configuration files downloaded from the internet. Files in this directory take precedence over those in
+.IR @DATADIR@/nbfc/configs .
+.RE
+
+.I /var/lib/nbfc/model_support.json
+.RS
+Model support database downloaded from the internet. Both
+.I /var/lib/nbfc/model_support.json
+and
+.I @DATADIR@/nbfc/model_support.json
+are taken into account.
+.RE
+
+.I /var/lib/nbfc/state.json
+.RS
+State file of nbfc_service. This holds the current fan speeds.
 .RE
 
 .SH EXIT STATUS
