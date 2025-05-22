@@ -93,6 +93,9 @@ static int Complete_Sensors() {
     printf("%s\tsensor\n", source->name);
 
     for_each_array(FS_TemperatureSource*, source2, FS_Sensors_Sources) {
+      if (! strcmp(source2->file, "none"))
+        continue; // nvidia-ml sensor has no file
+
       if (! strcmp(source->name, source2->name))
         printf("%s\t%s\n", source2->file, source->name);
     }
