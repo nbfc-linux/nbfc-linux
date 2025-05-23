@@ -24,9 +24,6 @@ Error* Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.maxSpeedValueReadAbs = max(my.minSpeedValueRead, my.maxSpeedValueRead);
   my.fanSpeedSteps        = my.maxSpeedValueReadAbs - my.minSpeedValueReadAbs;
 
-  if (! cfg->TemperatureThresholds.size)
-    return err_string(0, "Invalid size for FanConfiguration->TemperatureThresholds");
-
   return ThresholdManager_Init(&my.threshMan, &cfg->TemperatureThresholds);
 }
 
@@ -156,8 +153,7 @@ Error* Fan_SetFixedSpeed(Fan* self, float speed) {
 
 void Fan_SetAutoSpeed(Fan* self) {
   my.mode = Fan_ModeAuto;
-  if (my.threshMan.current)
-    my.targetFanSpeed = my.threshMan.current->FanSpeed;
+  my.targetFanSpeed = ThresholdManager_GetCurrentThreshold(&my.threshMan)->FanSpeed;
 }
 
 float Fan_GetCurrentSpeed(const Fan* self) {
