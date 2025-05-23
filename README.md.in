@@ -92,9 +92,17 @@ Installation
 Getting started with the GUI
 ----------------------------
 
-A graphical user interface (GUI) is available as a separate project.
+Graphical User Interfaces are available as separate projects.
 
-You can find it on GitHub: [nbfc-qt](https://github.com/nbfc-linux/nbfc-qt)
+Currently there are two GUI implementations:
+
+- [NBFC-Qt](https://github.com/nbfc-linux/nbfc-qt)
+  - Simple GUI written in Python based on Qt5/Qt6
+  - Comes with an extra tray application for controlling fans
+
+- [NBFC-Gtk](https://github.com/nbfc-linux/nbfc-gtk)
+  - Simple GUI written in Python based on Gtk4
+  - Very early version
 
 Getting started without the GUI
 -------------------------------
