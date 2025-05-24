@@ -1,0 +1,127 @@
+{
+	"NotebookModel": "HP Victus 16-e0175AX",
+	"Author": "iamslightlywind",
+	"EcPollInterval": 1500,
+	"ReadWriteWords": false,
+	"CriticalTemperature": 86,
+	"FanConfigurations": [
+		{
+			"ReadRegister": 177,
+			"WriteRegister": 44,
+			"MinSpeedValue": 0,
+			"MaxSpeedValue": 100,
+			"IndependentReadMinMaxValues": true,
+			"MinSpeedValueRead": 0,
+			"MaxSpeedValueRead": 33,
+			"ResetRequired": true,
+			"FanSpeedResetValue": 255,
+			"FanDisplayName": "CPU Fan",
+			"TemperatureThresholds": [
+				{
+					"DownThreshold": 0,
+					"UpThreshold": 44,
+					"FanSpeed": 0
+				},
+				{
+					"DownThreshold": 45,
+					"UpThreshold": 50,
+					"FanSpeed": 10
+				},
+				{
+					"DownThreshold": 49,
+					"UpThreshold": 55,
+					"FanSpeed": 15
+				},
+				{
+					"DownThreshold": 54,
+					"UpThreshold": 60,
+					"FanSpeed": 25
+				},
+				{
+					"DownThreshold": 59,
+					"UpThreshold": 65,
+					"FanSpeed": 35
+				},
+				{
+					"DownThreshold": 64,
+					"UpThreshold": 70,
+					"FanSpeed": 50
+				},
+				{
+					"DownThreshold": 69,
+					"UpThreshold": 75,
+					"FanSpeed": 65
+				},
+				{
+					"DownThreshold": 74,
+					"UpThreshold": 80,
+					"FanSpeed": 80
+				},
+				{
+					"DownThreshold": 79,
+					"UpThreshold": 85,
+					"FanSpeed": 100
+				}
+			]
+		},
+		{
+			"ReadRegister": 179,
+			"WriteRegister": 45,
+			"MinSpeedValue": 0,
+			"MaxSpeedValue": 100,
+			"IndependentReadMinMaxValues": true,
+			"MinSpeedValueRead": 0,
+			"MaxSpeedValueRead": 32,
+			"ResetRequired": true,
+			"FanSpeedResetValue": 255,
+			"FanDisplayName": "GPU Fan",
+			"TemperatureThresholds": [
+				{
+					"DownThreshold": 0,
+					"UpThreshold": 44,
+					"FanSpeed": 0
+				},
+				{
+					"DownThreshold": 45,
+					"UpThreshold": 50,
+					"FanSpeed": 10
+				},
+				{
+					"DownThreshold": 49,
+					"UpThreshold": 55,
+					"FanSpeed": 20
+				},
+				{
+					"DownThreshold": 54,
+					"UpThreshold": 60,
+					"FanSpeed": 30
+				},
+				{
+					"DownThreshold": 59,
+					"UpThreshold": 65,
+					"FanSpeed": 40
+				},
+				{
+					"DownThreshold": 64,
+					"UpThreshold": 70,
+					"FanSpeed": 50
+				},
+				{
+					"DownThreshold": 69,
+					"UpThreshold": 75,
+					"FanSpeed": 60
+				},
+				{
+					"DownThreshold": 74,
+					"UpThreshold": 80,
+					"FanSpeed": 70
+				},
+				{
+					"DownThreshold": 79,
+					"UpThreshold": 85,
+					"FanSpeed": 80
+				}
+			]
+		}
+	]
+}
