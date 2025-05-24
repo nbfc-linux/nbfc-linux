@@ -1,0 +1,62 @@
+{
+ "NotebookModel": "Acer Aspire A315-55G",
+ "Author": "Nj0be",
+ "EcPollInterval": 150,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 85,
+	 "WriteRegister": 85,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 10,
+	 "TemperatureThresholds": [
+      	  {
+	   "UpThreshold": 55,
+	   "DownThreshold": 0,
+	   "FanSpeed": 20
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 50,
+	   "FanSpeed": 30
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 55,
+	   "FanSpeed": 40
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 65,
+	   "FanSpeed":60
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 70,
+	   "FanSpeed": 70
+	  },
+	  {
+	   "UpThreshold": 89,
+	   "DownThreshold": 75,
+	   "FanSpeed": 80
+	  },
+	  {
+	   "UpThreshold": 92,
+	   "DownThreshold": 87,
+	   "FanSpeed": 90
+	  },
+	  {
+	   "UpThreshold": 95,
+	   "DownThreshold": 90,
+	   "FanSpeed": 100
+	  }
+	 ]
+	}
+ ]
+}
