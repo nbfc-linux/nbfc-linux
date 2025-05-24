@@ -127,7 +127,7 @@ void Fan_SetTemperature(Fan* self, float temperature)
     my.isCritical = false;
 
   TemperatureThreshold* threshold = ThresholdManager_AutoSelectThreshold(&my.threshMan, temperature);
-  if (my.mode == Fan_ModeAuto && threshold)
+  if (my.mode == Fan_ModeAuto)
     my.targetFanSpeed = threshold->FanSpeed;
 }
 
