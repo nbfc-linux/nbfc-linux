@@ -1,4 +1,4 @@
-AC_INIT([nbfc-linux], [0.3.17], [braph93@gmx.de])
+AC_INIT([nbfc-linux], [0.3.18], [braph93@gmx.de])
 
 # Checks for programs.
 AC_PROG_CC

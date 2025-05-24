@@ -1,5 +1,8 @@
 # Changelog
 
+## nbfc-linux-0.3.18 (2025-05-24)
+- New model configuration files
+
 ## nbfc-linux-0.3.17 (2025-05-22)
 - Using state file to store fan speeds
 
