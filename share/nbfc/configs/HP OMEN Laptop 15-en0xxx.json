@@ -1,120 +1,148 @@
 {
- "NotebookModel": "HP OMEN Laptop 15-en0xxx",
- "Author": "utk-spartan",
- "EcPollInterval": 1000,
- "ReadWriteWords": false,
- "CriticalTemperature": 100,
- "FanConfigurations": [
-	{
-	 "FanDisplayName": "CPU fan",
-	 "ReadRegister": 46,
-	 "WriteRegister": 44,
-	 "MinSpeedValue": 0,
-	 "MaxSpeedValue": 100,
-	 "IndependentReadMinMaxValues": false,
-	 "MinSpeedValueRead": 0,
-	 "MaxSpeedValueRead": 0,
-	 "ResetRequired": true,
-	 "FanSpeedResetValue": 255,
-	 "TemperatureThresholds": [
-	  {
-	   "UpThreshold": 55,
-	   "DownThreshold": 0,
-	   "FanSpeed": 0.0
-	  },
-	  {
-	   "UpThreshold": 57,
-	   "DownThreshold": 49,
-	   "FanSpeed": 18.0
-	  },
-	  {
-	   "UpThreshold": 60,
-	   "DownThreshold": 56,
-	   "FanSpeed": 25.0
-	  },
-	  {
-	   "UpThreshold": 63,
-	   "DownThreshold": 59,
-	   "FanSpeed": 35.0
-	  },
-	  {
-	   "UpThreshold": 66,
-	   "DownThreshold": 62,
-	   "FanSpeed": 53.0
-	  },
-	  {
-	   "UpThreshold": 70,
-	   "DownThreshold": 65,
-	   "FanSpeed": 70.0
-	  },
-	  {
-	   "UpThreshold": 72,
-	   "DownThreshold": 69,
-	   "FanSpeed": 90.0
-	  },
-	  {
-	   "UpThreshold": 75,
-	   "DownThreshold": 71,
-	   "FanSpeed": 100.0
-	  }
-	 ],
-	 "FanSpeedPercentageOverrides": []
-	},
-	{
-	 "FanDisplayName": "GPU fan",
-	 "ReadRegister": 47,
-	 "WriteRegister": 45,
-	 "MinSpeedValue": 0,
-	 "MaxSpeedValue": 100,
-	 "IndependentReadMinMaxValues": false,
-	 "MinSpeedValueRead": 0,
-	 "MaxSpeedValueRead": 0,
-	 "ResetRequired": true,
-	 "FanSpeedResetValue": 255,
-	 "TemperatureThresholds": [
-	  {
-	   "UpThreshold": 55,
-	   "DownThreshold": 0,
-	   "FanSpeed": 0.0
-	  },
-	  {
-	   "UpThreshold": 57,
-	   "DownThreshold": 49,
-	   "FanSpeed": 18.0
-	  },
-	  {
-	   "UpThreshold": 60,
-	   "DownThreshold": 56,
-	   "FanSpeed": 25.0
-	  },
-	  {
-	   "UpThreshold": 63,
-	   "DownThreshold": 59,
-	   "FanSpeed": 35.0
-	  },
-	  {
-	   "UpThreshold": 66,
-	   "DownThreshold": 62,
-	   "FanSpeed": 53.0
-	  },
-	  {
-	   "UpThreshold": 70,
-	   "DownThreshold": 65,
-	   "FanSpeed": 70.0
-	  },
-	  {
-	   "UpThreshold": 72,
-	   "DownThreshold": 69,
-	   "FanSpeed": 90.0
-	  },
-	  {
-	   "UpThreshold": 75,
-	   "DownThreshold": 71,
-	   "FanSpeed": 100.0
-	  }
-	 ],
-	 "FanSpeedPercentageOverrides": []
-	}
- ],
- "RegisterWriteConfigurations": []
+  "NotebookModel": "HP OMEN Laptop 15-en0xxx",
+  "Author": "Generatoz",
+  "EcPollInterval": 1000,
+  "ReadWriteWords": false,
+  "CriticalTemperature": 100,
+  "FanConfigurations": [
+    {
+      "ReadRegister": 46,
+      "WriteRegister": 44,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "IndependentReadMinMaxValues": false,
+      "MinSpeedValueRead": 0,
+      "MaxSpeedValueRead": 0,
+      "ResetRequired": true,
+      "FanSpeedResetValue": 255,
+      "FanDisplayName": "CPU fan",
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 49,
+          "DownThreshold": 0,
+          "FanSpeed": 0
+        },
+        {
+          "UpThreshold": 58,
+          "DownThreshold": 49,
+          "FanSpeed": 16
+        },
+        {
+          "UpThreshold": 62,
+          "DownThreshold": 56,
+          "FanSpeed": 20
+        },
+        {
+          "UpThreshold": 66,
+          "DownThreshold": 60,
+          "FanSpeed": 24
+        },
+        {
+          "UpThreshold": 71,
+          "DownThreshold": 64,
+          "FanSpeed": 29
+        },
+        {
+          "UpThreshold": 76,
+          "DownThreshold": 67,
+          "FanSpeed": 35
+        },
+        {
+          "UpThreshold": 78,
+          "DownThreshold": 72,
+          "FanSpeed": 41
+        },
+        {
+          "UpThreshold": 86,
+          "DownThreshold": 78,
+          "FanSpeed": 66
+        },
+        {
+          "UpThreshold": 90,
+          "DownThreshold": 84,
+          "FanSpeed": 81
+        },
+        {
+          "UpThreshold": 93,
+          "DownThreshold": 89,
+          "FanSpeed": 90
+        },
+        {
+          "UpThreshold": 100,
+          "DownThreshold": 91,
+          "FanSpeed": 100
+        }
+      ]
+    },
+    {
+      "ReadRegister": 47,
+      "WriteRegister": 45,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "IndependentReadMinMaxValues": false,
+      "MinSpeedValueRead": 0,
+      "MaxSpeedValueRead": 0,
+      "ResetRequired": true,
+      "FanSpeedResetValue": 255,
+      "FanDisplayName": "GPU fan",
+      "Sensors": ["@GPU"],
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 49,
+          "DownThreshold": 0,
+          "FanSpeed": 0
+        },
+        {
+          "UpThreshold": 58,
+          "DownThreshold": 49,
+          "FanSpeed": 16
+        },
+        {
+          "UpThreshold": 62,
+          "DownThreshold": 56,
+          "FanSpeed": 22
+        },
+        {
+          "UpThreshold": 66,
+          "DownThreshold": 60,
+          "FanSpeed": 26
+        },
+        {
+          "UpThreshold": 71,
+          "DownThreshold": 64,
+          "FanSpeed": 29
+        },
+        {
+          "UpThreshold": 76,
+          "DownThreshold": 67,
+          "FanSpeed": 35
+        },
+        {
+          "UpThreshold": 78,
+          "DownThreshold": 74,
+          "FanSpeed": 50
+        },
+        {
+          "UpThreshold": 82,
+          "DownThreshold": 68,
+          "FanSpeed": 75
+        },
+        {
+          "UpThreshold": 90,
+          "DownThreshold": 76,
+          "FanSpeed": 80
+        },
+        {
+          "UpThreshold": 93,
+          "DownThreshold": 89,
+          "FanSpeed": 90
+        },
+        {
+          "UpThreshold": 95,
+          "DownThreshold": 91,
+          "FanSpeed": 100
+        }
+      ]
+    }
+  ]
 }
