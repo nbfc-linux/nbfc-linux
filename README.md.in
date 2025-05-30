@@ -46,24 +46,24 @@ Installation
 ------------
 
 - Arch Linux:
-  - [Latest Version %TAG%](%ARCHLINUX_URL%)
+  - [Download Latest Version %TAG%](%ARCHLINUX_URL%)
   - Install curl: `pacman -S curl`
   - Install NBFC-Linux: `pacman -U ./%ARCHLINUX_PACKAGE%`
   - Or via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - Debian / Ubuntu:
-  - [Latest Version %TAG%](%DEBIAN_URL%)
+  - [Download Latest Version %TAG%](%DEBIAN_URL%)
   - Install libcurl: `apt install libcurl4`
   - Install NBFC-Linux: `dpkg -i ./%DEBIAN_PACKAGE%`
 
 - Fedora:
-  - [Latest Version %TAG%](%FEDORA_URL%)
+  - [Download Latest Version %TAG%](%FEDORA_URL%)
   - Install libcurl: `dnf install libcurl`
   - Install NBFC-Linux: `dnf install ./%FEDORA_PACKAGE%`
 
 - OpenSuse (Tumbleweed)
-  - [Latest Version %TAG%](%OPENSUSE_URL%)
+  - [Download Latest Version %TAG%](%OPENSUSE_URL%)
   - Install libcurl: `zypper install libcurl4`
   - Install NBFC-Linux: `zypper install ./%OPENSUSE_PACKAGE%`
 
@@ -102,7 +102,6 @@ Currently there are two GUI implementations:
 
 - [NBFC-Gtk](https://github.com/nbfc-linux/nbfc-gtk)
   - Simple GUI written in Python based on Gtk4
-  - Very early version
 
 Getting started without the GUI
 -------------------------------
@@ -258,16 +257,20 @@ The completion files are generated using [crazy-complete](https://github.com/cra
 --fork                 -f  -- Switch process to background after sucessfully started
 --help                 -h  -- show this help message and exit
 --read-only            -r  -- Start in read-only mode
---state-file           -s  -- Write state to an alternative file (default /var/run/nbfc_service.state.json)
 
 ~ $ nbfc <TAB>
-config   -- List or apply configs
-help     -- Show help
-restart  -- Restart the service
-set      -- Control fan speed
-start    -- Start the service
-status   -- Show the service status
-stop     -- Stop the service
+config          -- List or apply configs
+donate          -- Show how to support the project
+get-model-name  -- Print model name for notebook
+help            -- Show help
+restart         -- Restart the service
+sensors         -- Configure fan sensors
+set             -- Control fan speed
+start           -- Start the service
+status          -- Show the service status
+stop            -- Stop the service
+update          -- Download new configuration files
+warranty        -- Show warranty
 ```
 
 Contributing

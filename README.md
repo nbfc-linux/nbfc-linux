@@ -46,24 +46,24 @@ Installation
 ------------
 
 - Arch Linux:
-  - [Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/nbfc-linux-git-0.3.17.r30.gf32b2c7-1-x86_64.pkg.tar.zst)
+  - [Download Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/nbfc-linux-git-0.3.17.r30.gf32b2c7-1-x86_64.pkg.tar.zst)
   - Install curl: `pacman -S curl`
   - Install NBFC-Linux: `pacman -U ./nbfc-linux-git-0.3.17.r30.gf32b2c7-1-x86_64.pkg.tar.zst`
   - Or via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - Debian / Ubuntu:
-  - [Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/nbfc-linux_0.3.18_amd64.deb)
+  - [Download Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/nbfc-linux_0.3.18_amd64.deb)
   - Install libcurl: `apt install libcurl4`
   - Install NBFC-Linux: `dpkg -i ./nbfc-linux_0.3.18_amd64.deb`
 
 - Fedora:
-  - [Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/fedora-nbfc-linux-0.3.18-1.x86_64.rpm)
+  - [Download Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/fedora-nbfc-linux-0.3.18-1.x86_64.rpm)
   - Install libcurl: `dnf install libcurl`
   - Install NBFC-Linux: `dnf install ./fedora-nbfc-linux-0.3.18-1.x86_64.rpm`
 
 - OpenSuse (Tumbleweed)
-  - [Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/opensuse-nbfc-linux-0.3.18-1.x86_64.rpm)
+  - [Download Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/opensuse-nbfc-linux-0.3.18-1.x86_64.rpm)
   - Install libcurl: `zypper install libcurl4`
   - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.3.18-1.x86_64.rpm`
 
@@ -102,7 +102,6 @@ Currently there are two GUI implementations:
 
 - [NBFC-Gtk](https://github.com/nbfc-linux/nbfc-gtk)
   - Simple GUI written in Python based on Gtk4
-  - Very early version
 
 Getting started without the GUI
 -------------------------------
@@ -258,16 +257,20 @@ The completion files are generated using [crazy-complete](https://github.com/cra
 --fork                 -f  -- Switch process to background after sucessfully started
 --help                 -h  -- show this help message and exit
 --read-only            -r  -- Start in read-only mode
---state-file           -s  -- Write state to an alternative file (default /var/run/nbfc_service.state.json)
 
 ~ $ nbfc <TAB>
-config   -- List or apply configs
-help     -- Show help
-restart  -- Restart the service
-set      -- Control fan speed
-start    -- Start the service
-status   -- Show the service status
-stop     -- Stop the service
+config          -- List or apply configs
+donate          -- Show how to support the project
+get-model-name  -- Print model name for notebook
+help            -- Show help
+restart         -- Restart the service
+sensors         -- Configure fan sensors
+set             -- Control fan speed
+start           -- Start the service
+status          -- Show the service status
+stop            -- Stop the service
+update          -- Download new configuration files
+warranty        -- Show warranty
 ```
 
 Contributing
