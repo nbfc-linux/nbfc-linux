@@ -1,4 +1,4 @@
-version     = 0.3.18
+version     = 0.3.19
 
 PREFIX      = /usr
 
@@ -23,9 +23,9 @@ else
 	LDFLAGS  = -s
 endif
 
-LDLIBS_CLIENT = -lm -lcurl -lcrypto
+LDLIBS_CLIENT = -lcurl -lcrypto
 LDLIBS_SERVICE = -lm -ldl
-LDLIBS_EC_PROBE = -lm
+LDLIBS_EC_PROBE =
 LDLIBS_TEST_MODEL_CONFIG = -lm
 
 override CPPFLAGS += \
