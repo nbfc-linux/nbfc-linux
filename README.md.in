@@ -47,24 +47,20 @@ Installation
 
 - Arch Linux:
   - [Download Latest Version %TAG%](%ARCHLINUX_URL%)
-  - Install curl: `pacman -S curl`
   - Install NBFC-Linux: `pacman -U ./%ARCHLINUX_PACKAGE%`
   - Or via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - Debian / Ubuntu:
   - [Download Latest Version %TAG%](%DEBIAN_URL%)
-  - Install libcurl: `apt install libcurl4`
-  - Install NBFC-Linux: `dpkg -i ./%DEBIAN_PACKAGE%`
+  - Install NBFC-Linux: `apt install ./%DEBIAN_PACKAGE%`
 
 - Fedora:
   - [Download Latest Version %TAG%](%FEDORA_URL%)
-  - Install libcurl: `dnf install libcurl`
   - Install NBFC-Linux: `dnf install ./%FEDORA_PACKAGE%`
 
 - OpenSuse (Tumbleweed)
   - [Download Latest Version %TAG%](%OPENSUSE_URL%)
-  - Install libcurl: `zypper install libcurl4`
   - Install NBFC-Linux: `zypper install ./%OPENSUSE_PACKAGE%`
 
 - NixOS:
