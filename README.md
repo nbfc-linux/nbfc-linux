@@ -46,26 +46,26 @@ Installation
 ------------
 
 - Arch Linux:
-  - [Download Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/nbfc-linux-git-0.3.17.r30.gf32b2c7-1-x86_64.pkg.tar.zst)
+  - [Download Latest Version 0.3.19](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.19/nbfc-linux-git-0.3.18.r4.g656af52-1-x86_64.pkg.tar.zst)
   - Install curl: `pacman -S curl`
-  - Install NBFC-Linux: `pacman -U ./nbfc-linux-git-0.3.17.r30.gf32b2c7-1-x86_64.pkg.tar.zst`
+  - Install NBFC-Linux: `pacman -U ./nbfc-linux-git-0.3.18.r4.g656af52-1-x86_64.pkg.tar.zst`
   - Or via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - Debian / Ubuntu:
-  - [Download Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/nbfc-linux_0.3.18_amd64.deb)
+  - [Download Latest Version 0.3.19](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.19/nbfc-linux_0.3.19_amd64.deb)
   - Install libcurl: `apt install libcurl4`
-  - Install NBFC-Linux: `dpkg -i ./nbfc-linux_0.3.18_amd64.deb`
+  - Install NBFC-Linux: `dpkg -i ./nbfc-linux_0.3.19_amd64.deb`
 
 - Fedora:
-  - [Download Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/fedora-nbfc-linux-0.3.18-1.x86_64.rpm)
+  - [Download Latest Version 0.3.19](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.19/fedora-nbfc-linux-0.3.19-1.x86_64.rpm)
   - Install libcurl: `dnf install libcurl`
-  - Install NBFC-Linux: `dnf install ./fedora-nbfc-linux-0.3.18-1.x86_64.rpm`
+  - Install NBFC-Linux: `dnf install ./fedora-nbfc-linux-0.3.19-1.x86_64.rpm`
 
 - OpenSuse (Tumbleweed)
-  - [Download Latest Version 0.3.18](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.18/opensuse-nbfc-linux-0.3.18-1.x86_64.rpm)
+  - [Download Latest Version 0.3.19](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.3.19/opensuse-nbfc-linux-0.3.19-1.x86_64.rpm)
   - Install libcurl: `zypper install libcurl4`
-  - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.3.18-1.x86_64.rpm`
+  - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.3.19-1.x86_64.rpm`
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)
@@ -75,7 +75,7 @@ Installation
   - ensure, that podman is installed
     - docker should work also, but is currently not tested
   - edit [pkgbuilds/rpm/nbfc-linux.spec](./pkgbuilds/rpm/nbfc-linux.spec) and
-    - set wanted Version (e.g. 0.3.18)
+    - set wanted Version (e.g. 0.3.19)
     - set wanted Releasenumber (e.g. 1%{?dist} or 2%{?dist})
   - `./pkgbuilds/rpm/buildNBFC-LINUX`
   - the resulting rpm can be found in [pkgbuilds directory](./pkgbuilds/)
