@@ -11,15 +11,18 @@ def OrderedDict_insert_at_top(dict, key, value):
     return result
 
 def remove_empty_arrays(config):
-    if len(config['RegisterWriteConfigurations']) == 0:
-        del config['RegisterWriteConfigurations']
+    if 'RegisterWriteConfigurations' in config:
+        if len(config['RegisterWriteConfigurations']) == 0:
+            del config['RegisterWriteConfigurations']
 
     for FanConfiguration in config['FanConfigurations']:
-        if len(FanConfiguration['FanSpeedPercentageOverrides']) == 0:
-            del FanConfiguration['FanSpeedPercentageOverrides']
+        if 'FanSpeedPercentageOverrides' in FanConfiguration:
+            if len(FanConfiguration['FanSpeedPercentageOverrides']) == 0:
+                del FanConfiguration['FanSpeedPercentageOverrides']
 
-        if len(FanConfiguration['TemperatureThresholds']) == 0:
-            del FanConfiguration['TemperatureThresholds']
+        if 'TemperatureThresholds' in FanConfiguration:
+            if len(FanConfiguration['TemperatureThresholds']) == 0:
+                del FanConfiguration['TemperatureThresholds']
 
 def replace_space_by_tab(match):
     return match.group(0).replace(' ', '\t')

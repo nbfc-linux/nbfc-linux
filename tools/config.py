@@ -160,9 +160,12 @@ def handle_xml_node(node, definition):
         ret = {
             'const char*':             CString,
             'int':                     CInt,
+            'uint8_t':                 CInt,
+            'uint16_t':                CInt,
+            'int16_t':                 CInt,
             'short':                   CInt,
             'float':                   CFloat,
-            'Boolean':                 CBool,
+            'bool':                    CBool,
             'OverrideTargetOperation': COverrideTargetOperation,
             'RegisterWriteMode':       CRegisterWriteMode,
             'RegisterWriteOccasion':   CRegisterWriteOccasion
