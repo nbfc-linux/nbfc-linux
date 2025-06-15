@@ -3,6 +3,7 @@
 #include "service_config.h"
 #include "server.h"
 #include "error.h"
+#include "file_utils.h"
 #include "log.h"
 #include "ec.h"
 #include "model_config.h"
@@ -133,6 +134,14 @@ int main(int argc, char* const argv[])
 #endif
     "\n"
   );
+
+  // Sets the OOM (Out-Of-Memory) score adjustment for this process to -1000,
+  // which tells the Linux kernel to never kill this process, even under
+  // extreme memory pressure.
+  if (write_file("/proc/self/oom_score_adj", O_WRONLY, 0, "-1000\n", 6) < 0) {
+    Log_Error("%s: %s\n", "/proc/self/oom_score_adj", strerror(errno));
+    exit(NBFC_EXIT_FAILURE);
+  }
 
   if (options.read_only)
     Log_Info("Read-only mode enabled\n");
