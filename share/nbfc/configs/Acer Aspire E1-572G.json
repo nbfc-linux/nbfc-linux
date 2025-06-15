@@ -1,0 +1,131 @@
+{
+ "LegacyTemperatureThresholdsBehaviour": true,
+ "NotebookModel": "Aspire E1-572G",
+ "Author": "nightpearl",
+ "EcPollInterval": 2000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 75,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 180,
+	 "WriteRegister": 180,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 85,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": false,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "Fan speed",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 46,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 49,
+	   "DownThreshold": 46,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 54,
+	   "DownThreshold": 49,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 59,
+	   "DownThreshold": 54,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 64,
+	   "DownThreshold": 59,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 67,
+	   "DownThreshold": 64,
+	   "FanSpeed": 100.0
+	  }
+	 ]
+	},
+	{
+	 "ReadRegister": 189,
+	 "WriteRegister": 189,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 2,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 90,
+	 "FanDisplayName": "Thermo profile",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 64,
+	   "DownThreshold": 63,
+	   "FanSpeed": 100.0
+	  },
+	  {
+	   "UpThreshold": 63,
+	   "DownThreshold": 62,
+	   "FanSpeed": 50.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 90,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 50.0,
+	   "FanSpeedValue": 7,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 91,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	},
+	{
+	 "ReadRegister": 171,
+	 "WriteRegister": 171,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 1,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 8,
+	 "FanDisplayName": "Fan switch (on/off)",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 52,
+	   "DownThreshold": 46,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 53,
+	   "DownThreshold": 46,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": [
+	  {
+	   "FanSpeedPercentage": 0.0,
+	   "FanSpeedValue": 0,
+	   "TargetOperation": "ReadWrite"
+	  },
+	  {
+	   "FanSpeedPercentage": 100.0,
+	   "FanSpeedValue": 8,
+	   "TargetOperation": "ReadWrite"
+	  }
+	 ]
+	}
+ ]
+}

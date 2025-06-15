@@ -1,0 +1,72 @@
+{
+ "LegacyTemperatureThresholdsBehaviour": true,
+ "NotebookModel": "SVF15N1C5E",
+ "EcPollInterval": 1750,
+ "ReadWriteWords": true,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 92,
+	 "WriteRegister": 94,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 7,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 2,
+	 "FanDisplayName": "Fan",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 0,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 76,
+	   "FanSpeed": 85.71428571428571
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 68,
+	   "FanSpeed": 57.14285714285714
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 64,
+	   "FanSpeed": 42.857142857142854
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 56,
+	   "FanSpeed": 14.285714285714285
+	  },
+	  {
+	   "UpThreshold": 64,
+	   "DownThreshold": 60,
+	   "FanSpeed": 28.57142857142857
+	  },
+	  {
+	   "UpThreshold": 76,
+	   "DownThreshold": 72,
+	   "FanSpeed": 71.42857142857143
+	  },
+	  {
+	   "UpThreshold": 84,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnWriteFanSpeed",
+	 "Register": 95,
+	 "Value": 0,
+	 "ResetRequired": false,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "Ini"
+	}
+ ]
+}

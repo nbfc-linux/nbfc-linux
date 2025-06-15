@@ -1,0 +1,70 @@
+{
+ "LegacyTemperatureThresholdsBehaviour": true,
+ "NotebookModel": "Aspire A515-48M",
+ "Author": "moryz",
+ "EcPollInterval": 250,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 93,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 88,
+	 "WriteRegister": 88,
+	 "MinSpeedValue": 10,
+	 "MaxSpeedValue": 99,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 0,
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 49,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 50,
+	   "DownThreshold": 45,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 60,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 60,
+	   "FanSpeed": 65.0
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 65,
+	   "FanSpeed": 75.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 70,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 90,
+	   "DownThreshold": 80,
+	   "FanSpeed": 100.0
+	  }
+	 ]
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 147,
+	 "Value": 20,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "Set EC to manual control"
+	}
+ ]
+}
