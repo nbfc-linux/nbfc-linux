@@ -366,13 +366,13 @@ static int Read() {
     uint16_t word;
     Error* e = ec->ReadWord(options.register_, &word);
     e_die();
-    printf("%d (%.2X)\n", word, word);
+    printf("%d (0x%.2X)\n", word, word);
   }
   else {
     uint8_t byte;
     Error* e = ec->ReadByte(options.register_, &byte);
     e_die();
-    printf("%d (%.2X)\n", byte, byte);
+    printf("%d (0x%.2X)\n", byte, byte);
   }
 
   return 0;
