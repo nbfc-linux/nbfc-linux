@@ -92,6 +92,7 @@ static int Dump();
 static int Load();
 static int Monitor();
 static int Watch();
+static int Shell();
 
 enum Command {
   Command_Read,
@@ -100,12 +101,13 @@ enum Command {
   Command_Load,
   Command_Monitor,
   Command_Watch,
+  Command_Shell,
   Command_Help,
   Command_End
 };
 
 static enum Command Command_FromString(const char* s) {
-  const char* cmds[] = { "read", "write", "dump", "load", "monitor", "watch", "help" };
+  const char* cmds[] = { "read", "write", "dump", "load", "monitor", "watch", "shell", "help" };
 
   for (int i = 0; i < ARRAY_SSIZE(cmds); ++i)
     if (!strcmp(cmds[i], s))
@@ -121,6 +123,7 @@ static const char* HelpTexts[] = {
   EC_PROBE_LOAD_HELP_TEXT,
   EC_PROBE_MONITOR_HELP_TEXT,
   EC_PROBE_WATCH_HELP_TEXT,
+  EC_PROBE_SHELL_HELP_TEXT,
   EC_PROBE_HELP_TEXT,
 };
 
@@ -203,6 +206,7 @@ static const cli99_option* Options[] = {
   load_command_options,
   monitor_command_options,
   watch_command_options,
+  main_options, // shell
   main_options, // help
 };
 
@@ -357,6 +361,7 @@ int main(int argc, char* const argv[]) {
   case Command_Write:   return Write();
   case Command_Monitor: return Monitor();
   case Command_Watch:   return Watch();
+  case Command_Shell:   return Shell();
   default:              return NBFC_EXIT_FAILURE;
   }
 }
@@ -657,4 +662,200 @@ static int Register_LoadDump(RegisterBuf* self, FILE* fh) {
 error:
   Log_Error("File is not a valid register dump");
   return NBFC_EXIT_FAILURE;
+}
+
+struct Args {
+  const char* args[64];
+  ssize_t count;
+};
+
+static void ShellRead(const struct Args* args) {
+  int word = 0;
+  const char* register_arg = NULL;
+  const char* err;
+
+  for (int i = 1; i < args->count; ++i) {
+    const char* arg = args->args[i];
+
+    if (arg[0] == '-') {
+      if (!strcmp(arg, "-w") || !strcmp(arg, "--word"))
+        word = 1;
+      else
+        return (void) printf("ERR: Invalid option: %s\n", arg);
+    }
+    else if (! register_arg)
+      register_arg = arg;
+    else
+      return (void) printf("ERR: Too much arguments\n");
+  }
+
+  if (! register_arg)
+    return (void) printf("ERR: Missing argument (REGISTER)\n");
+
+  int register_ = parse_number(register_arg, 0, word ? 254 : 255, &err);
+  if (err)
+    return (void) printf("ERR: Argument (REGISTER): %s\n", err);
+
+  if (word) {
+    uint16_t value;
+    Error* e = ec->ReadWord(register_, &value);
+    if (e)
+      return (void) printf("ERR: %s\n", err_print_all(e));
+
+    printf("%d\n", value);
+  }
+  else {
+    uint8_t value;
+    Error* e = ec->ReadByte(register_, &value);
+    if (e)
+      return (void) printf("ERR: %s\n", err_print_all(e));
+
+    printf("%d\n", value);
+  }
+}
+
+static void ShellWrite(const struct Args* args) {
+  int word = 0;
+  const char* register_arg = NULL;
+  const char* value_arg = NULL;
+  const char* err;
+
+  for (int i = 1; i < args->count; ++i) {
+    const char* arg = args->args[i];
+
+    if (arg[0] == '-') {
+      if (!strcmp(arg, "-w") || !strcmp(arg, "--word"))
+        word = 1;
+      else
+        return (void) printf("ERR: Invalid option: %s\n", arg);
+    }
+    else if (! register_arg)
+      register_arg = arg;
+    else if (! value_arg)
+      value_arg = arg;
+    else
+      return (void) printf("ERR: Too much arguments\n");
+  }
+
+  if (! register_arg)
+    return (void) printf("ERR: Missing argument (REGISTER)\n");
+
+  if (! value_arg)
+    return (void) printf("ERR: Missing argument (VALUE)\n");
+
+  int register_ = parse_number(register_arg, 0, word ? 254 : 255, &err);
+  if (err)
+    return (void) printf("ERR: Argument (REGISTER): %s\n", err);
+
+  int value = parse_number(value_arg, 0, word ? 65535 : 255, &err);
+  if (err)
+    return (void) printf("ERR: Argument (VALUE): %s\n", err);
+
+  if (word) {
+    Error* e = ec->WriteWord(register_, value);
+    if (e)
+      return (void) printf("ERR: %s\n", err_print_all(e));
+  }
+  else {
+    Error* e = ec->WriteByte(register_, value);
+    if (e)
+      return (void) printf("ERR: %s\n", err_print_all(e));
+  }
+
+  printf("OK\n");
+}
+
+static void ShellReadAll(struct Args* args) {
+  uint8_t values[256];
+
+  for (int register_ = 0; register_ <= 255; ++register_) {
+    Error* e = ec->ReadByte(register_, &values[register_]);
+    if (e)
+      return (void) printf("ERR: %s\n", err_print_all(e));
+  }
+
+  printf("%d", values[0]);
+  for (int register_ = 1; register_ <= 255; ++register_)
+    printf(" %d", values[register_]);
+  printf("\n");
+}
+
+static void ShellHelp() {
+  printf(
+    "Available commands: \n"
+    "  read [-w|--word] REGISTER\n"
+    "  write [-w|--word] REGISTER VALUE\n"
+    "  read_all\n"
+    "  exit | quit\n"
+  );
+}
+
+static const char* read_arg(char** line) {
+  while (**line == ' ' || **line == '\t')
+    ++*line;
+
+  if (!**line)
+    return NULL;
+
+  const char* arg = *line;
+
+  ++*line;
+
+  while (**line && **line != ' ' && **line != '\t')
+    ++*line;
+
+  if (**line) {
+    **line = '\0';
+    ++*line;
+  }
+
+  return arg;
+}
+
+static void read_args(struct Args* args, char** line) {
+  args->count = 0;
+
+  while (args->count < ARRAY_SSIZE(args->args)) {
+    if (! (args->args[args->count] = read_arg(line)))
+      break;
+
+    args->count++;
+  }
+}
+
+static int Shell() {
+  char buffer[16384];
+  char* line;
+  struct Args args;
+
+  signal(SIGINT, SIG_DFL);
+  signal(SIGTERM, SIG_DFL);
+
+  while (fgets(buffer, sizeof(buffer), stdin)) {
+    size_t len = strlen(buffer);
+
+    if (buffer[len - 1] != '\n') {
+      printf("ERR: Line too long\n");
+      continue;
+    }
+
+    buffer[len - 1] = '\0';
+    line = buffer;
+
+    read_args(&args, &line);
+
+    if (! args.count);
+    else if (!strcmp(args.args[0], "read"))     ShellRead(&args);
+    else if (!strcmp(args.args[0], "write"))    ShellWrite(&args);
+    else if (!strcmp(args.args[0], "read_all")) ShellReadAll(&args);
+    else if (!strcmp(args.args[0], "help"))     ShellHelp();
+    else if (!strcmp(args.args[0], "exit"))     return 0;
+    else if (!strcmp(args.args[0], "quit"))     return 0;
+    else
+      printf("ERR: No such command: %s (type `help` for a list of commands)\n", args.args[0]);
+
+    fflush(stdout);
+  }
+
+  return 0;
 }

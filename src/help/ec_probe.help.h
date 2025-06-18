@@ -100,3 +100,12 @@
  "  -t seconds, --timespan SECONDS\n"                                          \
  "                        Sets how many seconds the program will run\n"        \
  ""
+
+#define EC_PROBE_SHELL_HELP_TEXT                                               \
+ "Usage: %s shell [-h]\n"                                                      \
+ "\n"                                                                          \
+ "Read commands from STDIN\n"                                                  \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
+ ""
