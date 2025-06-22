@@ -180,6 +180,33 @@
     ]
   },
   {
+    "name": "Sponsor",
+    "help": "Sponsor data",
+    "fields": [
+      {
+        "name": "Name",
+        "type": "const char*",
+        "help": "Sponsor name"
+      },
+      {
+        "name": "Description",
+        "type": "const char*",
+        "help": "Sponsor description",
+        "required": false
+      },
+      {
+        "name": "URL",
+        "type": "const char*",
+        "help": "URL to sponsor"
+      },
+      {
+        "name": "BannerURL",
+        "type": "const char*",
+        "help": "URL to banner"
+      }
+    ]
+  },
+  {
     "name": "ModelConfig",
     "help": "",
     "fields": [
@@ -222,6 +249,12 @@
         "type": "bool",
         "help": "If `true`, NBFC will combine two 8 bit registers to one 16-bit register when reading from or writing to the EC registers.",
         "default": "false"
+      },
+      {
+        "name": "Sponsor",
+        "type": "Sponsor",
+        "help": "Sponsored by data",
+        "required": false
       },
       {
         "name": "FanConfigurations",

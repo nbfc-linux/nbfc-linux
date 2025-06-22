@@ -9,6 +9,7 @@
 #include "fs_sensors.h"
 #include "service_config.h"
 #include "service_state.h"
+#include "sponsor.h"
 #include "nbfc.h"
 #include "trace.h"
 #include "memory.h"
@@ -88,6 +89,8 @@ Error* Service_Init() {
     e = err_string(e, trace.buf);
     goto error;
   }
+
+  Sponsor_Print();
 
   TemperatureThresholdManager_LegacyBehaviour = Service_Model_Config.LegacyTemperatureThresholdsBehaviour;
 

@@ -236,6 +236,7 @@ src/nbfc_service: \
 	src/service.c src/service.h \
 	src/service_config.c src/service_config.h \
 	src/service_state.c src/service_state.h \
+	src/sponsor.c src/sponsor.h \
 	src/temperature_filter.c src/temperature_filter.h \
 	src/temperature_threshold_manager.c src/temperature_threshold_manager.h \
 	src/optparse/optparse.h src/optparse/optparse.c

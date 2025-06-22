@@ -308,6 +308,58 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 	return err_success();
 }
 
+Error* Sponsor_ValidateFields(Sponsor* self) {
+	if (! Sponsor_IsSet_Name(self))
+		return err_stringf(0, "%s: %s", "Name", "Missing option");
+
+	if (false)
+		return err_stringf(0, "%s: %s", "Description", "Missing option");
+
+	if (! Sponsor_IsSet_URL(self))
+		return err_stringf(0, "%s: %s", "URL", "Missing option");
+
+	if (! Sponsor_IsSet_BannerURL(self))
+		return err_stringf(0, "%s: %s", "BannerURL", "Missing option");
+	return err_success();
+}
+
+Error* Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
+	Error* e;
+	memset(obj, 0, sizeof(*obj));
+
+	if (!json || json->type != NX_JSON_OBJECT)
+		return err_string(0, "Not a JSON object");
+
+	nx_json_for_each(c, json) {
+		if (!strcmp(c->key, "Comment"))
+			continue;
+		else if (!strcmp(c->key, "Name")) {
+			e = str_FromJson(&obj->Name, c);
+			if (!e)
+				Sponsor_Set_Name(obj);
+		}
+		else if (!strcmp(c->key, "Description")) {
+			e = str_FromJson(&obj->Description, c);
+			if (!e)
+				Sponsor_Set_Description(obj);
+		}
+		else if (!strcmp(c->key, "URL")) {
+			e = str_FromJson(&obj->URL, c);
+			if (!e)
+				Sponsor_Set_URL(obj);
+		}
+		else if (!strcmp(c->key, "BannerURL")) {
+			e = str_FromJson(&obj->BannerURL, c);
+			if (!e)
+				Sponsor_Set_BannerURL(obj);
+		}
+		else
+			e = err_string(0, "Unknown option");
+		if (e) return err_string(e, c->key);
+	}
+	return err_success();
+}
+
 Error* ModelConfig_ValidateFields(ModelConfig* self) {
 	if (! ModelConfig_IsSet_NotebookModel(self))
 		return err_stringf(0, "%s: %s", "NotebookModel", "Missing option");
@@ -329,6 +381,9 @@ Error* ModelConfig_ValidateFields(ModelConfig* self) {
 
 	if (! ModelConfig_IsSet_ReadWriteWords(self))
 		self->ReadWriteWords = false;
+
+	if (false)
+		return err_stringf(0, "%s: %s", "Sponsor", "Missing option");
 
 	if (! ModelConfig_IsSet_FanConfigurations(self))
 		return err_stringf(0, "%s: %s", "FanConfigurations", "Missing option");
@@ -384,6 +439,11 @@ Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 			e = bool_FromJson(&obj->ReadWriteWords, c);
 			if (!e)
 				ModelConfig_Set_ReadWriteWords(obj);
+		}
+		else if (!strcmp(c->key, "Sponsor")) {
+			e = Sponsor_FromJson(&obj->Sponsor, c);
+			if (!e)
+				ModelConfig_Set_Sponsor(obj);
 		}
 		else if (!strcmp(c->key, "FanConfigurations")) {
 			e = array_of_FanConfiguration_FromJson(&obj->FanConfigurations, c);
