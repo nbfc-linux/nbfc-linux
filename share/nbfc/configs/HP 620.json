@@ -1,0 +1,89 @@
+{
+    "LegacyTemperatureThresholdsBehaviour": false,
+    "NotebookModel": "HP 620",
+    "Author": "Benjamin Abendroth",
+    "EcPollInterval": 1000,
+    "CriticalTemperature": 85,
+    "CriticalTemperatureOffset": 15,
+    "ReadWriteWords": false,
+    "FanConfigurations": [
+        {
+            "FanDisplayName": "CPU Fan",
+            "WriteRegister": 215,
+            "ReadRegister": 214,
+            "MinSpeedValue": 20,
+            "MaxSpeedValue": 90,
+            "IndependentReadMinMaxValues": false,
+            "ResetRequired": true,
+            "FanSpeedResetValue": 50,
+            "Sensors": [
+                "@CPU"
+            ],
+            "TemperatureAlgorithmType": "Average",
+            "TemperatureThresholds": [
+                {
+                    "UpThreshold": 62,
+                    "DownThreshold": 0,
+                    "FanSpeed": 0
+                },
+                {
+                    "UpThreshold": 64,
+                    "DownThreshold": 63,
+                    "FanSpeed": 10
+                },
+                {
+                    "UpThreshold": 66,
+                    "DownThreshold": 65,
+                    "FanSpeed": 20.0
+                },
+                {
+                    "UpThreshold": 68,
+                    "DownThreshold": 67,
+                    "FanSpeed": 30
+                },
+                {
+                    "UpThreshold": 70,
+                    "DownThreshold": 69,
+                    "FanSpeed": 40
+                },
+                {
+                    "UpThreshold": 72,
+                    "DownThreshold": 71,
+                    "FanSpeed": 50
+                },
+                {
+                    "UpThreshold": 74,
+                    "DownThreshold": 73,
+                    "FanSpeed": 60
+                },
+                {
+                    "UpThreshold": 76,
+                    "DownThreshold": 75,
+                    "FanSpeed": 70
+                },
+                {
+                    "UpThreshold": 78,
+                    "DownThreshold": 77,
+                    "FanSpeed": 80
+                },
+                {
+                    "UpThreshold": 80,
+                    "DownThreshold": 79,
+                    "FanSpeed": 90
+                },
+                {
+                    "UpThreshold": 82,
+                    "DownThreshold": 81,
+                    "FanSpeed": 100
+                }
+            ],
+            "FanSpeedPercentageOverrides": [
+                {
+                    "FanSpeedValue": 0,
+                    "FanSpeedPercentage": 0.0,
+                    "TargetOperation": "ReadWrite"
+                }
+            ]
+        }
+    ]
+}
