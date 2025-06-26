@@ -1,0 +1,36 @@
+{
+    "LegacyTemperatureThresholdsBehaviour": false,
+    "NotebookModel": "HP Laptop 17-bs0xx",
+    "Author": "Benjamin Abendroth",
+    "EcPollInterval": 3000,
+    "CriticalTemperature": 75,
+    "CriticalTemperatureOffset": 15,
+    "ReadWriteWords": false,
+    "FanConfigurations": [
+        {
+            "FanDisplayName": "CPU Fan",
+            "WriteRegister": 148,
+            "ReadRegister": 149,
+            "MinSpeedValue": 255,
+            "MaxSpeedValue": 91,
+            "IndependentReadMinMaxValues": false,
+            "ResetRequired": false,
+            "Sensors": [
+                "@CPU"
+            ],
+            "TemperatureAlgorithmType": "Average"
+        }
+    ],
+    "RegisterWriteConfigurations": [
+        {
+            "Description": "Set manual fan control",
+            "WriteOccasion": "OnInitialization",
+            "WriteMode": "Set",
+            "Register": 147,
+            "Value": 20,
+            "ResetRequired": true,
+            "ResetWriteMode": "Set",
+            "ResetValue": 4
+        }
+    ]
+}
