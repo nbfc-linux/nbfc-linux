@@ -1,0 +1,111 @@
+{
+  "LegacyTemperatureThresholdsBehaviour": true,
+  "NotebookModel": "Acer Nitro V15-41",
+  "EcPollInterval": 3000,
+  "ReadWriteWords": false,
+  "CriticalTemperature": 95,
+  "FanConfigurations": [
+    {
+      "ReadRegister": 92,  // 0x5C converted to decimal
+      "WriteRegister": 73, // 0x49 converted to decimal
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100, // Maps to 0x64 (100 decimal)
+      "ResetRequired": false, // Set to false unless you experience issues with fan state after suspend/resume
+      "FanSpeedResetValue": 0,
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 0,
+          "DownThreshold": 0,
+          "FanSpeed": 0.0
+        },
+        {
+          "UpThreshold": 40,
+          "DownThreshold": 35, // Keep fans off until 40C, spin down at 35C
+          "FanSpeed": 0.0
+        },
+        {
+          "UpThreshold": 50,
+          "DownThreshold": 45,
+          "FanSpeed": 20.0
+        },
+        {
+          "UpThreshold": 60,
+          "DownThreshold": 55,
+          "FanSpeed": 40.0
+        },
+        {
+          "UpThreshold": 70,
+          "DownThreshold": 65,
+          "FanSpeed": 60.0
+        },
+        {
+          "UpThreshold": 80,
+          "DownThreshold": 75,
+          "FanSpeed": 85.0
+        },
+        {
+          "UpThreshold": 90,
+          "DownThreshold": 85,
+          "FanSpeed": 100.0
+        }
+      ]
+    },
+    {
+      "ReadRegister": 106, // 0x6A converted to decimal
+      "WriteRegister": 74, // 0x4A converted to decimal
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "ResetRequired": false,
+      "FanSpeedResetValue": 0,
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 0,
+          "DownThreshold": 0,
+          "FanSpeed": 0.0
+        },
+        {
+          "UpThreshold": 40,
+          "DownThreshold": 35,
+          "FanSpeed": 0.0
+        },
+        {
+          "UpThreshold": 50,
+          "DownThreshold": 45,
+          "FanSpeed": 20.0
+        },
+        {
+          "UpThreshold": 60,
+          "DownThreshold": 55,
+          "FanSpeed": 40.0
+        },
+        {
+          "UpThreshold": 70,
+          "DownThreshold": 65,
+          "FanSpeed": 60.0
+        },
+        {
+          "UpThreshold": 80,
+          "DownThreshold": 75,
+          "FanSpeed": 85.0
+        },
+        {
+          "UpThreshold": 90,
+          "DownThreshold": 85,
+          "FanSpeed": 100.0
+        }
+      ]
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Set",
+      "WriteOccasion": "OnInitialization",
+      "Register": 190,  // 0xBE converted to decimal
+      "Value": 0,      // Try writing 0x00 to 0xBE (which was present at Max fan state in your dump)
+      "ResetRequired": true,
+      "ResetValue": 224, // 0xE0, which was common in your dump when not at max fan. This is for reset on exit/suspend.
+      "ResetWriteMode": "Set",
+      "Description": "Set EC to manual/enabled control mode"
+    }
+  ]
+}
