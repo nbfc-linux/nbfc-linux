@@ -21,7 +21,11 @@ Probing tool for the embedded controller
 |
 .B monitor
 |
-.BR watch }
+.B watch
+|
+.B acpi_call
+|
+.BR shell }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -175,6 +179,27 @@ Sets the update interval in seconds.
 .RS
 Sets how many seconds the program will run.
 .RE
+.RE
+
+.PP
+.B acpi_call
+.I METHOD
+.RI [ ARGUMENT ...]
+.RS
+Call an ACPI Method.
+
+The maximum number of arguments is 8.
+
+Example:
+.RS
+ec_probe acpi_call '\\_SB.PCI0.LPCB.EC0.SFSD' 0xFF
+.RE
+.RE
+
+.PP
+.B shell
+.RS
+Read commands from STDIN
 .RE
 
 All input values are interpreted as decimal numbers by default.

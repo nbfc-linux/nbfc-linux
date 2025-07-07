@@ -25,6 +25,7 @@
 #include "ec_sys_linux.c"
 #endif
 
+#include "acpi_call.c"
 #include "log.c"
 #include "error.c"
 #include "trace.c"

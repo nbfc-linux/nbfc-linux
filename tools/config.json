@@ -63,12 +63,20 @@
       {
         "name": "Register",
         "type": "uint8_t",
-        "help": "The register which will be manipulated."
+        "help": "The register which will be manipulated.",
+        "required": false
       },
       {
         "name": "Value",
         "type": "uint16_t",
-        "help": "The Value which will be written"
+        "help": "The Value which will be written",
+        "required": false
+      },
+      {
+        "name": "AcpiMethod",
+        "type": "const char*",
+        "help": "The ACPI method to execute",
+        "required": false
       },
       {
         "name": "ResetRequired",
@@ -79,7 +87,14 @@
       {
         "name": "ResetValue",
         "type": "uint16_t",
-        "help": "The value which will be written upon reset."
+        "help": "The value which will be written upon reset.",
+        "required": false
+      },
+      {
+        "name": "ResetAcpiMethod",
+        "type": "const char*",
+        "help": "The ACPI method to execute",
+        "required": false
       },
       {
         "name": "ResetWriteMode",
@@ -108,12 +123,26 @@
       {
         "name": "ReadRegister",
         "type": "uint8_t",
-        "help": "The register from which NBFC reads the fan speed."
+        "help": "The register from which NBFC reads the fan speed.",
+        "required": false
+      },
+      {
+        "name": "ReadAcpiMethod",
+        "type": "const char*",
+        "help": "The ACPI method for reading the fan speed.",
+        "required": false
       },
       {
         "name": "WriteRegister",
         "type": "uint8_t",
-        "help": "The register which NBFC uses to control the fan"
+        "help": "The register which NBFC uses to control the fan",
+        "required": false
+      },
+      {
+        "name": "WriteAcpiMethod",
+        "type": "const char*",
+        "help": "The ACPI method for setting the fan speed.",
+        "required": false
       },
       {
         "name": "MinSpeedValue",
@@ -128,14 +157,14 @@
       {
         "name": "MinSpeedValueRead",
         "type": "uint16_t",
-        "default": 0,
-        "help": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
+        "help": "The value which corresponds to the lowest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`.",
+        "required": false
       },
       {
         "name": "MaxSpeedValueRead",
         "type": "uint16_t",
-        "default": 0,
-        "help": "The value which corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`."
+        "help": "The value which corresponds to the highest possible fan speed. Will be ignored if IndependentReadMinMaxValues is `false`.",
+        "required": false
       },
       {
         "name": "IndependentReadMinMaxValues",
@@ -152,8 +181,14 @@
       {
         "name": "FanSpeedResetValue",
         "type": "uint16_t",
-        "default": 0,
-        "help": "Defines the value which will be written to WriteRegister to reset the EC."
+        "help": "Defines the value which will be written to WriteRegister to reset the EC.",
+        "required": false
+      },
+      {
+        "name": "ResetAcpiMethod",
+        "type": "const char*",
+        "help": "The ACPI method for resetting the fan speed.",
+        "required": false
       },
       {
         "name": "TemperatureAlgorithmType",

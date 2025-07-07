@@ -5,6 +5,7 @@
 #include "ec_sys_linux.h"
 #include "ec_debug.h"
 #include "ec_dummy.h"
+#include "acpi_call.h"
 #include "fan.h"
 #include "fs_sensors.h"
 #include "service_config.h"
@@ -38,10 +39,12 @@ ModelConfig              Service_Model_Config;
 array_of(FanTemperatureControl) Service_Fans;
 static enum Service_Initialization Service_State;
 
-static Error* ApplyRegisterWriteConfig(int, uint8_t, RegisterWriteMode);
-static Error* ApplyRegisterWriteConfgurations(bool);
-static Error* ResetRegisterWriteConfigs();
+static Error* ApplyRegisterWriteConfigurations(bool);
+static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration*);
+static Error* ResetRegisterWriteConfigurations();
+static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration*);
 static void   ResetEC();
+static bool   IsAcpiCallUsed();
 static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable*);
 static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
@@ -85,10 +88,8 @@ Error* Service_Init() {
 
   Trace_Push(&trace, path);
   e = ModelConfig_Validate(&trace, &Service_Model_Config);
-  if (e) {
-    e = err_string(e, trace.buf);
+  if (e)
     goto error;
-  }
 
   Sponsor_Print();
 
@@ -159,9 +160,18 @@ Error* Service_Init() {
 
   Service_State = Initialized_5_Embedded_Controller;
 
+  // ACPI Call ================================================================
+  if (IsAcpiCallUsed()) {
+    e = AcpiCall_Open();
+    if (e) {
+      e = err_string(0, "Could not load kernel module 'acpi_call'. Is it installed?");
+      goto error;
+    }
+  }
+
   // Register Write configurations ============================================
   if (! options.read_only) {
-    e = ApplyRegisterWriteConfgurations(true);
+    e = ApplyRegisterWriteConfigurations(true);
     if (e)
       goto error;
   }
@@ -198,7 +208,7 @@ Error* Service_Loop() {
   }
 
   if (! options.read_only) {
-    e = ApplyRegisterWriteConfgurations(re_init_required);
+    e = ApplyRegisterWriteConfigurations(re_init_required);
     if (e)
       goto error;
   }
@@ -260,7 +270,7 @@ static void ResetEC() {
   int tries = 10;
 
   do {
-    e = ResetRegisterWriteConfigs();
+    e = ResetRegisterWriteConfigurations();
     e_warn();
     if (e)
       failed = true;
@@ -274,38 +284,109 @@ static void ResetEC() {
   } while (failed && --tries);
 }
 
-static Error* ResetRegisterWriteConfigs() {
+static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
+  Error* e;
+  uint8_t mask;
+  uint64_t out;
+
+  switch (cfg->ResetWriteMode) {
+    case RegisterWriteMode_Set:
+      return ec->WriteByte(cfg->Register, cfg->ResetValue);
+
+    case RegisterWriteMode_And:
+      e = ec->ReadByte(cfg->Register, &mask);
+      e_check();
+      return ec->WriteByte(cfg->Register, cfg->ResetValue & mask);
+
+    case RegisterWriteMode_Or:
+      e = ec->ReadByte(cfg->Register, &mask);
+      e_check();
+      return ec->WriteByte(cfg->Register, cfg->ResetValue | mask);
+
+    case RegisterWriteMode_Call:
+      e = AcpiCall_Call(cfg->ResetAcpiMethod, strlen(cfg->ResetAcpiMethod), &out);
+      if (e)
+        return err_string(e, "ResetAcpiMethod");
+      else
+        return err_success();
+
+    default:
+      return err_string(0, "ResetRegisterWriteConfig: INTERNAL ERROR");
+  }
+}
+
+static Error* ResetRegisterWriteConfigurations() {
   Error* e = NULL;
   for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations)
     if (cfg->ResetRequired) {
-      e = ApplyRegisterWriteConfig(cfg->Register, cfg->ResetValue, cfg->ResetWriteMode);
+      e = ResetRegisterWriteConfig(cfg);
       e_warn();
     }
   return e;
 }
 
-static Error* ApplyRegisterWriteConfig(int register_, uint8_t value, RegisterWriteMode mode) {
-  if (mode != RegisterWriteMode_Set) {
-    uint8_t mask;
-    Error* e = ec->ReadByte(register_, &mask);
-    e_check();
-    if (mode == RegisterWriteMode_And)
-      value &= mask;
-    else if (mode == RegisterWriteMode_Or)
-      value |= mask;
-  }
+static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
+  Error* e;
+  uint8_t mask;
+  uint64_t out;
 
-  return ec->WriteByte(register_, value);
+  switch (cfg->WriteMode) {
+    case RegisterWriteMode_Set:
+      return ec->WriteByte(cfg->Register, cfg->Value);
+
+    case RegisterWriteMode_And:
+      e = ec->ReadByte(cfg->Register, &mask);
+      e_check();
+      return ec->WriteByte(cfg->Register, cfg->Value & mask);
+
+    case RegisterWriteMode_Or:
+      e = ec->ReadByte(cfg->Register, &mask);
+      e_check();
+      return ec->WriteByte(cfg->Register, cfg->Value | mask);
+
+    case RegisterWriteMode_Call:
+      e = AcpiCall_Call(cfg->AcpiMethod, strlen(cfg->AcpiMethod), &out);
+      if (e)
+        return err_string(e, "AcpiMethod");
+      else
+        return err_success();
+
+    default:
+      return err_string(0, "ApplyRegisterWriteConfig: INTERNAL ERROR");
+  }
 }
 
-static Error* ApplyRegisterWriteConfgurations(bool initializing) {
+static Error* ApplyRegisterWriteConfigurations(bool initializing) {
   for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations) {
     if (initializing || cfg->WriteOccasion == RegisterWriteOccasion_OnWriteFanSpeed) {
-       Error* e = ApplyRegisterWriteConfig(cfg->Register, cfg->Value, cfg->WriteMode);
+       Error* e = ApplyRegisterWriteConfig(cfg);
        e_check();
     }
   }
   return err_success();
+}
+
+static bool IsAcpiCallUsed() {
+  for_each_array(FanConfiguration*, fc, Service_Model_Config.FanConfigurations) {
+    if (FanConfiguration_IsSet_WriteAcpiMethod(fc))
+      return true;
+
+    if (FanConfiguration_IsSet_ReadAcpiMethod(fc))
+      return true;
+
+    if (FanConfiguration_IsSet_ResetAcpiMethod(fc))
+      return true;
+  }
+
+  for_each_array(RegisterWriteConfiguration*, rwc, Service_Model_Config.RegisterWriteConfigurations) {
+    if (rwc->WriteMode == RegisterWriteMode_Call)
+      return true;
+
+    if (rwc->ResetWriteMode == RegisterWriteMode_Call)
+      return true;
+  }
+
+  return false;
 }
 
 void Service_WriteTargetFanSpeedsToState() {

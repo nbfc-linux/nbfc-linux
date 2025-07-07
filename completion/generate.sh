@@ -1,6 +1,6 @@
 #!/bin/bash
 
-crazy_complete=crazy-complete
+crazy_complete=${CRAZY_COMPLETE:-crazy-complete}
 
 $crazy_complete bash ec_probe.yaml      > bash/ec_probe.in
 $crazy_complete bash nbfc.yaml          > bash/nbfc.in

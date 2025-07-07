@@ -154,6 +154,38 @@ The register which NBFC uses to control the fan.
 .RE
 
 .PP
+.BR ReadAcpiCommand :
+.IR String
+.RS
+The ACPI method for reading the fan speed.
+
+Example:
+.RS
+"ReadAcpiCommand": "\\\\_SB.PCI0.LPCB.EC0.GFSD"
+.RE
+
+This option is mutually exclusive to
+.BR ReadRegister .
+Only one of them can be set at a time.
+.RE
+
+.PP
+.BR WriteAcpiCommand :
+.IR String
+.RS
+The ACPI method for writing the fan speed. The command must contain a placeholder ($) which will be replaced by the fan speed.
+
+Example:
+.RS
+"WriteAcpiCommand": "\\\\_SB.PCI0.LPCB.EC0.SFSD $"
+.RE
+
+This option is mutually exclusive to
+.BR WriteRegister .
+Only one of them can be set at a time.
+.RE
+
+.PP
 .BR MinSpeedValue :
 .I Integer
 .RS
@@ -218,6 +250,17 @@ to reset the EC.
 .RE
 
 .PP
+.BR ResetAcpiCommand :
+.I String
+.RS
+The ACPI method to call upon fan reset.
+
+This option is mutually exclusive to
+.BR FanSpeedResetValue .
+Only one of them can be set at a time.
+.RE
+
+.PP
 .BR Sensors :
 .I Array of String
 .RS
@@ -236,6 +279,7 @@ or
 Uses all sensors named
 .BR  amdgpu ,
 .BR  nvidia ,
+.BR  nvidia-ml ,
 .BR  nouveau
 or
 .BR  radeon
@@ -276,14 +320,20 @@ Allows to write to any EC register
 Defines how the value will be written:
 
 .IP \(bu 2
+.BR Set :
+overwrites the register with the specified value (register = value)
+.IP \(bu 2
 .BR And :
 performs a binary AND operation (register = register & value)
 .IP \(bu 2
 .BR Or :
 performs a binary OR operation (register = register | value)
 .IP \(bu 2
-.BR Set :
-overwrites the register with the specified value (register = value)
+.BR Call :
+calls the ACPI method stored in
+.B AcpiCommand
+or
+.B ResetAcpiCommand
 .RE
 
 .PP
@@ -311,7 +361,18 @@ The register which will be manipulated.
 .BR Value :
 .I Integer
 .RS
-The Value which will be written
+The value which will be written.
+.RE
+
+.PP
+.BR AcpiCommand :
+.I String
+.RS
+The ACPI method to call.
+
+This option is mutually exclusive to
+.BR Value .
+Only one of them can be set at a time.
 .RE
 
 .PP
@@ -326,6 +387,17 @@ Defines if the register should be reset before the service is shut down.
 .I Integer
 .RS
 The value which will be written upon reset.
+.RE
+
+.PP
+.BR ResetAcpiCommand :
+.I String
+.RS
+The ACPI method to call upon reset.
+
+This option is mutually exclusive to
+.BR ResetValue .
+Only one of them can be set at a time.
 .RE
 
 .PP
@@ -374,10 +446,16 @@ Defines for which operations the speeds should be overridden:
 .RS
 .IP \(bu 2
 .BR Read :
-if the value in the EC's ReadRegister is equal to FanSpeedValue, the corresponding percentage will not be calculated, but instead be set to FanSpeedPercentage.
+if the value in the EC's ReadRegister is equal to
+.BR FanSpeedValue ,
+the corresponding percentage will not be calculated, but instead be set to
+.BR FanSpeedPercentage .
 .IP \(bu 2
 .BR Write :
-if the target fan speed percentage is equal to FanSpeedPercentage, the corresponding value will not be calculated, but instead be set to FanSpeedValue.
+if the target fan speed percentage is equal to
+.BR FanSpeedPercentage ,
+the corresponding value will not be calculated, but instead be set to
+.BR FanSpeedValue .
 .IP \(bu 2
 .BR ReadWrite :
 applies to both, read and write operations.

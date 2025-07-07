@@ -102,9 +102,10 @@ static Error* RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* 
   const char* s; // NOLINT
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
-  else if (!strcmp(s, "Set")) *out = RegisterWriteMode_Set;
-  else if (!strcmp(s, "And")) *out = RegisterWriteMode_And;
-  else if (!strcmp(s, "Or"))  *out = RegisterWriteMode_Or;
+  else if (!strcmp(s, "Set"))  *out = RegisterWriteMode_Set;
+  else if (!strcmp(s, "And"))  *out = RegisterWriteMode_And;
+  else if (!strcmp(s, "Or"))   *out = RegisterWriteMode_Or;
+  else if (!strcmp(s, "Call")) *out = RegisterWriteMode_Call;
   else return err_stringf(0, "Invalid value for %s: %s", "RegisterWriteMode", s);
   return e;
 }
@@ -337,6 +338,9 @@ void ModelConfig_Free(ModelConfig* c) {
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
     Mem_Free((char*) f->FanDisplayName);
+    Mem_Free((char*) f->ReadAcpiMethod);
+    Mem_Free((char*) f->WriteAcpiMethod);
+    Mem_Free((char*) f->ResetAcpiMethod);
     Mem_Free(f->TemperatureThresholds.data);
     Mem_Free(f->FanSpeedPercentageOverrides.data);
   }
@@ -344,6 +348,8 @@ void ModelConfig_Free(ModelConfig* c) {
   Mem_Free(c->FanConfigurations.data);
 
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
+    Mem_Free((char*) r->AcpiMethod);
+    Mem_Free((char*) r->ResetAcpiMethod);
     Mem_Free((char*) r->Description);
   }
 
@@ -407,28 +413,96 @@ Error* TemperatureThresholds_Validate(
   return err_success();
 }
 
+static Error* RegisterWriteConfiguration_Validate(const RegisterWriteConfiguration* r) {
+  const bool AcpiMethod                  = RegisterWriteConfiguration_IsSet_AcpiMethod(r);
+  const bool ResetAcpiMethod             = RegisterWriteConfiguration_IsSet_ResetAcpiMethod(r);
+  const bool Register                    = RegisterWriteConfiguration_IsSet_Register(r);
+  const bool Value                       = RegisterWriteConfiguration_IsSet_Value(r);
+  const bool ResetValue                  = RegisterWriteConfiguration_IsSet_ResetValue(r);
+  const bool ResetRequired               = r->ResetRequired;
+  const RegisterWriteMode WriteMode      = r->WriteMode;
+  const RegisterWriteMode ResetWriteMode = r->ResetWriteMode;
+
+  if (WriteMode == RegisterWriteMode_Call) {
+    if (! AcpiMethod)
+      return err_stringf(0, "%s: %s", "AcpiMethod", "Missing option");
+
+    if (Value)
+      return err_string(0, "Value: Cannot be used with WriteMode == Call");
+  }
+  else {
+    if (! Register)
+      return err_stringf(0, "%s: %s", "Register", "Missing option");
+
+    if (! Value)
+      return err_stringf(0, "%s: %s", "Value", "Missing option");
+
+    if (AcpiMethod)
+      return err_string(0, "AcpiMethod: Cannot be used with WriteMode == Set/And/Or");
+  }
+
+  if (ResetRequired) {
+    if (ResetWriteMode == RegisterWriteMode_Call) {
+      if (! ResetAcpiMethod)
+        return err_stringf(0, "%s: %s", "ResetAcpiMethod", "Missing option");
+
+      if (ResetValue)
+        return err_string(0, "ResetValue: Cannot be used with ResetWriteMode == Call");
+    }
+    else {
+      if (! Register)
+        return err_stringf(0, "%s: %s", "Register", "Missing option");
+
+      if (! ResetValue)
+        return err_stringf(0, "%s: %s", "ResetValue", "Missing option");
+
+      if (ResetAcpiMethod)
+        return err_string(0, "ResetAcpiMethod: Cannot be used with ResetWriteMode == Set/And/Or");
+    }
+  }
+  else {
+    /* This is actually the right behaviour, but too many old config files
+     * have ResetValue set even if ResetRequired is false.
+     *
+    if (ResetValue)
+      return err_string(0, "ResetValue: Cannot be used with ResetRequired == false");
+    */
+
+    if (ResetAcpiMethod)
+      return err_string(0, "ResetAcpiComand: Cannot be used with ResetRequired == false");
+  }
+
+  if (WriteMode == RegisterWriteMode_Call && ResetWriteMode == RegisterWriteMode_Call) {
+    if (Register)
+      return err_string(0, "Register: Cannot be used if both WriteMode == Call and ResetWriteMode == Call");
+  }
+
+  return err_success();
+}
+
 Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
   Error* e;
 
   e = ModelConfig_ValidateFields(c);
-  e_check();
+  e_goto(err);
 
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
     Trace_Push(trace, "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
 
-    // Don't make the validation fail if `ResetRequired` is false and `ResetValue` was not set
-    // This relies on the fact that all structs are zero-initialized, and that ResetRequired defaults to false.
-    if (r->ResetRequired == false)
-      RegisterWriteConfiguration_Set_ResetValue(r);
-
     e = RegisterWriteConfiguration_ValidateFields(r);
-    e_check();
+    e_goto(err);
+
+    e = RegisterWriteConfiguration_Validate(r);
+    e_goto(err);
 
     Trace_Pop(trace);
   }
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
     Trace_Push(trace, "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
+
+    e = FanConfiguration_ValidateFields(f);
+    e_goto(err);
 
     // Add a default FanDisplayName
     if (f->FanDisplayName == NULL) {
@@ -437,31 +511,83 @@ Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
       f->FanDisplayName = Mem_Strdup(fan_name);
     }
 
-    // Don't make the validation fail if `ResetRequired` is false and `FanSpeedResetValue` was not set
-    // This relies on the fact that all structs are zero-initialized, and that ResetRequired defaults to false.
-    if (f->ResetRequired == false)
-      FanConfiguration_Set_FanSpeedResetValue(f);
+    // If ResetRequired is true, ensure that one (and only one) of "FanSpeedResetValue" and "ResetAcpiMethod" is set
+    if (f->ResetRequired) {
+      const int reset_group = (FanConfiguration_IsSet_FanSpeedResetValue(f) + FanConfiguration_IsSet_ResetAcpiMethod(f));
+      if (reset_group == 0) {
+        e = err_stringf(0, "Missing option: %s or %s", "FanSpeedResetValue", "ResetAcpiMethod");
+        goto err;
+      }
+      if (reset_group > 1) {
+        e = err_stringf(0, "Cannot set both %s and %s", "FanSpeedResetValue", "ResetAcpiMethod");
+        goto err;
+      }
+    }
+    else {
+      /* This is actually the right behaviour, but too many old config files
+       * have FanSpeedResetValue set even if ResetRequired is false.
+       *
+      if (FanConfiguration_IsSet_FanSpeedResetValue(f)) {
+        e = err_string(0, "FanSpeedResetValue: Cannot be used with ResetRequired == false");
+        goto err;
+      }
+       */
 
-    e = FanConfiguration_ValidateFields(f);
-    e_check();
+      if (FanConfiguration_IsSet_ResetAcpiMethod(f)) {
+        e = err_string(0, "ResetAcpiMethod: Cannot be used with ResetRequired == false");
+        goto err;
+      }
+    }
+
+    // Ensure that one (and only one) of "WriteRegister" and "WriteAcpiMethod" is set
+    const int write_group = (FanConfiguration_IsSet_WriteRegister(f) + FanConfiguration_IsSet_WriteAcpiMethod(f));
+    if (write_group == 0) {
+      e = err_stringf(0, "Missing option: %s or %s", "WriteRegister", "WriteAcpiMethod");
+      goto err;
+    }
+    if (write_group > 1) {
+      e = err_stringf(0, "Cannot set both %s and %s", "WriteRegister", "WriteAcpiMethod");
+      goto err;
+    }
+
+    // Ensure that one (and only one) of "ReadRegister" and "ReadAcpiMethod" is set
+    const int read_group = (FanConfiguration_IsSet_ReadRegister(f) + FanConfiguration_IsSet_ReadAcpiMethod(f));
+    if (read_group == 0) {
+      e = err_stringf(0, "Missing option: %s or %s", "ReadRegister", "ReadAcpiMethod");
+      goto err;
+    }
+    if (read_group > 1) {
+      e = err_stringf(0, "Cannot set both %s and %s", "ReadRegister", "ReadAcpiMethod");
+      goto err;
+    }
 
     if (f->MinSpeedValue == f->MaxSpeedValue) {
       e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValue", "MaxSpeedValue");
-      return e;
+      goto err;
     }
 
-    if (f->IndependentReadMinMaxValues &&
-        f->MinSpeedValueRead == f->MaxSpeedValueRead)
-    {
-      e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValueRead", "MaxSpeedValueRead");
-      return e;
+    if (f->IndependentReadMinMaxValues) {
+      if (! FanConfiguration_IsSet_MinSpeedValueRead(f)) {
+        e = err_stringf(0, "%s: %s", "MinSpeedValueRead", "Missing option");
+        goto err;
+      }
+
+      if (! FanConfiguration_IsSet_MaxSpeedValueRead(f)) {
+        e = err_stringf(0, "%s: %s", "MaxSpeedValueRead", "Missing option");
+        goto err;
+      }
+
+      if (f->MinSpeedValueRead == f->MaxSpeedValueRead) {
+        e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValueRead", "MaxSpeedValueRead");
+        goto err;
+      }
     }
 
     for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
       Trace_Push(trace, "FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
 
       e = FanSpeedPercentageOverride_ValidateFields(o);
-      e_check();
+      e_goto(err);
 
       Trace_Pop(trace);
     }
@@ -480,12 +606,15 @@ Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
     }
 
     e = TemperatureThresholds_Validate(trace, &f->TemperatureThresholds, c->CriticalTemperature);
-    e_check();
+    e_goto(err);
 
     Trace_Pop(trace);
   }
 
   return err_success();
+
+err:
+  return err_string(e, trace->buf);
 }
 
 Error* ModelConfig_FromFile(ModelConfig* config, const char* file) {

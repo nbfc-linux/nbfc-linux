@@ -6,9 +6,11 @@
 #include "sleep.h"
 #include "ec_linux.h"
 #include "ec_sys_linux.h"
+#include "acpi_call.h"
 #include "model_config.h"
 #include "optparse/optparse.h"
 #include "parse_number.h"
+#include "parse_unumber.h"
 #include "parse_double.h"
 #include "help/ec_probe.help.h"
 #include "program_name.c"
@@ -36,6 +38,7 @@
 #include "ec_sys_linux.c"      // src
 #endif
 
+#include "acpi_call.c"         // src
 #include "log.c"               // src
 #include "optparse/optparse.c" // src
 #include "memory.c"            // src
@@ -92,6 +95,7 @@ static int Dump();
 static int Load();
 static int Monitor();
 static int Watch();
+static int AcpiCall();
 static int Shell();
 
 enum Command {
@@ -101,13 +105,14 @@ enum Command {
   Command_Load,
   Command_Monitor,
   Command_Watch,
+  Command_AcpiCall,
   Command_Shell,
   Command_Help,
   Command_End
 };
 
 static enum Command Command_FromString(const char* s) {
-  const char* cmds[] = { "read", "write", "dump", "load", "monitor", "watch", "shell", "help" };
+  const char* cmds[] = { "read", "write", "dump", "load", "monitor", "watch", "acpi_call", "shell", "help" };
 
   for (int i = 0; i < ARRAY_SSIZE(cmds); ++i)
     if (!strcmp(cmds[i], s))
@@ -123,6 +128,7 @@ static const char* HelpTexts[] = {
   EC_PROBE_LOAD_HELP_TEXT,
   EC_PROBE_MONITOR_HELP_TEXT,
   EC_PROBE_WATCH_HELP_TEXT,
+  EC_PROBE_ACPI_CALL_HELP_TEXT,
   EC_PROBE_SHELL_HELP_TEXT,
   EC_PROBE_HELP_TEXT,
 };
@@ -144,6 +150,8 @@ enum Option {
   Option_Decimal,
   Option_Timespan,
   Option_Interval,
+  Option_AcpiCallMethod,
+  Option_AcpiCallArgument,
 };
 
 static const cli99_option main_options[] = {
@@ -199,6 +207,20 @@ static const cli99_option watch_command_options[] = {
   cli99_options_end()
 };
 
+static const cli99_option acpi_call_command_options[] = {
+  cli99_include_options(&main_options),
+  {"method",                   Option_AcpiCallMethod,      1|cli99_required_option},
+  {"arg1",                     Option_AcpiCallArgument,    1},
+  {"arg2",                     Option_AcpiCallArgument,    1},
+  {"arg3",                     Option_AcpiCallArgument,    1},
+  {"arg4",                     Option_AcpiCallArgument,    1},
+  {"arg5",                     Option_AcpiCallArgument,    1},
+  {"arg6",                     Option_AcpiCallArgument,    1},
+  {"arg7",                     Option_AcpiCallArgument,    1},
+  {"arg8",                     Option_AcpiCallArgument,    1},
+  cli99_options_end()
+};
+
 static const cli99_option* Options[] = {
   read_command_options,
   write_command_options,
@@ -206,6 +228,7 @@ static const cli99_option* Options[] = {
   load_command_options,
   monitor_command_options,
   watch_command_options,
+  acpi_call_command_options,
   main_options, // shell
   main_options, // help
 };
@@ -227,6 +250,9 @@ static struct {
   uint16_t      value;
   bool          use_word;
   enum UseColor use_color;
+  const char*   acpi_call_method;
+  uint64_t      acpi_call_args[8];
+  int           acpi_call_args_size;
 } options = {0};
 
 const char RegisterHeader[] =
@@ -322,6 +348,16 @@ int main(int argc, char* const argv[]) {
         return NBFC_EXIT_CMDLINE;
       }
       break;
+    case Option_AcpiCallMethod:
+      options.acpi_call_method = p.optarg;
+      break;
+    case Option_AcpiCallArgument:
+      options.acpi_call_args[options.acpi_call_args_size++] = parse_unumber(p.optarg, 0, UINT64_MAX, &err);
+      if (err) {
+        Log_Error("Argument: %s: %s\n", p.optarg, err);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
     default:
       cli99_ExplainError(&p);
       return NBFC_EXIT_CMDLINE;
@@ -355,14 +391,15 @@ int main(int argc, char* const argv[]) {
   e_die();
 
   switch (cmd) {
-  case Command_Dump:    return Dump();
-  case Command_Load:    return Load();
-  case Command_Read:    return Read();
-  case Command_Write:   return Write();
-  case Command_Monitor: return Monitor();
-  case Command_Watch:   return Watch();
-  case Command_Shell:   return Shell();
-  default:              return NBFC_EXIT_FAILURE;
+  case Command_Dump:     return Dump();
+  case Command_Load:     return Load();
+  case Command_Read:     return Read();
+  case Command_Write:    return Write();
+  case Command_Monitor:  return Monitor();
+  case Command_Watch:    return Watch();
+  case Command_AcpiCall: return AcpiCall();
+  case Command_Shell:    return Shell();
+  default:               return NBFC_EXIT_FAILURE;
   }
 }
 
@@ -484,6 +521,41 @@ static int Watch() {
   }
 
   return 0;
+}
+
+static int AcpiCall() {
+  Error* e;
+  char cmd[1024];
+
+  e = AcpiCall_Open();
+  e_die();
+
+  char fmt[] = "%s 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX";
+  fmt[2 + options.acpi_call_args_size * 6] = '\0';
+
+  ssize_t cmd_len = snprintf(cmd, sizeof(cmd), fmt,
+    options.acpi_call_method,
+    options.acpi_call_args[0],
+    options.acpi_call_args[1],
+    options.acpi_call_args[2],
+    options.acpi_call_args[3],
+    options.acpi_call_args[4],
+    options.acpi_call_args[5],
+    options.acpi_call_args[6],
+    options.acpi_call_args[7]
+  );
+
+  if (cmd_len == -1 || cmd_len >= (sizeof(cmd))) {
+    Log_Error("Method (including arguments) is too long\n");
+    return NBFC_EXIT_FAILURE;
+  }
+
+  uint64_t out;
+  e = AcpiCall_Call(cmd, cmd_len, &out);
+  e_die();
+  printf("0x%lX\n", out);
+
+  return NBFC_EXIT_SUCCESS;
 }
 
 static void Handle_Signal(int sig) {

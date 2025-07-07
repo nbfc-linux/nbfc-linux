@@ -249,6 +249,8 @@ _ec_probe__command() {
     write:'Write a byte to a EC register'
     monitor:'Monitor all EC registers for changes'
     watch:'Monitor all EC registers for changes (alternative version)'
+    acpi_call:'Call an ACPI method'
+    shell:'Read commands from STDIN'
   )
 
   _describe -- command items
@@ -266,6 +268,8 @@ _ec_probe() {
     (write) _ec_probe_write; return $?;;
     (monitor) _ec_probe_monitor; return $?;;
     (watch) _ec_probe_watch; return $?;;
+    (acpi_call) _ec_probe_acpi_call; return $?;;
+    (shell) _ec_probe_shell; return $?;;
   esac
 
   local -a args=(
@@ -328,6 +332,29 @@ _ec_probe_watch() {
   local -a args=(
     '(--interval -i)'{-i+,--interval=}'[Sets the update interval in seconds]':seconds:"_numbers -f"
     '(--timespan -t)'{-t+,--timespan=}'[Sets how many seconds the program will run]':seconds:_numbers
+    1:command1:_ec_probe__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_ec_probe_acpi_call() {
+  local -a args=(
+    1:command1:_ec_probe__command
+    2:'Method to call':' '
+    3:'First argument':_numbers
+    4:'Second argument':_numbers
+    5:'Third argument':_numbers
+    6:'Fourth argument':_numbers
+    7:'Fifth argument':_numbers
+    8:'Sixth argument':_numbers
+    9:'Seventh argument':_numbers
+    10:'Eighth argument':_numbers
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_ec_probe_shell() {
+  local -a args=(
     1:command1:_ec_probe__command
   )
   _arguments -S -s -w "${args[@]}"

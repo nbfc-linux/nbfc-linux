@@ -15,6 +15,7 @@
  "  write                 Write a byte to a EC register\n"                     \
  "  monitor               Monitor all EC registers for changes\n"              \
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
+ "  acpi_call             Call an ACPI method\n"                               \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default. Hexadecimal values may be entered by prefixing them with \"0x\".\n"\
  ""
@@ -99,6 +100,17 @@
  "                        Sets the update interval in seconds\n"               \
  "  -t seconds, --timespan SECONDS\n"                                          \
  "                        Sets how many seconds the program will run\n"        \
+ ""
+
+#define EC_PROBE_ACPI_CALL_HELP_TEXT                                           \
+ "Usage: %s acpi_call [-h] METHOD [ARGUMENT...]\n"                             \
+ "\n"                                                                          \
+ "Call an ACPI method.\n"                                                      \
+ "\n"                                                                          \
+ "The maximum number of arguments is 8.\n"                                     \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define EC_PROBE_SHELL_HELP_TEXT                                               \

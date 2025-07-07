@@ -99,17 +99,23 @@ Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* sel
 	if (! RegisterWriteConfiguration_IsSet_WriteOccasion(self))
 		self->WriteOccasion = RegisterWriteOccasion_OnInitialization;
 
-	if (! RegisterWriteConfiguration_IsSet_Register(self))
+	if (false)
 		return err_stringf(0, "%s: %s", "Register", "Missing option");
 
-	if (! RegisterWriteConfiguration_IsSet_Value(self))
+	if (false)
 		return err_stringf(0, "%s: %s", "Value", "Missing option");
+
+	if (false)
+		return err_stringf(0, "%s: %s", "AcpiMethod", "Missing option");
 
 	if (! RegisterWriteConfiguration_IsSet_ResetRequired(self))
 		self->ResetRequired = false;
 
-	if (! RegisterWriteConfiguration_IsSet_ResetValue(self))
+	if (false)
 		return err_stringf(0, "%s: %s", "ResetValue", "Missing option");
+
+	if (false)
+		return err_stringf(0, "%s: %s", "ResetAcpiMethod", "Missing option");
 
 	if (! RegisterWriteConfiguration_IsSet_ResetWriteMode(self))
 		self->ResetWriteMode = RegisterWriteMode_Set;
@@ -149,6 +155,11 @@ Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, cons
 			if (!e)
 				RegisterWriteConfiguration_Set_Value(obj);
 		}
+		else if (!strcmp(c->key, "AcpiMethod")) {
+			e = str_FromJson(&obj->AcpiMethod, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_AcpiMethod(obj);
+		}
 		else if (!strcmp(c->key, "ResetRequired")) {
 			e = bool_FromJson(&obj->ResetRequired, c);
 			if (!e)
@@ -158,6 +169,11 @@ Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, cons
 			e = uint16_t_FromJson(&obj->ResetValue, c);
 			if (!e)
 				RegisterWriteConfiguration_Set_ResetValue(obj);
+		}
+		else if (!strcmp(c->key, "ResetAcpiMethod")) {
+			e = str_FromJson(&obj->ResetAcpiMethod, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_ResetAcpiMethod(obj);
 		}
 		else if (!strcmp(c->key, "ResetWriteMode")) {
 			e = RegisterWriteMode_FromJson(&obj->ResetWriteMode, c);
@@ -180,11 +196,17 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
 		return err_stringf(0, "%s: %s", "FanDisplayName", "Missing option");
 
-	if (! FanConfiguration_IsSet_ReadRegister(self))
+	if (false)
 		return err_stringf(0, "%s: %s", "ReadRegister", "Missing option");
 
-	if (! FanConfiguration_IsSet_WriteRegister(self))
+	if (false)
+		return err_stringf(0, "%s: %s", "ReadAcpiMethod", "Missing option");
+
+	if (false)
 		return err_stringf(0, "%s: %s", "WriteRegister", "Missing option");
+
+	if (false)
+		return err_stringf(0, "%s: %s", "WriteAcpiMethod", "Missing option");
 
 	if (! FanConfiguration_IsSet_MinSpeedValue(self))
 		return err_stringf(0, "%s: %s", "MinSpeedValue", "Missing option");
@@ -192,11 +214,11 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (! FanConfiguration_IsSet_MaxSpeedValue(self))
 		return err_stringf(0, "%s: %s", "MaxSpeedValue", "Missing option");
 
-	if (! FanConfiguration_IsSet_MinSpeedValueRead(self))
-		self->MinSpeedValueRead = 0;
+	if (false)
+		return err_stringf(0, "%s: %s", "MinSpeedValueRead", "Missing option");
 
-	if (! FanConfiguration_IsSet_MaxSpeedValueRead(self))
-		self->MaxSpeedValueRead = 0;
+	if (false)
+		return err_stringf(0, "%s: %s", "MaxSpeedValueRead", "Missing option");
 
 	if (! FanConfiguration_IsSet_IndependentReadMinMaxValues(self))
 		self->IndependentReadMinMaxValues = false;
@@ -204,8 +226,11 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (! FanConfiguration_IsSet_ResetRequired(self))
 		self->ResetRequired = false;
 
-	if (! FanConfiguration_IsSet_FanSpeedResetValue(self))
-		self->FanSpeedResetValue = 0;
+	if (false)
+		return err_stringf(0, "%s: %s", "FanSpeedResetValue", "Missing option");
+
+	if (false)
+		return err_stringf(0, "%s: %s", "ResetAcpiMethod", "Missing option");
 
 	if (false)
 		return err_stringf(0, "%s: %s", "TemperatureAlgorithmType", "Missing option");
@@ -241,10 +266,20 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 			if (!e)
 				FanConfiguration_Set_ReadRegister(obj);
 		}
+		else if (!strcmp(c->key, "ReadAcpiMethod")) {
+			e = str_FromJson(&obj->ReadAcpiMethod, c);
+			if (!e)
+				FanConfiguration_Set_ReadAcpiMethod(obj);
+		}
 		else if (!strcmp(c->key, "WriteRegister")) {
 			e = uint8_t_FromJson(&obj->WriteRegister, c);
 			if (!e)
 				FanConfiguration_Set_WriteRegister(obj);
+		}
+		else if (!strcmp(c->key, "WriteAcpiMethod")) {
+			e = str_FromJson(&obj->WriteAcpiMethod, c);
+			if (!e)
+				FanConfiguration_Set_WriteAcpiMethod(obj);
 		}
 		else if (!strcmp(c->key, "MinSpeedValue")) {
 			e = uint16_t_FromJson(&obj->MinSpeedValue, c);
@@ -280,6 +315,11 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 			e = uint16_t_FromJson(&obj->FanSpeedResetValue, c);
 			if (!e)
 				FanConfiguration_Set_FanSpeedResetValue(obj);
+		}
+		else if (!strcmp(c->key, "ResetAcpiMethod")) {
+			e = str_FromJson(&obj->ResetAcpiMethod, c);
+			if (!e)
+				FanConfiguration_Set_ResetAcpiMethod(obj);
 		}
 		else if (!strcmp(c->key, "TemperatureAlgorithmType")) {
 			e = TemperatureAlgorithmType_FromJson(&obj->TemperatureAlgorithmType, c);

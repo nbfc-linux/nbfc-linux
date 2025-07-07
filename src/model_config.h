@@ -15,6 +15,7 @@ enum NBFC_PACKED_ENUM RegisterWriteMode_ {
   RegisterWriteMode_Set,
   RegisterWriteMode_And,
   RegisterWriteMode_Or,
+  RegisterWriteMode_Call,
   RegisterWriteMode_Unset,
 };
 

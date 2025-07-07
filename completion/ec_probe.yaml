@@ -90,3 +90,54 @@ options:
     metavar: "seconds"
     help: "Sets how many seconds the program will run"
     complete: ["integer"]
+---
+prog: "ec_probe acpi_call"
+help: "Call an ACPI method"
+positionals:
+  - number: 1
+    metavar: "METHOD"
+    help: "Method to call"
+    complete: ["none"]
+
+  - number: 2
+    metavar: "ARG1"
+    help: "First argument"
+    complete: ["integer"]
+
+  - number: 3
+    metavar: "ARG2"
+    help: "Second argument"
+    complete: ["integer"]
+
+  - number: 4
+    metavar: "ARG3"
+    help: "Third argument"
+    complete: ["integer"]
+
+  - number: 5
+    metavar: "ARG4"
+    help: "Fourth argument"
+    complete: ["integer"]
+
+  - number: 6
+    metavar: "ARG5"
+    help: "Fifth argument"
+    complete: ["integer"]
+
+  - number: 7
+    metavar: "ARG6"
+    help: "Sixth argument"
+    complete: ["integer"]
+
+  - number: 8
+    metavar: "ARG7"
+    help: "Seventh argument"
+    complete: ["integer"]
+
+  - number: 9
+    metavar: "ARG8"
+    help: "Eighth argument"
+    complete: ["integer"]
+---
+prog: "ec_probe shell"
+help: "Read commands from STDIN"

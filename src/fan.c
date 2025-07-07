@@ -2,9 +2,11 @@
 
 #include "error.h"
 #include "ec.h"
+#include "acpi_call.h"
 
-#include <math.h>  // fabs, round
-#include <errno.h> // EINVAL
+#include <math.h>    // fabs, round
+#include <errno.h>   // EINVAL
+#include <string.h>  // strlen
 #include <stdbool.h>
 
 extern EC_VTable* ec;
@@ -84,22 +86,44 @@ static float Fan_FanSpeedToPercentage(const Fan* self, uint16_t fanSpeed) {
 }
 
 static Error* Fan_ECWriteValue(Fan* self, uint16_t value) {
+  if (my.fanConfig->WriteAcpiMethod) {
+    uint64_t out;
+    Error* e = AcpiCall_CallTemplate(my.fanConfig->WriteAcpiMethod, value, &out);
+    if (e)
+      return err_string(e, "WriteAcpiMethod");
+    else
+      return err_success();
+  }
+
   return my.readWriteWords
     ? ec->WriteWord(my.fanConfig->WriteRegister, value)
     : ec->WriteByte(my.fanConfig->WriteRegister, value);
 }
 
 static Error* Fan_ECReadValue(const Fan* self, uint16_t* out) {
+  Error* e;
+
+  if (my.fanConfig->ReadAcpiMethod) {
+    const ssize_t len = strlen(my.fanConfig->ReadAcpiMethod);
+    uint64_t val;
+    e = AcpiCall_Call(my.fanConfig->ReadAcpiMethod, len, &val);
+    if (e)
+      return err_string(e, "ReadAcpiMethod");
+    else
+      *out = val;
+    return e;
+  }
+
   if (my.readWriteWords) {
     uint16_t word;
-    Error* e = ec->ReadWord(my.fanConfig->ReadRegister, &word);
+    e = ec->ReadWord(my.fanConfig->ReadRegister, &word);
     if (!e)
       *out = word;
     return e;
   }
   else {
     uint8_t byte;
-    Error* e = ec->ReadByte(my.fanConfig->ReadRegister, &byte);
+    e = ec->ReadByte(my.fanConfig->ReadRegister, &byte);
     if (!e)
       *out = byte;
     return e;
@@ -184,9 +208,20 @@ uint16_t Fan_GetSpeedSteps(const Fan* self) {
 }
 
 Error* Fan_ECReset(Fan* self) {
-  if (my.fanConfig->ResetRequired)
-    return Fan_ECWriteValue(self, my.fanConfig->FanSpeedResetValue);
-  return err_success();
+  if (! my.fanConfig->ResetRequired)
+    return err_success();
+
+  if (my.fanConfig->ResetAcpiMethod) {
+    const ssize_t len = strlen(my.fanConfig->ResetAcpiMethod);
+    uint64_t out;
+    Error* e = AcpiCall_Call(my.fanConfig->ResetAcpiMethod, len, &out);
+    if (e)
+      return err_string(e, "ResetAcpiMethod");
+    else
+      return err_success();
+  }
+
+  return Fan_ECWriteValue(self, my.fanConfig->FanSpeedResetValue);
 }
 
 Error* Fan_ECFlush(Fan* self) {

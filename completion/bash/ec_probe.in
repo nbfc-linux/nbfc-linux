@@ -214,6 +214,10 @@ _ec_probe_parse_commandline() {
               cmd+=" monitor";;
             watch)
               cmd+=" watch";;
+            acpi_call)
+              cmd+=" acpi_call";;
+            shell)
+              cmd+=" shell";;
             *) cmd+=" $arg";;
           esac
         fi
@@ -251,6 +255,8 @@ _ec_probe() {
       write) _ec_probe_write && return 0 || return 1;;
       monitor) _ec_probe_monitor && return 0 || return 1;;
       watch) _ec_probe_watch && return 0 || return 1;;
+      acpi_call) _ec_probe_acpi_call && return 0 || return 1;;
+      shell) _ec_probe_shell && return 0 || return 1;;
     esac
   fi
 
@@ -301,7 +307,7 @@ _ec_probe() {
   fi
 
   test "$POSITIONAL_NUM" -eq 1 && {
-    COMPREPLY=($(compgen -W 'dump load read write monitor watch' -- "$cur"))
+    COMPREPLY=($(compgen -W 'dump load read write monitor watch acpi_call shell' -- "$cur"))
     return 0;
   }
 
@@ -512,6 +518,57 @@ _ec_probe_watch() {
   fi
 
   return 1
+}
+
+_ec_probe_acpi_call() {
+  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
+  local -a OPT_help OPT_embedded_controller
+
+  _ec_probe_parse_commandline
+
+  local COMP_WORDBREAKS=''
+
+  test "$POSITIONAL_NUM" -eq 2 && {
+    return 0;
+  }
+
+  test "$POSITIONAL_NUM" -eq 3 && {
+    return 0;
+  }
+
+  test "$POSITIONAL_NUM" -eq 4 && {
+    return 0;
+  }
+
+  test "$POSITIONAL_NUM" -eq 5 && {
+    return 0;
+  }
+
+  test "$POSITIONAL_NUM" -eq 6 && {
+    return 0;
+  }
+
+  test "$POSITIONAL_NUM" -eq 7 && {
+    return 0;
+  }
+
+  test "$POSITIONAL_NUM" -eq 8 && {
+    return 0;
+  }
+
+  test "$POSITIONAL_NUM" -eq 9 && {
+    return 0;
+  }
+
+  test "$POSITIONAL_NUM" -eq 10 && {
+    return 0;
+  }
+
+  return 1
+}
+
+_ec_probe_shell() {
+  return 0
 }
 
 complete -F _ec_probe ec_probe

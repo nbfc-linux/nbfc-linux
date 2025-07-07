@@ -9,7 +9,9 @@ function _ec_probe__command
     read 'Read a byte from a EC register' \
     write 'Write a byte to a EC register' \
     monitor 'Monitor all EC registers for changes' \
-    watch 'Monitor all EC registers for changes (alternative version)'
+    watch 'Monitor all EC registers for changes (alternative version)' \
+    acpi_call 'Call an ACPI method' \
+    shell 'Read commands from STDIN'
 end
 
 function _ec_probe_fish_query
@@ -290,5 +292,29 @@ set -l C000 "$query '$opts' positional_contains 1 watch && not $query '$opts' ha
 set -l C001 "$query '$opts' positional_contains 1 watch && not $query '$opts' has_option -t --timespan"
 complete -c $prog -n $C000 -s i -l interval -d 'Sets the update interval in seconds' -x
 complete -c $prog -n $C001 -s t -l timespan -d 'Sets how many seconds the program will run' -x
+
+# command ec_probe acpi_call
+set -l opts "-h,--help,-e=,--embedded-controller="
+set -l C000 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 1"
+set -l C001 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 2"
+set -l C002 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 3"
+set -l C003 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 4"
+set -l C004 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 5"
+set -l C005 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 6"
+set -l C006 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 7"
+set -l C007 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 8"
+set -l C008 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 9"
+complete -c $prog -n $C000 -d 'Method to call' -x
+complete -c $prog -n $C001 -d 'First argument' -x
+complete -c $prog -n $C002 -d 'Second argument' -x
+complete -c $prog -n $C003 -d 'Third argument' -x
+complete -c $prog -n $C004 -d 'Fourth argument' -x
+complete -c $prog -n $C005 -d 'Fifth argument' -x
+complete -c $prog -n $C006 -d 'Sixth argument' -x
+complete -c $prog -n $C007 -d 'Seventh argument' -x
+complete -c $prog -n $C008 -d 'Eighth argument' -x
+
+# command ec_probe shell
+set -l opts "-h,--help,-e=,--embedded-controller="
 
 # vim: ft=fish ts=2 sts=2 sw=2 et

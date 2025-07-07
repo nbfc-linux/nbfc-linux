@@ -1,4 +1,4 @@
-version     = 0.3.19
+version     = 0.3.20
 
 PREFIX      = /usr
 
@@ -208,6 +208,7 @@ clean:
 # =============================================================================
 
 src/nbfc_service: \
+	src/acpi_call.h src/acpi_call.c \
 	src/build.c \
 	src/config.h \
 	src/ec_debug.h src/ec_debug.c \
@@ -243,6 +244,7 @@ src/nbfc_service: \
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDLIBS_SERVICE) $(LDFLAGS)
 
 src/ec_probe: \
+	src/acpi_call.h src/acpi_call.c \
 	src/config.h \
 	src/ec_probe.c \
 	src/ec_sys_linux.h src/ec_sys_linux.c \

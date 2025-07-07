@@ -1,5 +1,26 @@
 # Changelog
 
+## nbfc-linux-0.3.20 (2025-06-06)
+- Added support for calling ACPI methods
+
+  NBFC-Linux can now call ACPI methods to read or write the fan speed.
+  ACPI methods are also supported in RegisterWriteConfigurations.
+  This is useful if the fan cannot be controlled via simple EC register
+  manipulations.
+
+  In `FanConfiguration`:
+    - `ReadAcpiMethod`: Read the fan speed using an ACPI method
+    - `WriteAcpiMethod`: Write the fan speed using an ACPI method
+    - `ResetAcpiMethod`: Reset the fan using an ACPI method
+
+  In `RegisterWriteConfiguration`:
+    - `AcpiMethod` (requires `WriteMode` set to `Call`)
+    - `ResetAcpiMethod` (requires `ResetWriteMode` set to `Call`)
+
+  The `ec_probe` tool now supports calling methods using the `acpi_call` command.
+
+  This requires the `acpi_call` module to be installed.
+
 ## nbfc-linux-0.3.18 (2025-05-24)
 - New model configuration files
 
