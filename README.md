@@ -7,6 +7,8 @@ It provides the same utilities with the same interfaces as the original NBFC, al
 
 To check if your laptop is supported, use the [Configuration Search](https://nbfc-linux.github.io/configs/).
 
+If you want to write a configuration for your laptop model, see [Configuration HowTo](https://nbfc-linux.github.io/creating-config/).
+
 If you find my work helpful, you can show your appreciation by [buying me a coffee](https://paypal.me/BenjaminAbendroth).
 
 Table of Contents
@@ -29,7 +31,7 @@ Comparison of NBFC C# and NBFC Linux
 |What                             | NBFC Mono                             | NBFC Linux                                  |
 |---------------------------------|---------------------------------------|----------------------------------------------
 |Portability                      | Crossplatform                         | Linux                                       |
-|Configuration files              | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) (210 files) | [JSON](share/nbfc/configs) (290 files) |
+|Configuration files              | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) (210 files) | [JSON](share/nbfc/configs) (297 files) |
 |Model compatibility database     | No                                    | [Yes](share/nbfc/model_support.json)        |
 |Runtime                          | Mono                                  | Native                                      |
 |Memory consumption (ps\_mem)     | ~50MB                                 | ~280KB                                      |
