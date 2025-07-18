@@ -1,0 +1,30 @@
+{
+  "NotebookModel": "HP Pavilion 17 Notebook PC",
+  "Author": "Benjamin Abendroth",
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "CPU Fan",
+      "ResetRequired": true,
+      "WriteRegister": 244,
+      "ReadAcpiMethod": "\\_TZ.TZ01.FRSP",
+      "MinSpeedValue": 55,
+      "MaxSpeedValue": 100,
+      "FanSpeedResetValue": 0,
+      "IndependentReadMinMaxValues": true,
+      "MinSpeedValueRead": 300,
+      "MaxSpeedValueRead": 1380,
+      "FanSpeedPercentageOverrides": [
+        {
+          "FanSpeedPercentage": 0,
+          "FanSpeedValue": 1,
+          "TargetOperation": "Write"
+        },
+        {
+          "FanSpeedPercentage": 0,
+          "FanSpeedValue": 0,
+          "TargetOperation": "Read"
+        }
+      ]
+    }
+  ]
+}
