@@ -1,0 +1,25 @@
+{
+  "NotebookModel": "ASUSTeK COMPUTER INC. X551CA",
+  "Author": "Benjamin Abendroth",
+  "EcPollInterval": 3000,
+  "CriticalTemperature": 85,
+  "CriticalTemperatureOffset": 15,
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "CPU Fan",
+      "ResetRequired": true,
+      "ReadAcpiMethod": "\\_SB.PCI0.LPCB.EC0.RRAM 6151",
+      "WriteAcpiMethod": "\\_SB.PCI0.LPCB.EC0.SFNV 1 $",
+      "ResetAcpiMethod": "\\_SB.PCI0.LPCB.EC0.SFNV 0 0",
+      "MinSpeedValue": 30,
+      "MaxSpeedValue": 255,
+      "FanSpeedPercentageOverrides": [
+        {
+          "FanSpeedValue": 0,
+          "FanSpeedPercentage": 0.0,
+          "TargetOperation": "ReadWrite"
+        }
+      ]
+    }
+  ]
+}
