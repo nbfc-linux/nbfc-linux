@@ -170,6 +170,14 @@ int main(int argc, char* const argv[])
 
   atexit(Server_Close);
 
+  // We need to call Service_Loop once to catch and print errors early,
+  // since we will fork and close STDERR later.
+  e = Service_Loop();
+  if (e) {
+    Log_Error("%s\n", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
   if (options.fork) {
     Nvidia_Close();
 
