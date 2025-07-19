@@ -1,0 +1,14 @@
+{
+  "NotebookModel": "Acer Aspire ES1-711",
+  "Author": "Benjamin Abendroth",
+  "EcPollInterval": 300,
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "CPU Fan",
+      "ReadRegister": 85,
+      "WriteRegister": 85,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 7
+    }
+  ]
+}
