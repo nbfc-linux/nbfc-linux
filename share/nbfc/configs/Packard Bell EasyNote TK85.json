@@ -1,0 +1,16 @@
+{
+  "NotebookModel": "Packard Bell EasyNote TK85",
+  "Author": "Benjamin Abendroth",
+  "EcPollInterval": 500,
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "CPU Fan",
+      "ResetRequired": true,
+      "ReadAcpiMethod": "\\_SB.PCI0.LPCB.EC0.FANG 33026",
+      "WriteAcpiMethod": "\\_SB.PCI0.LPCB.EC0.FANW 33026 $",
+      "ResetAcpiMethod": "\\_SB.PCI0.LPCB.EC0.FANW 33026 0xFF",
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 255
+    }
+  ]
+}
