@@ -97,6 +97,29 @@ Defines how NBFC controls a fan
 
 > The register which NBFC uses to control the fan.
 
+**ReadAcpiCommand**: *String*
+
+> The ACPI method for reading the fan speed.
+>
+> Example:
+>
+> > \"ReadAcpiCommand\": \"\\\\\_SB.PCI0.LPCB.EC0.GFSD\"
+>
+> This option is mutually exclusive to **ReadRegister**. Only one of
+> them can be set at a time.
+
+**WriteAcpiCommand**: *String*
+
+> The ACPI method for writing the fan speed. The command must contain a
+> placeholder (\$) which will be replaced by the fan speed.
+>
+> Example:
+>
+> > \"WriteAcpiCommand\": \"\\\\\_SB.PCI0.LPCB.EC0.SFSD \$\"
+>
+> This option is mutually exclusive to **WriteRegister**. Only one of
+> them can be set at a time.
+
 **MinSpeedValue**: *Integer*
 
 > The value which puts the fan to the lowest possible speed (usually
@@ -132,6 +155,13 @@ Defines how NBFC controls a fan
 > Defines the value which will be written to **WriteRegister** to reset
 > the EC.
 
+**ResetAcpiCommand**: *String*
+
+> The ACPI method to call upon fan reset.
+>
+> This option is mutually exclusive to **FanSpeedResetValue**. Only one
+> of them can be set at a time.
+
 **Sensors**: *Array of String*
 
 > Defines which sensors shall be used for this fan. This should either
@@ -143,7 +173,7 @@ Defines how NBFC controls a fan
 >     **zenpower**
 >
 > -   **\@GPU**: Uses all sensors named **amdgpu**, **nvidia**,
->     **nouveau** or **radeon**
+>     **nvidia-ml**, **nouveau** or **radeon**
 
 **TemperatureAlgorithmType**: *String*
 
@@ -170,14 +200,17 @@ Allows to write to any EC register
 
 > Defines how the value will be written:
 >
+> -   **Set**: overwrites the register with the specified value
+>     (register = value)
+>
 > -   **And**: performs a binary AND operation (register = register &
 >     value)
 >
 > -   **Or**: performs a binary OR operation (register = register \|
 >     value)
 >
-> -   **Set**: overwrites the register with the specified value
->     (register = value)
+> -   **Call**: calls the ACPI method stored in **AcpiCommand** or
+>     **ResetAcpiCommand**
 
 **WriteOccasion**: *String*
 
@@ -196,7 +229,14 @@ Allows to write to any EC register
 
 **Value**: *Integer*
 
-> The Value which will be written
+> The value which will be written.
+
+**AcpiCommand**: *String*
+
+> The ACPI method to call.
+>
+> This option is mutually exclusive to **Value**. Only one of them can
+> be set at a time.
 
 **ResetRequired**: *Boolean*
 
@@ -206,6 +246,13 @@ Allows to write to any EC register
 **ResetValue**: *Integer*
 
 > The value which will be written upon reset.
+
+**ResetAcpiCommand**: *String*
+
+> The ACPI method to call upon reset.
+>
+> This option is mutually exclusive to **ResetValue**. Only one of them
+> can be set at a time.
 
 **ResetWriteMode**: *String*
 
@@ -233,12 +280,12 @@ Overrides the default algorithm to calculate fan speeds.
 > Defines for which operations the speeds should be overridden:
 >
 > > -   **Read**: if the value in the EC\'s ReadRegister is equal to
-> >     FanSpeedValue, the corresponding percentage will not be
-> >     calculated, but instead be set to FanSpeedPercentage.
+> >     **FanSpeedValue**, the corresponding percentage will not be
+> >     calculated, but instead be set to **FanSpeedPercentage**.
 > >
 > > -   **Write**: if the target fan speed percentage is equal to
-> >     FanSpeedPercentage, the corresponding value will not be
-> >     calculated, but instead be set to FanSpeedValue.
+> >     **FanSpeedPercentage**, the corresponding value will not be
+> >     calculated, but instead be set to **FanSpeedValue**.
 > >
 > > -   **ReadWrite**: applies to both, read and write operations.
 

@@ -99,6 +99,27 @@ RegisterWriteConfiguration</em></p>
 <blockquote>
 <p>The register which NBFC uses to control the fan.</p>
 </blockquote>
+<p><strong>ReadAcpiCommand</strong>: <em>String</em></p>
+<blockquote>
+<p>The ACPI method for reading the fan speed.</p>
+<p>Example:</p>
+<blockquote>
+<p>"ReadAcpiCommand": "\\_SB.PCI0.LPCB.EC0.GFSD"</p>
+</blockquote>
+<p>This option is mutually exclusive to <strong>ReadRegister</strong>.
+Only one of them can be set at a time.</p>
+</blockquote>
+<p><strong>WriteAcpiCommand</strong>: <em>String</em></p>
+<blockquote>
+<p>The ACPI method for writing the fan speed. The command must contain a
+placeholder ($) which will be replaced by the fan speed.</p>
+<p>Example:</p>
+<blockquote>
+<p>"WriteAcpiCommand": "\\_SB.PCI0.LPCB.EC0.SFSD $"</p>
+</blockquote>
+<p>This option is mutually exclusive to <strong>WriteRegister</strong>.
+Only one of them can be set at a time.</p>
+</blockquote>
 <p><strong>MinSpeedValue</strong>: <em>Integer</em></p>
 <blockquote>
 <p>The value which puts the fan to the lowest possible speed (usually
@@ -138,6 +159,13 @@ down.</p>
 <p>Defines the value which will be written to
 <strong>WriteRegister</strong> to reset the EC.</p>
 </blockquote>
+<p><strong>ResetAcpiCommand</strong>: <em>String</em></p>
+<blockquote>
+<p>The ACPI method to call upon fan reset.</p>
+<p>This option is mutually exclusive to
+<strong>FanSpeedResetValue</strong>. Only one of them can be set at a
+time.</p>
+</blockquote>
 <p><strong>Sensors</strong>: <em>Array of String</em></p>
 <blockquote>
 <p>Defines which sensors shall be used for this fan. This should either
@@ -149,7 +177,8 @@ be a sensor name or a sensor group.</p>
 <strong>zenpower</strong></p></li>
 <li><p><strong>@GPU</strong>: Uses all sensors named
 <strong>amdgpu</strong>, <strong>nvidia</strong>,
-<strong>nouveau</strong> or <strong>radeon</strong></p></li>
+<strong>nvidia-ml</strong>, <strong>nouveau</strong> or
+<strong>radeon</strong></p></li>
 </ul>
 </blockquote>
 <p><strong>TemperatureAlgorithmType</strong>: <em>String</em></p>
@@ -174,12 +203,15 @@ FanSpeedPercentageOverride</em></p>
 <blockquote>
 <p>Defines how the value will be written:</p>
 <ul>
+<li><p><strong>Set</strong>: overwrites the register with the specified
+value (register = value)</p></li>
 <li><p><strong>And</strong>: performs a binary AND operation (register =
 register &amp; value)</p></li>
 <li><p><strong>Or</strong>: performs a binary OR operation (register =
 register | value)</p></li>
-<li><p><strong>Set</strong>: overwrites the register with the specified
-value (register = value)</p></li>
+<li><p><strong>Call</strong>: calls the ACPI method stored in
+<strong>AcpiCommand</strong> or
+<strong>ResetAcpiCommand</strong></p></li>
 </ul>
 </blockquote>
 <p><strong>WriteOccasion</strong>: <em>String</em></p>
@@ -200,7 +232,13 @@ fan speed is set.</p></li>
 </blockquote>
 <p><strong>Value</strong>: <em>Integer</em></p>
 <blockquote>
-<p>The Value which will be written</p>
+<p>The value which will be written.</p>
+</blockquote>
+<p><strong>AcpiCommand</strong>: <em>String</em></p>
+<blockquote>
+<p>The ACPI method to call.</p>
+<p>This option is mutually exclusive to <strong>Value</strong>. Only one
+of them can be set at a time.</p>
 </blockquote>
 <p><strong>ResetRequired</strong>: <em>Boolean</em></p>
 <blockquote>
@@ -210,6 +248,12 @@ down.</p>
 <p><strong>ResetValue</strong>: <em>Integer</em></p>
 <blockquote>
 <p>The value which will be written upon reset.</p>
+</blockquote>
+<p><strong>ResetAcpiCommand</strong>: <em>String</em></p>
+<blockquote>
+<p>The ACPI method to call upon reset.</p>
+<p>This option is mutually exclusive to <strong>ResetValue</strong>.
+Only one of them can be set at a time.</p>
 </blockquote>
 <p><strong>ResetWriteMode</strong>: <em>String</em></p>
 <blockquote>
@@ -238,11 +282,13 @@ down.</p>
 <blockquote>
 <ul>
 <li><p><strong>Read</strong>: if the value in the EC's ReadRegister is
-equal to FanSpeedValue, the corresponding percentage will not be
-calculated, but instead be set to FanSpeedPercentage.</p></li>
+equal to <strong>FanSpeedValue</strong>, the corresponding percentage
+will not be calculated, but instead be set to
+<strong>FanSpeedPercentage</strong>.</p></li>
 <li><p><strong>Write</strong>: if the target fan speed percentage is
-equal to FanSpeedPercentage, the corresponding value will not be
-calculated, but instead be set to FanSpeedValue.</p></li>
+equal to <strong>FanSpeedPercentage</strong>, the corresponding value
+will not be calculated, but instead be set to
+<strong>FanSpeedValue</strong>.</p></li>
 <li><p><strong>ReadWrite</strong>: applies to both, read and write
 operations.</p></li>
 </ul>

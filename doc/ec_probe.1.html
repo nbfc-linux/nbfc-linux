@@ -5,7 +5,8 @@
 <h1>SYNOPSIS</h1>
 <p><strong>ec_probe</strong> {<strong>read</strong> |
 <strong>write</strong> | <strong>dump</strong> | <strong>load</strong> |
-<strong>monitor</strong> | <strong>watch</strong>}
+<strong>monitor</strong> | <strong>watch</strong> |
+<strong>acpi_call</strong> | <strong>shell</strong>}
 [<em>OPTIONS</em>]</p>
 <h1>OPTIONS</h1>
 <p><strong>-h</strong>, <strong>--help</strong></p>
@@ -105,6 +106,19 @@ version).</p>
 <blockquote>
 <p>Sets how many seconds the program will run.</p>
 </blockquote>
+</blockquote>
+<p><strong>acpi_call</strong> <em>METHOD</em> [<em>ARGUMENT</em>...]</p>
+<blockquote>
+<p>Call an ACPI Method.</p>
+<p>The maximum number of arguments is 8.</p>
+<p>Example:</p>
+<blockquote>
+<p>ec_probe acpi_call '\_SB.PCI0.LPCB.EC0.SFSD' 0xFF</p>
+</blockquote>
+</blockquote>
+<p><strong>shell</strong></p>
+<blockquote>
+<p>Read commands from STDIN</p>
 </blockquote>
 <p>All input values are interpreted as decimal numbers by default.
 Hexadecimal values may be entered by prefixing them with "0x".</p>

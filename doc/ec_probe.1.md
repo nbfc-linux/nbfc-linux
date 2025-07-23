@@ -9,7 +9,7 @@ Probing tool for the embedded controller
 # SYNOPSIS
 
 **ec_probe** {**read** \| **write** \| **dump** \| **load** \|
-**monitor** \| **watch**} \[*OPTIONS*\]
+**monitor** \| **watch** \| **acpi_call** \| **shell**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -109,6 +109,20 @@ Probing tool for the embedded controller
 > **-t**, **\--timespan** *SECONDS*
 >
 > > Sets how many seconds the program will run.
+
+**acpi_call** *METHOD* \[*ARGUMENT*\...\]
+
+> Call an ACPI Method.
+>
+> The maximum number of arguments is 8.
+>
+> Example:
+>
+> > ec_probe acpi_call \'\\\_SB.PCI0.LPCB.EC0.SFSD\' 0xFF
+
+**shell**
+
+> Read commands from STDIN
 
 All input values are interpreted as decimal numbers by default.
 Hexadecimal values may be entered by prefixing them with \"0x\".
