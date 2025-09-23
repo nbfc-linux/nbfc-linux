@@ -4,36 +4,39 @@
     "EcPollInterval": 1000,
     "FanConfigurations": [
     {
-        "ReadRegister": 209,
-        "WriteRegister": 231,
+        "ReadRegister": 209,    // 0XD1 = 209 = RPM1 (16)
+        "WriteRegister": 231,   // 0XE7 = 231 = XFAN (8)
         "MinSpeedValue": 0,
         "MaxSpeedValue": 100,
+        "IndependentReadMinMaxValues": true,
+	"MinSpeedValueRead": 0,
+	"MaxSpeedValueRead": 255,
         "ResetRequired": true,
         "FanDisplayName": "CPU fan",
         "TemperatureThresholds": [
         {
-            "UpThreshold": 0,
+            "UpThreshold": 40,
             "DownThreshold": 0,
-            "FanSpeed": 0.0
-        },
-        {
-            "UpThreshold": 50,
-            "DownThreshold": 40,
-            "FanSpeed": 30.0
+            "FanSpeed": 5.0
         },
         {
             "UpThreshold": 60,
-            "DownThreshold": 45,
-            "FanSpeed": 50.0
-        },
-        {
-            "UpThreshold": 70,
-            "DownThreshold": 55,
-            "FanSpeed": 70.0
+            "DownThreshold": 40,
+            "FanSpeed": 20.0
         },
         {
             "UpThreshold": 80,
-            "DownThreshold": 65,
+            "DownThreshold": 60,
+            "FanSpeed": 30.0
+        },
+        {
+            "UpThreshold": 90,
+            "DownThreshold": 80,
+            "FanSpeed": 50.0
+        },
+        {
+            "UpThreshold": 100,
+            "DownThreshold": 90,
             "FanSpeed": 100.0
         }]
     }]
