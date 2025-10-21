@@ -55,13 +55,6 @@
          "DownThreshold": 79,
          "FanSpeed": 100.0
         }
-       ],
-       "FanSpeedPercentageOverrides": [
-        {
-         "FanSpeedPercentage": 0.0,
-         "FanSpeedValue": 255,
-         "TargetOperation": "Write"
-        }
        ]
       },
       {
@@ -113,13 +106,6 @@
             "DownThreshold": 79,
             "FanSpeed": 100.0
            }
-       ],
-       "FanSpeedPercentageOverrides": [
-        {
-         "FanSpeedPercentage": 0.0,
-         "FanSpeedValue": 255,
-         "TargetOperation": "Write"
-        }
        ]
       }
    ],
