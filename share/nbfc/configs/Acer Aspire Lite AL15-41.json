@@ -1,6 +1,8 @@
 {
+    "LegacyTemperatureThresholdsBehaviour": true,
     "NotebookModel": "Acer Aspire Lite AL15-41",
     "Author": "OnlineLearningTutorials",
+    "CriticalTemperature": 95,
     "EcPollInterval": 1000,
     "FanConfigurations": [
     {
@@ -10,7 +12,7 @@
         "MaxSpeedValue": 100,
         "IndependentReadMinMaxValues": true,
 	"MinSpeedValueRead": 0,
-	"MaxSpeedValueRead": 255,
+	"MaxSpeedValueRead": 100,
         "ResetRequired": true,
         "FanDisplayName": "CPU fan",
         "TemperatureThresholds": [
@@ -22,12 +24,12 @@
         {
             "UpThreshold": 60,
             "DownThreshold": 40,
-            "FanSpeed": 20.0
+            "FanSpeed": 5.0
         },
         {
             "UpThreshold": 80,
             "DownThreshold": 60,
-            "FanSpeed": 30.0
+            "FanSpeed": 10.0
         },
         {
             "UpThreshold": 90,
@@ -35,9 +37,9 @@
             "FanSpeed": 50.0
         },
         {
-            "UpThreshold": 100,
+            "UpThreshold": 95,
             "DownThreshold": 90,
-            "FanSpeed": 100.0
+            "FanSpeed": 80.0
         }]
     }]
 }
