@@ -21,6 +21,7 @@
 
           nativeBuildInputs = with pkgs; [
             autoreconfHook
+            curl
             libsForQt5.qt5.wrapQtAppsHook
             libsForQt5.qt5.qtbase
           ];
