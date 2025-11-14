@@ -30,7 +30,7 @@
 
           configureFlags = [
             "--prefix=${placeholder "out"}"
-            "--sysconfdir=${placeholder "out"}/etc"
+            "--sysconfdir=/etc"
             "--bindir=${placeholder "out"}/bin"
           ];
         };
