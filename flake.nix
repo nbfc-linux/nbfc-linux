@@ -14,26 +14,18 @@
     in rec {
       packages = {
         nbfc = pkgs.stdenv.mkDerivation {
-          name = "nbfc-linux";
-          version = "0.1.15";
+          name = "nbfc";
+          version = "0.3.19";
 
           src = nixpkgs.lib.cleanSource ./.;
 
           nativeBuildInputs = with pkgs; [
             autoreconfHook
             curl
-            libsForQt5.qt5.wrapQtAppsHook
-            libsForQt5.qt5.qtbase
           ];
-          propagatedBuildInputs = with pkgs; [
-            (python3.withPackages (pythonPackages: with pythonPackages; [
-              pyqt5
-            ]))
-          ];
-          dontWrapQtApps = true;
 
           preFixup = ''
-            wrapQtApp "$out/bin/nbfc-qt"
+            ls $out/bin
           '';
 
           configureFlags = [
