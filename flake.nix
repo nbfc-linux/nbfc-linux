@@ -24,10 +24,6 @@
             curl
           ];
 
-          preFixup = ''
-            ls $out/bin
-          '';
-
           configureFlags = [
             "--prefix=${placeholder "out"}"
             "--sysconfdir=/etc"

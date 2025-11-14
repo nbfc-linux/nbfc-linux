@@ -113,9 +113,6 @@ etc/init.d/nbfc_service.systemv: etc/init.d/nbfc_service.systemv.in
 	$(REPLACE_VARS) < $< > $@
 
 install-configs:
-	# /usr/local/etc/nbfc
-	mkdir -p $(DESTDIR)$(confdir)/nbfc
-	
 	# /usr/local/share/nbfc/configs
 	mkdir -p $(DESTDIR)$(datadir)/nbfc/configs
 	cp share/nbfc/model_support.json $(DESTDIR)$(datadir)/nbfc
