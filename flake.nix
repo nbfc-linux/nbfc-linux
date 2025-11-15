@@ -4,6 +4,7 @@
     utils.url = "github:numtide/flake-utils";
   };
   outputs = {
+    self,
     nixpkgs,
     utils,
     ...
@@ -13,35 +14,33 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in rec {
       packages = {
-        nbfc = pkgs.stdenv.mkDerivation {
+        nbfc-linux = pkgs.stdenv.mkDerivation {
           name = "nbfc-linux";
-          version = "0.1.15";
+          version = "0.3.19";
 
           src = nixpkgs.lib.cleanSource ./.;
 
           nativeBuildInputs = with pkgs; [
             autoreconfHook
-            libsForQt5.qt5.wrapQtAppsHook
-            libsForQt5.qt5.qtbase
+            curl
           ];
-          propagatedBuildInputs = with pkgs; [
-            (python3.withPackages (pythonPackages: with pythonPackages; [
-              pyqt5
-            ]))
-          ];
-          dontWrapQtApps = true;
-
-          preFixup = ''
-            wrapQtApp "$out/bin/nbfc-qt"
-          '';
 
           configureFlags = [
-            "--prefix=${placeholder "out"}"
-            "--sysconfdir=${placeholder "out"}/etc"
             "--bindir=${placeholder "out"}/bin"
+            "--prefix=${placeholder "out"}"
+            "--sysconfdir=/etc"
           ];
         };
-        default = packages.nbfc;
+        default = packages.nbfc-linux;
       };
+
+      # This corrects the mismatch between the package name and the command name
+      apps.nbfc-linux = {
+        type = "app";
+        program = "${self.packages.${system}.nbfc-linux}/bin/nbfc";
+      };
+
+      # This tells `nix run` to use this package
+      defaultApp = self.apps.${system}.nbfc-linux;
     });
 }
