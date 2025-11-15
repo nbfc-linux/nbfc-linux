@@ -66,8 +66,7 @@ Installation
   - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.3.19-1.x86_64.rpm`
 
 - NixOS:
-  - [Declaratively](nixos-installation-new.md)
-  - [Imperatively](nixos-installation.md) (with `nix profile install` or `nix-env -if .`)
+  - [Follow the instructions for the nixpkgs](nixos-installation.md)
 
 - Fedora - this will not build the current working directory, but downloads a source archive from chosen release on github and builds an installable rpm:
   - ensure, that podman is installed
