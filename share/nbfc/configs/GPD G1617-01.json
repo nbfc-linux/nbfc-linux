@@ -1,0 +1,45 @@
+{
+  "NotebookModel": "GPD G1617-01",
+  "Author": "Sam Garfield",
+  "EcPollInterval": 5000,
+  "ReadWriteWords": false,
+  "CriticalTemperature": 85,
+  "FanConfigurations": [
+    {
+      "ReadRegister": 122,
+      "WriteRegister": 122,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 255,
+      "ResetRequired": true,
+      "FanSpeedResetValue": 0,
+      "FanDisplayName": "Fan",
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 44,
+          "DownThreshold": 0,
+          "FanSpeed": 10
+        },
+        {
+          "UpThreshold": 50,
+          "DownThreshold": 45,
+          "FanSpeed": 20
+        },
+        {
+          "UpThreshold": 65,
+          "DownThreshold": 51,
+          "FanSpeed": 30
+        },
+        {
+          "UpThreshold": 72,
+          "DownThreshold": 66,
+          "FanSpeed": 60
+        },
+        {
+          "UpThreshold": 85,
+          "DownThreshold": 73,
+          "FanSpeed": 100
+        }
+      ]
+    }
+  ]
+}
