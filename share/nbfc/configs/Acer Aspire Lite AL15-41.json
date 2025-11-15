@@ -6,14 +6,16 @@
     "EcPollInterval": 1000,
     "FanConfigurations": [
     {
-        "ReadRegister": 209,    // 0XD1 = 209 = RPM1 (16)
-        "WriteRegister": 231,   // 0XE7 = 231 = XFAN (8)
+    	"Comment":  "0XD1 = 209 = RPM1 (16)",
+        "ReadRegister": 209,
+        "Comment": "0XE7 = 231 = XFAN (8)",
+        "WriteRegister": 231, 
         "MinSpeedValue": 0,
         "MaxSpeedValue": 100,
         "IndependentReadMinMaxValues": true,
 	"MinSpeedValueRead": 0,
-	"MaxSpeedValueRead": 100,
-        "ResetRequired": true,
+	"MaxSpeedValueRead": 255,
+        "ResetRequired": false,
         "FanDisplayName": "CPU fan",
         "TemperatureThresholds": [
         {
