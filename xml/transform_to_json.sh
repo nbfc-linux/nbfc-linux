@@ -5,6 +5,7 @@ OUTDIR='../share/nbfc/configs'
 IGNORE=(
 	'HP Victus 16-e0175AX.xml'
 	'HP Victus 16-e0xxx.xml'
+	'Lenovo Yoga Slim7.xml'
 )
 
 is_ignored_file() {
