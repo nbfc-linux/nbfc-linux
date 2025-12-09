@@ -56,25 +56,25 @@ Error* AcpiCall_Call(const char* cmd, ssize_t cmd_len, uint64_t* out) {
   return err_success();
 }
 
-Error* AcpiCall_CallTemplate(const char* template, uint64_t value, uint64_t* out) {
+Error* AcpiCall_CallTemplate(const char* template_, uint64_t value, uint64_t* out) {
   char cmd[8192];
   ssize_t cmd_len = 0;
   char value_str[32];
   const ssize_t value_len = snprintf(value_str, sizeof(value_str), "0x%lX", value);
 
   // If every char in template is a placeholder ("$"), will it still fit in `cmd`?
-  if (strlen(template) * (sizeof("0x1122334455667788") - 1) > sizeof(cmd)) {
+  if (strlen(template_) * (sizeof("0x1122334455667788") - 1) > sizeof(cmd)) {
     errno = ENOBUFS;
     return err_stdlib(NULL, ACPI_CALL_FILE);
   }
 
-  for (; *template; ++template) {
-    if (*template == '$') {
+  for (; *template_; ++template_) {
+    if (*template_ == '$') {
       for (int j = 0; j < value_len; ++j)
         cmd[cmd_len++] = value_str[j];
     }
     else 
-      cmd[cmd_len++] = *template;
+      cmd[cmd_len++] = *template_;
   }
 
   return AcpiCall_Call(cmd, cmd_len, out);
