@@ -80,7 +80,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
       else if (c->type == NX_JSON_INTEGER)
         speed = c->val.i;
       else {
-        return err_string(0, "Speed: Invalid type. Either float or 'auto'");
+        return err_string(0, "Speed: Invalid type. Either float or \"auto\"");
       }
 
       if (speed < 0.0 || speed > 100.0)
