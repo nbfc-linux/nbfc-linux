@@ -8,6 +8,7 @@
 #define my               (*self)
 #define MAX(A, B)        ((A) > (B) ? (A) : (B))
 #define MIN(A, B)        ((A) < (B) ? (A) : (B))
+#define STRLEN(S)        (sizeof(S) - 1)
 
 #define PTR_DIFF(A, B) ((int) (A - B))
 

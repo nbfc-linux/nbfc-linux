@@ -38,7 +38,7 @@ Error* AcpiCall_Call(const char* cmd, ssize_t cmd_len, uint64_t* out) {
   }
 
   if (output[0] == 'E') {
-    const char* errmsg = output + (sizeof("Error: ") - 1);
+    const char* errmsg = output + STRLEN("Error: ");
     return err_stringf(NULL, "%s: %s", ACPI_CALL_FILE, errmsg);
   }
 
@@ -63,7 +63,7 @@ Error* AcpiCall_CallTemplate(const char* template_, uint64_t value, uint64_t* ou
   const ssize_t value_len = snprintf(value_str, sizeof(value_str), "0x%lX", value);
 
   // If every char in template is a placeholder ("$"), will it still fit in `cmd`?
-  if (strlen(template_) * (sizeof("0x1122334455667788") - 1) > sizeof(cmd)) {
+  if (strlen(template_) * STRLEN("0x1122334455667788") > sizeof(cmd)) {
     errno = ENOBUFS;
     return err_stdlib(NULL, ACPI_CALL_FILE);
   }
