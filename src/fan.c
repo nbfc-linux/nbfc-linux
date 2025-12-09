@@ -22,8 +22,8 @@ Error* Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   const bool same = ! cfg->IndependentReadMinMaxValues;
   my.minSpeedValueRead    = same ? my.minSpeedValueWrite : cfg->MinSpeedValueRead;
   my.maxSpeedValueRead    = same ? my.maxSpeedValueWrite : cfg->MaxSpeedValueRead;
-  my.minSpeedValueReadAbs = min(my.minSpeedValueRead, my.maxSpeedValueRead);
-  my.maxSpeedValueReadAbs = max(my.minSpeedValueRead, my.maxSpeedValueRead);
+  my.minSpeedValueReadAbs = MIN(my.minSpeedValueRead, my.maxSpeedValueRead);
+  my.maxSpeedValueReadAbs = MAX(my.minSpeedValueRead, my.maxSpeedValueRead);
   my.fanSpeedSteps        = my.maxSpeedValueReadAbs - my.minSpeedValueReadAbs;
 
   return ThresholdManager_Init(&my.threshMan, &cfg->TemperatureThresholds);

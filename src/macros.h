@@ -6,8 +6,8 @@
 #include <sys/types.h> // ssize_t
 
 #define my               (*self)
-#define max(A, B)        ((A) > (B) ? (A) : (B))
-#define min(A, B)        ((A) < (B) ? (A) : (B))
+#define MAX(A, B)        ((A) > (B) ? (A) : (B))
+#define MIN(A, B)        ((A) < (B) ? (A) : (B))
 
 #define PTR_DIFF(A, B) ((int) (A - B))
 

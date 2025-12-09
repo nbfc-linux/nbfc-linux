@@ -40,8 +40,8 @@ static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, f
     Error* e = FS_TemperatureSource_GetTemperature(ts, &tmp);
     e_warn();
     if (! e) {
-      min = min(min, tmp);
-      max = max(max, tmp);
+      min = MIN(min, tmp);
+      max = MAX(max, tmp);
       sum += tmp;
       ++total;
     }
