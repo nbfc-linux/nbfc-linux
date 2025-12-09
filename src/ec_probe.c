@@ -644,7 +644,7 @@ static void Register_PrintMonitor(RegisterBuf* readings, int size) {
 
     printf(Console_Green "0x%.2X:", register_);
     uint8_t byte = readings[0][register_];
-    for (range(int, i, max(size - 24, 0), size)) {
+    for (range(int, i, MAX(size - 24, 0), size)) {
       const uint8_t diff = byte - readings[i][register_];
       byte = readings[i][register_];
       if (diff)
