@@ -146,7 +146,7 @@ int main(int argc, char* const argv[])
   if (options.read_only)
     Log_Info("Read-only mode enabled\n");
 
-  e = PID_Write(true);
+  e = PID_Write(PID_AcquireLock);
   if (e) {
     Log_Error("%s\n", err_print_all(e));
     return NBFC_EXIT_INIT;
@@ -194,7 +194,7 @@ int main(int argc, char* const argv[])
       }
 
       // We got a new PID
-      e = PID_Write(false);
+      e = PID_Write(PID_NoAcquireLock);
       if (e) {
         Log_Error("%s\n", err_print_all(e));
         return NBFC_EXIT_INIT;
