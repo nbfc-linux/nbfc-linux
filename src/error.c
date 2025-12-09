@@ -19,16 +19,23 @@ static void err_print(const Error* e, StringBuf* s) {
     return;
 
   switch (e->system) {
-  case ErrorSystem_Stdlib:  StringBuf_Printf(s, "%s", strerror(e->value.code)); break;
-  case ErrorSystem_NxJson:  StringBuf_Printf(s, "%s", NX_JSON_MSGS[e->value.code]); break;
-  case ErrorSystem_String:  StringBuf_Printf(s, "%s", e->value.message); break;
+    case ErrorSystem_Stdlib:
+      StringBuf_Printf(s, "%s", strerror(e->value.code));
+      break;
+
+    case ErrorSystem_NxJson:
+      StringBuf_Printf(s, "%s", NX_JSON_MSGS[e->value.code]);
+      break;
+
+    case ErrorSystem_String:
+      StringBuf_Printf(s, "%s", e->value.message);
+      break;
   }
 }
 
 const char* err_print_all(const Error* e) {
   static char buf[4096];
   StringBuf s = { buf, 0, sizeof(buf) - 1 };
-
   buf[0] = '\0';
 
   if (! e)
