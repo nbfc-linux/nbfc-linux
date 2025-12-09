@@ -6,26 +6,20 @@
 #include <float.h>
 #include <string.h>
 
-static const char* const CPUSensorNames[] = {
-  "coretemp", "k10temp", "zenpower"
-};
-
-static const char* const GPUSensorNames[] = {
-  "amdgpu", "nvidia", "nvidia-ml", "nouveau", "radeon"
-};
-
 static inline int IsCPUSensorName(const char* s) {
-  for (int i = 0; i < ARRAY_SSIZE(CPUSensorNames); ++i)
-    if (! strcmp(s, CPUSensorNames[i]))
-      return true;
-  return false;
+  return
+    !strcmp(s, "coretemp") ||
+    !strcmp(s, "k10temp")  ||
+    !strcmp(s, "zenpower");
 }
 
 static inline int IsGPUSensorName(const char* s) {
-  for (int i = 0; i < ARRAY_SSIZE(GPUSensorNames); ++i)
-    if (! strcmp(s, GPUSensorNames[i]))
-      return true;
-  return false;
+  return
+    !strcmp(s, "amdgpu")    ||
+    !strcmp(s, "nvidia")    ||
+    !strcmp(s, "nvidia-ml") ||
+    !strcmp(s, "nouveau")   ||
+    !strcmp(s, "radeon");
 }
 
 static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, float* out) {
@@ -94,7 +88,7 @@ static Error* FanTemperatureControl_AddTemperatureSources(
   bool found_sensors = false;
 
   // ==========================================================================
-  // Sensor group "@CPU": Add all sensors found in `CPUSensorNames`
+  // Sensor group "@CPU": Add all sensors found in `IsCPUSensorName`
   // ==========================================================================
   if (!strcmp(sensor, "@CPU")) {
     for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
@@ -113,7 +107,7 @@ static Error* FanTemperatureControl_AddTemperatureSources(
   }
 
   // ==========================================================================
-  // Sensor group "@GPU": Add all sensors found in `GPUSensorNames`
+  // Sensor group "@GPU": Add all sensors found in `IsGPUSensorName`
   // ==========================================================================
   if (!strcmp(sensor, "@GPU")) {
     for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
