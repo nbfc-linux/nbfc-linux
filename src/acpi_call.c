@@ -1,9 +1,11 @@
 #include "acpi_call.h"
 
+#include <errno.h>  // errno, EINVAL, ENOBUFS, ENODATA
 #include <stdio.h>  // snprintf
 #include <string.h> // strlen
 #include <stdlib.h> // system
 
+#include "macros.h"
 #include "file_utils.h"
 
 #define ACPI_CALL_FILE          "/proc/acpi/call"

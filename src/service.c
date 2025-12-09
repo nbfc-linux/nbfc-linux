@@ -18,6 +18,7 @@
 #include "model_config.h"
 
 #include <stdio.h>  // snprintf
+#include <string.h> // strlen
 #include <math.h>   // fabs
 #include <linux/limits.h> // PATH_MAX
 
