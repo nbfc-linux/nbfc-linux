@@ -8,8 +8,8 @@
 #include "macros.h"
 #include "file_utils.h"
 
-#define ACPI_CALL_FILE          "/proc/acpi/call"
-#define ACPI_CALL_MODPROBE_CMD  "modprobe acpi_call"
+#define ACPI_CALL_FILE         "/proc/acpi/call"
+#define ACPI_CALL_MODPROBE_CMD "modprobe acpi_call"
 
 Error* AcpiCall_Open() {
   switch (system(ACPI_CALL_MODPROBE_CMD)) {
@@ -61,20 +61,16 @@ Error* AcpiCall_Call(const char* cmd, ssize_t cmd_len, uint64_t* out) {
 Error* AcpiCall_CallTemplate(const char* template_, uint64_t value, uint64_t* out) {
   char cmd[8192];
   ssize_t cmd_len = 0;
-  char value_str[32];
-  const ssize_t value_len = snprintf(value_str, sizeof(value_str), "0x%lX", value);
 
   // If every char in template is a placeholder ("$"), will it still fit in `cmd`?
-  if (strlen(template_) * STRLEN("0x1122334455667788") > sizeof(cmd)) {
+  if (strlen(template_) * STRLEN("0x1122334455667788") >= sizeof(cmd)) {
     errno = ENOBUFS;
     return err_stdlib(NULL, ACPI_CALL_FILE);
   }
 
   for (; *template_; ++template_) {
-    if (*template_ == '$') {
-      for (int j = 0; j < value_len; ++j)
-        cmd[cmd_len++] = value_str[j];
-    }
+    if (*template_ == '$')
+      cmd_len += snprintf(cmd + cmd_len, 99, "0x%lX", value);
     else 
       cmd[cmd_len++] = *template_;
   }
