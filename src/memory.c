@@ -1,14 +1,10 @@
-#undef _XOPEN_SOURCE
-
-#define _XOPEN_SOURCE 500 // string.h: strdup()
-
 #include "memory.h"
 
 #include "macros.h" // unlikely
 #include "nbfc.h"   // NBFC_EXIT_FATAL
 
 #include <stdlib.h> // malloc, calloc, realloc, free, exit
-#include <string.h> // strerror
+#include <string.h> // strlen, strcpy, strerror
 #include <stdio.h>  // fprintf
 #include <errno.h>  // ENOMEM
 
@@ -39,9 +35,9 @@ void* Mem_Realloc(void* p, const size_t size) {
 }
 
 char* Mem_Strdup(const char* s) {
-  char* p = strdup(s);
-  if (unlikely(!p))
-    Mem_FatalError();
+  const size_t len = strlen(s);
+  char* p = Mem_Malloc(len + 1);
+  strcpy(p, s);
   return p;
 }
 

@@ -1,4 +1,4 @@
-#define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread(), string.h: strdup()
+#define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread()
 #define _DEFAULT_SOURCE   // endian.h: htole16(), le16toh()
 
 // The data structures returned by nxjson are temporary and are loaded into proper C structs.

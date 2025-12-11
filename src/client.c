@@ -1,5 +1,3 @@
-#define _XOPEN_SOURCE 500 // string.h: strdup
-
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) Mem_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (Mem_Free((void*) (JSON)))
 
