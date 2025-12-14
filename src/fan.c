@@ -6,7 +6,6 @@
 
 #include <math.h>    // fabs, round
 #include <errno.h>   // EINVAL
-#include <string.h>  // strlen
 #include <stdbool.h>
 
 extern EC_VTable* ec;
@@ -104,9 +103,8 @@ static Error* Fan_ECReadValue(const Fan* self, uint16_t* out) {
   Error* e;
 
   if (my.fanConfig->ReadAcpiMethod) {
-    const ssize_t len = strlen(my.fanConfig->ReadAcpiMethod);
     uint64_t val;
-    e = AcpiCall_Call(my.fanConfig->ReadAcpiMethod, len, &val);
+    e = AcpiCall_Call_Str(my.fanConfig->ReadAcpiMethod, &val);
     if (e)
       return err_string(e, "ReadAcpiMethod");
     else
@@ -212,9 +210,8 @@ Error* Fan_ECReset(Fan* self) {
     return err_success();
 
   if (my.fanConfig->ResetAcpiMethod) {
-    const ssize_t len = strlen(my.fanConfig->ResetAcpiMethod);
     uint64_t out;
-    Error* e = AcpiCall_Call(my.fanConfig->ResetAcpiMethod, len, &out);
+    Error* e = AcpiCall_Call_Str(my.fanConfig->ResetAcpiMethod, &out);
     if (e)
       return err_string(e, "ResetAcpiMethod");
     else
