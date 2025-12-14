@@ -10,7 +10,7 @@
 #include <stdio.h>   // snprintf
 #include <string.h>  // strcmp
 #include <stdbool.h> // bool
-#include <stdlib.h>  // strtold
+#include <stdlib.h>  // strtod
 #include <linux/limits.h> // PATH_MAX
 
 static const char* const LinuxHwmonDirs[] = {
@@ -51,7 +51,7 @@ Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* ou
 
   char* end;
   errno = 0;
-  *out = strtold(buf, &end);
+  *out = strtod(buf, &end);
   *out *= my.multiplier;
   if (end == buf)
     errno = EINVAL;
