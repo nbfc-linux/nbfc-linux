@@ -311,7 +311,7 @@ static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
         return err_success();
 
     default:
-      return err_string(0, "ResetRegisterWriteConfig: INTERNAL ERROR");
+      return err_string(0, "ERR-01");
   }
 }
 
@@ -352,7 +352,7 @@ static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
         return err_success();
 
     default:
-      return err_string(0, "ApplyRegisterWriteConfig: INTERNAL ERROR");
+      return err_string(0, "ERR-02");
   }
 }
 
