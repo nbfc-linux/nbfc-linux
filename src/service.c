@@ -108,7 +108,7 @@ Error* Service_Init() {
   Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
   Service_State = Initialized_4_Fans;
 
-  for_enumerate_array(ssize_t, i, Service_Fans) {
+  for_enumerate_array(array_size_t, i, Service_Fans) {
     e = Fan_Init(
         &Service_Fans.data[i].Fan,
         &Service_Model_Config.FanConfigurations.data[i],
@@ -118,7 +118,7 @@ Error* Service_Init() {
       goto error;
   }
 
-  for_enumerate_array(ssize_t, i, service_state.TargetFanSpeeds) {
+  for_enumerate_array(array_size_t, i, service_state.TargetFanSpeeds) {
     if (i >= Service_Fans.size)
       continue;
 
@@ -391,12 +391,12 @@ static bool IsAcpiCallUsed() {
 }
 
 void Service_WriteTargetFanSpeedsToState() {
-  const int fancount = Service_Model_Config.FanConfigurations.size;
+  const array_size_t fancount = Service_Model_Config.FanConfigurations.size;
 
   service_state.TargetFanSpeeds.data = Mem_Realloc(service_state.TargetFanSpeeds.data, sizeof(float) * fancount);
   service_state.TargetFanSpeeds.size = fancount;
 
-  for_enumerate_array(int, i, Service_Fans) {
+  for_enumerate_array(array_size_t, i, Service_Fans) {
     Fan* fan = &Service_Fans.data[i].Fan;
     if (fan->mode == Fan_ModeAuto)
       service_state.TargetFanSpeeds.data[i] = -1;

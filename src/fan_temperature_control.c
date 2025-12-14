@@ -233,7 +233,7 @@ static Error* FanTemperatureControl_SetByModelConfig(
 {
   Error* e;
 
-  for_enumerate_array(int, fan_index, *fans) {
+  for_enumerate_array(array_size_t, fan_index, *fans) {
     FanTemperatureControl* ftc = &fans->data[fan_index];
     FanConfiguration* fc = &model_config->FanConfigurations.data[fan_index];
 
@@ -336,7 +336,7 @@ Error* FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
 }
 
 void FanTemperatureControl_Log(array_of(FanTemperatureControl)* fans, ModelConfig* model_config) {
-  for_enumerate_array(int, fan_index, *fans) {
+  for_enumerate_array(array_size_t, fan_index, *fans) {
     FanTemperatureControl* ftc = &fans->data[fan_index];
 
     for (int i = 0; i < ftc->TemperatureSourcesSize; ++i)

@@ -11,7 +11,7 @@ typedef struct TemperatureFilter TemperatureFilter;
 struct TemperatureFilter {
   float           sum;
   array_of(float) ring_buffer;
-  ssize_t         index;
+  array_size_t    index;
   bool            buffer_is_full;
 };
 

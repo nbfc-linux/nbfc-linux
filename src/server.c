@@ -94,7 +94,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   if (speed == -2)
     return err_string(0, "Missing argument: Speed");
 
-  for_enumerate_array(int, i, Service_Fans) {
+  for_enumerate_array(array_size_t, i, Service_Fans) {
     if (fan == -1 || fan == i) {
       if (speed == -1)
         Fan_SetAutoSpeed(&Service_Fans.data[i].Fan);

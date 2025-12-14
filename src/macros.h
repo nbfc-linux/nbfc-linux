@@ -28,11 +28,13 @@
 #define for_each_array_reverse(TYPE, VAR, ARRAY) \
   for (TYPE VAR = (ARRAY).data + (ARRAY).size; --VAR != (ARRAY).data;)
 
+typedef ssize_t array_size_t;
+
 #define declare_array_of(T)                  \
   typedef struct array_of(T) array_of(T);    \
   struct array_of(T) {                       \
-    T*  data;                                \
-    ssize_t size;                            \
+    T* data;                                 \
+    array_size_t size;                       \
   }
 
 declare_array_of(float);

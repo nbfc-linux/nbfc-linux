@@ -155,7 +155,7 @@ Error* FS_Sensors_Init() {
       continue;
     }
 
-    const size_t idx = FS_Sensors_Sources.size;
+    const array_size_t idx = FS_Sensors_Sources.size;
     FS_Sensors_Sources.data = Mem_Realloc(FS_Sensors_Sources.data, (idx + 1) * sizeof(FS_TemperatureSource));
     FS_Sensors_Sources.data[idx].name = Mem_Strdup("nvidia-ml");
     FS_Sensors_Sources.data[idx].file = Mem_Strdup("none");

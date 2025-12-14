@@ -9,7 +9,7 @@
 typedef struct ThresholdManager ThresholdManager;
 struct ThresholdManager {
   array_of(TemperatureThreshold) thresholds;
-  ssize_t current;
+  array_size_t current;
 };
 
 Error*                ThresholdManager_Init(ThresholdManager*, array_of(TemperatureThreshold)*);
