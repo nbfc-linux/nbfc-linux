@@ -19,7 +19,7 @@ ifeq ($(BUILD), debug)
 	CFLAGS   = -Og -g
 else
 	CPPFLAGS = -DNDEBUG
-	CFLAGS   = -Wall -Os -flto
+	CFLAGS   = -Wall -Os -flto -fno-unwind-tables -fno-asynchronous-unwind-tables -fomit-frame-pointer
 	LDFLAGS  = -s
 endif
 
