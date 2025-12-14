@@ -14,7 +14,7 @@ static void Mem_FatalError() {
 }
 
 void* Mem_Malloc(const size_t size) {
-  void* p = malloc(size);
+  void* p = calloc(1, size);
   if (unlikely(!p))
     Mem_FatalError();
   return p;
