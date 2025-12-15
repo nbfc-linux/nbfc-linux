@@ -33,7 +33,7 @@ static void sig_handler(int sig) {
     quit = true;
 }
 
-static struct option cli_options[] = {
+static const struct option cli_options[] = {
   {"help",                no_argument,       NULL, 'h'},
   {"version",             no_argument,       NULL, 'v'},
   {"embedded-controller", required_argument, NULL, 'e'},
