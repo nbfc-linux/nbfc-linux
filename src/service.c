@@ -23,7 +23,7 @@
 
 Service_Options options;
 
-extern EC_VTable* ec;
+extern const EC_VTable* ec;
 
 enum Service_Initialization {
   Initialized_0_None,
@@ -45,8 +45,8 @@ static Error* ResetRegisterWriteConfigurations();
 static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration*);
 static void   ResetEC();
 static bool   IsAcpiCallUsed();
-static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable*);
-static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
+static EmbeddedControllerType EmbeddedControllerType_By_EC(const EC_VTable*);
+static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
 Error* Service_Init() {
   Error* e;
@@ -230,7 +230,7 @@ error:
   return e;
 }
 
-static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable* ec) {
+static EmbeddedControllerType EmbeddedControllerType_By_EC(const EC_VTable* ec) {
 #if ENABLE_EC_SYS
   if (ec == &EC_SysLinux_VTable)       return EmbeddedControllerType_ECSysLinux;
 #endif
@@ -246,7 +246,7 @@ static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable* ec) {
   return EmbeddedControllerType_Unset;
 }
 
-static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
+static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
   switch (t) {
 #if ENABLE_EC_SYS
   case EmbeddedControllerType_ECSysLinux:     return &EC_SysLinux_VTable;

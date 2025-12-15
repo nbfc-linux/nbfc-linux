@@ -19,7 +19,7 @@
 #include "temperature_threshold_manager.c"
 #include "stack_memory.c"
 
-EC_VTable* ec;
+const EC_VTable* ec;
 
 int test_model_config(const char*);
 

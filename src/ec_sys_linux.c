@@ -108,7 +108,7 @@ static inline Error* EC_SysLinux_LoadACPIKernelModule() {
   }
 }
 
-EC_VTable EC_SysLinux_VTable = {
+const EC_VTable EC_SysLinux_VTable = {
   EC_SysLinux_Open,
   EC_SysLinux_Close,
   EC_SysLinux_ReadByte,
@@ -117,7 +117,7 @@ EC_VTable EC_SysLinux_VTable = {
   EC_SysLinux_WriteWord,
 };
 
-EC_VTable EC_SysLinux_ACPI_VTable = {
+const EC_VTable EC_SysLinux_ACPI_VTable = {
   EC_SysLinux_ACPI_Open,
   EC_SysLinux_Close,
   EC_SysLinux_ReadByte,

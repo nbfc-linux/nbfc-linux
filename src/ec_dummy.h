@@ -3,7 +3,7 @@
 
 #include "ec.h"
 
-extern EC_VTable EC_Dummy_VTable;
+extern const EC_VTable EC_Dummy_VTable;
 
 Error* EC_Dummy_Open();
 void   EC_Dummy_Close();

@@ -24,7 +24,7 @@
 #include <unistd.h> // fork, setsid, chdir, geteuid
 #include <sys/time.h> // gettimeofday
 
-EC_VTable* ec;
+const EC_VTable* ec;
 
 static volatile bool quit = false;
 

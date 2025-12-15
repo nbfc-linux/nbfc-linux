@@ -56,7 +56,7 @@ Error* EC_Dummy_WriteWord(uint8_t register_, uint16_t value) {
   return err_success();
 }
 
-EC_VTable EC_Dummy_VTable = {
+const EC_VTable EC_Dummy_VTable = {
   EC_Dummy_Open,
   EC_Dummy_Close,
   EC_Dummy_ReadByte,

@@ -86,7 +86,7 @@ static void         Register_PrintDump(RegisterBuf*, bool);
 static int          Register_LoadDump(RegisterBuf*, FILE*);
 static void         Handle_Signal(int);
 
-static EC_VTable*   ec;
+static const EC_VTable* ec;
 static volatile int quit;
 
 static int Read();

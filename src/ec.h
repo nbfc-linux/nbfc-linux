@@ -17,7 +17,7 @@ struct EC_VTable {
   Error* (*WriteWord)(uint8_t, uint16_t);
 };
 
-bool   EC_CheckWorking(EC_VTable*);
-Error* EC_FindWorking(EC_VTable**);
+bool   EC_CheckWorking(const EC_VTable*);
+Error* EC_FindWorking(const EC_VTable**);
 
 #endif

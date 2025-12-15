@@ -3,8 +3,8 @@
 
 #include "ec.h"
 
-extern EC_VTable  EC_Debug_VTable;
-extern EC_VTable* EC_Debug_Controller;
+extern const EC_VTable  EC_Debug_VTable;
+extern const EC_VTable* EC_Debug_Controller;
 
 Error* EC_Debug_Open();
 void   EC_Debug_Close();

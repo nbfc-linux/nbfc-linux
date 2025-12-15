@@ -212,7 +212,7 @@ Error* EC_Linux_ReadWord(uint8_t register_, uint16_t* val) {
   return err_stdlib(0, "EC_Linux_ReadWord");
 }
 
-EC_VTable EC_Linux_VTable = {
+const EC_VTable EC_Linux_VTable = {
   EC_Linux_Open,
   EC_Linux_Close,
   EC_Linux_ReadByte,

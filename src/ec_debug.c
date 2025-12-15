@@ -2,7 +2,7 @@
 
 #include "log.h"
 
-EC_VTable* EC_Debug_Controller;
+const EC_VTable* EC_Debug_Controller;
 
 Error* EC_Debug_Open() {
   return EC_Debug_Controller->Open();
@@ -40,7 +40,7 @@ Error* EC_Debug_ReadWord(uint8_t register_, uint16_t* out) {
   return e;
 }
 
-EC_VTable EC_Debug_VTable = {
+const EC_VTable EC_Debug_VTable = {
   EC_Debug_Open,
   EC_Debug_Close,
   EC_Debug_ReadByte,

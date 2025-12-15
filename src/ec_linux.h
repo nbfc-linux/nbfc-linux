@@ -3,7 +3,7 @@
 
 #include "ec.h"
 
-extern EC_VTable EC_Linux_VTable;
+extern const EC_VTable EC_Linux_VTable;
 
 Error* EC_Linux_Open();
 void   EC_Linux_Close();

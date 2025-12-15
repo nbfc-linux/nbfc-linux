@@ -8,7 +8,7 @@
 #include <errno.h>   // EINVAL
 #include <stdbool.h>
 
-extern EC_VTable* ec;
+extern const EC_VTable* ec;
 
 Error* Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.fanConfig            = cfg;

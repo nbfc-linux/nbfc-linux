@@ -3,8 +3,8 @@
 
 #include "ec.h"
 
-extern EC_VTable EC_SysLinux_VTable;
-extern EC_VTable EC_SysLinux_ACPI_VTable;
+extern const EC_VTable EC_SysLinux_VTable;
+extern const EC_VTable EC_SysLinux_ACPI_VTable;
 
 Error* EC_SysLinux_Open();
 Error* EC_SysLinux_ACPI_Open();
