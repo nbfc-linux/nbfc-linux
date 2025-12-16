@@ -23,15 +23,12 @@ void EC_Dummy_Close() {
 }
 
 Error* EC_Dummy_ReadByte(uint8_t register_, uint8_t* out) {
-  *out = 0;
-  if (register_ < EC_Dummy_FakeRegistersSize)
-    *out = EC_Dummy_FakeRegisters[register_];
+  *out = EC_Dummy_FakeRegisters[register_];
   return err_success();
 }
 
 Error* EC_Dummy_WriteByte(uint8_t register_, uint8_t value) {
-  if (register_ < EC_Dummy_FakeRegistersSize)
-    EC_Dummy_FakeRegisters[register_] = value;
+  EC_Dummy_FakeRegisters[register_] = value;
   return err_success();
 }
 
