@@ -289,7 +289,7 @@ define_array_of_T_FromJson(FanTemperatureSourceConfig)
 // Default temperature thresholds
 // ============================================================================
 
-static TemperatureThreshold _Config_DefaultTemperatureThresholds[] = {
+static const TemperatureThreshold _Config_DefaultTemperatureThresholds[] = {
   {60,  0,   0, 255},
   {63, 48,  10, 255},
   {66, 55,  20, 255},
@@ -298,12 +298,12 @@ static TemperatureThreshold _Config_DefaultTemperatureThresholds[] = {
   {75, 67, 100, 255},
 };
 
-static array_of(TemperatureThreshold) Config_DefaultTemperatureThresholds = {
+static const array_of_const(TemperatureThreshold) Config_DefaultTemperatureThresholds = {
   _Config_DefaultTemperatureThresholds,
   ARRAY_SIZE(_Config_DefaultTemperatureThresholds)
 };
 
-static TemperatureThreshold _Config_DefaultLegacyTemperatureThresholds[] = {
+static const TemperatureThreshold _Config_DefaultLegacyTemperatureThresholds[] = {
   {0,   0,   0, 255},
   {60, 48,  10, 255},
   {63, 55,  20, 255},
@@ -312,14 +312,14 @@ static TemperatureThreshold _Config_DefaultLegacyTemperatureThresholds[] = {
   {71, 67, 100, 255},
 };
 
-static array_of(TemperatureThreshold) Config_DefaultLegacyTemperatureThresholds = {
+static const array_of_const(TemperatureThreshold) Config_DefaultLegacyTemperatureThresholds = {
   _Config_DefaultLegacyTemperatureThresholds,
   ARRAY_SIZE(_Config_DefaultLegacyTemperatureThresholds)
 };
 
 static void copy_array_of_TemperatureThreshold(
   array_of(TemperatureThreshold)* dest,
-  array_of(TemperatureThreshold)* src) {
+  const array_of_const(TemperatureThreshold)* src) {
   dest->size = src->size;
   dest->data = Mem_Malloc(src->size * sizeof(TemperatureThreshold));
   memcpy(dest->data, src->data, src->size * sizeof(TemperatureThreshold));
@@ -364,7 +364,6 @@ void ModelConfig_Free(ModelConfig* c) {
 //
 // Calls *_ValidateFields on each structure and does some validations
 // that cannot be auto-generated.
-
 
 Error* TemperatureThresholds_Validate(
   Trace* trace,

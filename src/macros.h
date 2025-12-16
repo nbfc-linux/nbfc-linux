@@ -5,16 +5,17 @@
 #include <stdlib.h>
 #include <sys/types.h> // ssize_t
 
-#define my               (*self)
-#define MAX(A, B)        ((A) > (B) ? (A) : (B))
-#define MIN(A, B)        ((A) < (B) ? (A) : (B))
-#define STRLEN(S)        (sizeof(S) - 1)
+#define my                (*self)
+#define MAX(A, B)         ((A) > (B) ? (A) : (B))
+#define MIN(A, B)         ((A) < (B) ? (A) : (B))
+#define STRLEN(S)         (sizeof(S) - 1)
 
-#define PTR_DIFF(A, B) ((int) (A - B))
+#define PTR_DIFF(A, B)    ((int) (A - B))
 
-#define ARRAY_SIZE(A)    (sizeof(A) / sizeof(*A))
-#define ARRAY_SSIZE(A)   ((ssize_t) ARRAY_SIZE(A))
-#define array_of(T)      array_of_ ## T
+#define ARRAY_SIZE(A)     (sizeof(A) / sizeof(*A))
+#define ARRAY_SSIZE(A)    ((ssize_t) ARRAY_SIZE(A))
+#define array_of(T)       array_of_ ## T
+#define array_of_const(T) array_of_const_ ## T
 
 #define range(TYPE, VAR, START, STOP) \
   TYPE VAR = START; VAR < STOP; ++VAR
@@ -30,11 +31,17 @@
 
 typedef ssize_t array_size_t;
 
-#define declare_array_of(T)                  \
-  typedef struct array_of(T) array_of(T);    \
-  struct array_of(T) {                       \
-    T* data;                                 \
-    array_size_t size;                       \
+#define declare_array_of(T)                           \
+  typedef struct array_of(T) array_of(T);             \
+  struct array_of(T) {                                \
+    T* data;                                          \
+    array_size_t size;                                \
+  };                                                  \
+                                                      \
+  typedef struct array_of_const(T) array_of_const(T); \
+  struct array_of_const(T) {                          \
+    const T* data;                                    \
+    array_size_t size;                                \
   }
 
 declare_array_of(float);
