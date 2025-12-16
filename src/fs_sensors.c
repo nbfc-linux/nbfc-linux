@@ -8,8 +8,6 @@
 
 #include <errno.h>   // ENODATA, EINVAL
 #include <stdio.h>   // snprintf
-#include <string.h>  // strcmp
-#include <stdbool.h> // bool
 #include <stdlib.h>  // strtod
 #include <linux/limits.h> // PATH_MAX
 

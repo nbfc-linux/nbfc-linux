@@ -84,7 +84,7 @@ static inline Error* double_FromJson(double* out, const nx_json* node) {
 }
 
 static inline Error* float_FromJson(float* out, const nx_json* json) {
-  double d = 0;
+  double d; // NOLINT
   Error* e = double_FromJson(&d, json);
   if (! e)
     *out = d;
@@ -124,9 +124,9 @@ static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* out, con
   const char* s; // NOLINT
   Error* e = nx_json_get_str(&s, json);
   if (e) return e;
-  else if (!strcmp(s, "Read"))       *out = OverrideTargetOperation_Read;
-  else if (!strcmp(s, "Write"))      *out = OverrideTargetOperation_Write;
-  else if (!strcmp(s, "ReadWrite"))  *out = OverrideTargetOperation_ReadWrite;
+  else if (!strcmp(s, "Read"))      *out = OverrideTargetOperation_Read;
+  else if (!strcmp(s, "Write"))     *out = OverrideTargetOperation_Write;
+  else if (!strcmp(s, "ReadWrite")) *out = OverrideTargetOperation_ReadWrite;
   else return err_stringf(0, "Invalid value for %s: %s", "OverrideTargetOperation", s);
   return e;
 }

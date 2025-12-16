@@ -55,7 +55,7 @@ static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, f
       *out = max;
       return err_success();
     default:
-      return err_string(0, "FanTemperatureControl_GetTemperature: Invalid value for type");
+      return err_string(0, "ERR-03");
   }
 }
 

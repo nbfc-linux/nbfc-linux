@@ -65,7 +65,6 @@ void Log_Warn(const char* fmt, ...) {
   if (Log_LogLevel < LogLevel_Warn)
     return;
 
-
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
     va_list args;
