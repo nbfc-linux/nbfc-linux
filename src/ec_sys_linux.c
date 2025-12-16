@@ -5,10 +5,10 @@
 #define _DEFAULT_SOURCE   // endian.h: htole16(), le16toh()
 
 #include "ec_sys_linux.h"
+#include "process.h"
 
 #include <endian.h> // htole16, le16toh
 #include <fcntl.h>  // open, close, O_RDWR
-#include <stdlib.h> // system
 #include <unistd.h> // pread, pwrite
 
 #define EC_SysLinux_ACPI_EC_Path    "/dev/ec"
@@ -93,19 +93,11 @@ Error* EC_SysLinux_ReadWord(uint8_t register_, uint16_t* out) {
 }
 
 static inline Error* EC_SysLinux_LoadKernelModule() {
-  switch (system(EC_SysLinux_Module_Cmd)) {
-  case 0:  return err_success();
-  case -1: return err_stdlib(0, "system()");
-  default: return err_stringf(0, "Could not execute `%s'", EC_SysLinux_Module_Cmd);
-  }
+  return Process_Call(EC_SysLinux_Module_Cmd);
 }
 
 static inline Error* EC_SysLinux_LoadACPIKernelModule() {
-  switch (system(EC_SysLinux_ACPI_Module_Cmd)) {
-  case 0:  return err_success();
-  case -1: return err_stdlib(0, "system()");
-  default: return err_stringf(0, "Could not execute `%s'", EC_SysLinux_ACPI_Module_Cmd);
-  }
+  return Process_Call(EC_SysLinux_ACPI_Module_Cmd);
 }
 
 const EC_VTable EC_SysLinux_VTable = {

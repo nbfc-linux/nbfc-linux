@@ -3,20 +3,16 @@
 #include <errno.h>  // errno, EINVAL, ENOBUFS, ENODATA
 #include <stdio.h>  // snprintf
 #include <string.h> // strlen
-#include <stdlib.h> // system
 
 #include "macros.h"
+#include "process.h"
 #include "file_utils.h"
 
 #define ACPI_CALL_FILE         "/proc/acpi/call"
 #define ACPI_CALL_MODPROBE_CMD "modprobe acpi_call"
 
 Error* AcpiCall_Open() {
-  switch (system(ACPI_CALL_MODPROBE_CMD)) {
-  case 0:  return err_success();
-  case -1: return err_stdlib(0, "system()");
-  default: return err_stringf(0, "Could not execute `%s'", ACPI_CALL_MODPROBE_CMD);
-  }
+  return Process_Call(ACPI_CALL_MODPROBE_CMD);
 }
 
 Error* AcpiCall_Call(const char* cmd, ssize_t cmd_len, uint64_t* out) {
