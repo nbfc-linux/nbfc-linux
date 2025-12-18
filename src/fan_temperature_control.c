@@ -22,7 +22,7 @@ static inline int IsGPUSensorName(const char* s) {
     !strcmp(s, "radeon");
 }
 
-static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, float* out) {
+static Error FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, float* out) {
   float tmp;
   float sum = 0;
   float min = FLT_MAX;
@@ -31,7 +31,7 @@ static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, f
 
   for (int i = 0; i < ftc->TemperatureSourcesSize; ++i) {
     FS_TemperatureSource* ts = ftc->TemperatureSources[i];
-    Error* e = FS_TemperatureSource_GetTemperature(ts, &tmp);
+    Error e = FS_TemperatureSource_GetTemperature(ts, &tmp);
     e_warn();
     if (! e) {
       min = MIN(min, tmp);
@@ -61,7 +61,7 @@ static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, f
 
 // Add a TemperatureSource to a FanTemperatureControl.
 // Return error if maxiumum size of TemperatureSources is exceeded.
-static Error* FanTemperatureControl_AddTemperatureSource(
+static Error FanTemperatureControl_AddTemperatureSource(
   FanTemperatureControl* ftc,
   FS_TemperatureSource* ts)
 {
@@ -80,11 +80,11 @@ static Error* FanTemperatureControl_AddTemperatureSource(
 //
 // Return error if `sensor` is not found in available temperature sources
 // or `sensor` is not a valid file path to a temperature file.
-static Error* FanTemperatureControl_AddTemperatureSources(
+static Error FanTemperatureControl_AddTemperatureSources(
   FanTemperatureControl* ftc,
   const char* sensor)
 {
-  Error* e;
+  Error e;
   bool found_sensors = false;
 
   // ==========================================================================
@@ -182,8 +182,8 @@ static Error* FanTemperatureControl_AddTemperatureSources(
 // That means:
 //   - Use "Average" as TemperatureAlgorithmType
 //   - Utilize every sensor that is matched by `IsCPUSensorName`
-static Error* FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)* fans) {
-  Error* e;
+static Error FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)* fans) {
+  Error e;
 
   for_each_array(FanTemperatureControl*, ftc, *fans) {
     ftc->TemperatureAlgorithmType = TemperatureAlgorithmType_Average;
@@ -201,11 +201,11 @@ static Error* FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)*
   return err_success();
 }
 
-static Error* FanTemperatureControl_SetByModelConfig0(
+static Error FanTemperatureControl_SetByModelConfig0(
   FanTemperatureControl* ftc,
   FanConfiguration* fc)
 {
-  Error* e;
+  Error e;
 
   if (FanConfiguration_IsSet_TemperatureAlgorithmType(fc))
     ftc->TemperatureAlgorithmType = fc->TemperatureAlgorithmType;
@@ -227,11 +227,11 @@ static Error* FanTemperatureControl_SetByModelConfig0(
 }
 
 // Set fan temperature sources by model config
-static Error* FanTemperatureControl_SetByModelConfig(
+static Error FanTemperatureControl_SetByModelConfig(
   array_of(FanTemperatureControl)* fans,
   ModelConfig* model_config)
 {
-  Error* e;
+  Error e;
 
   for_enumerate_array(array_size_t, fan_index, *fans) {
     FanTemperatureControl* ftc = &fans->data[fan_index];
@@ -246,11 +246,11 @@ static Error* FanTemperatureControl_SetByModelConfig(
 }
 
 // Initialize `fans` by `service_config`
-static Error* FanTemperatureControl_SetByServiceConfig(
+static Error FanTemperatureControl_SetByServiceConfig(
   array_of(FanTemperatureControl)* fans,
   ServiceConfig* service_config) 
 {
-  Error* e;
+  Error e;
 
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config->FanTemperatureSources) {
     if (ftsc->FanIndex >= fans->size)
@@ -279,11 +279,11 @@ static Error* FanTemperatureControl_SetByServiceConfig(
 }
 
 // Initialize temperature filters in `fans`
-static Error* FanTemperatureControl_InitializeTemperatureFilters(
+static Error FanTemperatureControl_InitializeTemperatureFilters(
   array_of(FanTemperatureControl)* fans,
   int poll_interval)
 {
-  Error* e;
+  Error e;
 
   for_each_array(FanTemperatureControl*, ftc, *fans) {
     e = TemperatureFilter_Init(&ftc->TemperatureFilter, poll_interval, NBFC_TEMPERATURE_FILTER_TIMESPAN);
@@ -295,12 +295,12 @@ static Error* FanTemperatureControl_InitializeTemperatureFilters(
 }
 
 // Initialize FanTemperatureControls in `fans`
-Error* FanTemperatureControl_Init(
+Error FanTemperatureControl_Init(
   array_of(FanTemperatureControl)* fans,
   ServiceConfig* service_config,
   ModelConfig* model_config)
 {
-  Error* e;
+  Error e;
 
   // Set default TemperatureAlgorithmType and temperature sources.
   e = FanTemperatureControl_SetDefaults(fans);
@@ -325,9 +325,9 @@ Error* FanTemperatureControl_Init(
   return err_success();
 }
 
-Error* FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
+Error FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
   float temp; // NOLINT
-  Error* e = FanTemperatureControl_GetTemperature(ftc, &temp);
+  Error e = FanTemperatureControl_GetTemperature(ftc, &temp);
   if (e)
     return e;
 

@@ -15,7 +15,7 @@
 #include <math.h>    // NAN
 #include <linux/limits.h>
 
-static inline Error* bool_FromJson(bool* out, const nx_json* node) {
+static inline Error bool_FromJson(bool* out, const nx_json* node) {
   if (node->type == NX_JSON_BOOL) {
     *out = node->val.u;
     return err_success();
@@ -23,7 +23,7 @@ static inline Error* bool_FromJson(bool* out, const nx_json* node) {
   return err_string(0, "Not a bool");
 }
 
-static inline Error* int_FromJson(int* out, const nx_json* node) {
+static inline Error int_FromJson(int* out, const nx_json* node) {
   if (node->type == NX_JSON_INTEGER) {
     *out = node->val.i;
     return err_success();
@@ -31,9 +31,9 @@ static inline Error* int_FromJson(int* out, const nx_json* node) {
   return err_string(0, "Not an integer");
 }
 
-static inline Error* int8_t_FromJson(int8_t* out, const nx_json* node) {
+static inline Error int8_t_FromJson(int8_t* out, const nx_json* node) {
   int val; // NOLINT
-  Error* e = int_FromJson(&val, node);
+  Error e = int_FromJson(&val, node);
   e_check();
   if (val < INT8_MIN || val > INT8_MAX)
     return err_stringf(0, "Value not in range (%d - %d): %d", INT8_MIN, INT8_MAX, val);
@@ -41,9 +41,9 @@ static inline Error* int8_t_FromJson(int8_t* out, const nx_json* node) {
   return err_success();
 }
 
-static inline Error* uint8_t_FromJson(uint8_t* out, const nx_json* node) {
+static inline Error uint8_t_FromJson(uint8_t* out, const nx_json* node) {
   int val; // NOLINT
-  Error* e = int_FromJson(&val, node);
+  Error e = int_FromJson(&val, node);
   e_check();
   if (val < 0 || val > UINT8_MAX)
     return err_stringf(0, "Value not in range (%d - %d): %d", 0, UINT8_MAX, val);
@@ -51,9 +51,9 @@ static inline Error* uint8_t_FromJson(uint8_t* out, const nx_json* node) {
   return err_success();
 }
 
-static inline Error* int16_t_FromJson(int16_t* out, const nx_json* node) {
+static inline Error int16_t_FromJson(int16_t* out, const nx_json* node) {
   int val; // NOLINT
-  Error* e = int_FromJson(&val, node);
+  Error e = int_FromJson(&val, node);
   e_check();
   if (val < INT16_MIN || val > INT16_MAX)
     return err_stringf(0, "Value not in range (%d - %d): %d", INT16_MIN, INT16_MAX, val);
@@ -61,9 +61,9 @@ static inline Error* int16_t_FromJson(int16_t* out, const nx_json* node) {
   return err_success();
 }
 
-static inline Error* uint16_t_FromJson(uint16_t* out, const nx_json* node) {
+static inline Error uint16_t_FromJson(uint16_t* out, const nx_json* node) {
   int val; // NOLINT
-  Error* e = int_FromJson(&val, node);
+  Error e = int_FromJson(&val, node);
   e_check();
   if (val < 0 || val > UINT16_MAX)
     return err_stringf(0, "Value not in range (%d - %d): %d", 0, UINT16_MAX, val);
@@ -71,7 +71,7 @@ static inline Error* uint16_t_FromJson(uint16_t* out, const nx_json* node) {
   return err_success();
 }
 
-static inline Error* double_FromJson(double* out, const nx_json* node) {
+static inline Error double_FromJson(double* out, const nx_json* node) {
   if (node->type == NX_JSON_INTEGER) {
     *out = node->val.i;
     return err_success();
@@ -83,24 +83,24 @@ static inline Error* double_FromJson(double* out, const nx_json* node) {
   return err_string(0, "Not a double");
 }
 
-static inline Error* float_FromJson(float* out, const nx_json* json) {
+static inline Error float_FromJson(float* out, const nx_json* json) {
   double d; // NOLINT
-  Error* e = double_FromJson(&d, json);
+  Error e = double_FromJson(&d, json);
   if (! e)
     *out = d;
   return e;
 }
 
-static inline Error* str_FromJson(const char** out, const nx_json* json) {
-  Error* e = nx_json_get_str(out, json);
+static inline Error str_FromJson(const char** out, const nx_json* json) {
+  Error e = nx_json_get_str(out, json);
   e_check();
   *out = Mem_Strdup(*out);
   return err_success();
 }
 
-static Error* RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* json) {
+static Error RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* json) {
   const char* s; // NOLINT
-  Error* e = nx_json_get_str(&s, json);
+  Error e = nx_json_get_str(&s, json);
   if (e) return e;
   else if (!strcmp(s, "Set"))  *out = RegisterWriteMode_Set;
   else if (!strcmp(s, "And"))  *out = RegisterWriteMode_And;
@@ -110,9 +110,9 @@ static Error* RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* 
   return e;
 }
 
-static Error* RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const nx_json* json) {
+static Error RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const nx_json* json) {
   const char* s; // NOLINT
-  Error* e = nx_json_get_str(&s, json);
+  Error e = nx_json_get_str(&s, json);
   if (e) return e;
   else if (!strcmp(s, "OnWriteFanSpeed"))  *out = RegisterWriteOccasion_OnWriteFanSpeed;
   else if (!strcmp(s, "OnInitialization")) *out = RegisterWriteOccasion_OnInitialization;
@@ -120,9 +120,9 @@ static Error* RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const n
   return e;
 }
 
-static Error* OverrideTargetOperation_FromJson(OverrideTargetOperation* out, const nx_json* json) {
+static Error OverrideTargetOperation_FromJson(OverrideTargetOperation* out, const nx_json* json) {
   const char* s; // NOLINT
-  Error* e = nx_json_get_str(&s, json);
+  Error e = nx_json_get_str(&s, json);
   if (e) return e;
   else if (!strcmp(s, "Read"))      *out = OverrideTargetOperation_Read;
   else if (!strcmp(s, "Write"))     *out = OverrideTargetOperation_Write;
@@ -138,9 +138,9 @@ TemperatureAlgorithmType TemperatureAlgorithmType_FromString(const char* s) {
   return TemperatureAlgorithmType_Unset;
 }
 
-static Error* TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, const nx_json* json) {
+static Error TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, const nx_json* json) {
   const char* s; // NOLINT
-  Error* e = nx_json_get_str(&s, json);
+  Error e = nx_json_get_str(&s, json);
   if (e) return e;
   TemperatureAlgorithmType a = TemperatureAlgorithmType_FromString(s);
   if (a == TemperatureAlgorithmType_Unset)
@@ -149,9 +149,9 @@ static Error* TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, c
   return e;
 }
 
-static Error* EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const nx_json* json) {
+static Error EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const nx_json* json) {
   const char* s; // NOLINT
-  Error* e = nx_json_get_str(&s, json);
+  Error e = nx_json_get_str(&s, json);
   if (e) return e;
   EmbeddedControllerType t = EmbeddedControllerType_FromString(s);
   if (t == EmbeddedControllerType_Unset)
@@ -248,10 +248,10 @@ const char* TemperatureAlgorithmType_ToString(TemperatureAlgorithmType t) {
   return NULL;
 }
 
-typedef Error* (FromJson_Callback)(void*, const nx_json*);
+typedef Error (FromJson_Callback)(void*, const nx_json*);
 
-static Error* array_of_FromJson(FromJson_Callback callback, void** v_data, array_size_t* v_size, ssize_t size, const nx_json* json) {
-  Error* e = nx_json_get_array(json);
+static Error array_of_FromJson(FromJson_Callback callback, void** v_data, array_size_t* v_size, ssize_t size, const nx_json* json) {
+  Error e = nx_json_get_array(json);
   e_check();
 
   *v_size = 0;
@@ -272,7 +272,7 @@ static Error* array_of_FromJson(FromJson_Callback callback, void** v_data, array
 }
 
 #define define_array_of_T_FromJson(T) \
-static inline Error* array_of_##T##_FromJson(array_of(T)* v, const nx_json *json) { \
+static inline Error array_of_##T##_FromJson(array_of(T)* v, const nx_json *json) { \
   return array_of_FromJson((FromJson_Callback*) T ## _FromJson, (void**) &v->data, &v->size, sizeof(T), json); \
 }
 
@@ -365,13 +365,13 @@ void ModelConfig_Free(ModelConfig* c) {
 // Calls *_ValidateFields on each structure and does some validations
 // that cannot be auto-generated.
 
-Error* TemperatureThresholds_Validate(
+Error TemperatureThresholds_Validate(
   Trace* trace,
   array_of(TemperatureThreshold)* TemperatureThresholds,
   int CriticalTemperature
 )
 {
-  Error* e;
+  Error e;
   bool has_0_FanSpeed   = false;
   bool has_100_FanSpeed = false;
 
@@ -412,7 +412,7 @@ Error* TemperatureThresholds_Validate(
   return err_success();
 }
 
-static Error* RegisterWriteConfiguration_Validate(const RegisterWriteConfiguration* r) {
+static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguration* r) {
   const bool AcpiMethod                  = RegisterWriteConfiguration_IsSet_AcpiMethod(r);
   const bool ResetAcpiMethod             = RegisterWriteConfiguration_IsSet_ResetAcpiMethod(r);
   const bool Register                    = RegisterWriteConfiguration_IsSet_Register(r);
@@ -479,8 +479,8 @@ static Error* RegisterWriteConfiguration_Validate(const RegisterWriteConfigurati
   return err_success();
 }
 
-Error* ModelConfig_Validate(Trace* trace, ModelConfig* c) {
-  Error* e;
+Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
+  Error e;
 
   e = ModelConfig_ValidateFields(c);
   e_goto(err);
@@ -616,8 +616,8 @@ err:
   return err_string(e, trace->buf);
 }
 
-Error* ModelConfig_FromFile(ModelConfig* config, const char* file) {
-  Error* e;
+Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
+  Error e;
   char file_content[NBFC_MAX_FILE_SIZE];
   char nxjson_memory[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
@@ -639,7 +639,7 @@ err:
   return e;
 }
 
-Error* ModelConfig_FindAndLoad(ModelConfig* config, char* resolved, const char* file) {
+Error ModelConfig_FindAndLoad(ModelConfig* config, char* resolved, const char* file) {
   if (file[0] == '/') {
     snprintf(resolved, PATH_MAX, "%s", file);
     return ModelConfig_FromFile(config, file);

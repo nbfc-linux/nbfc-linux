@@ -4,7 +4,7 @@
 #include "ec_sys_linux.h"
 
 bool EC_CheckWorking(const EC_VTable* ec) {
-  Error* e = ec->Open();
+  Error e = ec->Open();
   if (e)
     return false;
 
@@ -14,7 +14,7 @@ bool EC_CheckWorking(const EC_VTable* ec) {
   return !e;
 }
 
-Error* EC_FindWorking(const EC_VTable** out) {
+Error EC_FindWorking(const EC_VTable** out) {
 #if ENABLE_EC_SYS
   if (EC_CheckWorking(&EC_SysLinux_VTable)) {
     *out = &EC_SysLinux_VTable;

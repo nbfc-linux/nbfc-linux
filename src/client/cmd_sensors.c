@@ -62,7 +62,7 @@ struct {
   false,
 };
 
-static Error* Sensors_IsValidSensor(const char* sensor) {
+static Error Sensors_IsValidSensor(const char* sensor) {
   switch (sensor[0]) {
     case '@':
       // TODO: Check if sensor group can be resolved to a sensor
@@ -105,7 +105,7 @@ static FanTemperatureSourceConfig* Sensors_GetFTSCByFanIndex(int fanIndex) {
 }
 
 static int Sensors_Set() {
-  Error* e;
+  Error e;
   ModelConfig model_config = {0};
 
   check_root();

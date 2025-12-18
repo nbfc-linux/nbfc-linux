@@ -17,8 +17,8 @@
 
 ServiceConfig service_config = {0};
 
-Error* ServiceConfig_Init(const char* file) {
-  Error* e;
+Error ServiceConfig_Init(const char* file) {
+  Error e;
   Trace trace = {0};
   char file_content[NBFC_MAX_FILE_SIZE];
   char nxjson_memory[NBFC_MAX_FILE_SIZE];
@@ -83,7 +83,7 @@ err:
   return err_success();
 }
 
-Error* ServiceConfig_Write(const char* file) {
+Error ServiceConfig_Write(const char* file) {
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
 

@@ -8,8 +8,8 @@
 #include <unistd.h> // getpid
 #include <sys/stat.h>
 
-Error* PID_Write(enum PID_LockMode lock_mode) {
-  Error* e = NULL;
+Error PID_Write(enum PID_LockMode lock_mode) {
+  Error e = err_success();
   int flags = lock_mode;
   char buf[32];
   int len = snprintf(buf, sizeof(buf), "%d", getpid());

@@ -156,7 +156,7 @@ char* Get_Supported_Config_From_SupportFile(const char* support_file, array_of(C
   const nx_json* root = NULL;
   char* config = NULL;
 
-  Error* e = nx_json_parse_file(&root, buf, sizeof(buf), support_file);
+  Error e = nx_json_parse_file(&root, buf, sizeof(buf), support_file);
   if (e) {
     Log_Warn("%s: %s\n", support_file, err_print_all(e));
     goto end;

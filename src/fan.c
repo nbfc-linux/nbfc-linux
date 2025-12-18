@@ -10,7 +10,7 @@
 
 extern const EC_VTable* ec;
 
-Error* Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
+Error Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.fanConfig            = cfg;
   my.mode                 = Fan_ModeAuto;
   my.criticalTemperature  = modelCfg->CriticalTemperature;
@@ -84,10 +84,10 @@ static float Fan_FanSpeedToPercentage(const Fan* self, uint16_t fanSpeed) {
      (my.maxSpeedValueRead - my.minSpeedValueRead)) * 100.0f;
 }
 
-static Error* Fan_ECWriteValue(Fan* self, uint16_t value) {
+static Error Fan_ECWriteValue(Fan* self, uint16_t value) {
   if (my.fanConfig->WriteAcpiMethod) {
     uint64_t out;
-    Error* e = AcpiCall_CallTemplate(my.fanConfig->WriteAcpiMethod, value, &out);
+    Error e = AcpiCall_CallTemplate(my.fanConfig->WriteAcpiMethod, value, &out);
     if (e)
       return err_string(e, "WriteAcpiMethod");
     else
@@ -99,8 +99,8 @@ static Error* Fan_ECWriteValue(Fan* self, uint16_t value) {
     : ec->WriteByte(my.fanConfig->WriteRegister, value);
 }
 
-static Error* Fan_ECReadValue(const Fan* self, uint16_t* out) {
-  Error* e;
+static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {
+  Error e;
 
   if (my.fanConfig->ReadAcpiMethod) {
     uint64_t val;
@@ -153,8 +153,8 @@ void Fan_SetTemperature(Fan* self, float temperature)
     my.targetFanSpeed = threshold->FanSpeed;
 }
 
-Error* Fan_SetFixedSpeed(Fan* self, float speed) {
-  Error* e = NULL;
+Error Fan_SetFixedSpeed(Fan* self, float speed) {
+  Error e = err_success();
   my.mode = Fan_ModeFixed;
 
   if (speed < 0.0f) {
@@ -182,13 +182,13 @@ float Fan_GetCurrentSpeed(const Fan* self) {
   return my.currentSpeed;
 }
 
-Error* Fan_UpdateCurrentSpeed(Fan* self) {
+Error Fan_UpdateCurrentSpeed(Fan* self) {
   uint16_t speed;
 
   // If the value is out of range 3 or more times,
   // minFanSpeed and/or maxFanSpeed are probably wrong.
   for (range(int, i, 0, 3)) {
-    Error* e = Fan_ECReadValue(self, &speed);
+    Error e = Fan_ECReadValue(self, &speed);
     if (e)
       return e;
 
@@ -205,13 +205,13 @@ uint16_t Fan_GetSpeedSteps(const Fan* self) {
   return my.fanSpeedSteps;
 }
 
-Error* Fan_ECReset(Fan* self) {
+Error Fan_ECReset(Fan* self) {
   if (! my.fanConfig->ResetRequired)
     return err_success();
 
   if (my.fanConfig->ResetAcpiMethod) {
     uint64_t out;
-    Error* e = AcpiCall_Call_Str(my.fanConfig->ResetAcpiMethod, &out);
+    Error e = AcpiCall_Call_Str(my.fanConfig->ResetAcpiMethod, &out);
     if (e)
       return err_string(e, "ResetAcpiMethod");
     else
@@ -221,7 +221,7 @@ Error* Fan_ECReset(Fan* self) {
   return Fan_ECWriteValue(self, my.fanConfig->FanSpeedResetValue);
 }
 
-Error* Fan_ECFlush(Fan* self) {
+Error Fan_ECFlush(Fan* self) {
   const float speed = Fan_GetTargetSpeed(self);
   const uint16_t value = Fan_PercentageToFanSpeed(self, speed);
   return Fan_ECWriteValue(self, value);

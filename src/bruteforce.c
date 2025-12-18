@@ -146,11 +146,11 @@ int main(int argc, char* const argv[]) {
   }
 
   if (ec == NULL) {
-    Error* e = EC_FindWorking(&ec);
+    Error e = EC_FindWorking(&ec);
     e_die();
   }
 
-  Error* e = ec->Open();
+  Error e = ec->Open();
   e_die();
 
   atexit(reset_embedded_controller);
@@ -237,7 +237,7 @@ static void reset_embedded_controller() {
 
 static void bruteforce() {
   uint8_t byte;
-  Error* e;
+  Error e;
 
   e = ec->ReadByte(options.fan_register, &byte);
   e_die();

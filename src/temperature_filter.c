@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <string.h>
 
-Error* TemperatureFilter_Init(TemperatureFilter* self, int poll_interval, int timespan) {
+Error TemperatureFilter_Init(TemperatureFilter* self, int poll_interval, int timespan) {
   if (poll_interval <= 0)
     return (errno = EINVAL), err_stdlib(0, "poll_interval");
 

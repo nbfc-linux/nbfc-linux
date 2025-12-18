@@ -21,7 +21,7 @@ static const char* const LinuxTempSensorFile = "temp%d_input";
 
 array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
-Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
+Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
   char buf[32];
   int nread;
 
@@ -59,8 +59,8 @@ Error* FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* ou
   return err_success();
 }
 
-static Error* FS_Sensors_Init_HwMon() {
-  Error* e;
+static Error FS_Sensors_Init_HwMon() {
+  Error e;
   FS_TemperatureSource sources[64];
   FS_TemperatureSource *source = sources;
   FS_TemperatureSource *const sources_end = &sources[ARRAY_SIZE(sources)];
@@ -127,8 +127,8 @@ void FS_Sensors_Log() {
     Log_Info("Available temperature source: '%s' (%s)\n", source->name, source->file);
 }
 
-Error* FS_Sensors_Init() {
-  Error* e;
+Error FS_Sensors_Init() {
+  Error e;
   int slept;
   const int sleep_time = 30;
 

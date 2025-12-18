@@ -76,7 +76,7 @@ void Nvidia_Close() {
   Nvidia_nvmlShutdown_fn = NULL;
 }
 
-Error* Nvidia_GetTemperature(float* out) {
+Error Nvidia_GetTemperature(float* out) {
   unsigned int temp; // NOLINT
 
   if (Nvidia_nvmlDeviceGetTemperature_fn(Nvidia_Device, NVML_TEMPERATURE_GPU, &temp) == NVML_SUCCESS)

@@ -39,17 +39,17 @@ ModelConfig              Service_Model_Config;
 array_of(FanTemperatureControl) Service_Fans;
 static enum Service_Initialization Service_State;
 
-static Error* ApplyRegisterWriteConfigurations(bool);
-static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration*);
-static Error* ResetRegisterWriteConfigurations();
-static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration*);
-static void   ResetEC();
-static bool   IsAcpiCallUsed();
+static Error ApplyRegisterWriteConfigurations(bool);
+static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration*);
+static Error ResetRegisterWriteConfigurations();
+static Error ResetRegisterWriteConfig(RegisterWriteConfiguration*);
+static void  ResetEC();
+static bool  IsAcpiCallUsed();
 static EmbeddedControllerType EmbeddedControllerType_By_EC(const EC_VTable*);
 static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
-Error* Service_Init() {
-  Error* e;
+Error Service_Init() {
+  Error e;
   Trace trace = {0};
   char path[PATH_MAX];
   Service_State = Initialized_0_None;
@@ -191,8 +191,8 @@ error:
   return e;
 }
 
-Error* Service_Loop() {
-  Error* e = err_success();
+Error Service_Loop() {
+  Error e = err_success();
 
   bool re_init_required = false;
   for_each_array(FanTemperatureControl*, f, Service_Fans) {
@@ -265,7 +265,7 @@ static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
 }
 
 static void ResetEC() {
-  Error* e;
+  Error e;
   bool failed = false;
   int tries = 10;
 
@@ -284,8 +284,8 @@ static void ResetEC() {
   } while (failed && --tries);
 }
 
-static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
-  Error* e;
+static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
+  Error e;
   uint8_t mask;
   uint64_t out;
 
@@ -315,8 +315,8 @@ static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
   }
 }
 
-static Error* ResetRegisterWriteConfigurations() {
-  Error* e = NULL;
+static Error ResetRegisterWriteConfigurations() {
+  Error e = err_success();
   for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations)
     if (cfg->ResetRequired) {
       e = ResetRegisterWriteConfig(cfg);
@@ -325,8 +325,8 @@ static Error* ResetRegisterWriteConfigurations() {
   return e;
 }
 
-static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
-  Error* e;
+static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
+  Error e;
   uint8_t mask;
   uint64_t out;
 
@@ -356,10 +356,10 @@ static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
   }
 }
 
-static Error* ApplyRegisterWriteConfigurations(bool initializing) {
+static Error ApplyRegisterWriteConfigurations(bool initializing) {
   for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations) {
     if (initializing || cfg->WriteOccasion == RegisterWriteOccasion_OnWriteFanSpeed) {
-       Error* e = ApplyRegisterWriteConfig(cfg);
+       Error e = ApplyRegisterWriteConfig(cfg);
        e_check();
     }
   }

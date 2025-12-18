@@ -10,7 +10,7 @@ enum PID_LockMode {
   PID_NoAcquireLock = 0
 };
 
-Error* PID_Write(enum PID_LockMode);
-void   PID_Cleanup();
+Error PID_Write(enum PID_LockMode);
+void  PID_Cleanup();
 
 #endif

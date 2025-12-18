@@ -12,8 +12,8 @@
 
 ServiceState service_state = {0};
 
-Error* ServiceState_Init() {
-  Error* e;
+Error ServiceState_Init() {
+  Error e;
   Trace trace = {0};
   char file_content[NBFC_MAX_FILE_SIZE];
   char nxjson_memory[NBFC_MAX_FILE_SIZE];
@@ -61,7 +61,7 @@ err:
   return err_success();
 }
 
-Error* ServiceState_Write() {
+Error ServiceState_Write() {
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
 

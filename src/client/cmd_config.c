@@ -140,7 +140,7 @@ int Set_Or_Apply() {
   service_config.SelectedConfigId = config;
   ServiceConfig_Set_SelectedConfigId(&service_config);
 
-  Error* e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
+  Error e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
   Mem_Free(config);
 
   if (e) {

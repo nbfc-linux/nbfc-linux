@@ -72,7 +72,7 @@ int test_model_config(const char* file) {
 
   Log_Info(">>> Processing %s ...\n", file);
 
-  Error* e = ModelConfig_FromFile(&model_config, path);
+  Error e = ModelConfig_FromFile(&model_config, path);
   e_die();
 
   Trace trace = {0};

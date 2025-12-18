@@ -202,8 +202,8 @@ def write_header(fh):
         p('')
         p(f'typedef struct {name} {name};')
         p(f'declare_array_of({name});')
-        p(f'Error* {struct.name}_FromJson({struct.name}*, const nx_json*);')
-        p(f'Error* {struct.name}_ValidateFields({struct.name}*);')
+        p(f'Error {struct.name}_FromJson({struct.name}*, const nx_json*);')
+        p(f'Error {struct.name}_ValidateFields({struct.name}*);')
         p('')
 
         for i, field in enumerate(struct):
@@ -234,7 +234,7 @@ def write_source(fh):
 def write_validate_fields(struct, fh):
     p = lambda *a,**kw: print(*a, **kw, file=fh)
 
-    p(f'Error* {struct.name}_ValidateFields({struct.name}* self) {{', end='')
+    p(f'Error {struct.name}_ValidateFields({struct.name}* self) {{', end='')
     for field in struct:
         if field.required == False:
             is_unset = 'false'
@@ -262,8 +262,8 @@ def write_validate_fields(struct, fh):
 def write_parse_struct(struct, fh):
     p = lambda *a,**kw: print(*a, **kw, file=fh)
 
-    p(f'Error* {struct.name}_FromJson({struct.name}* obj, const nx_json* json) {{')
-    p( '\tError* e;')
+    p(f'Error {struct.name}_FromJson({struct.name}* obj, const nx_json* json) {{')
+    p( '\tError e;')
     p(f'\tmemset(obj, 0, sizeof(*obj));')
     p('')
     p( '\tif (!json || json->type != NX_JSON_OBJECT)')

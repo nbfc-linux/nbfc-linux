@@ -1,6 +1,6 @@
 /* Auto generated code ['./tools/config.py', 'source'] */
 
-Error* TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
+Error TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
 	if (! TemperatureThreshold_IsSet_UpThreshold(self))
 		return err_stringf(0, "%s: %s", "UpThreshold", "Missing option");
 
@@ -14,8 +14,8 @@ Error* TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
 	return err_success();
 }
 
-Error* TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* json) {
-	Error* e;
+Error TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -46,7 +46,7 @@ Error* TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* j
 	return err_success();
 }
 
-Error* FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* self) {
+Error FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* self) {
 	if (! FanSpeedPercentageOverride_IsSet_FanSpeedPercentage(self))
 		return err_stringf(0, "%s: %s", "FanSpeedPercentage", "Missing option");
 	else if (! (self->FanSpeedPercentage >= 0.0 && self->FanSpeedPercentage <= 100.0))
@@ -60,8 +60,8 @@ Error* FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* sel
 	return err_success();
 }
 
-Error* FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const nx_json* json) {
-	Error* e;
+Error FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -92,7 +92,7 @@ Error* FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, cons
 	return err_success();
 }
 
-Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self) {
+Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self) {
 	if (! RegisterWriteConfiguration_IsSet_WriteMode(self))
 		self->WriteMode = RegisterWriteMode_Set;
 
@@ -125,8 +125,8 @@ Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* sel
 	return err_success();
 }
 
-Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const nx_json* json) {
-	Error* e;
+Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -192,7 +192,7 @@ Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, cons
 	return err_success();
 }
 
-Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
+Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
 		return err_stringf(0, "%s: %s", "FanDisplayName", "Missing option");
 
@@ -246,8 +246,8 @@ Error* FanConfiguration_ValidateFields(FanConfiguration* self) {
 	return err_success();
 }
 
-Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
-	Error* e;
+Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -348,7 +348,7 @@ Error* FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 	return err_success();
 }
 
-Error* Sponsor_ValidateFields(Sponsor* self) {
+Error Sponsor_ValidateFields(Sponsor* self) {
 	if (! Sponsor_IsSet_Name(self))
 		return err_stringf(0, "%s: %s", "Name", "Missing option");
 
@@ -363,8 +363,8 @@ Error* Sponsor_ValidateFields(Sponsor* self) {
 	return err_success();
 }
 
-Error* Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
-	Error* e;
+Error Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -400,7 +400,7 @@ Error* Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
 	return err_success();
 }
 
-Error* ModelConfig_ValidateFields(ModelConfig* self) {
+Error ModelConfig_ValidateFields(ModelConfig* self) {
 	if (! ModelConfig_IsSet_NotebookModel(self))
 		return err_stringf(0, "%s: %s", "NotebookModel", "Missing option");
 
@@ -435,8 +435,8 @@ Error* ModelConfig_ValidateFields(ModelConfig* self) {
 	return err_success();
 }
 
-Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
-	Error* e;
+Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -502,7 +502,7 @@ Error* ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 	return err_success();
 }
 
-Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* self) {
+Error FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* self) {
 	if (! FanTemperatureSourceConfig_IsSet_FanIndex(self))
 		return err_stringf(0, "%s: %s", "FanIndex", "Missing option");
 
@@ -514,8 +514,8 @@ Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* sel
 	return err_success();
 }
 
-Error* FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const nx_json* json) {
-	Error* e;
+Error FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -546,7 +546,7 @@ Error* FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, cons
 	return err_success();
 }
 
-Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
+Error ServiceConfig_ValidateFields(ServiceConfig* self) {
 	if (! ServiceConfig_IsSet_SelectedConfigId(self))
 		return err_stringf(0, "%s: %s", "SelectedConfigId", "Missing option");
 
@@ -561,8 +561,8 @@ Error* ServiceConfig_ValidateFields(ServiceConfig* self) {
 	return err_success();
 }
 
-Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
-	Error* e;
+Error ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -598,14 +598,14 @@ Error* ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 	return err_success();
 }
 
-Error* ServiceState_ValidateFields(ServiceState* self) {
+Error ServiceState_ValidateFields(ServiceState* self) {
 	if (false)
 		return err_stringf(0, "%s: %s", "TargetFanSpeeds", "Missing option");
 	return err_success();
 }
 
-Error* ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
-	Error* e;
+Error ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -626,7 +626,7 @@ Error* ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
 	return err_success();
 }
 
-Error* FanInfo_ValidateFields(FanInfo* self) {
+Error FanInfo_ValidateFields(FanInfo* self) {
 	if (! FanInfo_IsSet_Name(self))
 		return err_stringf(0, "%s: %s", "Name", "Missing option");
 
@@ -653,8 +653,8 @@ Error* FanInfo_ValidateFields(FanInfo* self) {
 	return err_success();
 }
 
-Error* FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
-	Error* e;
+Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
@@ -710,7 +710,7 @@ Error* FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 	return err_success();
 }
 
-Error* ServiceInfo_ValidateFields(ServiceInfo* self) {
+Error ServiceInfo_ValidateFields(ServiceInfo* self) {
 	if (! ServiceInfo_IsSet_PID(self))
 		return err_stringf(0, "%s: %s", "PID", "Missing option");
 
@@ -725,8 +725,8 @@ Error* ServiceInfo_ValidateFields(ServiceInfo* self) {
 	return err_success();
 }
 
-Error* ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
-	Error* e;
+Error ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
+	Error e;
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)

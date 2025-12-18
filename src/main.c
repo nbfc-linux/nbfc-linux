@@ -84,7 +84,7 @@ static void parse_opts(int argc, char* const argv[]) {
 
 int main(int argc, char* const argv[])
 {
-  Error* e;
+  Error e;
 
   Program_Name_Set(argv[0]);
 

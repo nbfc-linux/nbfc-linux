@@ -49,7 +49,7 @@ int Set() {
 
   char* buf = NULL;
   const nx_json* out = NULL;
-  Error* e = Client_Communicate(in, &buf, &out);
+  Error e = Client_Communicate(in, &buf, &out);
   if (e)
     goto error;
 

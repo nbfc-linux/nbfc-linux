@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-static inline Error* Process_Call(const char* cmd) {
+static inline Error Process_Call(const char* cmd) {
   switch (system(cmd)) {
   case 0:  return err_success();
   case -1: return err_stdlib(0, "system()");

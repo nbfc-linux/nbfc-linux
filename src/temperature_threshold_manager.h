@@ -12,7 +12,7 @@ struct ThresholdManager {
   array_size_t current;
 };
 
-Error*                ThresholdManager_Init(ThresholdManager*, array_of(TemperatureThreshold)*);
+Error                 ThresholdManager_Init(ThresholdManager*, array_of(TemperatureThreshold)*);
 void                  ThresholdManager_ResetCurrentThreshold(ThresholdManager*, float temperature);
 TemperatureThreshold* ThresholdManager_AutoSelectThreshold(ThresholdManager*, float temperature);
 TemperatureThreshold* ThresholdManager_GetCurrentThreshold(const ThresholdManager*);

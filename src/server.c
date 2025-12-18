@@ -51,7 +51,7 @@ static size_t             Server_PollFDSize = 0;
  * Note: We don't use StackMemory_Init() here, because that has already
  * been called in Server_HandleClient().
  */
-static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
+static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
   int fan = -1;
   float speed = -2;
   const int fancount = Service_Model_Config.FanConfigurations.size;
@@ -112,7 +112,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
   nx_json *o = create_json_object(NULL, &root);
   create_json_string("Status", o, "OK");
 
-  Error* e = Protocol_Send_Json(socket, o);
+  Error e = Protocol_Send_Json(socket, o);
   nx_json_free(o);
   return e;
 }
@@ -126,7 +126,7 @@ static Error* Server_Command_Set_Fan(int socket, const nx_json* json) {
  * Note: We don't use StackMemory_Init() here, because that has already
  * been called in Server_HandleClient().
  */
-static Error* Server_Command_Status(int socket, const nx_json* json) {
+static Error Server_Command_Status(int socket, const nx_json* json) {
   if (json->val.children.length > 1)
       return err_string(0, "Unknown arguments");
 
@@ -150,7 +150,7 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
     create_json_integer("SpeedSteps", fan_json, Fan_GetSpeedSteps(fan));
   }
 
-  Error* e = Protocol_Send_Json(socket, o);
+  Error e = Protocol_Send_Json(socket, o);
   nx_json_free(o);
   return e;
 }
@@ -161,8 +161,8 @@ static Error* Server_Command_Status(int socket, const nx_json* json) {
  *
  * Also change the mode of the socket file to 0666.
  */
-Error* Server_Init() {
-  Error* e = NULL;
+Error Server_Init() {
+  Error e = err_success();
 
   memset(&Server_Address, 0, sizeof(Server_Address));
   Server_Address.sun_family = AF_UNIX;
@@ -216,7 +216,7 @@ static Client* Server_AllocateClient() {
  * - Reset the buffer
  * - Make the file descriptor non blocking
  */
-static Error* Server_UseClient(Client* client, int fd) {
+static Error Server_UseClient(Client* client, int fd) {
   int flags = fcntl(fd, F_GETFL, 0);
 
   if (flags == -1)
@@ -250,8 +250,8 @@ static size_t Server_GetNumberOfActiveClients() {
 }
 
 // Accept a new connection and add setup client
-static Error* Server_AcceptClient() {
-  Error* e;
+static Error Server_AcceptClient() {
+  Error e;
   int addrlen = sizeof(Server_Address);
   int new_socket;
 
@@ -316,7 +316,7 @@ static int Server_ReceiveMessage(Client* client) {
  * - Call the command functions
  */
 static void Server_HandleClient(Client* client) {
-  Error* e = NULL;
+  Error e = err_success();
   const nx_json* json = NULL;
 
   Log_Debug("Server_HandleClient(fd=%d)\n", client->fd);
@@ -387,7 +387,7 @@ end:
 }
 
 // Hadle incoming connections and process clients
-Error* Server_Loop(int timeout) {
+Error Server_Loop(int timeout) {
   const size_t num_clients = Server_GetNumberOfActiveClients();
   const size_t needed_fdsize = num_clients + 1;
 
@@ -424,7 +424,7 @@ Error* Server_Loop(int timeout) {
 
   // We have an incoming connection ...
   if (Server_PollFDs[0].revents & POLLIN) {
-    Error* e = Server_AcceptClient();
+    Error e = Server_AcceptClient();
     if (e)
       return e;
   }

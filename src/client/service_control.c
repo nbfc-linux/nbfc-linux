@@ -48,10 +48,10 @@ error:
   return pid;
 }
 
-Error* Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
+Error Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
   int sock;
   struct sockaddr_un serv_addr;
-  Error* e = NULL;
+  Error e = err_success();
 
   sock = socket(AF_UNIX, SOCK_STREAM, 0);
   if (sock < 0)
@@ -88,7 +88,7 @@ void ServiceConfig_Load() {
 
   char buf[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
-  Error* e = nx_json_parse_file(&js, buf, sizeof(buf), NBFC_SERVICE_CONFIG);
+  Error e = nx_json_parse_file(&js, buf, sizeof(buf), NBFC_SERVICE_CONFIG);
   if (e)
     goto error;
 
@@ -102,8 +102,8 @@ error:
   }
 }
 
-Error* ServiceInfo_TryLoad(ServiceInfo* service_info) {
-  Error* e;
+Error ServiceInfo_TryLoad(ServiceInfo* service_info) {
+  Error e;
   nx_json root = {0};
   nx_json* in = create_json_object(NULL, &root);
   create_json_string("Command", in, "status");
@@ -153,7 +153,7 @@ error:
 }
 
 void Service_LoadAllConfigFiles(ModelConfig* model_config) {
-  Error* e;
+  Error e;
   Trace trace = {0};
   char path[PATH_MAX];
 

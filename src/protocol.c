@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-Error* Protocol_Send(int socket, const char* buffer, size_t length) {
+Error Protocol_Send(int socket, const char* buffer, size_t length) {
   size_t total_sent = 0;
 
   while (total_sent < length) {
@@ -31,8 +31,8 @@ Error* Protocol_Send(int socket, const char* buffer, size_t length) {
   return err_success();
 }
 
-Error* Protocol_Send_Json(int socket, const nx_json* json) {
-  Error* e;
+Error Protocol_Send_Json(int socket, const nx_json* json) {
+  Error e;
   char buf[NBFC_MAX_FILE_SIZE];
   StringBuf s = { buf, 0, sizeof(buf) };
   buf[0] = '\0';
@@ -50,7 +50,7 @@ Error* Protocol_Send_Json(int socket, const nx_json* json) {
   return err_success();
 }
 
-Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
+Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
   char buffer[PROTOCOL_BUFFER_SIZE] = {0};
   int nread;
   const nx_json* json = NULL;
@@ -87,7 +87,7 @@ Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
   return err_success();
 }
 
-Error* Protocol_Send_Error(int socket, const char* message) {
+Error Protocol_Send_Error(int socket, const char* message) {
   nx_json error  = {0};
   error.type     = NX_JSON_STRING;
   error.key      = "Error";

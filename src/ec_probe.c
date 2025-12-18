@@ -383,11 +383,11 @@ int main(int argc, char* const argv[]) {
   signal(SIGTERM, Handle_Signal);
 
   if (ec == NULL) {
-    Error* e = EC_FindWorking(&ec);
+    Error e = EC_FindWorking(&ec);
     e_die();
   }
 
-  Error* e = ec->Open();
+  Error e = ec->Open();
   e_die();
 
   switch (cmd) {
@@ -406,13 +406,13 @@ int main(int argc, char* const argv[]) {
 static int Read() {
   if (options.use_word) {
     uint16_t word;
-    Error* e = ec->ReadWord(options.register_, &word);
+    Error e = ec->ReadWord(options.register_, &word);
     e_die();
     printf("%d (0x%.2X)\n", word, word);
   }
   else {
     uint8_t byte;
-    Error* e = ec->ReadByte(options.register_, &byte);
+    Error e = ec->ReadByte(options.register_, &byte);
     e_die();
     printf("%d (0x%.2X)\n", byte, byte);
   }
@@ -422,7 +422,7 @@ static int Read() {
 
 static int Write() {
   if (options.use_word) {
-    Error* e = ec->WriteWord(options.register_, options.value);
+    Error e = ec->WriteWord(options.register_, options.value);
     e_die();
   }
   else {
@@ -430,7 +430,7 @@ static int Write() {
       Log_Error("write: Value too big: %d\n", options.value);
       return NBFC_EXIT_CMDLINE;
     }
-    Error* e = ec->WriteByte(options.register_, options.value);
+    Error e = ec->WriteByte(options.register_, options.value);
     e_die();
   }
 
@@ -524,7 +524,7 @@ static int Watch() {
 }
 
 static int AcpiCall() {
-  Error* e;
+  Error e;
   char cmd[1024];
 
   e = AcpiCall_Open();
@@ -770,7 +770,7 @@ static void ShellRead(const struct Args* args) {
 
   if (word) {
     uint16_t value;
-    Error* e = ec->ReadWord(register_, &value);
+    Error e = ec->ReadWord(register_, &value);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
 
@@ -778,7 +778,7 @@ static void ShellRead(const struct Args* args) {
   }
   else {
     uint8_t value;
-    Error* e = ec->ReadByte(register_, &value);
+    Error e = ec->ReadByte(register_, &value);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
 
@@ -824,12 +824,12 @@ static void ShellWrite(const struct Args* args) {
     return (void) printf("ERR: Argument (VALUE): %s\n", err);
 
   if (word) {
-    Error* e = ec->WriteWord(register_, value);
+    Error e = ec->WriteWord(register_, value);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
   }
   else {
-    Error* e = ec->WriteByte(register_, value);
+    Error e = ec->WriteByte(register_, value);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
   }
@@ -841,7 +841,7 @@ static void ShellReadAll(struct Args* args) {
   uint8_t values[256];
 
   for (int register_ = 0; register_ <= 255; ++register_) {
-    Error* e = ec->ReadByte(register_, &values[register_]);
+    Error e = ec->ReadByte(register_, &values[register_]);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
   }

@@ -59,7 +59,7 @@ int Status() {
     Status_Options.all = true;
 
   while (true) {
-    Error* e = ServiceInfo_TryLoad(&service_info);
+    Error e = ServiceInfo_TryLoad(&service_info);
     e_die();
 
     if (Status_Options.all || Status_Options.service)
