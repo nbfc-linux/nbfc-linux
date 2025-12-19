@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <sys/types.h> // ssize_t
 
+#define STRINGIFY_(S)     #S
+#define STRINGIFY(S)      STRINGIFY_(S)
+
 #define my                (*self)
 #define MAX(A, B)         ((A) > (B) ? (A) : (B))
 #define MIN(A, B)         ((A) < (B) ? (A) : (B))
