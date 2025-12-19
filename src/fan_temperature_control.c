@@ -42,7 +42,7 @@ static Error FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, fl
   }
 
   if (! total)
-    return err_string(0, "No temperatures available");
+    return err_string("No temperatures available");
 
   switch (ftc->TemperatureAlgorithmType) {
     case TemperatureAlgorithmType_Average:
@@ -55,7 +55,7 @@ static Error FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, fl
       *out = max;
       return err_success();
     default:
-      return err_string(0, "ERR-03");
+      return err_string("ERR-03");
   }
 }
 
@@ -66,7 +66,7 @@ static Error FanTemperatureControl_AddTemperatureSource(
   FS_TemperatureSource* ts)
 {
   if (ftc->TemperatureSourcesSize >= FAN_TEMPERATURE_CONTROL_MAX_SOURCES)
-    return err_string(0, "Too many temperature sources found");
+    return err_string("Too many temperature sources found");
 
   ftc->TemperatureSources[ftc->TemperatureSourcesSize++] = ts;
   return err_success();
@@ -103,7 +103,7 @@ static Error FanTemperatureControl_AddTemperatureSources(
 
     return found_sensors
       ? err_success()
-      : err_stringf(0, "%s: No sensors found", "@CPU");
+      : err_stringf("%s: No sensors found", "@CPU");
   }
 
   // ==========================================================================
@@ -122,7 +122,7 @@ static Error FanTemperatureControl_AddTemperatureSources(
 
     return found_sensors
       ? err_success()
-      : err_stringf(0, "%s: No sensors found", "@GPU");
+      : err_stringf("%s: No sensors found", "@GPU");
   }
 
   // ==========================================================================
@@ -239,7 +239,7 @@ static Error FanTemperatureControl_SetByModelConfig(
 
     e = FanTemperatureControl_SetByModelConfig0(ftc, fc);
     if (e)
-      return err_stringf(e, "FanConfigurations[%d] (%s)", fan_index, fc->FanDisplayName);
+      return err_chain_stringf(e, "FanConfigurations[%d] (%s)", fan_index, fc->FanDisplayName);
   }
 
   return err_success();
@@ -254,7 +254,7 @@ static Error FanTemperatureControl_SetByServiceConfig(
 
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config->FanTemperatureSources) {
     if (ftsc->FanIndex >= fans->size)
-      return err_stringf(0, "Invalid FanIndex in FanTemperatureSources: %d", ftsc->FanIndex);
+      return err_stringf("Invalid FanIndex in FanTemperatureSources: %d", ftsc->FanIndex);
 
     FanTemperatureControl* ftc = &fans->data[ftsc->FanIndex];
 
@@ -271,7 +271,7 @@ static Error FanTemperatureControl_SetByServiceConfig(
     for_each_array(const char**, sensor, ftsc->Sensors) {
       e = FanTemperatureControl_AddTemperatureSources(ftc, *sensor);
       if (e)
-        return err_stringf(e, "FanTemperatureSources[%d]", ftsc->FanIndex);
+        return err_chain_stringf(e, "FanTemperatureSources[%d]", ftsc->FanIndex);
     }
   }
 

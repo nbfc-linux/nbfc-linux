@@ -23,32 +23,32 @@ Error AcpiCall_Call(const char* cmd, ssize_t cmd_len, uint64_t* out) {
   ret = write_file(ACPI_CALL_FILE, O_WRONLY, 0, cmd, cmd_len);
 
   if (ret == -1)
-    return err_stdlib(0, ACPI_CALL_FILE);
+    return err_stdlib(ACPI_CALL_FILE);
 
   ret = slurp_file(output, sizeof(output), ACPI_CALL_FILE);
 
   if (ret == -1)
-    return err_stdlib(0, ACPI_CALL_FILE);
+    return err_stdlib(ACPI_CALL_FILE);
 
   if (! output[0]) {
     errno = ENODATA;
-    return err_stdlib(0, ACPI_CALL_FILE);
+    return err_stdlib(ACPI_CALL_FILE);
   }
 
   if (output[0] == 'E') {
     const char* errmsg = output + STRLEN("Error: ");
-    return err_stringf(0, "%s: %s", ACPI_CALL_FILE, errmsg);
+    return err_stringf("%s: %s", ACPI_CALL_FILE, errmsg);
   }
 
   errno = 0;
   *out = strtoull(output, &end, 0);
 
   if (errno)
-    return err_stdlib(0, ACPI_CALL_FILE);
+    return err_stdlib(ACPI_CALL_FILE);
 
   if (*end) {
     errno = EINVAL;
-    return err_stdlib(0, ACPI_CALL_FILE);
+    return err_stdlib(ACPI_CALL_FILE);
   }
 
   return err_success();
@@ -61,7 +61,7 @@ Error AcpiCall_CallTemplate(const char* template_, uint64_t value, uint64_t* out
   // If every char in template is a placeholder ("$"), will it still fit in `cmd`?
   if (strlen(template_) * STRLEN("0x1122334455667788") >= sizeof(cmd)) {
     errno = ENOBUFS;
-    return err_stdlib(0, ACPI_CALL_FILE);
+    return err_stdlib(ACPI_CALL_FILE);
   }
 
   for (; *template_; ++template_) {

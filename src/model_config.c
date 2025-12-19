@@ -20,7 +20,7 @@ static inline Error bool_FromJson(bool* out, const nx_json* node) {
     *out = node->val.u;
     return err_success();
   }
-  return err_string(0, "Not a bool");
+  return err_string("Not a bool");
 }
 
 static inline Error int_FromJson(int* out, const nx_json* node) {
@@ -28,7 +28,7 @@ static inline Error int_FromJson(int* out, const nx_json* node) {
     *out = node->val.i;
     return err_success();
   }
-  return err_string(0, "Not an integer");
+  return err_string("Not an integer");
 }
 
 static inline Error int8_t_FromJson(int8_t* out, const nx_json* node) {
@@ -36,7 +36,7 @@ static inline Error int8_t_FromJson(int8_t* out, const nx_json* node) {
   Error e = int_FromJson(&val, node);
   e_check();
   if (val < INT8_MIN || val > INT8_MAX)
-    return err_stringf(0, "Value not in range (%d - %d): %d", INT8_MIN, INT8_MAX, val);
+    return err_stringf("Value not in range (%d - %d): %d", INT8_MIN, INT8_MAX, val);
   *out = val;
   return err_success();
 }
@@ -46,7 +46,7 @@ static inline Error uint8_t_FromJson(uint8_t* out, const nx_json* node) {
   Error e = int_FromJson(&val, node);
   e_check();
   if (val < 0 || val > UINT8_MAX)
-    return err_stringf(0, "Value not in range (%d - %d): %d", 0, UINT8_MAX, val);
+    return err_stringf("Value not in range (%d - %d): %d", 0, UINT8_MAX, val);
   *out = val;
   return err_success();
 }
@@ -56,7 +56,7 @@ static inline Error int16_t_FromJson(int16_t* out, const nx_json* node) {
   Error e = int_FromJson(&val, node);
   e_check();
   if (val < INT16_MIN || val > INT16_MAX)
-    return err_stringf(0, "Value not in range (%d - %d): %d", INT16_MIN, INT16_MAX, val);
+    return err_stringf("Value not in range (%d - %d): %d", INT16_MIN, INT16_MAX, val);
   *out = val;
   return err_success();
 }
@@ -66,7 +66,7 @@ static inline Error uint16_t_FromJson(uint16_t* out, const nx_json* node) {
   Error e = int_FromJson(&val, node);
   e_check();
   if (val < 0 || val > UINT16_MAX)
-    return err_stringf(0, "Value not in range (%d - %d): %d", 0, UINT16_MAX, val);
+    return err_stringf("Value not in range (%d - %d): %d", 0, UINT16_MAX, val);
   *out = val;
   return err_success();
 }
@@ -80,7 +80,7 @@ static inline Error double_FromJson(double* out, const nx_json* node) {
     *out = node->val.dbl;
     return err_success();
   }
-  return err_string(0, "Not a double");
+  return err_string("Not a double");
 }
 
 static inline Error float_FromJson(float* out, const nx_json* json) {
@@ -106,7 +106,7 @@ static Error RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* j
   else if (!strcmp(s, "And"))  *out = RegisterWriteMode_And;
   else if (!strcmp(s, "Or"))   *out = RegisterWriteMode_Or;
   else if (!strcmp(s, "Call")) *out = RegisterWriteMode_Call;
-  else return err_stringf(0, "Invalid value for %s: %s", "RegisterWriteMode", s);
+  else return err_stringf("Invalid value for %s: %s", "RegisterWriteMode", s);
   return e;
 }
 
@@ -116,7 +116,7 @@ static Error RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const nx
   if (e) return e;
   else if (!strcmp(s, "OnWriteFanSpeed"))  *out = RegisterWriteOccasion_OnWriteFanSpeed;
   else if (!strcmp(s, "OnInitialization")) *out = RegisterWriteOccasion_OnInitialization;
-  else return err_stringf(0, "Invalid value for %s: %s", "RegisterWriteOccasion", s);
+  else return err_stringf("Invalid value for %s: %s", "RegisterWriteOccasion", s);
   return e;
 }
 
@@ -127,7 +127,7 @@ static Error OverrideTargetOperation_FromJson(OverrideTargetOperation* out, cons
   else if (!strcmp(s, "Read"))      *out = OverrideTargetOperation_Read;
   else if (!strcmp(s, "Write"))     *out = OverrideTargetOperation_Write;
   else if (!strcmp(s, "ReadWrite")) *out = OverrideTargetOperation_ReadWrite;
-  else return err_stringf(0, "Invalid value for %s: %s", "OverrideTargetOperation", s);
+  else return err_stringf("Invalid value for %s: %s", "OverrideTargetOperation", s);
   return e;
 }
 
@@ -144,7 +144,7 @@ static Error TemperatureAlgorithmType_FromJson(TemperatureAlgorithmType* out, co
   if (e) return e;
   TemperatureAlgorithmType a = TemperatureAlgorithmType_FromString(s);
   if (a == TemperatureAlgorithmType_Unset)
-    return err_stringf(0, "Invalid value for %s: %s", "TemperatureAlgorithmType", s);
+    return err_stringf("Invalid value for %s: %s", "TemperatureAlgorithmType", s);
   *out = a;
   return e;
 }
@@ -155,7 +155,7 @@ static Error EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const 
   if (e) return e;
   EmbeddedControllerType t = EmbeddedControllerType_FromString(s);
   if (t == EmbeddedControllerType_Unset)
-    return err_stringf(0, "Invalid value for %s: %s", "EmbeddedControllerType", s);
+    return err_stringf("Invalid value for %s: %s", "EmbeddedControllerType", s);
   *out = t;
   return e;
 }
@@ -385,7 +385,7 @@ Error TemperatureThresholds_Validate(
     has_100_FanSpeed |= (t->FanSpeed == 100);
 
     if (t->UpThreshold < t->DownThreshold) {
-      e = err_string(0, "UpThreshold cannot be less than DownThreshold");
+      e = err_string("UpThreshold cannot be less than DownThreshold");
       return e;
     }
 
@@ -395,7 +395,7 @@ Error TemperatureThresholds_Validate(
 
     for_each_array(TemperatureThreshold*, t1, *TemperatureThresholds) {
       if (t != t1 && t->UpThreshold == t1->UpThreshold) {
-        e = err_string(0, "Duplicate UpThreshold");
+        e = err_string("Duplicate UpThreshold");
         return e;
       }
     }
@@ -424,39 +424,39 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
 
   if (WriteMode == RegisterWriteMode_Call) {
     if (! AcpiMethod)
-      return err_stringf(0, "%s: %s", "AcpiMethod", "Missing option");
+      return err_stringf("%s: %s", "AcpiMethod", "Missing option");
 
     if (Value)
-      return err_string(0, "Value: Cannot be used with WriteMode == Call");
+      return err_string("Value: Cannot be used with WriteMode == Call");
   }
   else {
     if (! Register)
-      return err_stringf(0, "%s: %s", "Register", "Missing option");
+      return err_stringf("%s: %s", "Register", "Missing option");
 
     if (! Value)
-      return err_stringf(0, "%s: %s", "Value", "Missing option");
+      return err_stringf("%s: %s", "Value", "Missing option");
 
     if (AcpiMethod)
-      return err_string(0, "AcpiMethod: Cannot be used with WriteMode == Set/And/Or");
+      return err_string("AcpiMethod: Cannot be used with WriteMode == Set/And/Or");
   }
 
   if (ResetRequired) {
     if (ResetWriteMode == RegisterWriteMode_Call) {
       if (! ResetAcpiMethod)
-        return err_stringf(0, "%s: %s", "ResetAcpiMethod", "Missing option");
+        return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
       if (ResetValue)
-        return err_string(0, "ResetValue: Cannot be used with ResetWriteMode == Call");
+        return err_string("ResetValue: Cannot be used with ResetWriteMode == Call");
     }
     else {
       if (! Register)
-        return err_stringf(0, "%s: %s", "Register", "Missing option");
+        return err_stringf("%s: %s", "Register", "Missing option");
 
       if (! ResetValue)
-        return err_stringf(0, "%s: %s", "ResetValue", "Missing option");
+        return err_stringf("%s: %s", "ResetValue", "Missing option");
 
       if (ResetAcpiMethod)
-        return err_string(0, "ResetAcpiMethod: Cannot be used with ResetWriteMode == Set/And/Or");
+        return err_string("ResetAcpiMethod: Cannot be used with ResetWriteMode == Set/And/Or");
     }
   }
   else {
@@ -464,16 +464,16 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
      * have ResetValue set even if ResetRequired is false.
      *
     if (ResetValue)
-      return err_string(0, "ResetValue: Cannot be used with ResetRequired == false");
+      return err_string("ResetValue: Cannot be used with ResetRequired == false");
     */
 
     if (ResetAcpiMethod)
-      return err_string(0, "ResetAcpiComand: Cannot be used with ResetRequired == false");
+      return err_string("ResetAcpiComand: Cannot be used with ResetRequired == false");
   }
 
   if (WriteMode == RegisterWriteMode_Call && ResetWriteMode == RegisterWriteMode_Call) {
     if (Register)
-      return err_string(0, "Register: Cannot be used if both WriteMode == Call and ResetWriteMode == Call");
+      return err_string("Register: Cannot be used if both WriteMode == Call and ResetWriteMode == Call");
   }
 
   return err_success();
@@ -514,11 +514,11 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
     if (f->ResetRequired) {
       const int reset_group = (FanConfiguration_IsSet_FanSpeedResetValue(f) + FanConfiguration_IsSet_ResetAcpiMethod(f));
       if (reset_group == 0) {
-        e = err_stringf(0, "Missing option: %s or %s", "FanSpeedResetValue", "ResetAcpiMethod");
+        e = err_stringf("Missing option: %s or %s", "FanSpeedResetValue", "ResetAcpiMethod");
         goto err;
       }
       if (reset_group > 1) {
-        e = err_stringf(0, "Cannot set both %s and %s", "FanSpeedResetValue", "ResetAcpiMethod");
+        e = err_stringf("Cannot set both %s and %s", "FanSpeedResetValue", "ResetAcpiMethod");
         goto err;
       }
     }
@@ -527,13 +527,13 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
        * have FanSpeedResetValue set even if ResetRequired is false.
        *
       if (FanConfiguration_IsSet_FanSpeedResetValue(f)) {
-        e = err_string(0, "FanSpeedResetValue: Cannot be used with ResetRequired == false");
+        e = err_string("FanSpeedResetValue: Cannot be used with ResetRequired == false");
         goto err;
       }
        */
 
       if (FanConfiguration_IsSet_ResetAcpiMethod(f)) {
-        e = err_string(0, "ResetAcpiMethod: Cannot be used with ResetRequired == false");
+        e = err_string("ResetAcpiMethod: Cannot be used with ResetRequired == false");
         goto err;
       }
     }
@@ -541,43 +541,43 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
     // Ensure that one (and only one) of "WriteRegister" and "WriteAcpiMethod" is set
     const int write_group = (FanConfiguration_IsSet_WriteRegister(f) + FanConfiguration_IsSet_WriteAcpiMethod(f));
     if (write_group == 0) {
-      e = err_stringf(0, "Missing option: %s or %s", "WriteRegister", "WriteAcpiMethod");
+      e = err_stringf("Missing option: %s or %s", "WriteRegister", "WriteAcpiMethod");
       goto err;
     }
     if (write_group > 1) {
-      e = err_stringf(0, "Cannot set both %s and %s", "WriteRegister", "WriteAcpiMethod");
+      e = err_stringf("Cannot set both %s and %s", "WriteRegister", "WriteAcpiMethod");
       goto err;
     }
 
     // Ensure that one (and only one) of "ReadRegister" and "ReadAcpiMethod" is set
     const int read_group = (FanConfiguration_IsSet_ReadRegister(f) + FanConfiguration_IsSet_ReadAcpiMethod(f));
     if (read_group == 0) {
-      e = err_stringf(0, "Missing option: %s or %s", "ReadRegister", "ReadAcpiMethod");
+      e = err_stringf("Missing option: %s or %s", "ReadRegister", "ReadAcpiMethod");
       goto err;
     }
     if (read_group > 1) {
-      e = err_stringf(0, "Cannot set both %s and %s", "ReadRegister", "ReadAcpiMethod");
+      e = err_stringf("Cannot set both %s and %s", "ReadRegister", "ReadAcpiMethod");
       goto err;
     }
 
     if (f->MinSpeedValue == f->MaxSpeedValue) {
-      e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValue", "MaxSpeedValue");
+      e = err_stringf("%s and %s cannot be the same", "MinSpeedValue", "MaxSpeedValue");
       goto err;
     }
 
     if (f->IndependentReadMinMaxValues) {
       if (! FanConfiguration_IsSet_MinSpeedValueRead(f)) {
-        e = err_stringf(0, "%s: %s", "MinSpeedValueRead", "Missing option");
+        e = err_stringf("%s: %s", "MinSpeedValueRead", "Missing option");
         goto err;
       }
 
       if (! FanConfiguration_IsSet_MaxSpeedValueRead(f)) {
-        e = err_stringf(0, "%s: %s", "MaxSpeedValueRead", "Missing option");
+        e = err_stringf("%s: %s", "MaxSpeedValueRead", "Missing option");
         goto err;
       }
 
       if (f->MinSpeedValueRead == f->MaxSpeedValueRead) {
-        e = err_stringf(0, "%s and %s cannot be the same", "MinSpeedValueRead", "MaxSpeedValueRead");
+        e = err_stringf("%s and %s cannot be the same", "MinSpeedValueRead", "MaxSpeedValueRead");
         goto err;
       }
     }
@@ -613,7 +613,7 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
   return err_success();
 
 err:
-  return err_string(e, trace->buf);
+  return err_chain_string(e, trace->buf);
 }
 
 Error ModelConfig_FromFile(ModelConfig* config, const char* file) {

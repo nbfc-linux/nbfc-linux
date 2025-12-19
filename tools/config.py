@@ -244,7 +244,7 @@ def write_validate_fields(struct, fh):
         if field.default is not None:
             set_or_throw = f'self->{field.var} = {field.default}'
         else:
-            set_or_throw = f'return err_stringf(0, "%s: %s", "{field.name}", "Missing option")'
+            set_or_throw = f'return err_stringf("%s: %s", "{field.name}", "Missing option")'
 
         if field.valid is not None:
             is_valid = field.valid.replace('parameter', f'self->{field.var}')
@@ -254,7 +254,7 @@ def write_validate_fields(struct, fh):
         p(f'\t\t{set_or_throw};')
         if field.valid is not None:
             p(f'\telse if (! ({is_valid}))')
-            p(f'\t\treturn err_stringf(0, "%s: %s", "{field.name}", "requires: {field.valid}");')
+            p(f'\t\treturn err_stringf("%s: %s", "{field.name}", "requires: {field.valid}");')
 
     p('\treturn err_success();')
     p('}\n')
@@ -267,7 +267,7 @@ def write_parse_struct(struct, fh):
     p(f'\tmemset(obj, 0, sizeof(*obj));')
     p('')
     p( '\tif (!json || json->type != NX_JSON_OBJECT)')
-    p( '\t\treturn err_string(0, "Not a JSON object");')
+    p( '\t\treturn err_string("Not a JSON object");')
     p( '')
     p( '\tnx_json_for_each(c, json) {')
     p( '\t\tif (!strcmp(c->key, "Comment"))')
@@ -281,8 +281,8 @@ def write_parse_struct(struct, fh):
         p(f'\t\t}}')
 
     p( '\t\telse')
-    p( '\t\t\te = err_string(0, "Unknown option");')
-    p( '\t\tif (e) return err_string(e, c->key);')
+    p( '\t\t\te = err_string("Unknown option");')
+    p( '\t\tif (e) return err_chain_string(e, c->key);')
     p( '\t}')
     p( '\treturn err_success();')
     p( '}')

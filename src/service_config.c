@@ -66,7 +66,7 @@ Error ServiceConfig_Init(const char* file) {
 
     for_each_array(FanTemperatureSourceConfig*, ftsc1, service_config.FanTemperatureSources) {
       if (ftsc != ftsc1 && ftsc->FanIndex == ftsc1->FanIndex) {
-        e = err_string(0, "Duplicate FanIndex");
+        e = err_string("Duplicate FanIndex");
         goto err;
       }
     }
@@ -78,7 +78,7 @@ err:
   nx_json_free(js);
   StackMemory_Destroy();
   if (e)
-    return err_string(e, trace.buf);
+    return err_chain_string(e, trace.buf);
 
   return err_success();
 }
@@ -128,7 +128,7 @@ Error ServiceConfig_Write(const char* file) {
   nx_json_free(o);
 
   if (write_file(file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
-    return err_stdlib(0, file);
+    return err_stdlib(file);
   }
 
   return err_success();

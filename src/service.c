@@ -80,7 +80,7 @@ Error Service_Init() {
   Log_Info("Using '%s' as model config\n", service_config.SelectedConfigId);
   e = ModelConfig_FindAndLoad(&Service_Model_Config, path, service_config.SelectedConfigId);
   if (e) {
-    e = err_string(e, path);
+    e = err_chain_string(e, path);
     goto error;
   }
 
@@ -164,7 +164,7 @@ Error Service_Init() {
   if (IsAcpiCallUsed()) {
     e = AcpiCall_Open();
     if (e) {
-      e = err_string(0, "Could not load kernel module 'acpi_call'. Is it installed?");
+      e = err_string("Could not load kernel module 'acpi_call'. Is it installed?");
       goto error;
     }
   }
@@ -306,12 +306,12 @@ static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
     case RegisterWriteMode_Call:
       e = AcpiCall_Call_Str(cfg->ResetAcpiMethod, &out);
       if (e)
-        return err_string(e, "ResetAcpiMethod");
+        return err_chain_string(e, "ResetAcpiMethod");
       else
         return err_success();
 
     default:
-      return err_string(0, "ERR-01");
+      return err_string("ERR-01");
   }
 }
 
@@ -347,12 +347,12 @@ static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
     case RegisterWriteMode_Call:
       e = AcpiCall_Call_Str(cfg->AcpiMethod, &out);
       if (e)
-        return err_string(e, "AcpiMethod");
+        return err_chain_string(e, "AcpiMethod");
       else
         return err_success();
 
     default:
-      return err_string(0, "ERR-02");
+      return err_string("ERR-02");
   }
 }
 

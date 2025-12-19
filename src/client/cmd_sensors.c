@@ -72,14 +72,14 @@ static Error Sensors_IsValidSensor(const char* sensor) {
       if (!strcmp(sensor, "@GPU"))
         return err_success();
 
-      return err_stringf(0, "No such sensor group: %s", sensor);
+      return err_stringf("No such sensor group: %s", sensor);
 
     case '/':
       if (access(sensor, F_OK) == 0)
         return err_success();
 
       errno = ENOENT;
-      return err_stdlib(0, sensor);
+      return err_stdlib(sensor);
 
     case '$':
       return err_success();
@@ -89,7 +89,7 @@ static Error Sensors_IsValidSensor(const char* sensor) {
         if (!strcmp(ts->name, sensor))
           return err_success();
 
-      return err_stringf(0, "No such sensor name: %s", sensor);
+      return err_stringf("No such sensor name: %s", sensor);
   }
 }
 

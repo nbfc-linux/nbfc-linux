@@ -34,7 +34,7 @@ Error EC_SysLinux_Open() {
 
   EC_SysLinux_FD = open(EC_SysLinux_EC0_IO_Path, O_RDWR);
   if (EC_SysLinux_FD == -1)
-    return err_stdlib(0, EC_SysLinux_EC0_IO_Path);
+    return err_stdlib(EC_SysLinux_EC0_IO_Path);
   else
     return err_success();
 }
@@ -51,7 +51,7 @@ Error EC_SysLinux_ACPI_Open() {
 
   EC_SysLinux_FD = open(EC_SysLinux_ACPI_EC_Path, O_RDWR);
   if (EC_SysLinux_FD == -1)
-    return err_stdlib(0, EC_SysLinux_ACPI_EC_Path);
+    return err_stdlib(EC_SysLinux_ACPI_EC_Path);
   else
     return err_success();
 }
@@ -65,21 +65,21 @@ void EC_SysLinux_Close() {
 
 Error EC_SysLinux_WriteByte(uint8_t register_, uint8_t value) {
   if (1 != pwrite(EC_SysLinux_FD, &value, 1, register_))
-    return err_stdlib(0, EC_SysLinux_File);
+    return err_stdlib(EC_SysLinux_File);
   return err_success();
 }
 
 Error EC_SysLinux_WriteWord(uint8_t register_, uint16_t value) {
   value = htole16(value);
   if (2 != pwrite(EC_SysLinux_FD, &value, 2, register_))
-    return err_stdlib(0, EC_SysLinux_File);
+    return err_stdlib(EC_SysLinux_File);
   return err_success();
 }
 
 Error EC_SysLinux_ReadByte(uint8_t register_, uint8_t* out) {
   uint8_t value;
   if (1 != pread(EC_SysLinux_FD, &value, 1, register_))
-    return err_stdlib(0, EC_SysLinux_File);
+    return err_stdlib(EC_SysLinux_File);
   *out = value;
   return err_success();
 }
@@ -87,7 +87,7 @@ Error EC_SysLinux_ReadByte(uint8_t register_, uint8_t* out) {
 Error EC_SysLinux_ReadWord(uint8_t register_, uint16_t* out) {
   uint16_t value;
   if (2 != pread(EC_SysLinux_FD, &value, 2, register_))
-    return err_stdlib(0, EC_SysLinux_File);
+    return err_stdlib(EC_SysLinux_File);
   *out = le16toh(value);
   return err_success();
 }

@@ -82,7 +82,7 @@ Error Nvidia_GetTemperature(float* out) {
   if (Nvidia_nvmlDeviceGetTemperature_fn(Nvidia_Device, NVML_TEMPERATURE_GPU, &temp) == NVML_SUCCESS)
     *out = temp;
   else
-    return err_string(0, "nvidia-ml: Failed to get temperature");
+    return err_string("nvidia-ml: Failed to get temperature");
 
   return err_success();
 }

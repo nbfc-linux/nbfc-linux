@@ -52,14 +52,14 @@ const char* err_print_all(Error e) {
   return buf;
 }
 
-Error err_string(Error e, const char* message) {
+Error err_chain_string(Error e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_String;
   snprintf(e->value.message, sizeof(e->value.message), "%s", message);
   return e;
 }
 
-Error err_stringf(Error e, const char* message, ...) {
+Error err_chain_stringf(Error e, const char* message, ...) {
   e = err_allocate(e);
   e->system = ErrorSystem_String;
 
@@ -71,20 +71,20 @@ Error err_stringf(Error e, const char* message, ...) {
   return e;
 }
 
-Error err_stdlib(Error e, const char* message) {
+Error err_chain_stdlib(Error e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_Stdlib;
   e->value.code = errno;
   if (message)
-    return err_string(e, message);
+    return err_chain_string(e, message);
   return e;
 }
 
-Error err_nxjson(Error e, const char* message) {
+Error err_chain_nxjson(Error e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_NxJson;
   e->value.code = NX_JSON_ERROR;
   if (message)
-    return err_string(e, message);
+    return err_chain_string(e, message);
   return e;
 }

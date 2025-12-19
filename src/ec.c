@@ -36,5 +36,5 @@ Error EC_FindWorking(const EC_VTable** out) {
   }
 #endif
 
-  return err_string(0, "No working implementation found for accessing the embedded controller");
+  return err_string("No working implementation found for accessing the embedded controller");
 }

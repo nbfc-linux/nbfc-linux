@@ -20,7 +20,7 @@ Error Protocol_Send(int socket, const char* buffer, size_t length) {
     int ret = send(socket, buffer + total_sent, to_send, MSG_NOSIGNAL);
     if (ret < 0) {
       if (errno != EINTR && errno != EAGAIN)
-        return err_stdlib(0, "send()");
+        return err_stdlib("send()");
       else
         continue;
     }
@@ -75,14 +75,14 @@ Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
     json = nx_json_parse_utf8(msg);
     if (! json) {
       Mem_Free(msg);
-      return err_nxjson(0, "Invalid JSON");
+      return err_nxjson("Invalid JSON");
     }
 
     *buf = msg;
     *out = json;
   }
   else
-    return err_string(0, "Empty response");
+    return err_string("Empty response");
 
   return err_success();
 }

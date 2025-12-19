@@ -2,15 +2,15 @@
 
 Error TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
 	if (! TemperatureThreshold_IsSet_UpThreshold(self))
-		return err_stringf(0, "%s: %s", "UpThreshold", "Missing option");
+		return err_stringf("%s: %s", "UpThreshold", "Missing option");
 
 	if (! TemperatureThreshold_IsSet_DownThreshold(self))
-		return err_stringf(0, "%s: %s", "DownThreshold", "Missing option");
+		return err_stringf("%s: %s", "DownThreshold", "Missing option");
 
 	if (! TemperatureThreshold_IsSet_FanSpeed(self))
-		return err_stringf(0, "%s: %s", "FanSpeed", "Missing option");
+		return err_stringf("%s: %s", "FanSpeed", "Missing option");
 	else if (! (self->FanSpeed >= 0.0 && self->FanSpeed <= 100.0))
-		return err_stringf(0, "%s: %s", "FanSpeed", "requires: parameter >= 0.0 && parameter <= 100.0");
+		return err_stringf("%s: %s", "FanSpeed", "requires: parameter >= 0.0 && parameter <= 100.0");
 	return err_success();
 }
 
@@ -19,7 +19,7 @@ Error TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* js
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -40,20 +40,20 @@ Error TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* js
 				TemperatureThreshold_Set_FanSpeed(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* self) {
 	if (! FanSpeedPercentageOverride_IsSet_FanSpeedPercentage(self))
-		return err_stringf(0, "%s: %s", "FanSpeedPercentage", "Missing option");
+		return err_stringf("%s: %s", "FanSpeedPercentage", "Missing option");
 	else if (! (self->FanSpeedPercentage >= 0.0 && self->FanSpeedPercentage <= 100.0))
-		return err_stringf(0, "%s: %s", "FanSpeedPercentage", "requires: parameter >= 0.0 && parameter <= 100.0");
+		return err_stringf("%s: %s", "FanSpeedPercentage", "requires: parameter >= 0.0 && parameter <= 100.0");
 
 	if (! FanSpeedPercentageOverride_IsSet_FanSpeedValue(self))
-		return err_stringf(0, "%s: %s", "FanSpeedValue", "Missing option");
+		return err_stringf("%s: %s", "FanSpeedValue", "Missing option");
 
 	if (! FanSpeedPercentageOverride_IsSet_TargetOperation(self))
 		self->TargetOperation = OverrideTargetOperation_ReadWrite;
@@ -65,7 +65,7 @@ Error FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -86,8 +86,8 @@ Error FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const
 				FanSpeedPercentageOverride_Set_TargetOperation(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
@@ -100,22 +100,22 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self
 		self->WriteOccasion = RegisterWriteOccasion_OnInitialization;
 
 	if (false)
-		return err_stringf(0, "%s: %s", "Register", "Missing option");
+		return err_stringf("%s: %s", "Register", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "Value", "Missing option");
+		return err_stringf("%s: %s", "Value", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "AcpiMethod", "Missing option");
+		return err_stringf("%s: %s", "AcpiMethod", "Missing option");
 
 	if (! RegisterWriteConfiguration_IsSet_ResetRequired(self))
 		self->ResetRequired = false;
 
 	if (false)
-		return err_stringf(0, "%s: %s", "ResetValue", "Missing option");
+		return err_stringf("%s: %s", "ResetValue", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "ResetAcpiMethod", "Missing option");
+		return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
 	if (! RegisterWriteConfiguration_IsSet_ResetWriteMode(self))
 		self->ResetWriteMode = RegisterWriteMode_Set;
@@ -130,7 +130,7 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -186,39 +186,39 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 				RegisterWriteConfiguration_Set_Description(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
-		return err_stringf(0, "%s: %s", "FanDisplayName", "Missing option");
+		return err_stringf("%s: %s", "FanDisplayName", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "ReadRegister", "Missing option");
+		return err_stringf("%s: %s", "ReadRegister", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "ReadAcpiMethod", "Missing option");
+		return err_stringf("%s: %s", "ReadAcpiMethod", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "WriteRegister", "Missing option");
+		return err_stringf("%s: %s", "WriteRegister", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "WriteAcpiMethod", "Missing option");
+		return err_stringf("%s: %s", "WriteAcpiMethod", "Missing option");
 
 	if (! FanConfiguration_IsSet_MinSpeedValue(self))
-		return err_stringf(0, "%s: %s", "MinSpeedValue", "Missing option");
+		return err_stringf("%s: %s", "MinSpeedValue", "Missing option");
 
 	if (! FanConfiguration_IsSet_MaxSpeedValue(self))
-		return err_stringf(0, "%s: %s", "MaxSpeedValue", "Missing option");
+		return err_stringf("%s: %s", "MaxSpeedValue", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "MinSpeedValueRead", "Missing option");
+		return err_stringf("%s: %s", "MinSpeedValueRead", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "MaxSpeedValueRead", "Missing option");
+		return err_stringf("%s: %s", "MaxSpeedValueRead", "Missing option");
 
 	if (! FanConfiguration_IsSet_IndependentReadMinMaxValues(self))
 		self->IndependentReadMinMaxValues = false;
@@ -227,19 +227,19 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 		self->ResetRequired = false;
 
 	if (false)
-		return err_stringf(0, "%s: %s", "FanSpeedResetValue", "Missing option");
+		return err_stringf("%s: %s", "FanSpeedResetValue", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "ResetAcpiMethod", "Missing option");
+		return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "TemperatureAlgorithmType", "Missing option");
+		return err_stringf("%s: %s", "TemperatureAlgorithmType", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "Sensors", "Missing option");
+		return err_stringf("%s: %s", "Sensors", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "TemperatureThresholds", "Missing option");
+		return err_stringf("%s: %s", "TemperatureThresholds", "Missing option");
 
 	if (! FanConfiguration_IsSet_FanSpeedPercentageOverrides(self))
 		self->FanSpeedPercentageOverrides = Config_DefaultFanSpeedPercentageOverrides;
@@ -251,7 +251,7 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -342,24 +342,24 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 				FanConfiguration_Set_FanSpeedPercentageOverrides(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error Sponsor_ValidateFields(Sponsor* self) {
 	if (! Sponsor_IsSet_Name(self))
-		return err_stringf(0, "%s: %s", "Name", "Missing option");
+		return err_stringf("%s: %s", "Name", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "Description", "Missing option");
+		return err_stringf("%s: %s", "Description", "Missing option");
 
 	if (! Sponsor_IsSet_URL(self))
-		return err_stringf(0, "%s: %s", "URL", "Missing option");
+		return err_stringf("%s: %s", "URL", "Missing option");
 
 	if (! Sponsor_IsSet_BannerURL(self))
-		return err_stringf(0, "%s: %s", "BannerURL", "Missing option");
+		return err_stringf("%s: %s", "BannerURL", "Missing option");
 	return err_success();
 }
 
@@ -368,7 +368,7 @@ Error Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -394,15 +394,15 @@ Error Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
 				Sponsor_Set_BannerURL(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error ModelConfig_ValidateFields(ModelConfig* self) {
 	if (! ModelConfig_IsSet_NotebookModel(self))
-		return err_stringf(0, "%s: %s", "NotebookModel", "Missing option");
+		return err_stringf("%s: %s", "NotebookModel", "Missing option");
 
 	if (! ModelConfig_IsSet_Author(self))
 		self->Author = Mem_Strdup("");
@@ -423,15 +423,15 @@ Error ModelConfig_ValidateFields(ModelConfig* self) {
 		self->ReadWriteWords = false;
 
 	if (false)
-		return err_stringf(0, "%s: %s", "Sponsor", "Missing option");
+		return err_stringf("%s: %s", "Sponsor", "Missing option");
 
 	if (! ModelConfig_IsSet_FanConfigurations(self))
-		return err_stringf(0, "%s: %s", "FanConfigurations", "Missing option");
+		return err_stringf("%s: %s", "FanConfigurations", "Missing option");
 	else if (! (self->FanConfigurations.size > 0))
-		return err_stringf(0, "%s: %s", "FanConfigurations", "requires: parameter.size > 0");
+		return err_stringf("%s: %s", "FanConfigurations", "requires: parameter.size > 0");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "RegisterWriteConfigurations", "Missing option");
+		return err_stringf("%s: %s", "RegisterWriteConfigurations", "Missing option");
 	return err_success();
 }
 
@@ -440,7 +440,7 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -496,21 +496,21 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 				ModelConfig_Set_RegisterWriteConfigurations(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* self) {
 	if (! FanTemperatureSourceConfig_IsSet_FanIndex(self))
-		return err_stringf(0, "%s: %s", "FanIndex", "Missing option");
+		return err_stringf("%s: %s", "FanIndex", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "TemperatureAlgorithmType", "Missing option");
+		return err_stringf("%s: %s", "TemperatureAlgorithmType", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "Sensors", "Missing option");
+		return err_stringf("%s: %s", "Sensors", "Missing option");
 	return err_success();
 }
 
@@ -519,7 +519,7 @@ Error FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -540,24 +540,24 @@ Error FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const
 				FanTemperatureSourceConfig_Set_Sensors(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error ServiceConfig_ValidateFields(ServiceConfig* self) {
 	if (! ServiceConfig_IsSet_SelectedConfigId(self))
-		return err_stringf(0, "%s: %s", "SelectedConfigId", "Missing option");
+		return err_stringf("%s: %s", "SelectedConfigId", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "EmbeddedControllerType", "Missing option");
+		return err_stringf("%s: %s", "EmbeddedControllerType", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "TargetFanSpeeds", "Missing option");
+		return err_stringf("%s: %s", "TargetFanSpeeds", "Missing option");
 
 	if (false)
-		return err_stringf(0, "%s: %s", "FanTemperatureSources", "Missing option");
+		return err_stringf("%s: %s", "FanTemperatureSources", "Missing option");
 	return err_success();
 }
 
@@ -566,7 +566,7 @@ Error ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -592,15 +592,15 @@ Error ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 				ServiceConfig_Set_FanTemperatureSources(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error ServiceState_ValidateFields(ServiceState* self) {
 	if (false)
-		return err_stringf(0, "%s: %s", "TargetFanSpeeds", "Missing option");
+		return err_stringf("%s: %s", "TargetFanSpeeds", "Missing option");
 	return err_success();
 }
 
@@ -609,7 +609,7 @@ Error ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -620,36 +620,36 @@ Error ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
 				ServiceState_Set_TargetFanSpeeds(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error FanInfo_ValidateFields(FanInfo* self) {
 	if (! FanInfo_IsSet_Name(self))
-		return err_stringf(0, "%s: %s", "Name", "Missing option");
+		return err_stringf("%s: %s", "Name", "Missing option");
 
 	if (! FanInfo_IsSet_Temperature(self))
-		return err_stringf(0, "%s: %s", "Temperature", "Missing option");
+		return err_stringf("%s: %s", "Temperature", "Missing option");
 
 	if (! FanInfo_IsSet_AutoMode(self))
-		return err_stringf(0, "%s: %s", "AutoMode", "Missing option");
+		return err_stringf("%s: %s", "AutoMode", "Missing option");
 
 	if (! FanInfo_IsSet_Critical(self))
-		return err_stringf(0, "%s: %s", "Critical", "Missing option");
+		return err_stringf("%s: %s", "Critical", "Missing option");
 
 	if (! FanInfo_IsSet_CurrentSpeed(self))
-		return err_stringf(0, "%s: %s", "CurrentSpeed", "Missing option");
+		return err_stringf("%s: %s", "CurrentSpeed", "Missing option");
 
 	if (! FanInfo_IsSet_TargetSpeed(self))
-		return err_stringf(0, "%s: %s", "TargetSpeed", "Missing option");
+		return err_stringf("%s: %s", "TargetSpeed", "Missing option");
 
 	if (! FanInfo_IsSet_RequestedSpeed(self))
-		return err_stringf(0, "%s: %s", "RequestedSpeed", "Missing option");
+		return err_stringf("%s: %s", "RequestedSpeed", "Missing option");
 
 	if (! FanInfo_IsSet_SpeedSteps(self))
-		return err_stringf(0, "%s: %s", "SpeedSteps", "Missing option");
+		return err_stringf("%s: %s", "SpeedSteps", "Missing option");
 	return err_success();
 }
 
@@ -658,7 +658,7 @@ Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -704,24 +704,24 @@ Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 				FanInfo_Set_SpeedSteps(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }
 
 Error ServiceInfo_ValidateFields(ServiceInfo* self) {
 	if (! ServiceInfo_IsSet_PID(self))
-		return err_stringf(0, "%s: %s", "PID", "Missing option");
+		return err_stringf("%s: %s", "PID", "Missing option");
 
 	if (! ServiceInfo_IsSet_SelectedConfigId(self))
-		return err_stringf(0, "%s: %s", "SelectedConfigId", "Missing option");
+		return err_stringf("%s: %s", "SelectedConfigId", "Missing option");
 
 	if (! ServiceInfo_IsSet_ReadOnly(self))
-		return err_stringf(0, "%s: %s", "ReadOnly", "Missing option");
+		return err_stringf("%s: %s", "ReadOnly", "Missing option");
 
 	if (! ServiceInfo_IsSet_Fans(self))
-		return err_stringf(0, "%s: %s", "Fans", "Missing option");
+		return err_stringf("%s: %s", "Fans", "Missing option");
 	return err_success();
 }
 
@@ -730,7 +730,7 @@ Error ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
 	memset(obj, 0, sizeof(*obj));
 
 	if (!json || json->type != NX_JSON_OBJECT)
-		return err_string(0, "Not a JSON object");
+		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
 		if (!strcmp(c->key, "Comment"))
@@ -756,8 +756,8 @@ Error ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
 				ServiceInfo_Set_Fans(obj);
 		}
 		else
-			e = err_string(0, "Unknown option");
-		if (e) return err_string(e, c->key);
+			e = err_string("Unknown option");
+		if (e) return err_chain_string(e, c->key);
 	}
 	return err_success();
 }

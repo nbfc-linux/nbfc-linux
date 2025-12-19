@@ -61,14 +61,14 @@ static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
       continue;
     else if (!strcmp(c->key, "Fan")) {
       if (c->type != NX_JSON_INTEGER)
-        return err_string(0, "Fan: Not an integer");
+        return err_string("Fan: Not an integer");
 
       fan = c->val.i;
 
       if (fan < 0)
-        return err_string(0, "Fan: Cannot be negative");
+        return err_string("Fan: Cannot be negative");
       else if (fan >= fancount)
-        return err_string(0, "Fan: No such fan available");
+        return err_string("Fan: No such fan available");
     }
     else if (!strcmp(c->key, "Speed")) {
       if (c->type == NX_JSON_STRING && !strcmp(c->val.text, "auto")) {
@@ -80,19 +80,19 @@ static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
       else if (c->type == NX_JSON_INTEGER)
         speed = c->val.i;
       else {
-        return err_string(0, "Speed: Invalid type. Either float or \"auto\"");
+        return err_string("Speed: Invalid type. Either float or \"auto\"");
       }
 
       if (speed < 0.0 || speed > 100.0)
-        return err_string(0, "Speed: Invalid value");
+        return err_string("Speed: Invalid value");
     }
     else {
-      return err_string(0, "Unknown arguments");
+      return err_string("Unknown arguments");
     }
   }
 
   if (speed == -2)
-    return err_string(0, "Missing argument: Speed");
+    return err_string("Missing argument: Speed");
 
   for_enumerate_array(array_size_t, i, Service_Fans) {
     if (fan == -1 || fan == i) {
@@ -128,7 +128,7 @@ static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
  */
 static Error Server_Command_Status(int socket, const nx_json* json) {
   if (json->val.children.length > 1)
-      return err_string(0, "Unknown arguments");
+      return err_string("Unknown arguments");
 
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
@@ -169,22 +169,22 @@ Error Server_Init() {
   snprintf(Server_Address.sun_path, sizeof(Server_Address.sun_path), NBFC_SOCKET_PATH);
 
   if ((Server_FD = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-    e = err_stdlib(0, "socket()");
+    e = err_stdlib("socket()");
     goto error;
   }
 
   if (bind(Server_FD, (struct sockaddr *)&Server_Address, sizeof(Server_Address)) < 0) {
-    e = err_stdlib(err_string(0, NBFC_SOCKET_PATH), "bind()");
+    e = err_chain_stdlib(err_string(NBFC_SOCKET_PATH), "bind()");
     goto error;
   }
 
   if (chmod(NBFC_SOCKET_PATH, 0666) < 0) {
-    e = err_stdlib(err_string(0, NBFC_SOCKET_PATH), "chmod()");
+    e = err_chain_stdlib(err_string(NBFC_SOCKET_PATH), "chmod()");
     goto error;
   }
 
   if (listen(Server_FD, 3) < 0) {
-    e = err_stdlib(0, "listen()");
+    e = err_stdlib("listen()");
     goto error;
   }
 
@@ -220,10 +220,10 @@ static Error Server_UseClient(Client* client, int fd) {
   int flags = fcntl(fd, F_GETFL, 0);
 
   if (flags == -1)
-    return err_stdlib(0, "fcntl()");
+    return err_stdlib("fcntl()");
 
   if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1)
-    return err_stdlib(0, "fcntl()");
+    return err_stdlib("fcntl()");
 
   client->active = true;
   client->fd = fd;
@@ -256,7 +256,7 @@ static Error Server_AcceptClient() {
   int new_socket;
 
   if ((new_socket = accept(Server_FD, (struct sockaddr*)&Server_Address, (socklen_t*)&addrlen)) < 0)
-    return err_stdlib(0, "accept()");
+    return err_stdlib("accept()");
 
   Client* client = Server_AllocateClient();
 
@@ -330,7 +330,7 @@ static void Server_HandleClient(Client* client) {
         return;
 
       case EFBIG:
-        e = err_string(0, "Message too large");
+        e = err_string("Message too large");
         goto end;
 
       default:
@@ -350,23 +350,23 @@ static void Server_HandleClient(Client* client) {
   json = nx_json_parse_utf8(client->buf);
 
   if (! json) {
-    e = err_nxjson(0, "Invalid JSON");
+    e = err_nxjson("Invalid JSON");
     goto end;
   }
 
   if (json->type != NX_JSON_OBJECT) {
-    e = err_string(0, "Not a JSON object");
+    e = err_string("Not a JSON object");
     goto end;
   }
 
   const nx_json* command = nx_json_get(json, "Command");
   if (! command) {
-    e = err_string(0, "Missing 'Command' field");
+    e = err_string("Missing 'Command' field");
     goto end;
   }
 
   if (command->type != NX_JSON_STRING) {
-    e = err_string(0, "Command: Not a string");
+    e = err_string("Command: Not a string");
     goto end;
   }
 
@@ -375,7 +375,7 @@ static void Server_HandleClient(Client* client) {
   else if (!strcmp(command->val.text, "status"))
     e = Server_Command_Status(client->fd, json);
   else
-    e = err_string(0, "Invalid command");
+    e = err_string("Invalid command");
 
 end:
   nx_json_free(json);
@@ -417,7 +417,7 @@ Error Server_Loop(int timeout) {
   int poll_count = poll(Server_PollFDs, needed_fdsize, timeout);
   if (poll_count < 0) {
     if (errno != EINTR)
-      return err_stdlib(0, "poll()");
+      return err_stdlib("poll()");
     else
       return err_success();
   }

@@ -17,29 +17,29 @@ static inline Error nx_json_get_str(const char** out, const nx_json* node) {
     *out = node->val.text;
     return err_success();
   }
-  return err_string(0, "Not a string");
+  return err_string("Not a string");
 }
 
 static inline Error nx_json_get_array(const nx_json* node) {
   if (node->type != NX_JSON_ARRAY)
-    return err_string(0, "Not an array");
+    return err_string("Not an array");
   return err_success();
 }
 
 static inline Error nx_json_get_object(const nx_json* node) {
   if (node->type != NX_JSON_OBJECT)
-    return err_string(0, "Not an object");
+    return err_string("Not an object");
   return err_success();
 }
 
 static inline Error nx_json_parse_file(const nx_json** out, char* buf, size_t bufsize, const char* file) {
   int len = slurp_file(buf, bufsize, file);
   if (len < 0)
-    return err_stdlib(0, NULL);
+    return err_stdlib(NULL);
 
   *out = nx_json_parse_utf8(buf);
   if (! *out)
-    return err_nxjson(0, NULL);
+    return err_nxjson(NULL);
 
   return err_success();
 }

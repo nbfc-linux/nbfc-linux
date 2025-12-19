@@ -34,7 +34,7 @@ Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out
   else {
     FILE* fh = popen(my.file, "r");
     if (! fh)
-      return err_stdlib(0, my.file);
+      return err_stdlib(my.file);
     nread = fread(buf, 1, sizeof(buf), fh);
     int olderr = errno;
     pclose(fh);
@@ -42,10 +42,10 @@ Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out
   }
 
   if (nread < 0)
-    return err_stdlib(0, my.file);
+    return err_stdlib(my.file);
 
   if (nread == 0)
-    return (errno = ENODATA), err_stdlib(0, my.file);
+    return (errno = ENODATA), err_stdlib(my.file);
 
   char* end;
   errno = 0;
@@ -54,7 +54,7 @@ Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out
   if (end == buf)
     errno = EINVAL;
   if (errno)
-    return err_stdlib(err_string(0, buf), my.file);
+    return err_chain_stdlib(err_string(buf), my.file);
 
   return err_success();
 }
@@ -77,7 +77,7 @@ static Error FS_Sensors_Init_HwMon() {
       int nread = slurp_file(source_name, sizeof(source_name), file);
       if (nread < 0) {
         if (errno != ENOENT) {
-          e = err_stdlib(0, file);
+          e = err_stdlib(file);
           e_warn();
         }
         continue;
@@ -114,7 +114,7 @@ static Error FS_Sensors_Init_HwMon() {
 end:
   n_sources = source - sources;
   if (! n_sources)
-    return err_string(0, "No temperature sources found");
+    return err_string("No temperature sources found");
 
   FS_Sensors_Sources.size = n_sources;
   FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Malloc(n_sources * sizeof(FS_TemperatureSource));
@@ -164,7 +164,7 @@ Error FS_Sensors_Init() {
   }
 
   if (! FS_Sensors_Sources.size)
-    return err_string(0, "No temperature sources found");
+    return err_string("No temperature sources found");
 
   return err_success();
 }

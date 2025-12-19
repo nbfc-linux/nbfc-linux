@@ -7,10 +7,10 @@
 
 Error TemperatureFilter_Init(TemperatureFilter* self, int poll_interval, int timespan) {
   if (poll_interval <= 0)
-    return (errno = EINVAL), err_stdlib(0, "poll_interval");
+    return (errno = EINVAL), err_stdlib("poll_interval");
 
   if (timespan <= 0)
-    return (errno = EINVAL), err_stdlib(0, "timespan");
+    return (errno = EINVAL), err_stdlib("timespan");
 
   my.index = 0;
   my.ring_buffer.size = timespan / poll_interval + !!(timespan % poll_interval);

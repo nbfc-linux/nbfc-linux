@@ -55,15 +55,15 @@ Error Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
 
   sock = socket(AF_UNIX, SOCK_STREAM, 0);
   if (sock < 0)
-    return err_stdlib(0, "socket()");
+    return err_stdlib("socket()");
 
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sun_family = AF_UNIX;
   snprintf(serv_addr.sun_path, sizeof(serv_addr.sun_path), NBFC_SOCKET_PATH);
 
   if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-    e = err_string(0, NBFC_SOCKET_PATH);
-    e = err_stdlib(e, "connect()");
+    e = err_string(NBFC_SOCKET_PATH);
+    e = err_chain_stdlib(e, "connect()");
     goto error;
   }
 
@@ -97,7 +97,7 @@ void ServiceConfig_Load() {
 
   if (e) {
 error:
-    e = err_string(e, NBFC_SERVICE_CONFIG);
+    e = err_chain_string(e, NBFC_SERVICE_CONFIG);
     e_die();
   }
 }
@@ -115,18 +115,18 @@ Error ServiceInfo_TryLoad(ServiceInfo* service_info) {
     goto error;
 
   if (out->type != NX_JSON_OBJECT) {
-    e = err_string(0, "Not a JSON object");
+    e = err_string("Not a JSON object");
     goto error;
   }
 
   const nx_json* err = nx_json_get(out, "Error");
   if (err) {
     if (err->type != NX_JSON_STRING) {
-      e = err_string(0, "'Error' is not a string");
+      e = err_string("'Error' is not a string");
       goto error;
     }
 
-    e = err_string(0, err->val.text);
+    e = err_string(err->val.text);
     goto error;
   }
 

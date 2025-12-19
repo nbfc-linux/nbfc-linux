@@ -8,8 +8,8 @@
 static inline Error Process_Call(const char* cmd) {
   switch (system(cmd)) {
   case 0:  return err_success();
-  case -1: return err_stdlib(0, "system()");
-  default: return err_stringf(0, "Could not execute `%s'", cmd);
+  case -1: return err_stdlib("system()");
+  default: return err_stringf("Could not execute `%s'", cmd);
   }
 }
 

@@ -4,7 +4,7 @@ bool TemperatureThresholdManager_LegacyBehaviour = false;
 
 Error ThresholdManager_Init(ThresholdManager* self, array_of(TemperatureThreshold)* thresholds) {
   if (! thresholds->size)
-    return err_string(0, "Invalid size for TemperatureThresholds");
+    return err_string("Invalid size for TemperatureThresholds");
 
   my.current = 0;
   my.thresholds = *thresholds;

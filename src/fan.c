@@ -89,7 +89,7 @@ static Error Fan_ECWriteValue(Fan* self, uint16_t value) {
     uint64_t out;
     Error e = AcpiCall_CallTemplate(my.fanConfig->WriteAcpiMethod, value, &out);
     if (e)
-      return err_string(e, "WriteAcpiMethod");
+      return err_chain_string(e, "WriteAcpiMethod");
     else
       return err_success();
   }
@@ -106,7 +106,7 @@ static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {
     uint64_t val;
     e = AcpiCall_Call_Str(my.fanConfig->ReadAcpiMethod, &val);
     if (e)
-      return err_string(e, "ReadAcpiMethod");
+      return err_chain_string(e, "ReadAcpiMethod");
     else
       *out = val;
     return e;
@@ -160,12 +160,12 @@ Error Fan_SetFixedSpeed(Fan* self, float speed) {
   if (speed < 0.0f) {
     speed = 0.0f;
     errno = EINVAL;
-    e = err_stdlib(0, "speed");
+    e = err_stdlib("speed");
   }
   else if (speed > 100.0f) {
     speed = 100.0f;
     errno = EINVAL;
-    e = err_stdlib(0, "speed");
+    e = err_stdlib("speed");
   }
 
   my.requestedSpeed = speed;
@@ -213,7 +213,7 @@ Error Fan_ECReset(Fan* self) {
     uint64_t out;
     Error e = AcpiCall_Call_Str(my.fanConfig->ResetAcpiMethod, &out);
     if (e)
-      return err_string(e, "ResetAcpiMethod");
+      return err_chain_string(e, "ResetAcpiMethod");
     else
       return err_success();
   }

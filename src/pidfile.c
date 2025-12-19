@@ -15,10 +15,10 @@ Error PID_Write(enum PID_LockMode lock_mode) {
   int len = snprintf(buf, sizeof(buf), "%d", getpid());
 
   if (write_file(NBFC_PID_FILE, flags|O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, buf, len) == -1) {
-    e = err_stdlib(e, NBFC_PID_FILE);
+    e = err_stdlib(NBFC_PID_FILE);
 
     if (errno == EEXIST)
-      e = err_string(e, "Failed to acquire lock file");
+      e = err_chain_string(e, "Failed to acquire lock file");
   }
 
   return e;

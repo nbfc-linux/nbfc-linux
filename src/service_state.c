@@ -56,7 +56,7 @@ err:
   nx_json_free(js);
   StackMemory_Destroy();
   if (e)
-    return err_string(e, trace.buf);
+    return err_chain_string(e, trace.buf);
 
   return err_success();
 }
@@ -80,7 +80,7 @@ Error ServiceState_Write() {
   nx_json_free(o);
 
   if (write_file(NBFC_STATE_FILE, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
-    return err_stdlib(0, NBFC_STATE_FILE);
+    return err_stdlib(NBFC_STATE_FILE);
   }
 
   return err_success();
