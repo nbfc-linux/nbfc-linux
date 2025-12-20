@@ -37,13 +37,14 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
   if (Log_LogLevel < level)
     return;
 
+  char buf[LOG_BUFFER_SIZE];
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, args);
+  va_end(args);
+
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
-    va_list args;
-    va_start(args, fmt);
-
-    char buf[LOG_BUFFER_SIZE];
-    vsnprintf(buf, sizeof(buf), fmt, args);
 
     switch (level) {
       case LogLevel_Error: syslog(LOG_ERR,     "%s", buf); break;
@@ -52,13 +53,9 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
       case LogLevel_Debug: syslog(LOG_DEBUG,   "%s", buf); break;
       default: break;
     }
-
-    va_end(args);
   }
 #endif
 
-  va_list args;
-  va_start(args, fmt);
   const char* s;
 
   switch (level) {
@@ -69,8 +66,5 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
     default: break;
   }
 
-  fprintf(stderr, "%s: %s: ", s, Program_Name);
-  vfprintf(stderr, fmt, args);
-
-  va_end(args);
+  fprintf(stderr, "%s: %s: %s", s, Program_Name, buf);
 }
