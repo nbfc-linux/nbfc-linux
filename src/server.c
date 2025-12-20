@@ -32,13 +32,12 @@ struct Client {
   size_t bufsz;
 };
 typedef struct Client Client;
-declare_array_of(Client);
 
 static int                Server_FD = -1;
 static struct sockaddr_un Server_Address;
-static array_of(Client)   Server_Clients = {0};
-static struct pollfd*     Server_PollFDs = NULL;
-static size_t             Server_PollFDSize = 0;
+static Client             Server_Clients[NBFC_MAX_CONNECTIONS] = {0};
+static struct pollfd      Server_PollFDs[NBFC_MAX_CONNECTIONS + 1] = {0};
+static nfds_t             Server_PollFDSize = 0;
 
 /* Command "set-fan-speed"
  *
@@ -195,18 +194,13 @@ error:
   return e;
 }
 
-// Return a new `Client` structure
+// Return an inactive `Client` structure
 static Client* Server_AllocateClient() {
-  // Try to use an existing client that is inactive
-  for_each_array(Client*, client, Server_Clients)
-    if (! client->active)
-      return client;
+  for (unsigned i = 0; i < NBFC_MAX_CONNECTIONS; ++i)
+    if (! Server_Clients[i].active)
+      return &Server_Clients[i];
 
-  // Allocate space for new client
-  const size_t idx = Server_Clients.size;
-  Server_Clients.data = Mem_Realloc(Server_Clients.data, (idx + 1) * sizeof(Client));
-  Server_Clients.size = idx + 1;
-  return &Server_Clients.data[idx];
+  return NULL;
 }
 
 /* Initialize a client
@@ -234,9 +228,9 @@ static Error Server_UseClient(Client* client, int fd) {
 
 // Find an active client whose file descriptor matches `fd`
 static Client* Server_FindClientByFileDescriptor(int fd) {
-  for_each_array(Client*, client, Server_Clients)
-    if (client->active && client->fd == fd)
-      return client;
+  for (unsigned i = 0; i < NBFC_MAX_CONNECTIONS; ++i)
+    if (Server_Clients[i].active && Server_Clients[i].fd == fd)
+      return &Server_Clients[i];
 
   return NULL;
 }
@@ -244,8 +238,8 @@ static Client* Server_FindClientByFileDescriptor(int fd) {
 // Get the number of active clients
 static size_t Server_GetNumberOfActiveClients() {
   size_t num_clients = 0;
-  for_each_array(Client*, client, Server_Clients)
-    num_clients += client->active;
+  for (unsigned i = 0; i < NBFC_MAX_CONNECTIONS; ++i)
+    num_clients += Server_Clients[i].active;
   return num_clients;
 }
 
@@ -259,6 +253,11 @@ static Error Server_AcceptClient() {
     return err_stdlib("accept()");
 
   Client* client = Server_AllocateClient();
+  if (! client) {
+    close(new_socket);
+    errno = ECONNREFUSED;
+    return err_stdlib(NULL);
+  }
 
   e = Server_UseClient(client, new_socket);
   if (e)
@@ -389,15 +388,9 @@ end:
 // Hadle incoming connections and process clients
 Error Server_Loop(int timeout) {
   const size_t num_clients = Server_GetNumberOfActiveClients();
-  const size_t needed_fdsize = num_clients + 1;
+  Server_PollFDSize = num_clients + 1;
 
   Log_Debug("Server_Loop(timeout=%d): num clients: %d\n", timeout, num_clients);
-
-  // Allocate pollfd array if needed
-  if (needed_fdsize > Server_PollFDSize) {
-    Server_PollFDs = Mem_Realloc(Server_PollFDs, needed_fdsize * sizeof(struct pollfd));
-    Server_PollFDSize = needed_fdsize;
-  }
 
   // Add server file descriptor to Server_PollFDs
   Server_PollFDs[0].fd = Server_FD;
@@ -405,7 +398,9 @@ Error Server_Loop(int timeout) {
 
   // Add clients to Server_PollFDs
   size_t idx = 1;
-  for_each_array(Client*, client, Server_Clients) {
+  for (unsigned i = 0; i < NBFC_MAX_CONNECTIONS; ++i) {
+    const Client* client = &Server_Clients[i];
+
     if (client->active) {
       Server_PollFDs[idx].fd = client->fd;
       Server_PollFDs[idx].events = POLLIN;
@@ -414,7 +409,7 @@ Error Server_Loop(int timeout) {
   }
 
   // Call poll() ...
-  int poll_count = poll(Server_PollFDs, needed_fdsize, timeout);
+  int poll_count = poll(Server_PollFDs, Server_PollFDSize, timeout);
   if (poll_count < 0) {
     if (errno != EINTR)
       return err_stdlib("poll()");
@@ -430,7 +425,7 @@ Error Server_Loop(int timeout) {
   }
 
   // Check for activity on client file descriptors ...
-  for (idx = 1; idx < needed_fdsize; ++idx) {
+  for (idx = 1; idx < Server_PollFDSize; ++idx) {
     if (Server_PollFDs[idx].revents & POLLIN) {
       Client* client = Server_FindClientByFileDescriptor(Server_PollFDs[idx].fd);
       if (client == NULL)
