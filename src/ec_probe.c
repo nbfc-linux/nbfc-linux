@@ -284,7 +284,7 @@ int main(int argc, char* const argv[]) {
       cmd = Command_FromString(p.optarg);
 
       if (cmd == Command_End) {
-        Log_Error("Invalid command: %s\n", p.optarg);
+        Log_Error("Invalid command: %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
 
@@ -298,14 +298,14 @@ int main(int argc, char* const argv[]) {
     case Option_Register:
       options.register_ = parse_number(p.optarg, 0, 255, &err);
       if (err) {
-        Log_Error("Register: %s: %s\n", p.optarg, err);
+        Log_Error("Register: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Value:
       options.value = parse_number(p.optarg, 0, 65535, &err);
       if (err) {
-        Log_Error("Value: %s: %s\n", p.optarg, err);
+        Log_Error("Value: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -330,21 +330,21 @@ int main(int argc, char* const argv[]) {
         case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable;         break;
 #endif
         default:
-          Log_Error("-e|--embedded-controller: Invalid value: %s\n", p.optarg);
+          Log_Error("-e|--embedded-controller: Invalid value: %s", p.optarg);
           return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Timespan:
       options.timespan = parse_number(p.optarg, 1, INT_MAX, &err);
       if (err) {
-        Log_Error("-t|--timespan: %s: %s\n", p.optarg, err);
+        Log_Error("-t|--timespan: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Interval:
       options.interval = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
-        Log_Error("-i|--interval: %s: %s\n", p.optarg, err);
+        Log_Error("-i|--interval: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -354,7 +354,7 @@ int main(int argc, char* const argv[]) {
     case Option_AcpiCallArgument:
       options.acpi_call_args[options.acpi_call_args_size++] = parse_unumber(p.optarg, 0, UINT64_MAX, &err);
       if (err) {
-        Log_Error("Argument: %s: %s\n", p.optarg, err);
+        Log_Error("Argument: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -365,7 +365,7 @@ int main(int argc, char* const argv[]) {
   }
 
   if (! cli99_End(&p)) {
-    Log_Error("Too much arguments\n");
+    Log_Error("Too much arguments");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -375,7 +375,7 @@ int main(int argc, char* const argv[]) {
   }
 
   if (geteuid()) {
-    Log_Error("This program must be run as root\n");
+    Log_Error("This program must be run as root");
     return NBFC_EXIT_FAILURE;
   }
 
@@ -427,7 +427,7 @@ static int Write() {
   }
   else {
     if (options.value > 255) {
-      Log_Error("write: Value too big: %d\n", options.value);
+      Log_Error("write: Value too big: %d", options.value);
       return NBFC_EXIT_CMDLINE;
     }
     Error e = ec->WriteByte(options.register_, options.value);
@@ -461,7 +461,7 @@ static int Load() {
   else {
     infile = fopen(options.file, "r");
     if (! infile) {
-      Log_Error("Error opening file: %s: %s\n", options.file, strerror(errno));
+      Log_Error("Error opening file: %s: %s", options.file, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -495,7 +495,7 @@ static int Monitor() {
   if (options.report) {
     FILE* fh = fopen(options.report, "w");
     if (! fh) {
-      Log_Error("%s: %s\n", options.report, strerror(errno));
+      Log_Error("%s: %s", options.report, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
     Register_WriteMonitorReport(regs, loops, fh);
@@ -546,7 +546,7 @@ static int AcpiCall() {
   );
 
   if (cmd_len == -1 || cmd_len >= (sizeof(cmd))) {
-    Log_Error("Method (including arguments) is too long\n");
+    Log_Error("Method (including arguments) is too long");
     return NBFC_EXIT_FAILURE;
   }
 

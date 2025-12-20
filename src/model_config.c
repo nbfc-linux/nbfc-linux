@@ -166,7 +166,7 @@ EmbeddedControllerType EmbeddedControllerType_FromString(const char* s) {
     return EmbeddedControllerType_ECSysLinux;
 #else
 ec_sys_disabled:
-    Log_Error("EmbeddedControllerType 'ec_sys' has been disabled at compile time.\n");
+    Log_Error("EmbeddedControllerType 'ec_sys' has been disabled at compile time.");
     return EmbeddedControllerType_Unset;
 #endif
   }
@@ -176,7 +176,7 @@ ec_sys_disabled:
     return EmbeddedControllerType_ECSysLinuxACPI;
 #else
 ec_acpi_disabled:
-    Log_Error("EmbeddedControllerType 'acpi_ec' has been disabled at compile time.\n");
+    Log_Error("EmbeddedControllerType 'acpi_ec' has been disabled at compile time.");
     return EmbeddedControllerType_Unset;
 #endif
   }
@@ -186,7 +186,7 @@ ec_acpi_disabled:
     return EmbeddedControllerType_ECLinux;
 #else
 ec_dev_port_disabled:
-    Log_Error("EmbeddedControllerType 'dev_port' has been disabled at compile time.\n");
+    Log_Error("EmbeddedControllerType 'dev_port' has been disabled at compile time.");
     return EmbeddedControllerType_Unset;
 #endif
   }
@@ -195,7 +195,7 @@ ec_dev_port_disabled:
 #if ENABLE_EC_DUMMY
     return EmbeddedControllerType_ECDummy;
 #else
-    Log_Error("EmbeddedControllerType 'dummy' has been disabled at compile time.\n");
+    Log_Error("EmbeddedControllerType 'dummy' has been disabled at compile time.");
 #endif
   }
 
@@ -390,7 +390,7 @@ Error TemperatureThresholds_Validate(
     }
 
     if (t->UpThreshold > CriticalTemperature) {
-      Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature\n", trace->buf);
+      Log_Warn("%s: UpThreshold cannot be greater than CriticalTemperature", trace->buf);
     }
 
     for_each_array(TemperatureThreshold*, t1, *TemperatureThresholds) {
@@ -404,10 +404,10 @@ Error TemperatureThresholds_Validate(
   }
 
   if (! has_0_FanSpeed)
-    Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace->buf, 0);
+    Log_Warn("%s: No threshold with FanSpeed == %d found", trace->buf, 0);
 
   if (! has_100_FanSpeed)
-    Log_Warn("%s: No threshold with FanSpeed == %d found\n", trace->buf, 100);
+    Log_Warn("%s: No threshold with FanSpeed == %d found", trace->buf, 100);
 
   return err_success();
 }

@@ -54,7 +54,7 @@ static void parse_opts(int argc, char* const argv[]) {
     case 'e':
       options.embedded_controller_type = EmbeddedControllerType_FromString(optarg);
       if (options.embedded_controller_type == EmbeddedControllerType_Unset) {
-        Log_Error("Invalid value for %s: %s\n", "-e|--embedded-controller", optarg);
+        Log_Error("Invalid value for %s: %s", "-e|--embedded-controller", optarg);
         exit(NBFC_EXIT_CMDLINE);
       }
       break;
@@ -64,7 +64,7 @@ static void parse_opts(int argc, char* const argv[]) {
       break;
     case 'c':
       if (! realpath(optarg, options.service_config)) {
-        Log_Error("%s: %s: %s\n", "-c|--config-file", optarg, strerror(errno));
+        Log_Error("%s: %s: %s", "-c|--config-file", optarg, strerror(errno));
         exit(NBFC_EXIT_CMDLINE);
       }
       break;
@@ -77,7 +77,7 @@ static void parse_opts(int argc, char* const argv[]) {
   }
 
   if (optind < argc) {
-    Log_Error("Too much arguments\n");
+    Log_Error("Too much arguments");
     exit(NBFC_EXIT_CMDLINE);
   }
 }
@@ -104,7 +104,7 @@ int main(int argc, char* const argv[])
   chdir("/");
 
   if (geteuid() != 0) {
-    Log_Error("This program must be run as root\n");
+    Log_Error("This program must be run as root");
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -114,11 +114,11 @@ int main(int argc, char* const argv[])
   Log_Init(options.fork);
   atexit(Log_Close);
 
-  Log_Info("NBFC-Linux comes with no warranty. Run `nbfc warranty` for details.\n");
-  Log_Info("Running version " NBFC_VERSION "\n");
-  Log_Info("SYSCONFDIR is '%s'\n", SYSCONFDIR);
-  Log_Info("DATADIR is '%s'\n", DATADIR);
-  Log_Info("RUNSTATEDIR is '%s'\n", RUNSTATEDIR);
+  Log_Info("NBFC-Linux comes with no warranty. Run `nbfc warranty` for details.");
+  Log_Info("Running version " NBFC_VERSION);
+  Log_Info("SYSCONFDIR is '%s'", SYSCONFDIR);
+  Log_Info("DATADIR is '%s'", DATADIR);
+  Log_Info("RUNSTATEDIR is '%s'", RUNSTATEDIR);
   Log_Info("Available Embedded Controllers: "
 #if ENABLE_EC_SYS
     "ec_sys "
@@ -132,23 +132,22 @@ int main(int argc, char* const argv[])
 #if ENABLE_EC_DUMMY
     "dummy "
 #endif
-    "\n"
   );
 
   // Sets the OOM (Out-Of-Memory) score adjustment for this process to -1000,
   // which tells the Linux kernel to never kill this process, even under
   // extreme memory pressure.
   if (write_file("/proc/self/oom_score_adj", O_WRONLY, 0, "-1000\n", 6) < 0) {
-    Log_Error("%s: %s\n", "/proc/self/oom_score_adj", strerror(errno));
+    Log_Error("%s: %s", "/proc/self/oom_score_adj", strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }
 
   if (options.read_only)
-    Log_Info("Read-only mode enabled\n");
+    Log_Info("Read-only mode enabled");
 
   e = PID_Write(PID_AcquireLock);
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_INIT;
   }
 
@@ -156,7 +155,7 @@ int main(int argc, char* const argv[])
 
   e = Service_Init();
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_INIT;
   }
 
@@ -164,7 +163,7 @@ int main(int argc, char* const argv[])
 
   e = Server_Init();
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_INIT;
   }
 
@@ -174,7 +173,7 @@ int main(int argc, char* const argv[])
   // since we will fork and close STDERR later.
   e = Service_Loop();
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 
@@ -183,20 +182,20 @@ int main(int argc, char* const argv[])
 
     switch (fork()) {
     case -1:
-      Log_Error("fork(): %s\n", strerror(errno));
+      Log_Error("fork(): %s", strerror(errno));
       return NBFC_EXIT_FAILURE;
     case 0:
       // Create a new session and detach from the controlling terminal
       // to run the process as a true daemon.
       if (setsid() < 0) {
-        Log_Error("setsid(): %s\n", strerror(errno));
+        Log_Error("setsid(): %s", strerror(errno));
         return NBFC_EXIT_FAILURE;
       }
 
       // We got a new PID
       e = PID_Write(PID_NoAcquireLock);
       if (e) {
-        Log_Error("%s\n", err_print_all(e));
+        Log_Error("%s", err_print_all(e));
         return NBFC_EXIT_INIT;
       }
 
@@ -228,8 +227,8 @@ int main(int argc, char* const argv[])
     }
     else {
       if (++failures >= 100) {
-        Log_Error("%s\n", err_print_all(e));
-        Log_Error("We tried %d times, exiting now...\n", failures);
+        Log_Error("%s", err_print_all(e));
+        Log_Error("We tried %d times, exiting now...", failures);
         return NBFC_EXIT_FAILURE;
       }
       sleep_ms(10);

@@ -23,8 +23,8 @@ typedef struct ErrorImpl ErrorImpl;
 
 typedef struct ErrorImpl* Error;
 
-#define e_warn()      do { if (e) { Log_Warn("%s\n", err_print_all(e)); } } while (0)
-#define e_die()       do { if (e) { Log_Error("%s\n", err_print_all(e)); exit(EXIT_FAILURE); } } while(0)
+#define e_warn()      do { if (e) { Log_Warn("%s", err_print_all(e)); } } while (0)
+#define e_die()       do { if (e) { Log_Error("%s", err_print_all(e)); exit(EXIT_FAILURE); } } while(0)
 #define e_check()     do { if (e) return e;         } while(0)
 #define e_goto(LABEL) do { if (e) goto LABEL;       } while(0)
 #define err_success() NULL

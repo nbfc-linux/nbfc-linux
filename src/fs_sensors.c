@@ -124,7 +124,7 @@ end:
 
 void FS_Sensors_Log() {
   for_each_array(FS_TemperatureSource*, source, FS_Sensors_Sources)
-    Log_Info("Available temperature source: '%s' (%s)\n", source->name, source->file);
+    Log_Info("Available temperature source: '%s' (%s)", source->name, source->file);
 }
 
 Error FS_Sensors_Init() {
@@ -137,7 +137,7 @@ Error FS_Sensors_Init() {
     e = FS_Sensors_Init_HwMon();
     if (! e)
       break;
-    Log_Info("Waiting for /sys/class/hwmon* sensors ...\n");
+    Log_Info("Waiting for /sys/class/hwmon* sensors ...");
     sleep_ms(1000);
   }
 
@@ -148,7 +148,7 @@ Error FS_Sensors_Init() {
       break;
 
     if (ne == Nvidia_Error_API) {
-      Log_Info("Waiting for nvidia sensor ...\n");
+      Log_Info("Waiting for nvidia sensor ...");
       sleep_ms(1000);
       continue;
     }

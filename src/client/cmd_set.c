@@ -31,7 +31,7 @@ int Set() {
   }
 
   if (Service_Get_PID() == -1) {
-    Log_Error("Service not running\n");
+    Log_Error("Service not running");
     return NBFC_EXIT_FAILURE;
   }
 
@@ -65,7 +65,7 @@ int Set() {
       goto error;
     }
 
-    Log_Error("Service returned: %s\n", err->val.text);
+    Log_Error("Service returned: %s", err->val.text);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -91,7 +91,7 @@ error:
   Mem_Free(buf);
 
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 

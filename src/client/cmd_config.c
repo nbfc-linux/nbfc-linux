@@ -41,7 +41,7 @@ struct {
 
 void Set_Config_Action(enum Config_Action action) {
   if (Config_Options.action && Config_Options.action != action) {
-    Log_Error("Options --apply, --set, --list and --recommend are mutually exclusive\n");
+    Log_Error("Options --apply, --set, --list and --recommend are mutually exclusive");
     exit(NBFC_EXIT_CMDLINE);
   }
 
@@ -90,7 +90,7 @@ int Recommend() {
   }
 
   if (! have_match) {
-    Log_Error("No recommended configuration files found\n");
+    Log_Error("No recommended configuration files found");
   }
 
   return NBFC_EXIT_SUCCESS;
@@ -106,7 +106,7 @@ int Set_Or_Apply() {
     config = Get_Supported_Config(&files, DMI_Get_Model_Name());
 
     if (! config) {
-      Log_Error("No config found to apply automatically\n");
+      Log_Error("No config found to apply automatically");
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -120,7 +120,7 @@ int Set_Or_Apply() {
       *dot = '\0';
 
     if  (! Contains_Config(&files, config)) {
-      Log_Error("No such configuration available: %s\n", config);
+      Log_Error("No such configuration available: %s", config);
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -130,7 +130,7 @@ int Set_Or_Apply() {
     config = realpath(Config_Options.config, NULL);
 
     if (! config) {
-      Log_Error("Failed to resolve path '%s': %s\n", Config_Options.config, strerror(errno));
+      Log_Error("Failed to resolve path '%s': %s", Config_Options.config, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -144,7 +144,7 @@ int Set_Or_Apply() {
   Mem_Free(config);
 
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 

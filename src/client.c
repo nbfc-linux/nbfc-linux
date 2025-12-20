@@ -154,7 +154,7 @@ int main(int argc, char *const argv[]) {
     case Option_Command:
       cmd = Command_FromString(p.optarg);
       if (cmd == Command_End) {
-        Log_Error("Invalid command: %s\n", p.optarg);
+        Log_Error("Invalid command: %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
 
@@ -181,7 +181,7 @@ int main(int argc, char *const argv[]) {
       {
         const int fan = parse_number(p.optarg, 0, INT_MAX, &err);
         if (err) {
-          Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
+          Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
           return NBFC_EXIT_FAILURE;
         }
 
@@ -195,7 +195,7 @@ int main(int argc, char *const argv[]) {
     case Option_Status_Watch:
       Status_Options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s\n", "-w|--watch", err, p.optarg);
+        Log_Error("%s: %s: %s", "-w|--watch", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -207,7 +207,7 @@ int main(int argc, char *const argv[]) {
     case Option_Sensors_Command:
       Sensors_Options.command = Sensors_Command_FromString(p.optarg);
       if (Sensors_Options.command == Sensors_Command_End) {
-        Log_Error("Invalid command: sensors %s\n", p.optarg);
+        Log_Error("Invalid command: sensors %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
 
@@ -219,7 +219,7 @@ int main(int argc, char *const argv[]) {
     case Option_Sensors_Fan:
       Sensors_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
+        Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -236,7 +236,7 @@ int main(int argc, char *const argv[]) {
     case Option_Sensors_Algorithm:
       Sensors_Options.algorithm = TemperatureAlgorithmType_FromString(p.optarg);
       if (Sensors_Options.algorithm == TemperatureAlgorithmType_Unset) {
-        Log_Error("%s: %s: %s\n", "-a|--algorithm", "Invalid value", p.optarg);
+        Log_Error("%s: %s: %s", "-a|--algorithm", "Invalid value", p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -273,7 +273,7 @@ int main(int argc, char *const argv[]) {
 
     case Option_Set_Auto:
       if (Set_Options.speed != -2.0) {
-        Log_Error("Options -a|--auto or -s|--speed may only be specified once\n");
+        Log_Error("Options -a|--auto or -s|--speed may only be specified once");
         return NBFC_EXIT_FAILURE;
       }
 
@@ -282,26 +282,26 @@ int main(int argc, char *const argv[]) {
 
     case Option_Set_Speed:
       if (Set_Options.speed != -2.0) {
-        Log_Error("Options -a|--auto or -s|--speed may only be specified once\n");
+        Log_Error("Options -a|--auto or -s|--speed may only be specified once");
         return NBFC_EXIT_FAILURE;
       }
 
       Set_Options.speed = parse_double(p.optarg, 0, 100, &err);
       if (err) {
-        Log_Error("%s: %s: %s\n", "-s|--speed", err, p.optarg);
+        Log_Error("%s: %s: %s", "-s|--speed", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
 
     case Option_Set_Fan:
       if (Set_Options.fan != -1) {
-        Log_Error("Option -f|--fan may only be specified once\n");
+        Log_Error("Option -f|--fan may only be specified once");
         return NBFC_EXIT_FAILURE;
       }
 
       Set_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s\n", "-f|--fan", err, p.optarg);
+        Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;
@@ -313,7 +313,7 @@ int main(int argc, char *const argv[]) {
     case Option_Update_Parallel:
       Update_Options.parallel = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s\n", "-p|--parallel", err, p.optarg);
+        Log_Error("%s: %s: %s", "-p|--parallel", err, p.optarg);
         return NBFC_EXIT_FAILURE;
       }
       break;

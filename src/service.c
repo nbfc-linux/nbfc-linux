@@ -77,7 +77,7 @@ Error Service_Init() {
   Service_State = Initialized_1_Service_Config;
 
   // Model config =============================================================
-  Log_Info("Using '%s' as model config\n", service_config.SelectedConfigId);
+  Log_Info("Using '%s' as model config", service_config.SelectedConfigId);
   e = ModelConfig_FindAndLoad(&Service_Model_Config, path, service_config.SelectedConfigId);
   if (e) {
     e = err_chain_string(e, path);
@@ -144,7 +144,7 @@ Error Service_Init() {
   }
 
   EmbeddedControllerType t = EmbeddedControllerType_By_EC(ec);
-  Log_Info("Using '%s' as EmbeddedControllerType\n", EmbeddedControllerType_ToString(t));
+  Log_Info("Using '%s' as EmbeddedControllerType", EmbeddedControllerType_ToString(t));
   e = ec->Open();
   if (e)
     goto error;
@@ -154,7 +154,7 @@ Error Service_Init() {
     EC_Debug_Controller = ec;
     ec = &EC_Debug_VTable;
 #else
-    Log_Warn("Debugging EC has been disabled at compile time.\n");
+    Log_Warn("Debugging EC has been disabled at compile time.");
 #endif
   }
 
@@ -203,7 +203,7 @@ Error Service_Loop() {
     // Re-init if current fan speeds are off by more than 15%
     if (fabs(Fan_GetCurrentSpeed(&f->Fan) - Fan_GetTargetSpeed(&f->Fan)) > 15) {
       re_init_required = true;
-      Log_Debug("re_init_required = 1;\n");
+      Log_Debug("re_init_required = 1;");
     }
   }
 

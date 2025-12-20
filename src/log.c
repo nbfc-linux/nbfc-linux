@@ -66,5 +66,5 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
     default: break;
   }
 
-  fprintf(stderr, "%s: %s: %s", s, Program_Name, buf);
+  fprintf(stderr, "%s: %s: %s\n", s, Program_Name, buf);
 }

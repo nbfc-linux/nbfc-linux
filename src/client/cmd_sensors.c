@@ -111,7 +111,7 @@ static int Sensors_Set() {
   check_root();
 
   if (Sensors_Options.fan == -1) {
-    Log_Error("Missing option: %s\n", "-f|--fan");
+    Log_Error("Missing option: %s", "-f|--fan");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -119,7 +119,7 @@ static int Sensors_Set() {
   Service_LoadAllConfigFiles(&model_config);
 
   if (Sensors_Options.fan >= model_config.FanConfigurations.size) {
-    Log_Error("%s: No such fan: %d\n", "-f|--fan", Sensors_Options.fan);
+    Log_Error("%s: No such fan: %d", "-f|--fan", Sensors_Options.fan);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -127,8 +127,8 @@ static int Sensors_Set() {
     for_each_array(str*, sensor, Sensors_Options.sensors) {
       e = Sensors_IsValidSensor(*sensor);
       if (e) {
-        Log_Error("%s: %s\n", "-s|--sensor", err_print_all(e));
-        Log_Info("You can use --force to apply the sensor anyway\n");
+        Log_Error("%s: %s", "-s|--sensor", err_print_all(e));
+        Log_Info("You can use --force to apply the sensor anyway");
         return NBFC_EXIT_FAILURE;
       }
     }

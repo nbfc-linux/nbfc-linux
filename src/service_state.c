@@ -40,12 +40,12 @@ Error ServiceState_Init() {
     Trace_Push(&trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_state.TargetFanSpeeds.data));
 
     if (*f > 100.0f) {
-      Log_Warn("%s: Value cannot be greater than 100.0\n", trace.buf);
+      Log_Warn("%s: Value cannot be greater than 100.0", trace.buf);
       *f = 100.0f;
     }
 
     if (*f < 0.0f && *f != -1.0f) {
-      Log_Warn("%s: Please use `-1' for selecting auto mode\n", trace.buf);
+      Log_Warn("%s: Please use `-1' for selecting auto mode", trace.buf);
       *f = -1.0f;
     }
 

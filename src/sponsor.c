@@ -9,10 +9,10 @@ void Sponsor_Print() {
 
   const Sponsor* sponsor = &Service_Model_Config.Sponsor;
 
-  Log_Info("This configuration is sponsored by:\n");
+  Log_Info("This configuration is sponsored by:");
 
   if (Sponsor_IsSet_Description(sponsor))
-    Log_Info("%s - %s (%s)\n", sponsor->Name, sponsor->Description, sponsor->URL);
+    Log_Info("%s - %s (%s)", sponsor->Name, sponsor->Description, sponsor->URL);
   else
-    Log_Info("%s (%s)\n", sponsor->Name, sponsor->URL);
+    Log_Info("%s (%s)", sponsor->Name, sponsor->URL);
 }

@@ -41,7 +41,7 @@ int Service_Get_PID() {
   int pid = parse_number(buf, 0, INT_MAX, &err);
   if (err) {
 error:
-    Log_Error("Failed to read the pid file: " NBFC_PID_FILE ": %s\n", err);
+    Log_Error("Failed to read the pid file: " NBFC_PID_FILE ": %s", err);
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -159,23 +159,23 @@ void Service_LoadAllConfigFiles(ModelConfig* model_config) {
 
   e = ServiceConfig_Init(NBFC_SERVICE_CONFIG);
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
-    Log_Error("This command needs a valid and configured `%s`\n", NBFC_SERVICE_CONFIG);
+    Log_Error("%s", err_print_all(e));
+    Log_Error("This command needs a valid and configured `%s`", NBFC_SERVICE_CONFIG);
     exit(NBFC_EXIT_FAILURE);
   }
 
   e = ModelConfig_FindAndLoad(model_config, path, service_config.SelectedConfigId);
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
-    Log_Error("This command needs a valid model configuration (%s)\n", path);
+    Log_Error("%s", err_print_all(e));
+    Log_Error("This command needs a valid model configuration (%s)", path);
     exit(NBFC_EXIT_FAILURE);
   }
 
   Trace_Push(&trace, path);
   e = ModelConfig_Validate(&trace, model_config);
   if (e) {
-    Log_Error("%s: %s\n", trace.buf, err_print_all(e));
-    Log_Error("This command needs a valid model configuration (%s)\n", path);
+    Log_Error("%s: %s", trace.buf, err_print_all(e));
+    Log_Error("This command needs a valid model configuration (%s)", path);
     exit(NBFC_EXIT_FAILURE);
   }
 }
@@ -183,7 +183,7 @@ void Service_LoadAllConfigFiles(ModelConfig* model_config) {
 int Service_Start(bool read_only) {
   int pid = Service_Get_PID();
   if (pid != -1) {
-    Log_Info("Service already running (pid: %d)\n", pid);
+    Log_Info("Service already running (pid: %d)", pid);
     return NBFC_EXIT_SUCCESS;
   }
 
@@ -193,11 +193,11 @@ int Service_Start(bool read_only) {
 
   int ret = system(cmd);
   if (ret == -1) {
-    Log_Error("Failed to start process: %s\n", strerror(errno));
+    Log_Error("Failed to start process: %s", strerror(errno));
     return NBFC_EXIT_FAILURE;
   }
   if (WEXITSTATUS(ret) == 127) {
-    Log_Error("Can't run nbfc_service, make sure the binary is installed\n");
+    Log_Error("Can't run nbfc_service, make sure the binary is installed");
     return NBFC_EXIT_FAILURE;
   }
 
@@ -207,13 +207,13 @@ int Service_Start(bool read_only) {
 int Service_Stop() {
   int pid = Service_Get_PID();
   if (pid == -1) {
-    Log_Error("Service not running\n");
+    Log_Error("Service not running");
     return NBFC_EXIT_SUCCESS;
   }
 
-  Log_Info("Killing nbfc_service (%d)\n", pid);
+  Log_Info("Killing nbfc_service (%d)", pid);
   if (kill(pid, SIGINT) == -1) {
-    Log_Error("Failed to kill nbfc_service process (%d): %s\n", pid, strerror(errno));
+    Log_Error("Failed to kill nbfc_service process (%d): %s", pid, strerror(errno));
     return NBFC_EXIT_FAILURE;
   }
 

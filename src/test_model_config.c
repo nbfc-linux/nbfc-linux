@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
   }
 
   if (optind >= argc) {
-    Log_Error("Missing file\n");
+    Log_Error("Missing file");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -70,7 +70,7 @@ int test_model_config(const char* file) {
   else
     snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, file);
 
-  Log_Info(">>> Processing %s ...\n", file);
+  Log_Info(">>> Processing %s ...", file);
 
   Error e = ModelConfig_FromFile(&model_config, path);
   e_die();
@@ -79,13 +79,13 @@ int test_model_config(const char* file) {
   e = ModelConfig_Validate(&trace, &model_config);
   if (e) {
     e = err_chain_string(e, trace.buf);
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     ret = 1;
     goto end;
   }
 
   TemperatureThresholdManager_LegacyBehaviour = model_config.LegacyTemperatureThresholdsBehaviour;
-  Log_Info("TemperatureThresholdManager_LegacyBehaviour = %s\n",
+  Log_Info("TemperatureThresholdManager_LegacyBehaviour = %s",
     TemperatureThresholdManager_LegacyBehaviour ? "true" : "false");
 
   for_enumerate_array(ssize_t, i, model_config.FanConfigurations) {
@@ -115,19 +115,19 @@ int test_model_config(const char* file) {
       Fan_SetTemperature(&fan, temp);
       float speed = Fan_GetTargetSpeed(&fan);
       if (options.verbose)
-        Log_Info("[%ld]: temp = %3d, speed = %f\n", i, temp, speed);
+        Log_Info("[%ld]: temp = %3d, speed = %f", i, temp, speed);
       seen_0_speed   |= (speed == 0.0f);
       seen_100_speed |= (speed == 100.0f);
     }
 
     if (! seen_0_speed && seen_0_threshold) {
-      Log_Error("%s[%ld]: Didn't see 0.0 speed\n", file, i);
+      Log_Error("%s[%ld]: Didn't see 0.0 speed", file, i);
       ret = 1;
       goto end;
     }
 
     if (! seen_100_speed) {
-      Log_Error("%s[%ld]: Didn't see 100.0 speed\n", file, i);
+      Log_Error("%s[%ld]: Didn't see 100.0 speed", file, i);
       ret = 1;
       goto end;
     }
@@ -138,19 +138,19 @@ int test_model_config(const char* file) {
       Fan_SetTemperature(&fan, temp);
       float speed = Fan_GetTargetSpeed(&fan);
       if (options.verbose)
-        Log_Info("[%ld]: temp = %3d, speed = %f\n", i, temp, speed);
+        Log_Info("[%ld]: temp = %3d, speed = %f", i, temp, speed);
       seen_0_speed   |= (speed == 0.0f);
       seen_100_speed |= (speed == 100.0f);
     }
 
     if (! seen_0_speed && seen_0_threshold) {
-      Log_Error("%s[%ld]: Didn't see 0.0 speed\n", file, i);
+      Log_Error("%s[%ld]: Didn't see 0.0 speed", file, i);
       ret = 1;
       goto end;
     }
 
     if (! seen_100_speed) {
-      Log_Error("%s[%ld]: Didn't see 100.0 speed\n", file, i);
+      Log_Error("%s[%ld]: Didn't see 100.0 speed", file, i);
       ret = 1;
       goto end;
     }

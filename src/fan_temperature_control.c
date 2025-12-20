@@ -340,7 +340,7 @@ void FanTemperatureControl_Log(array_of(FanTemperatureControl)* fans, ModelConfi
     FanTemperatureControl* ftc = &fans->data[fan_index];
 
     for (int i = 0; i < ftc->TemperatureSourcesSize; ++i)
-      Log_Info("Fan #%d (%s) uses '%s' (%s) as temperature source (%s)\n",
+      Log_Info("Fan #%d (%s) uses '%s' (%s) as temperature source (%s)",
         fan_index,
         model_config->FanConfigurations.data[fan_index].FanDisplayName,
         ftc->TemperatureSources[i]->name,

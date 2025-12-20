@@ -288,7 +288,7 @@ static int Server_ReceiveMessage(Client* client) {
     else
       size_to_read = space_left;
 
-    Log_Debug("read(%d, ..., %d)\n", client->fd, size_to_read);
+    Log_Debug("read(%d, ..., %d)", client->fd, size_to_read);
 
     nread = read(client->fd, client->buf + client->bufsz, size_to_read);
 
@@ -318,7 +318,7 @@ static void Server_HandleClient(Client* client) {
   Error e = err_success();
   const nx_json* json = NULL;
 
-  Log_Debug("Server_HandleClient(fd=%d)\n", client->fd);
+  Log_Debug("Server_HandleClient(fd=%d)", client->fd);
 
   if (Server_ReceiveMessage(client) == -1) {
     switch (errno) {
@@ -333,7 +333,7 @@ static void Server_HandleClient(Client* client) {
         goto end;
 
       default:
-        Log_Warn("Client %d read failed: %s\n", client->fd, strerror(errno));
+        Log_Warn("Client %d read failed: %s", client->fd, strerror(errno));
         close(client->fd);
         client->active = false;
         return;
@@ -390,7 +390,7 @@ Error Server_Loop(int timeout) {
   const size_t num_clients = Server_GetNumberOfActiveClients();
   Server_PollFDSize = num_clients + 1;
 
-  Log_Debug("Server_Loop(timeout=%d): num clients: %d\n", timeout, num_clients);
+  Log_Debug("Server_Loop(timeout=%d): num clients: %d", timeout, num_clients);
 
   // Add server file descriptor to Server_PollFDs
   Server_PollFDs[0].fd = Server_FD;
@@ -429,7 +429,7 @@ Error Server_Loop(int timeout) {
     if (Server_PollFDs[idx].revents & POLLIN) {
       Client* client = Server_FindClientByFileDescriptor(Server_PollFDs[idx].fd);
       if (client == NULL)
-        Log_Warn("No client with fd=%d found\n", Server_PollFDs[idx].fd);
+        Log_Warn("No client with fd=%d found", Server_PollFDs[idx].fd);
       else {
         Server_HandleClient(client);
       }
