@@ -2,9 +2,9 @@
 #define _DEFAULT_SOURCE   // endian.h: htole16(), le16toh()
 
 // The data structures returned by nxjson are temporary and are loaded into proper C structs.
-// We allocate memory on the stack to avoid malloc() and reduce memory usage.
-#define NX_JSON_CALLOC(SIZE) ((nx_json*) StackMemory_Calloc(1, SIZE))
-#define NX_JSON_FREE(JSON)   (StackMemory_Free((void*) (JSON)))
+// We allocate memory from a pool to avoid malloc() and reduce memory usage.
+#define NX_JSON_CALLOC(SIZE) ((nx_json*) NXJSON_Memory_Calloc(1, SIZE))
+#define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
 
 #include "config.h"
 #include "ec.c"
@@ -34,7 +34,7 @@
 #include "fs_sensors.c"
 #include "file_utils.c"
 #include "memory.c"
-#include "stack_memory.c"
+#include "nxjson_memory.c"
 #include "model_config.c"
 #include "nxjson.c"
 #include "nvidia.c"

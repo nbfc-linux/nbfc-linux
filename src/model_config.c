@@ -4,7 +4,6 @@
 #include "log.h"
 #include "macros.h"
 #include "memory.h"
-#include "stack_memory.h"
 #include "nxjson_utils.h"
 
 #include <assert.h>  // assert
@@ -619,11 +618,7 @@ err:
 Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
   Error e;
   char file_content[NBFC_MAX_FILE_SIZE];
-  char nxjson_memory[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
-
-  // Use memory from the stack to allocate data structures from nxjson
-  StackMemory_Init(nxjson_memory, sizeof(nxjson_memory));
 
   e = nx_json_parse_file(&js, file_content, sizeof(file_content), file);
   if (e)
@@ -635,7 +630,6 @@ Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
 
 err:
   nx_json_free(js);
-  StackMemory_Destroy();
   return e;
 }
 

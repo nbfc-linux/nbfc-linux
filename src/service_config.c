@@ -5,7 +5,6 @@
 #include "macros.h"
 #include "memory.h"
 #include "trace.h"
-#include "stack_memory.h"
 #include "model_config.h"
 #include "nxjson_utils.h"
 #include "nxjson_write.h"
@@ -21,13 +20,9 @@ Error ServiceConfig_Init(const char* file) {
   Error e;
   Trace trace = {0};
   char file_content[NBFC_MAX_FILE_SIZE];
-  char nxjson_memory[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
 
   Trace_Push(&trace, file);
-
-  // Use memory from the stack to allocate data structures from nxjson
-  StackMemory_Init(nxjson_memory, sizeof(nxjson_memory));
 
   e = nx_json_parse_file(&js, file_content, sizeof(file_content), file);
   if (e)
@@ -76,7 +71,6 @@ Error ServiceConfig_Init(const char* file) {
 
 err:
   nx_json_free(js);
-  StackMemory_Destroy();
   if (e)
     return err_chain_string(e, trace.buf);
 

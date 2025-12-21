@@ -1,3 +1,8 @@
+// The data structures returned by nxjson are temporary and are loaded into proper C structs.
+// We allocate memory from a pool to avoid malloc() and reduce memory usage.
+#define NX_JSON_CALLOC(SIZE) ((nx_json*) NXJSON_Memory_Calloc(1, SIZE))
+#define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
+
 #define _XOPEN_SOURCE  500 // unistd.h: export pwrite()/pread()
 #define _DEFAULT_SOURCE    // endian.h:
 
@@ -42,9 +47,9 @@
 #include "log.c"               // src
 #include "optparse/optparse.c" // src
 #include "memory.c"            // src
+#include "nxjson_memory.c"     // src
 #include "nxjson.c"            // src
 #include "model_config.c"      // src
-#include "stack_memory.c"      // src
 #include "trace.c"             // src
 #include "file_utils.c"        // src
 

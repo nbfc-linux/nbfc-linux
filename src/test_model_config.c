@@ -1,3 +1,8 @@
+// The data structures returned by nxjson are temporary and are loaded into proper C structs.
+// We allocate memory from a pool to avoid malloc() and reduce memory usage.
+#define NX_JSON_CALLOC(SIZE) ((nx_json*) NXJSON_Memory_Calloc(1, SIZE))
+#define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
+
 #define _XOPEN_SOURCE 500 // unistd.h: export pwrite()/pread()
 
 #include <string.h>
@@ -12,12 +17,12 @@
 #include "file_utils.c"
 #include "trace.c"
 #include "memory.c"
+#include "nxjson_memory.c"
 #include "nxjson.c"
 #include "model_config.c"
 #include "program_name.c"
 #include "fan.c"
 #include "temperature_threshold_manager.c"
-#include "stack_memory.c"
 
 const EC_VTable* ec;
 

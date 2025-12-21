@@ -11,7 +11,6 @@
 #include "log.h"
 #include "protocol.h"
 #include "memory.h"
-#include "stack_memory.h"
 
 #include <errno.h>      // errno, EWOULDBLOCK, EAGAIN, EFBIG, EINTR
 #include <stdio.h>      // snprintf
@@ -46,9 +45,6 @@ static nfds_t             Server_PollFDSize = 0;
  * {"Command": "set-fan-speed", "Speed": <SPEED>}
  * {"Command": "set-fan-speed", "Fan": <NUMBER>, "Speed": <SPEED>}
  * {"Command": "set-fan-speed", "Fan": <NUMBER>, "Speed": "auto"}
- *
- * Note: We don't use StackMemory_Init() here, because that has already
- * been called in Server_HandleClient().
  */
 static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
   int fan = -1;
@@ -121,9 +117,6 @@ static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
  * Examples of incoming JSON:
  *
  * {"Command": "status"}
- *
- * Note: We don't use StackMemory_Init() here, because that has already
- * been called in Server_HandleClient().
  */
 static Error Server_Command_Status(int socket, const nx_json* json) {
   if (json->val.children.length > 1)
@@ -340,12 +333,6 @@ static void Server_HandleClient(Client* client) {
     }
   }
 
-  // The functions `Server_Command_Set_Fan()` and `Server_Command_Status()`
-  // are also allocating using this stack, so keep this large
-  char nxjson_memory[NBFC_MAX_FILE_SIZE];
-
-  StackMemory_Init(nxjson_memory, sizeof(nxjson_memory));
-
   json = nx_json_parse_utf8(client->buf);
 
   if (! json) {
@@ -378,7 +365,6 @@ static void Server_HandleClient(Client* client) {
 
 end:
   nx_json_free(json);
-  StackMemory_Destroy();
   if (e)
     Protocol_Send_Error(client->fd, err_print_all(e));
   close(client->fd);
