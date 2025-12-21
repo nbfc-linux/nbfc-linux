@@ -29,4 +29,8 @@ static inline void WriteToErr(const char* s) {
   write(STDERR_FILENO, s, strlen(s));
 }
 
+static inline void WriteToOut(const char* s) {
+  write(STDOUT_FILENO, s, strlen(s));
+}
+
 #endif

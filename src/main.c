@@ -49,6 +49,8 @@ static const char cli_options_str[] = "hve:rfds:c:";
 static void parse_opts(int argc, char* const argv[]) {
   int o;
   int option_index;
+  char help[sizeof(NBFC_SERVICE_HELP_TEXT) + 256];
+
   while ((o = getopt_long(argc, argv, cli_options_str, cli_options, &option_index)) != -1) {
     switch (o) {
     case 'e':
@@ -68,11 +70,23 @@ static void parse_opts(int argc, char* const argv[]) {
         exit(NBFC_EXIT_CMDLINE);
       }
       break;
-    case 'v':  printf("nbfc-linux " NBFC_VERSION "\n"); exit(0);   break;
-    case 'h':  printf(NBFC_SERVICE_HELP_TEXT, argv[0]); exit(0);   break;
-    case 'r':  options.read_only = 1;                              break;
-    case 'f':  options.fork = 1;                                   break;
-    default:   exit(NBFC_EXIT_CMDLINE);
+    case 'v':
+      WriteToOut("nbfc-linux " NBFC_VERSION "\n");
+      exit(0);
+      break;
+    case 'h':
+      snprintf(help, sizeof(help), NBFC_SERVICE_HELP_TEXT, Program_Name);
+      WriteToOut(help);
+      exit(0);
+      break;
+    case 'r':
+      options.read_only = 1;
+      break;
+    case 'f':
+      options.fork = 1;
+      break;
+    default:
+      exit(NBFC_EXIT_CMDLINE);
     }
   }
 
