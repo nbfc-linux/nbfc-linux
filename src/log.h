@@ -2,6 +2,8 @@
 #define LOG_H_
 
 #include <stdbool.h>
+#include <unistd.h> // write
+#include <string.h> // strlen
 
 enum LogLevel {
   LogLevel_Quiet,
@@ -22,5 +24,9 @@ void Log_Log(LogLevel, const char* fmt, ...);
 #define Log_Warn(...)  Log_Log(LogLevel_Warn, __VA_ARGS__)
 #define Log_Info(...)  Log_Log(LogLevel_Info, __VA_ARGS__)
 #define Log_Debug(...) Log_Log(LogLevel_Debug, __VA_ARGS__)
+
+static inline void WriteToErr(const char* s) {
+  write(STDERR_FILENO, s, strlen(s));
+}
 
 #endif

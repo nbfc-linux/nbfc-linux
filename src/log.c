@@ -1,10 +1,12 @@
 #include "log.h"
 
 #include "config.h"
+#include "macros.h"
 #include "program_name.h"
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <unistd.h>
 #if ENABLE_SYSLOG
 #include <syslog.h>
 #endif
@@ -45,7 +47,6 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
 
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
-
     switch (level) {
       case LogLevel_Error: syslog(LOG_ERR,     "%s", buf); break;
       case LogLevel_Warn:  syslog(LOG_WARNING, "%s", buf); break;
@@ -56,15 +57,17 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
   }
 #endif
 
-  const char* s;
-
   switch (level) {
-    case LogLevel_Error: s = "ERROR";   break;
-    case LogLevel_Warn:  s = "WARNING"; break;
-    case LogLevel_Info:  s = "INFO";    break;
-    case LogLevel_Debug: s = "DEBUG";   break;
+    case LogLevel_Error: WriteToErr("ERROR");   break;
+    case LogLevel_Warn:  WriteToErr("WARNING"); break;
+    case LogLevel_Info:  WriteToErr("INFO");    break;
+    case LogLevel_Debug: WriteToErr("DEBUG");   break;
     default: break;
   }
 
-  fprintf(stderr, "%s: %s: %s\n", s, Program_Name, buf);
+  WriteToErr(": ");
+  WriteToErr(Program_Name);
+  WriteToErr(": ");
+  WriteToErr(buf);
+  WriteToErr("\n");
 }

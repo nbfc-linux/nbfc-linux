@@ -2,14 +2,14 @@
 
 #include "macros.h" // unlikely
 #include "nbfc.h"   // NBFC_EXIT_FATAL
+#include "log.h"    // WriteToErr
 
 #include <stdlib.h> // malloc, calloc, realloc, free, exit
 #include <string.h> // strlen, strcpy, strerror
 #include <stdio.h>  // fprintf
-#include <errno.h>  // ENOMEM
 
 static void Memory_FatalError() {
-  fprintf(stderr, "FATAL ERROR: %s\n", strerror(ENOMEM));
+  WriteToErr("FATAL ERROR: Cannot allocate memory\n");
   exit(NBFC_EXIT_FATAL);
 }
 
