@@ -3,7 +3,7 @@
 #include "nbfc.h"
 #include "macros.h"
 #include "nxjson_utils.h"
-#include "reverse_nxjson.h"
+#include "nxjson_write.h"
 #include "error.h"
 #include "fan_temperature_control.h"
 #include "service.h"

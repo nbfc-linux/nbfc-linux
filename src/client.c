@@ -25,7 +25,7 @@
 #include "program_name.c"
 #include "protocol.c"
 #include "nxjson.c"
-#include "reverse_nxjson.c"
+#include "nxjson_write.c"
 #include "service_config.c"
 #include "stack_memory.c"
 #include "trace.c"

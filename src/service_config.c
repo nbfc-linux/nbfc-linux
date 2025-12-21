@@ -8,7 +8,7 @@
 #include "stack_memory.h"
 #include "model_config.h"
 #include "nxjson_utils.h"
-#include "reverse_nxjson.h"
+#include "nxjson_write.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,18 +120,19 @@ Error ServiceConfig_Write(const char* file) {
     }
   }
 
-  char buf[NBFC_MAX_FILE_SIZE];
-  StringBuf s = { buf, 0, sizeof(buf) };
-  buf[0] = '\0';
-
-  nx_json_to_string(o, &s, 0);
-  nx_json_free(o);
-
-  if (write_file(file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
+  int fd = open(file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+  if (fd == -1)
     return err_stdlib(file);
-  }
 
-  return err_success();
+  NX_JSON_Write write_obj = NX_JSON_Write_Init(fd, WriteMode_Write);
+  nx_json_write(&write_obj, o, 0);
+  nx_json_free(o);
+  close(fd);
+
+  if (write_obj.success)
+    return err_success();
+  else
+    return err_stdlib(file);
 }
 
 void ServiceConfig_Free(ServiceConfig* c) {

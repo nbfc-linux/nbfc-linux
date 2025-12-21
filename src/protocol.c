@@ -3,51 +3,20 @@
 #include "nbfc.h"
 #include "memory.h"
 #include "nxjson_utils.h"
-#include "reverse_nxjson.h"
+#include "nxjson_write.h"
 
 #include <unistd.h>
 #include <sys/socket.h>
 
-Error Protocol_Send(int socket, const char* buffer, size_t length) {
-  size_t total_sent = 0;
-
-  while (total_sent < length) {
-    size_t to_send = length - total_sent;
-
-    if (to_send > PROTOCOL_BUFFER_SIZE)
-      to_send = PROTOCOL_BUFFER_SIZE;
-
-    int ret = send(socket, buffer + total_sent, to_send, MSG_NOSIGNAL);
-    if (ret < 0) {
-      if (errno != EINTR && errno != EAGAIN)
-        return err_stdlib("send()");
-      else
-        continue;
-    }
-
-    total_sent += ret;
-  }
-
-  return err_success();
-}
-
 Error Protocol_Send_Json(int socket, const nx_json* json) {
-  Error e;
-  char buf[NBFC_MAX_FILE_SIZE];
-  StringBuf s = { buf, 0, sizeof(buf) };
-  buf[0] = '\0';
-  nx_json_to_string(json, &s, 0);
-  // TODO: handle case if buffer is too small
+  NX_JSON_Write write_obj = NX_JSON_Write_Init(socket, WriteMode_Send);
 
-  e = Protocol_Send(socket, s.s, s.size);
-  if (e)
-    return e;
+  nx_json_write(&write_obj, json, 0);
 
-  e = Protocol_Send_End(socket);
-  if (e)
-    return e;
+  if (! write_obj.success)
+    return err_stdlib("send()");
 
-  return err_success();
+  return Protocol_Send_End(socket);
 }
 
 Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
