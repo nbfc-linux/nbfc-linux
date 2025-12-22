@@ -17,6 +17,7 @@
 #include "parse_double.h"
 #include "client/client_global.h"
 
+#include "buffer.c"
 #include "log.c"
 #include "error.c"
 #include "file_utils.c"

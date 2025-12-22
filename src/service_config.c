@@ -4,6 +4,7 @@
 #include "error.h"
 #include "macros.h"
 #include "memory.h"
+#include "buffer.h"
 #include "trace.h"
 #include "model_config.h"
 #include "nxjson_utils.h"
@@ -19,12 +20,12 @@ ServiceConfig service_config = {0};
 Error ServiceConfig_Init(const char* file) {
   Error e;
   Trace trace = {0};
-  char file_content[NBFC_MAX_FILE_SIZE];
+  char* file_content = Buffer_Get();
   const nx_json* js = NULL;
 
   Trace_Push(&trace, file);
 
-  e = nx_json_parse_file(&js, file_content, sizeof(file_content), file);
+  e = nx_json_parse_file(&js, file_content, BUFFER_SIZE, file);
   if (e)
     goto err;
 
@@ -71,6 +72,7 @@ Error ServiceConfig_Init(const char* file) {
 
 err:
   nx_json_free(js);
+  Buffer_Release(file_content);
   if (e)
     return err_chain_string(e, trace.buf);
 

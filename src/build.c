@@ -26,6 +26,7 @@
 #endif
 
 #include "acpi_call.c"
+#include "buffer.c"
 #include "log.c"
 #include "error.c"
 #include "trace.c"

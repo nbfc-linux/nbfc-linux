@@ -4,6 +4,7 @@
 #include "log.h"
 #include "macros.h"
 #include "memory.h"
+#include "buffer.h"
 #include "nxjson_utils.h"
 
 #include <assert.h>  // assert
@@ -617,10 +618,10 @@ err:
 
 Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
   Error e;
-  char file_content[NBFC_MAX_FILE_SIZE];
+  char* file_content = Buffer_Get();
   const nx_json* js = NULL;
 
-  e = nx_json_parse_file(&js, file_content, sizeof(file_content), file);
+  e = nx_json_parse_file(&js, file_content, BUFFER_SIZE, file);
   if (e)
     goto err;
 
@@ -630,6 +631,7 @@ Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
 
 err:
   nx_json_free(js);
+  Buffer_Release(file_content);
   return e;
 }
 

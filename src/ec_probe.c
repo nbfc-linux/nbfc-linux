@@ -44,6 +44,7 @@
 #endif
 
 #include "acpi_call.c"         // src
+#include "buffer.c"            // src
 #include "log.c"               // src
 #include "optparse/optparse.c" // src
 #include "memory.c"            // src

@@ -12,6 +12,7 @@
 
 #include "ec.h"
 #include "nbfc.h"
+#include "buffer.c"
 #include "log.c"
 #include "error.c"
 #include "file_utils.c"
