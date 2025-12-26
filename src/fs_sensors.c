@@ -1,6 +1,7 @@
 #include "fs_sensors.h"
 
 #include "memory.h"
+#include "buffer.h"
 #include "file_utils.h"
 #include "log.h"
 #include "sleep.h"
@@ -59,19 +60,21 @@ Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out
   return err_success();
 }
 
+#define FS_SENSORS_MAX_SOURCES 256
+#define FS_SENSORS_BUFFER_SIZE (sizeof(FS_TemperatureSource) * FS_SENSORS_MAX_SOURCES)
+
 static Error FS_Sensors_Init_HwMon() {
   Error e;
-  FS_TemperatureSource sources[64];
-  FS_TemperatureSource *source = sources;
-  FS_TemperatureSource *const sources_end = &sources[ARRAY_SIZE(sources)];
-  char dir[PATH_MAX];
-  char file[PATH_MAX];
-  int n_sources;
+  char* dir = Buffer_Get(PATH_MAX);
+  char* file = Buffer_Get(PATH_MAX);
+  char* filename = Buffer_Get(PATH_MAX);
+  FS_TemperatureSource* sources = (FS_TemperatureSource*) Buffer_Get(FS_SENSORS_BUFFER_SIZE);
+  int n_sources = 0;
 
   for (const char* const* hwmonDir = LinuxHwmonDirs; *hwmonDir; ++hwmonDir) {
     for (int i = 0; i < 10; i++) {
-      snprintf(dir,  sizeof(dir), *hwmonDir, i);
-      snprintf(file, sizeof(file), "%s/name", dir);
+      snprintf(dir,  PATH_MAX, *hwmonDir, i);
+      snprintf(file, PATH_MAX, "%s/name", dir);
 
       char source_name[256];
       int nread = slurp_file(source_name, sizeof(source_name), file);
@@ -87,10 +90,13 @@ static Error FS_Sensors_Init_HwMon() {
         source_name[nread--] = '\0'; /* strip whitespace */
 
       for (int j = 0; j < 10; j++) {
-        char filename[PATH_MAX];
-        snprintf(filename, sizeof(filename), LinuxTempSensorFile, j);
-        snprintf(file, sizeof(file), "%s/%s", dir, filename);
+        if (n_sources >= FS_SENSORS_MAX_SOURCES)
+          goto end;
 
+        snprintf(filename, PATH_MAX, LinuxTempSensorFile, j);
+        snprintf(file, PATH_MAX, "%s/%s", dir, filename);
+
+        FS_TemperatureSource* source = &sources[n_sources];
         source->name = source_name;
         source->file = file;
         source->multiplier = 0.001;
@@ -103,22 +109,28 @@ static Error FS_Sensors_Init_HwMon() {
 #endif
         if (e)
           continue;
+
+        ++n_sources;
         source->name = Mem_Strdup(source->name);
         source->file = Mem_Strdup(source->file);
-        if (++source == sources_end)
-          goto end;
       }
     }
   }
 
 end:
-  n_sources = source - sources;
-  if (! n_sources)
+  Buffer_Release(dir, PATH_MAX);
+  Buffer_Release(file, PATH_MAX);
+  Buffer_Release(filename, PATH_MAX);
+
+  if (! n_sources) {
+    Buffer_Release((char*) sources, FS_SENSORS_BUFFER_SIZE);
     return err_string("No temperature sources found");
+  }
 
   FS_Sensors_Sources.size = n_sources;
   FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Malloc(n_sources * sizeof(FS_TemperatureSource));
   memcpy(FS_Sensors_Sources.data, sources, n_sources * sizeof(FS_TemperatureSource));
+  Buffer_Release((char*) sources, FS_SENSORS_BUFFER_SIZE);
   return err_success();
 }
 

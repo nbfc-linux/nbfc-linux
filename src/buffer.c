@@ -2,41 +2,46 @@
 
 #include "memory.h"
 
-#include <stdbool.h>
+#include <sys/mman.h>
 
 /*
- * NOTE: Static buffers are used instead of large stack allocations on purpose.
+ * Why mmap() is used instead of stack or static allocations:
  *
- * Although stack memory is often considered "cheap", large stack frames
- * significantly increase the process' resident set size (RSS) on Linux,
- * because stack pages are faulted in eagerly and remain mapped for the
- * lifetime of the thread.
+ * - Stack allocations permanently increase the maximum stack usage of the
+ *   process, even if the memory is only needed temporarily. Large stack
+ *   frames can force the kernel to commit additional stack pages and raise
+ *   the process' resident memory footprint.
  *
- * In contrast, static (.bss / .data) buffers are backed by demand-paged
- * anonymous memory and only consume physical memory once actually touched,
- * without growing the per-thread stack. This results in a lower and more
- * predictable runtime memory footprint, especially for large temporary
- * buffers that are not used concurrently.
+ * - Static/global allocations live for the entire lifetime of the process.
+ *   Even though they may be lazily paged in, they reserve address space
+ *   unconditionally and cannot be released back to the operating system.
+ *
+ * - mmap() provides on-demand, page-granular memory:
+ *   Physical memory is only committed when the pages are actually touched.
+ *   Memory can be fully returned to the kernel via munmap().
+ *   Large temporary buffers do not permanently inflate RSS or stack usage.
+ *
+ * Using mmap() for large or temporary allocations keeps memory usage low,
+ * avoids unnecessary stack growth, and allows the kernel to reclaim memory
+ * when it is no longer needed.
  */
 
-static char Buffer_Buf[BUFFER_SIZE];
-static bool Buffer_Used = false;
+char* Buffer_Get(size_t size) {
+  void* p = mmap(
+    NULL,
+    size,
+    PROT_READ | PROT_WRITE,
+    MAP_PRIVATE | MAP_ANONYMOUS,
+    -1,
+    0
+  );
 
-char* Buffer_Get() {
-  if (Buffer_Used) {
-    // Defensive malloc() fallback. Should never happen.
-    return Mem_Malloc(BUFFER_SIZE);
-  }
+  if (p == MAP_FAILED)
+    Memory_FatalError();
 
-  Buffer_Used = true;
-  return Buffer_Buf;
+  return (char*) p;
 }
 
-void Buffer_Release(char* buffer) {
-  if (buffer == Buffer_Buf) {
-    Buffer_Used = false;
-  }
-  else {
-    Mem_Free(buffer);
-  }
+void Buffer_Release(char* buffer, size_t size) {
+  munmap(buffer, size);
 }

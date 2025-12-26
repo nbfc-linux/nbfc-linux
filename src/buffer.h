@@ -3,9 +3,9 @@
 
 #include "nbfc.h"
 
-#define BUFFER_SIZE NBFC_MAX_FILE_SIZE
+#include <sys/types.h>
 
-char* Buffer_Get();
-void  Buffer_Release(char*);
+char* Buffer_Get(size_t);
+void  Buffer_Release(char*, size_t);
 
 #endif

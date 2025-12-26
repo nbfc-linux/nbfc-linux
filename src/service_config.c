@@ -20,12 +20,12 @@ ServiceConfig service_config = {0};
 Error ServiceConfig_Init(const char* file) {
   Error e;
   Trace trace = {0};
-  char* file_content = Buffer_Get();
+  char* file_content = Buffer_Get(NBFC_MAX_FILE_SIZE);
   const nx_json* js = NULL;
 
   Trace_Push(&trace, file);
 
-  e = nx_json_parse_file(&js, file_content, BUFFER_SIZE, file);
+  e = nx_json_parse_file(&js, file_content, NBFC_MAX_FILE_SIZE, file);
   if (e)
     goto err;
 
@@ -72,7 +72,7 @@ Error ServiceConfig_Init(const char* file) {
 
 err:
   nx_json_free(js);
-  Buffer_Release(file_content);
+  Buffer_Release(file_content, NBFC_MAX_FILE_SIZE);
   if (e)
     return err_chain_string(e, trace.buf);
 

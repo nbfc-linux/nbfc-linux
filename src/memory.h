@@ -9,6 +9,8 @@
 
 #define MEMORY_TRACE __FILE__ ":" STRINGIFY(__LINE__)
 
+void Memory_FatalError();
+
 #if MEMORY_TRACE_ALLOCS
 
 void* Memory_Malloc(const char* trace, size_t);

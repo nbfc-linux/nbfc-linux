@@ -14,6 +14,7 @@
 #include "nbfc.h"
 #include "trace.h"
 #include "memory.h"
+#include "buffer.h"
 #include "macros.h"
 #include "model_config.h"
 
@@ -51,7 +52,7 @@ static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 Error Service_Init() {
   Error e;
   Trace trace = {0};
-  char path[PATH_MAX];
+  char* path = Buffer_Get(PATH_MAX);
   Service_State = Initialized_0_None;
 
   // Service config ===========================================================
@@ -184,9 +185,11 @@ Error Service_Init() {
 
   FanTemperatureControl_Log(&Service_Fans, &Service_Model_Config);
 
+  Buffer_Release(path, PATH_MAX);
   return err_success();
 
 error:
+  Buffer_Release(path, PATH_MAX);
   Service_Cleanup();
   return e;
 }

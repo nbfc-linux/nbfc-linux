@@ -618,10 +618,10 @@ err:
 
 Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
   Error e;
-  char* file_content = Buffer_Get();
+  char* file_content = Buffer_Get(NBFC_MAX_FILE_SIZE);
   const nx_json* js = NULL;
 
-  e = nx_json_parse_file(&js, file_content, BUFFER_SIZE, file);
+  e = nx_json_parse_file(&js, file_content, NBFC_MAX_FILE_SIZE, file);
   if (e)
     goto err;
 
@@ -631,7 +631,7 @@ Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
 
 err:
   nx_json_free(js);
-  Buffer_Release(file_content);
+  Buffer_Release(file_content, NBFC_MAX_FILE_SIZE);
   return e;
 }
 
