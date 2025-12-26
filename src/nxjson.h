@@ -87,7 +87,7 @@ enum nx_json_error { NX_JSON_FOREACH_ERRORS(NX_JSON_Callback) };
 extern int                NX_JSON_SRC_LINE;
 extern enum nx_json_error NX_JSON_ERROR;
 extern const char*        NX_JSON_STRING_POS;
-extern const char*        NX_JSON_MSGS[NX_JSON_ERR_INVALID_NUMBER + 1];
+extern const char* const  NX_JSON_MSGS[NX_JSON_ERR_INVALID_NUMBER + 1];
 
 #ifdef  __cplusplus
 }
