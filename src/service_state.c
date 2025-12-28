@@ -14,11 +14,12 @@ ServiceState service_state = {0};
 
 Error ServiceState_Init() {
   Error e;
-  Trace trace = {0};
+  Trace* trace = (Trace*) Buffer_Get(sizeof(Trace));
   char* file_content = Buffer_Get(NBFC_MAX_FILE_SIZE);
   const nx_json* js = NULL;
 
-  Trace_Push(&trace, NBFC_STATE_FILE);
+  Trace_Init(trace);
+  Trace_Push(trace, NBFC_STATE_FILE);
 
   e = nx_json_parse_file(&js, file_content, NBFC_MAX_FILE_SIZE, NBFC_STATE_FILE);
   if (e)
@@ -33,28 +34,31 @@ Error ServiceState_Init() {
     goto err;
 
   for_each_array(float*, f, service_state.TargetFanSpeeds) {
-    Trace_Push(&trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_state.TargetFanSpeeds.data));
+    Trace_Push(trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_state.TargetFanSpeeds.data));
 
     if (*f > 100.0f) {
-      Log_Warn("%s: Value cannot be greater than 100.0", trace.buf);
+      Log_Warn("%s: Value cannot be greater than 100.0", trace->buf);
       *f = 100.0f;
     }
 
     if (*f < 0.0f && *f != -1.0f) {
-      Log_Warn("%s: Please use `-1' for selecting auto mode", trace.buf);
+      Log_Warn("%s: Please use `-1' for selecting auto mode", trace->buf);
       *f = -1.0f;
     }
 
-    Trace_Pop(&trace);
+    Trace_Pop(trace);
   }
 
 err:
   nx_json_free(js);
-  Buffer_Release(file_content, NBFC_MAX_FILE_SIZE);
-  if (e)
-    return err_chain_string(e, trace.buf);
 
-  return err_success();
+  if (e)
+    e = err_chain_string(e, trace->buf);
+
+  Buffer_Release(file_content, NBFC_MAX_FILE_SIZE);
+  Buffer_Release((char*) trace, sizeof(Trace));
+
+  return e;
 }
 
 Error ServiceState_Write() {

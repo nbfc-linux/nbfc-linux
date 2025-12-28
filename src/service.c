@@ -51,8 +51,10 @@ static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
 Error Service_Init() {
   Error e;
-  Trace trace = {0};
+  Trace* trace = (Trace*) Buffer_Get(sizeof(Trace));
   char* path = Buffer_Get(PATH_MAX);
+
+  Trace_Init(trace);
   Service_State = Initialized_0_None;
 
   // Service config ===========================================================
@@ -87,8 +89,8 @@ Error Service_Init() {
 
   Service_State = Initialized_2_Model_Config;
 
-  Trace_Push(&trace, path);
-  e = ModelConfig_Validate(&trace, &Service_Model_Config);
+  Trace_Push(trace, path);
+  e = ModelConfig_Validate(trace, &Service_Model_Config);
   if (e)
     goto error;
 
@@ -185,12 +187,14 @@ Error Service_Init() {
 
   FanTemperatureControl_Log(&Service_Fans, &Service_Model_Config);
 
-  Buffer_Release(path, PATH_MAX);
-  return err_success();
-
 error:
+
   Buffer_Release(path, PATH_MAX);
-  Service_Cleanup();
+  Buffer_Release((char*) trace, sizeof(Trace));
+
+  if (e)
+    Service_Cleanup();
+
   return e;
 }
 

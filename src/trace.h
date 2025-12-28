@@ -1,5 +1,7 @@
-#ifndef TRACE_H_
-#define TRACE_H_
+#ifndef NBFC_TRACE_H_
+#define NBFC_TRACE_H_
+
+#include <string.h> // memset
 
 struct Trace {
   char buf[4096];
@@ -10,5 +12,9 @@ typedef struct Trace Trace;
 
 void Trace_Push(Trace*, const char*, ...);
 void Trace_Pop(Trace*);
+
+static inline void Trace_Init(Trace* trace) {
+  memset(trace, 0, sizeof(Trace));
+}
 
 #endif
