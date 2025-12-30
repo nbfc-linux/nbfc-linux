@@ -311,7 +311,7 @@ static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
       return ec->WriteByte(cfg->Register, cfg->ResetValue | mask);
 
     case RegisterWriteMode_Call:
-      e = AcpiCall_Call_Str(cfg->ResetAcpiMethod, &out);
+      e = AcpiCall_Call(cfg->ResetAcpiMethod, 0, &out);
       if (e)
         return err_chain_string(e, "ResetAcpiMethod");
       else
@@ -352,7 +352,7 @@ static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
       return ec->WriteByte(cfg->Register, cfg->Value | mask);
 
     case RegisterWriteMode_Call:
-      e = AcpiCall_Call_Str(cfg->AcpiMethod, &out);
+      e = AcpiCall_Call(cfg->AcpiMethod, 0, &out);
       if (e)
         return err_chain_string(e, "AcpiMethod");
       else

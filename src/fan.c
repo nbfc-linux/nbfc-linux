@@ -87,7 +87,7 @@ static float Fan_FanSpeedToPercentage(const Fan* self, uint16_t fanSpeed) {
 static Error Fan_ECWriteValue(Fan* self, uint16_t value) {
   if (my.fanConfig->WriteAcpiMethod) {
     uint64_t out;
-    Error e = AcpiCall_CallTemplate(my.fanConfig->WriteAcpiMethod, value, &out);
+    Error e = AcpiCall_Call(my.fanConfig->WriteAcpiMethod, value, &out);
     if (e)
       return err_chain_string(e, "WriteAcpiMethod");
     else
@@ -104,7 +104,7 @@ static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {
 
   if (my.fanConfig->ReadAcpiMethod) {
     uint64_t val;
-    e = AcpiCall_Call_Str(my.fanConfig->ReadAcpiMethod, &val);
+    e = AcpiCall_Call(my.fanConfig->ReadAcpiMethod, 0, &val);
     if (e)
       return err_chain_string(e, "ReadAcpiMethod");
     else
@@ -211,7 +211,7 @@ Error Fan_ECReset(Fan* self) {
 
   if (my.fanConfig->ResetAcpiMethod) {
     uint64_t out;
-    Error e = AcpiCall_Call_Str(my.fanConfig->ResetAcpiMethod, &out);
+    Error e = AcpiCall_Call(my.fanConfig->ResetAcpiMethod, 0, &out);
     if (e)
       return err_chain_string(e, "ResetAcpiMethod");
     else

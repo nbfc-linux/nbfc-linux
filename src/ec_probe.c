@@ -557,7 +557,7 @@ static int AcpiCall() {
   }
 
   uint64_t out;
-  e = AcpiCall_Call(cmd, cmd_len, &out);
+  e = AcpiCall_Call(cmd, 0, &out);
   e_die();
   printf("0x%lX\n", out);
 
