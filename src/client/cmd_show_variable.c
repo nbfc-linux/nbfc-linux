@@ -20,7 +20,7 @@ struct {
 
 int Show_Variable() {
   if (! Show_Variable_Options.variable) {
-    Log_Error("Missing argument: VARIABLE\n");
+    Log_Error("Missing argument: VARIABLE");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -37,7 +37,7 @@ int Show_Variable() {
     printf("%s\n", NBFC_MODEL_CONFIGS_DIR);
   else {
     ret = NBFC_EXIT_FAILURE;
-    Log_Error("Unknown variable '%s'. Choose from 'config_file', 'socket_file', 'pid_file', 'model_configs_dir'\n",
+    Log_Error("Unknown variable '%s'. Choose from 'config_file', 'socket_file', 'pid_file', 'model_configs_dir'",
       Show_Variable_Options.variable);
   }
 

@@ -99,23 +99,23 @@ RegisterWriteConfiguration</em></p>
 <blockquote>
 <p>The register which NBFC uses to control the fan.</p>
 </blockquote>
-<p><strong>ReadAcpiCommand</strong>: <em>String</em></p>
+<p><strong>ReadAcpiMethod</strong>: <em>String</em></p>
 <blockquote>
 <p>The ACPI method for reading the fan speed.</p>
 <p>Example:</p>
 <blockquote>
-<p>"ReadAcpiCommand": "\\_SB.PCI0.LPCB.EC0.GFSD"</p>
+<p>"ReadAcpiMethod": "\\_SB.PCI0.LPCB.EC0.GFSD"</p>
 </blockquote>
 <p>This option is mutually exclusive to <strong>ReadRegister</strong>.
 Only one of them can be set at a time.</p>
 </blockquote>
-<p><strong>WriteAcpiCommand</strong>: <em>String</em></p>
+<p><strong>WriteAcpiMethod</strong>: <em>String</em></p>
 <blockquote>
 <p>The ACPI method for writing the fan speed. The command must contain a
 placeholder ($) which will be replaced by the fan speed.</p>
 <p>Example:</p>
 <blockquote>
-<p>"WriteAcpiCommand": "\\_SB.PCI0.LPCB.EC0.SFSD $"</p>
+<p>"WriteAcpiMethod": "\\_SB.PCI0.LPCB.EC0.SFSD $"</p>
 </blockquote>
 <p>This option is mutually exclusive to <strong>WriteRegister</strong>.
 Only one of them can be set at a time.</p>
@@ -159,7 +159,7 @@ down.</p>
 <p>Defines the value which will be written to
 <strong>WriteRegister</strong> to reset the EC.</p>
 </blockquote>
-<p><strong>ResetAcpiCommand</strong>: <em>String</em></p>
+<p><strong>ResetAcpiMethod</strong>: <em>String</em></p>
 <blockquote>
 <p>The ACPI method to call upon fan reset.</p>
 <p>This option is mutually exclusive to
@@ -210,8 +210,7 @@ register &amp; value)</p></li>
 <li><p><strong>Or</strong>: performs a binary OR operation (register =
 register | value)</p></li>
 <li><p><strong>Call</strong>: calls the ACPI method stored in
-<strong>AcpiCommand</strong> or
-<strong>ResetAcpiCommand</strong></p></li>
+<strong>AcpiMethod</strong> or <strong>ResetAcpiMethod</strong></p></li>
 </ul>
 </blockquote>
 <p><strong>WriteOccasion</strong>: <em>String</em></p>
@@ -234,7 +233,7 @@ fan speed is set.</p></li>
 <blockquote>
 <p>The value which will be written.</p>
 </blockquote>
-<p><strong>AcpiCommand</strong>: <em>String</em></p>
+<p><strong>AcpiMethod</strong>: <em>String</em></p>
 <blockquote>
 <p>The ACPI method to call.</p>
 <p>This option is mutually exclusive to <strong>Value</strong>. Only one
@@ -249,7 +248,7 @@ down.</p>
 <blockquote>
 <p>The value which will be written upon reset.</p>
 </blockquote>
-<p><strong>ResetAcpiCommand</strong>: <em>String</em></p>
+<p><strong>ResetAcpiMethod</strong>: <em>String</em></p>
 <blockquote>
 <p>The ACPI method to call upon reset.</p>
 <p>This option is mutually exclusive to <strong>ResetValue</strong>.

@@ -56,7 +56,7 @@ enum nx_json_error NX_JSON_ERROR;
 const char*        NX_JSON_STRING_POS;
 
 #define NX_JSON_Callback(_, MSG) MSG,
-const char* NX_JSON_MSGS[NX_JSON_ERR_INVALID_NUMBER + 1] = {
+const char* const NX_JSON_MSGS[NX_JSON_ERR_INVALID_NUMBER + 1] = {
   NX_JSON_FOREACH_ERRORS(NX_JSON_Callback)
 };
 #undef  NX_JSON_Callback

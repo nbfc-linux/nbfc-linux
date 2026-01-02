@@ -97,25 +97,25 @@ Defines how NBFC controls a fan
 
 > The register which NBFC uses to control the fan.
 
-**ReadAcpiCommand**: *String*
+**ReadAcpiMethod**: *String*
 
 > The ACPI method for reading the fan speed.
 >
 > Example:
 >
-> > \"ReadAcpiCommand\": \"\\\\\_SB.PCI0.LPCB.EC0.GFSD\"
+> > \"ReadAcpiMethod\": \"\\\\\_SB.PCI0.LPCB.EC0.GFSD\"
 >
 > This option is mutually exclusive to **ReadRegister**. Only one of
 > them can be set at a time.
 
-**WriteAcpiCommand**: *String*
+**WriteAcpiMethod**: *String*
 
 > The ACPI method for writing the fan speed. The command must contain a
 > placeholder (\$) which will be replaced by the fan speed.
 >
 > Example:
 >
-> > \"WriteAcpiCommand\": \"\\\\\_SB.PCI0.LPCB.EC0.SFSD \$\"
+> > \"WriteAcpiMethod\": \"\\\\\_SB.PCI0.LPCB.EC0.SFSD \$\"
 >
 > This option is mutually exclusive to **WriteRegister**. Only one of
 > them can be set at a time.
@@ -155,7 +155,7 @@ Defines how NBFC controls a fan
 > Defines the value which will be written to **WriteRegister** to reset
 > the EC.
 
-**ResetAcpiCommand**: *String*
+**ResetAcpiMethod**: *String*
 
 > The ACPI method to call upon fan reset.
 >
@@ -209,8 +209,8 @@ Allows to write to any EC register
 > -   **Or**: performs a binary OR operation (register = register \|
 >     value)
 >
-> -   **Call**: calls the ACPI method stored in **AcpiCommand** or
->     **ResetAcpiCommand**
+> -   **Call**: calls the ACPI method stored in **AcpiMethod** or
+>     **ResetAcpiMethod**
 
 **WriteOccasion**: *String*
 
@@ -231,7 +231,7 @@ Allows to write to any EC register
 
 > The value which will be written.
 
-**AcpiCommand**: *String*
+**AcpiMethod**: *String*
 
 > The ACPI method to call.
 >
@@ -247,7 +247,7 @@ Allows to write to any EC register
 
 > The value which will be written upon reset.
 
-**ResetAcpiCommand**: *String*
+**ResetAcpiMethod**: *String*
 
 > The ACPI method to call upon reset.
 >

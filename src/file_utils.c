@@ -33,8 +33,5 @@ ssize_t write_file(const char* file, int flags, mode_t mode, const char* content
   close(fd);
   errno = old_errno;
 
-  if (nwritten == -1)
-    return -1;
-
   return nwritten;
 }

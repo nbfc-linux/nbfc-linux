@@ -12,6 +12,6 @@ typedef enum Nvidia_Error Nvidia_Error;
 
 Nvidia_Error Nvidia_Init();
 void         Nvidia_Close();
-Error*       Nvidia_GetTemperature(float*);
+Error        Nvidia_GetTemperature(float*);
 
 #endif

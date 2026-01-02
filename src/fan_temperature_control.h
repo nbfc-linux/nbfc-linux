@@ -19,8 +19,8 @@ struct FanTemperatureControl {
 typedef struct FanTemperatureControl FanTemperatureControl;
 declare_array_of(FanTemperatureControl);
 
-Error* FanTemperatureControl_Init(array_of(FanTemperatureControl)*, ServiceConfig*, ModelConfig*);
-Error* FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl*);
-void   FanTemperatureControl_Log(array_of(FanTemperatureControl)*, ModelConfig*);
+Error FanTemperatureControl_Init(array_of(FanTemperatureControl)*, ServiceConfig*, ModelConfig*);
+Error FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl*);
+void  FanTemperatureControl_Log(array_of(FanTemperatureControl)*, ModelConfig*);
 
 #endif

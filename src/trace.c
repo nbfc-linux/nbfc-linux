@@ -30,6 +30,6 @@ void Trace_Pop(Trace* trace) {
   if (! trace->stack_size)
     return;
 
-  const size_t previous_len = trace->stack[--trace->stack_size];
+  const unsigned int previous_len = trace->stack[--trace->stack_size];
   trace->buf[previous_len] = '\0';
 }

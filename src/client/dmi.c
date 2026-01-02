@@ -30,7 +30,7 @@ const char* DMI_Get_System_Product() {
   return buf;
 
 error:
-  Log_Error("Could not get product name. Failed to read " DMI_ProductNameFile ": %s\n", strerror(errno));
+  Log_Error("Could not get product name. Failed to read " DMI_ProductNameFile ": %s", strerror(errno));
   exit(NBFC_EXIT_FAILURE);
 }
 
@@ -50,7 +50,7 @@ const char* DMI_Get_System_Vendor() {
   return buf;
 
 error:
-  Log_Error("Could not get system vendor. Failed to read " DMI_SysVendorFile ": %s\n", strerror(errno));
+  Log_Error("Could not get system vendor. Failed to read " DMI_SysVendorFile ": %s", strerror(errno));
   exit(NBFC_EXIT_FAILURE);
 }
 

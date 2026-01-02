@@ -19,7 +19,7 @@ ifeq ($(BUILD), debug)
 	CFLAGS   = -Og -g
 else
 	CPPFLAGS = -DNDEBUG
-	CFLAGS   = -Wall -Os -flto
+	CFLAGS   = -Wall -Os -flto -fno-unwind-tables -fno-asynchronous-unwind-tables -fomit-frame-pointer
 	LDFLAGS  = -s
 endif
 
@@ -280,7 +280,7 @@ src/nbfc: \
 	src/mkdir_p.c src/mkdir_p.h \
 	src/optparse/optparse.h src/optparse/optparse.c \
 	src/protocol.c src/protocol.h \
-	src/nxjson.c src/reverse_nxjson.c src/nxjson.h \
+	src/nxjson.c src/nxjson_write.c src/nxjson.h \
 	src/nbfc.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
 

@@ -1,6 +1,6 @@
 #include "program_name.h"
 
-const char* Program_Name = "unkown";
+const char* Program_Name = "?";
 
 void Program_Name_Set(const char* path) {
   for (const char* c = path; *c; ++c)

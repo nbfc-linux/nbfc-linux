@@ -9,15 +9,15 @@
 
 typedef struct EC_VTable EC_VTable;
 struct EC_VTable {
-  Error* (*Open)();
-  void   (*Close)();
-  Error* (*ReadByte)(uint8_t, uint8_t*);
-  Error* (*ReadWord)(uint8_t, uint16_t*);
-  Error* (*WriteByte)(uint8_t, uint8_t);
-  Error* (*WriteWord)(uint8_t, uint16_t);
+  Error (*Open)();
+  void  (*Close)();
+  Error (*ReadByte)(uint8_t, uint8_t*);
+  Error (*ReadWord)(uint8_t, uint16_t*);
+  Error (*WriteByte)(uint8_t, uint8_t);
+  Error (*WriteWord)(uint8_t, uint16_t);
 };
 
-bool   EC_CheckWorking(EC_VTable*);
-Error* EC_FindWorking(EC_VTable**);
+bool  EC_CheckWorking(const EC_VTable*);
+Error EC_FindWorking(const EC_VTable**);
 
 #endif

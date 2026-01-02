@@ -3,28 +3,25 @@
 #include "nbfc.h"
 #include "macros.h"
 #include "memory.h"
+#include "buffer.h"
 #include "trace.h"
-#include "stack_memory.h"
 #include "nxjson_utils.h"
-#include "reverse_nxjson.h"
+#include "nxjson_write.h"
 
 #include <sys/stat.h>
 
 ServiceState service_state = {0};
 
-Error* ServiceState_Init() {
-  Error* e;
-  Trace trace = {0};
-  char file_content[NBFC_MAX_FILE_SIZE];
-  char nxjson_memory[NBFC_MAX_FILE_SIZE];
+Error ServiceState_Init() {
+  Error e;
+  Trace* trace = (Trace*) Buffer_Get(sizeof(Trace));
+  char* file_content = Buffer_Get(NBFC_MAX_FILE_SIZE);
   const nx_json* js = NULL;
 
-  Trace_Push(&trace, NBFC_STATE_FILE);
+  Trace_Init(trace);
+  Trace_Push(trace, NBFC_STATE_FILE);
 
-  // Use memory from the stack to allocate data structures from nxjson
-  StackMemory_Init(nxjson_memory, sizeof(nxjson_memory));
-
-  e = nx_json_parse_file(&js, file_content, sizeof(file_content), NBFC_STATE_FILE);
+  e = nx_json_parse_file(&js, file_content, NBFC_MAX_FILE_SIZE, NBFC_STATE_FILE);
   if (e)
     goto err;
 
@@ -37,31 +34,34 @@ Error* ServiceState_Init() {
     goto err;
 
   for_each_array(float*, f, service_state.TargetFanSpeeds) {
-    Trace_Push(&trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_state.TargetFanSpeeds.data));
+    Trace_Push(trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_state.TargetFanSpeeds.data));
 
     if (*f > 100.0f) {
-      Log_Warn("%s: Value cannot be greater than 100.0\n", trace.buf);
+      Log_Warn("%s: Value cannot be greater than 100.0", trace->buf);
       *f = 100.0f;
     }
 
     if (*f < 0.0f && *f != -1.0f) {
-      Log_Warn("%s: Please use `-1' for selecting auto mode\n", trace.buf);
+      Log_Warn("%s: Please use `-1' for selecting auto mode", trace->buf);
       *f = -1.0f;
     }
 
-    Trace_Pop(&trace);
+    Trace_Pop(trace);
   }
 
 err:
   nx_json_free(js);
-  StackMemory_Destroy();
-  if (e)
-    return err_string(e, trace.buf);
 
-  return err_success();
+  if (e)
+    e = err_chain_string(e, trace->buf);
+
+  Buffer_Release(file_content, NBFC_MAX_FILE_SIZE);
+  Buffer_Release((char*) trace, sizeof(Trace));
+
+  return e;
 }
 
-Error* ServiceState_Write() {
+Error ServiceState_Write() {
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
 
@@ -72,18 +72,19 @@ Error* ServiceState_Write() {
       create_json_double(NULL, fanspeeds, *f);
   }
 
-  char buf[NBFC_MAX_FILE_SIZE];
-  StringBuf s = { buf, 0, sizeof(buf) };
-  buf[0] = '\0';
+  int fd = open(NBFC_STATE_FILE, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+  if (fd == -1)
+    return err_stdlib(NBFC_STATE_FILE);
 
-  nx_json_to_string(o, &s, 0);
+  NX_JSON_Write write_obj = NX_JSON_Write_Init(fd, WriteMode_Write);
+  nx_json_write(&write_obj, o, 0);
   nx_json_free(o);
+  close(fd);
 
-  if (write_file(NBFC_STATE_FILE, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
-    return err_stdlib(0, NBFC_STATE_FILE);
-  }
-
-  return err_success();
+  if (write_obj.success)
+    return err_success();
+  else
+    return err_stdlib(NBFC_STATE_FILE);
 }
 
 void ServiceState_Free() {

@@ -3,8 +3,8 @@
 
 #include "error.h"
 
-Error* Server_Init();
-Error* Server_Loop(int);
-void   Server_Close();
+Error Server_Init();
+Error Server_Loop(int);
+void  Server_Close();
 
 #endif

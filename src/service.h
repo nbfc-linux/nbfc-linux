@@ -24,9 +24,9 @@ extern ModelConfig     Service_Model_Config;
 extern array_of(FanTemperatureControl) Service_Fans;
 extern Service_Options options;
 
-Error* Service_Init();
-Error* Service_Loop();
-void   Service_Cleanup();
-void   Service_WriteTargetFanSpeedsToState();
+Error Service_Init();
+Error Service_Loop();
+void  Service_Cleanup();
+void  Service_WriteTargetFanSpeedsToState();
 
 #endif

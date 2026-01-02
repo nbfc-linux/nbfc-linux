@@ -14,6 +14,7 @@
 #include "nbfc.h"
 #include "trace.h"
 #include "memory.h"
+#include "buffer.h"
 #include "macros.h"
 #include "model_config.h"
 
@@ -23,7 +24,7 @@
 
 Service_Options options;
 
-extern EC_VTable* ec;
+extern const EC_VTable* ec;
 
 enum Service_Initialization {
   Initialized_0_None,
@@ -39,19 +40,21 @@ ModelConfig              Service_Model_Config;
 array_of(FanTemperatureControl) Service_Fans;
 static enum Service_Initialization Service_State;
 
-static Error* ApplyRegisterWriteConfigurations(bool);
-static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration*);
-static Error* ResetRegisterWriteConfigurations();
-static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration*);
-static void   ResetEC();
-static bool   IsAcpiCallUsed();
-static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable*);
-static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
+static Error ApplyRegisterWriteConfigurations(bool);
+static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration*);
+static Error ResetRegisterWriteConfigurations();
+static Error ResetRegisterWriteConfig(RegisterWriteConfiguration*);
+static void  ResetEC();
+static bool  IsAcpiCallUsed();
+static EmbeddedControllerType EmbeddedControllerType_By_EC(const EC_VTable*);
+static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
-Error* Service_Init() {
-  Error* e;
-  Trace trace = {0};
-  char path[PATH_MAX];
+Error Service_Init() {
+  Error e;
+  Trace* trace = (Trace*) Buffer_Get(sizeof(Trace));
+  char* path = Buffer_Get(PATH_MAX);
+
+  Trace_Init(trace);
   Service_State = Initialized_0_None;
 
   // Service config ===========================================================
@@ -77,17 +80,17 @@ Error* Service_Init() {
   Service_State = Initialized_1_Service_Config;
 
   // Model config =============================================================
-  Log_Info("Using '%s' as model config\n", service_config.SelectedConfigId);
+  Log_Info("Using '%s' as model config", service_config.SelectedConfigId);
   e = ModelConfig_FindAndLoad(&Service_Model_Config, path, service_config.SelectedConfigId);
   if (e) {
-    e = err_string(e, path);
+    e = err_chain_string(e, path);
     goto error;
   }
 
   Service_State = Initialized_2_Model_Config;
 
-  Trace_Push(&trace, path);
-  e = ModelConfig_Validate(&trace, &Service_Model_Config);
+  Trace_Push(trace, path);
+  e = ModelConfig_Validate(trace, &Service_Model_Config);
   if (e)
     goto error;
 
@@ -107,7 +110,7 @@ Error* Service_Init() {
   Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
   Service_State = Initialized_4_Fans;
 
-  for_enumerate_array(ssize_t, i, Service_Fans) {
+  for_enumerate_array(array_size_t, i, Service_Fans) {
     e = Fan_Init(
         &Service_Fans.data[i].Fan,
         &Service_Model_Config.FanConfigurations.data[i],
@@ -117,7 +120,7 @@ Error* Service_Init() {
       goto error;
   }
 
-  for_enumerate_array(ssize_t, i, service_state.TargetFanSpeeds) {
+  for_enumerate_array(array_size_t, i, service_state.TargetFanSpeeds) {
     if (i >= Service_Fans.size)
       continue;
 
@@ -144,7 +147,7 @@ Error* Service_Init() {
   }
 
   EmbeddedControllerType t = EmbeddedControllerType_By_EC(ec);
-  Log_Info("Using '%s' as EmbeddedControllerType\n", EmbeddedControllerType_ToString(t));
+  Log_Info("Using '%s' as EmbeddedControllerType", EmbeddedControllerType_ToString(t));
   e = ec->Open();
   if (e)
     goto error;
@@ -154,7 +157,7 @@ Error* Service_Init() {
     EC_Debug_Controller = ec;
     ec = &EC_Debug_VTable;
 #else
-    Log_Warn("Debugging EC has been disabled at compile time.\n");
+    Log_Warn("Debugging EC has been disabled at compile time.");
 #endif
   }
 
@@ -164,7 +167,7 @@ Error* Service_Init() {
   if (IsAcpiCallUsed()) {
     e = AcpiCall_Open();
     if (e) {
-      e = err_string(0, "Could not load kernel module 'acpi_call'. Is it installed?");
+      e = err_string("Could not load kernel module 'acpi_call'. Is it installed?");
       goto error;
     }
   }
@@ -184,15 +187,19 @@ Error* Service_Init() {
 
   FanTemperatureControl_Log(&Service_Fans, &Service_Model_Config);
 
-  return err_success();
-
 error:
-  Service_Cleanup();
+
+  Buffer_Release(path, PATH_MAX);
+  Buffer_Release((char*) trace, sizeof(Trace));
+
+  if (e)
+    Service_Cleanup();
+
   return e;
 }
 
-Error* Service_Loop() {
-  Error* e = err_success();
+Error Service_Loop() {
+  Error e = err_success();
 
   bool re_init_required = false;
   for_each_array(FanTemperatureControl*, f, Service_Fans) {
@@ -203,7 +210,7 @@ Error* Service_Loop() {
     // Re-init if current fan speeds are off by more than 15%
     if (fabs(Fan_GetCurrentSpeed(&f->Fan) - Fan_GetTargetSpeed(&f->Fan)) > 15) {
       re_init_required = true;
-      Log_Debug("re_init_required = 1;\n");
+      Log_Debug("re_init_required = 1;");
     }
   }
 
@@ -230,7 +237,7 @@ error:
   return e;
 }
 
-static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable* ec) {
+static EmbeddedControllerType EmbeddedControllerType_By_EC(const EC_VTable* ec) {
 #if ENABLE_EC_SYS
   if (ec == &EC_SysLinux_VTable)       return EmbeddedControllerType_ECSysLinux;
 #endif
@@ -246,7 +253,7 @@ static EmbeddedControllerType EmbeddedControllerType_By_EC(EC_VTable* ec) {
   return EmbeddedControllerType_Unset;
 }
 
-static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
+static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
   switch (t) {
 #if ENABLE_EC_SYS
   case EmbeddedControllerType_ECSysLinux:     return &EC_SysLinux_VTable;
@@ -265,7 +272,7 @@ static EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
 }
 
 static void ResetEC() {
-  Error* e;
+  Error e;
   bool failed = false;
   int tries = 10;
 
@@ -284,8 +291,8 @@ static void ResetEC() {
   } while (failed && --tries);
 }
 
-static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
-  Error* e;
+static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
+  Error e;
   uint8_t mask;
   uint64_t out;
 
@@ -304,19 +311,19 @@ static Error* ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
       return ec->WriteByte(cfg->Register, cfg->ResetValue | mask);
 
     case RegisterWriteMode_Call:
-      e = AcpiCall_Call(cfg->ResetAcpiMethod, strlen(cfg->ResetAcpiMethod), &out);
+      e = AcpiCall_Call(cfg->ResetAcpiMethod, 0, &out);
       if (e)
-        return err_string(e, "ResetAcpiMethod");
+        return err_chain_string(e, "ResetAcpiMethod");
       else
         return err_success();
 
     default:
-      return err_string(0, "ResetRegisterWriteConfig: INTERNAL ERROR");
+      return err_string("ERR-01");
   }
 }
 
-static Error* ResetRegisterWriteConfigurations() {
-  Error* e = NULL;
+static Error ResetRegisterWriteConfigurations() {
+  Error e = err_success();
   for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations)
     if (cfg->ResetRequired) {
       e = ResetRegisterWriteConfig(cfg);
@@ -325,8 +332,8 @@ static Error* ResetRegisterWriteConfigurations() {
   return e;
 }
 
-static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
-  Error* e;
+static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
+  Error e;
   uint8_t mask;
   uint64_t out;
 
@@ -345,21 +352,21 @@ static Error* ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
       return ec->WriteByte(cfg->Register, cfg->Value | mask);
 
     case RegisterWriteMode_Call:
-      e = AcpiCall_Call(cfg->AcpiMethod, strlen(cfg->AcpiMethod), &out);
+      e = AcpiCall_Call(cfg->AcpiMethod, 0, &out);
       if (e)
-        return err_string(e, "AcpiMethod");
+        return err_chain_string(e, "AcpiMethod");
       else
         return err_success();
 
     default:
-      return err_string(0, "ApplyRegisterWriteConfig: INTERNAL ERROR");
+      return err_string("ERR-02");
   }
 }
 
-static Error* ApplyRegisterWriteConfigurations(bool initializing) {
+static Error ApplyRegisterWriteConfigurations(bool initializing) {
   for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations) {
     if (initializing || cfg->WriteOccasion == RegisterWriteOccasion_OnWriteFanSpeed) {
-       Error* e = ApplyRegisterWriteConfig(cfg);
+       Error e = ApplyRegisterWriteConfig(cfg);
        e_check();
     }
   }
@@ -390,12 +397,12 @@ static bool IsAcpiCallUsed() {
 }
 
 void Service_WriteTargetFanSpeedsToState() {
-  const int fancount = Service_Model_Config.FanConfigurations.size;
+  const array_size_t fancount = Service_Model_Config.FanConfigurations.size;
 
   service_state.TargetFanSpeeds.data = Mem_Realloc(service_state.TargetFanSpeeds.data, sizeof(float) * fancount);
   service_state.TargetFanSpeeds.size = fancount;
 
-  for_enumerate_array(int, i, Service_Fans) {
+  for_enumerate_array(array_size_t, i, Service_Fans) {
     Fan* fan = &Service_Fans.data[i].Fan;
     if (fan->mode == Fan_ModeAuto)
       service_state.TargetFanSpeeds.data[i] = -1;

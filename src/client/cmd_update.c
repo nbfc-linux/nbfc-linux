@@ -72,15 +72,15 @@ declare_array_of(GitHubFile);
 
 static inline void Log_Download_Finished(const char* url) {
   if (! Update_Options.quiet)
-    Log_Info("Finished downloading %s\n", url);
+    Log_Info("Finished downloading %s", url);
 }
 
 static inline void Log_Download_Failed(const char* url, CURLcode ret) {
-  Log_Error("Download failed: %s (%s)\n", url, curl_easy_strerror(ret));
+  Log_Error("Download failed: %s (%s)", url, curl_easy_strerror(ret));
 }
 
 static inline void Log_Write_Failed(const char* path, int err) {
-  Log_Error("Write failed: %s: %s\n", path, strerror(err));
+  Log_Error("Write failed: %s: %s", path, strerror(err));
 }
 
 // Callback function for `curl_easy_perform()`
@@ -101,7 +101,7 @@ static size_t Curl_Write_Memory_Callback(char* data, size_t size, size_t nmemb, 
 static CURL* CurlWithMem_Create(const char* url, const char* path) {
   CURL* curl = curl_easy_init();
   if (! curl) {
-    Log_Error("curl_easy_init() failed\n");
+    Log_Error("curl_easy_init() failed");
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -171,7 +171,7 @@ static bool File_Equals_Git_SHA1_Sum(const char* path, const char* sha1sum) {
   char hash[SHA_DIGEST_LENGTH * 2 + 1] = {0};
 
   if (slurp_file(buf, sizeof(buf), path) == -1) {
-    Log_Error("Error reading file: %s: %s\n", path, strerror(errno));
+    Log_Error("Error reading file: %s: %s", path, strerror(errno));
     return false;
   }
 
@@ -230,7 +230,7 @@ static void Print_Summary(array_of(GitHubFile)* files) {
       ++files_changed;
   }
 
-  Log_Info("New files: %d   Files changed: %d\n", files_new, files_changed);
+  Log_Info("New files: %d   Files changed: %d", files_new, files_changed);
 }
 
 // Iterates through an array of GitHubFile and returns a CURL instance
@@ -260,7 +260,7 @@ static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int paralle
 
   CURLM* multi = curl_multi_init();
   if (! multi) {
-    Log_Error("curl_multi_init() failed\n");
+    Log_Error("curl_multi_init() failed");
     return -1;
   }
 
@@ -280,14 +280,14 @@ static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int paralle
 
     mc = curl_multi_perform(multi, &still_running);
     if (mc != CURLM_OK) {
-      Log_Error("curl_multi_perform() failed\n");
+      Log_Error("curl_multi_perform() failed");
       ret = -1;
       break;
     }
 
     mc = curl_multi_wait(multi, NULL, 0, 1000, &numfds);
     if (mc != CURLM_OK) {
-      Log_Error("curl_multi_wait() failed\n");
+      Log_Error("curl_multi_wait() failed");
       ret = -1;
       break;
     }
@@ -371,20 +371,20 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
   root = nx_json_parse_utf8(data);
 
   if (! root) {
-    Log_Error("Invalid JSON: %s\n", NX_JSON_MSGS[NX_JSON_ERROR]);
+    Log_Error("Invalid JSON: %s", NX_JSON_MSGS[NX_JSON_ERROR]);
     ret = -1;
     goto end;
   }
 
   if (root->type != NX_JSON_ARRAY) {
-    Log_Error("Received data is not a JSON array\n");
+    Log_Error("Received data is not a JSON array");
     ret = -1;
     goto end;
   }
 
   nx_json_for_each(file, root) {
     if (file->type != NX_JSON_OBJECT) {
-      Log_Error("Item is not a JSON object\n");
+      Log_Error("Item is not a JSON object");
       continue;
     }
 
@@ -404,17 +404,17 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
     }
 
     if (name == NULL) {
-      Log_Error("Field missing: 'name'\n");
+      Log_Error("Field missing: 'name'");
       continue;
     }
 
     if (download_url == NULL) {
-      Log_Error("Field missing: 'download_url'\n");
+      Log_Error("Field missing: 'download_url'");
       continue;
     }
 
     if (sha == NULL) {
-      Log_Warn("Field missing: 'sha'\n");
+      Log_Warn("Field missing: 'sha'");
       sha = "";
     }
 
@@ -467,7 +467,7 @@ static int UpdateConfigurationFiles() {
 
   // Get a list of configuration files in the GitHub repository
   if (GitHub_Get_Dir_Contents(UpdateAPIContentsURL, &files) == -1) {
-    Log_Error("Failed to download configuration file list\n");
+    Log_Error("Failed to download configuration file list");
     ret = -1;
     goto end;
   }
@@ -480,7 +480,7 @@ static int UpdateConfigurationFiles() {
 
   // Download configuration files
   if (Curl_Parallel_Download_Files(&files, Update_Options.parallel) == -1) {
-    Log_Error("Some configuration files could not be downloaded\n");
+    Log_Error("Some configuration files could not be downloaded");
     ret = -1;
   }
 
@@ -499,15 +499,15 @@ int Update() {
   int ret = NBFC_EXIT_SUCCESS;
 
   if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {
-    Log_Error("curl_global_init() failed\n");
+    Log_Error("curl_global_init() failed");
     return NBFC_EXIT_FAILURE;
   }
 
-  Log_Info("Updating model compatibility database ...\n");
+  Log_Info("Updating model compatibility database ...");
   if (UpdateModelCompatibilityDatabase() == -1)
     ret = NBFC_EXIT_FAILURE;
 
-  Log_Info("Updating configuration files ...\n");
+  Log_Info("Updating configuration files ...");
   if (UpdateConfigurationFiles() == -1)
     ret = NBFC_EXIT_FAILURE;
   

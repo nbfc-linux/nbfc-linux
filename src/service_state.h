@@ -5,8 +5,8 @@
 
 extern ServiceState service_state;
 
-Error* ServiceState_Init();
-Error* ServiceState_Write();
-void   ServiceState_Free();
+Error ServiceState_Init();
+Error ServiceState_Write();
+void  ServiceState_Free();
 
 #endif

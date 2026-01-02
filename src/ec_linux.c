@@ -20,10 +20,10 @@
 
 static int EC_Linux_FD = -1;
 
-Error* EC_Linux_Open() {
+Error EC_Linux_Open() {
   EC_Linux_FD = open(EC_Linux_PortFilePath, O_RDWR);
   if (EC_Linux_FD < 0)
-    return err_stdlib(0, EC_Linux_PortFilePath);
+    return err_stdlib(EC_Linux_PortFilePath);
   return err_success();
 }
 
@@ -182,37 +182,37 @@ static bool EC_Linux_TryWriteWord(int register_, uint16_t value)
 // PUBLIC
 // ============================================================================
 
-Error* EC_Linux_WriteByte(uint8_t register_, uint8_t val) {
+Error EC_Linux_WriteByte(uint8_t register_, uint8_t val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryWriteByte(register_, val))
       return err_success();
-  return err_stdlib(0, "EC_Linux_WriteByte");
+  return err_stdlib("EC_Linux_WriteByte");
 }
 
-Error* EC_Linux_WriteWord(uint8_t register_, uint16_t val) {
+Error EC_Linux_WriteWord(uint8_t register_, uint16_t val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryWriteWord(register_, val))
       return err_success();
-  return err_stdlib(0, "EC_Linux_WriteWord");
+  return err_stdlib("EC_Linux_WriteWord");
 }
 
-Error* EC_Linux_ReadByte(uint8_t register_, uint8_t* val) {
+Error EC_Linux_ReadByte(uint8_t register_, uint8_t* val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryReadByte(register_, val))
       return err_success();
   *val = 0;
-  return err_stdlib(0, "EC_Linux_ReadByte");
+  return err_stdlib("EC_Linux_ReadByte");
 }
 
-Error* EC_Linux_ReadWord(uint8_t register_, uint16_t* val) {
+Error EC_Linux_ReadWord(uint8_t register_, uint16_t* val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryReadWord(register_, val))
       return err_success();
   *val = 0;
-  return err_stdlib(0, "EC_Linux_ReadWord");
+  return err_stdlib("EC_Linux_ReadWord");
 }
 
-EC_VTable EC_Linux_VTable = {
+const EC_VTable EC_Linux_VTable = {
   EC_Linux_Open,
   EC_Linux_Close,
   EC_Linux_ReadByte,

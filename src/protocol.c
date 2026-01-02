@@ -3,54 +3,23 @@
 #include "nbfc.h"
 #include "memory.h"
 #include "nxjson_utils.h"
-#include "reverse_nxjson.h"
+#include "nxjson_write.h"
 
 #include <unistd.h>
 #include <sys/socket.h>
 
-Error* Protocol_Send(int socket, const char* buffer, size_t length) {
-  size_t total_sent = 0;
+Error Protocol_Send_Json(int socket, const nx_json* json) {
+  NX_JSON_Write write_obj = NX_JSON_Write_Init(socket, WriteMode_Send);
 
-  while (total_sent < length) {
-    size_t to_send = length - total_sent;
+  nx_json_write(&write_obj, json, 0);
 
-    if (to_send > PROTOCOL_BUFFER_SIZE)
-      to_send = PROTOCOL_BUFFER_SIZE;
+  if (! write_obj.success)
+    return err_stdlib("send()");
 
-    int ret = send(socket, buffer + total_sent, to_send, MSG_NOSIGNAL);
-    if (ret < 0) {
-      if (errno != EINTR && errno != EAGAIN)
-        return err_stdlib(0, "send()");
-      else
-        continue;
-    }
-
-    total_sent += ret;
-  }
-
-  return err_success();
+  return Protocol_Send_End(socket);
 }
 
-Error* Protocol_Send_Json(int socket, const nx_json* json) {
-  Error* e;
-  char buf[NBFC_MAX_FILE_SIZE];
-  StringBuf s = { buf, 0, sizeof(buf) };
-  buf[0] = '\0';
-  nx_json_to_string(json, &s, 0);
-  // TODO: handle case if buffer is too small
-
-  e = Protocol_Send(socket, s.s, s.size);
-  if (e)
-    return e;
-
-  e = Protocol_Send_End(socket);
-  if (e)
-    return e;
-
-  return err_success();
-}
-
-Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
+Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
   char buffer[PROTOCOL_BUFFER_SIZE] = {0};
   int nread;
   const nx_json* json = NULL;
@@ -75,19 +44,19 @@ Error *Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
     json = nx_json_parse_utf8(msg);
     if (! json) {
       Mem_Free(msg);
-      return err_nxjson(0, "Invalid JSON");
+      return err_nxjson("Invalid JSON");
     }
 
     *buf = msg;
     *out = json;
   }
   else
-    return err_string(0, "Empty response");
+    return err_string("Empty response");
 
   return err_success();
 }
 
-Error* Protocol_Send_Error(int socket, const char* message) {
+Error Protocol_Send_Error(int socket, const char* message) {
   nx_json error  = {0};
   error.type     = NX_JSON_STRING;
   error.key      = "Error";

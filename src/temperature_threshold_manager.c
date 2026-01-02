@@ -2,16 +2,16 @@
 
 bool TemperatureThresholdManager_LegacyBehaviour = false;
 
-Error* ThresholdManager_Init(ThresholdManager* self, array_of(TemperatureThreshold)* thresholds) {
+Error ThresholdManager_Init(ThresholdManager* self, array_of(TemperatureThreshold)* thresholds) {
   if (! thresholds->size)
-    return err_string(0, "Invalid size for TemperatureThresholds");
+    return err_string("Invalid size for TemperatureThresholds");
 
   my.current = 0;
   my.thresholds = *thresholds;
 
   /* Bubble sort - ascending */
-  for (ssize_t i = 0; i < thresholds->size - 1; ++i)
-    for (ssize_t j = 0; j < thresholds->size - i - 1; ++j) {
+  for (array_size_t i = 0; i < thresholds->size - 1; ++i)
+    for (array_size_t j = 0; j < thresholds->size - i - 1; ++j) {
       TemperatureThreshold* a = &thresholds->data[j];
       TemperatureThreshold* b = &thresholds->data[j+1];
       if (a->UpThreshold > b->UpThreshold) {
@@ -25,8 +25,8 @@ Error* ThresholdManager_Init(ThresholdManager* self, array_of(TemperatureThresho
 }
 
 TemperatureThreshold* ThresholdManager_AutoSelectThreshold(ThresholdManager* self, float temperature) {
-  const ssize_t size = my.thresholds.size;
-  size_t i = my.current;
+  const array_size_t size = my.thresholds.size;
+  array_size_t i = my.current;
 
   if (TemperatureThresholdManager_LegacyBehaviour) {
     while (i > 0        && temperature <= my.thresholds.data[i].DownThreshold)   --i;

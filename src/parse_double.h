@@ -8,7 +8,7 @@
 static double parse_double(const char* s, double min, double max, const char** errmsg) {
   errno = 0;
   char* end;
-  double val = strtold(s, &end);
+  double val = strtod(s, &end);
 
   if (errno)
     *errmsg = strerror(errno);

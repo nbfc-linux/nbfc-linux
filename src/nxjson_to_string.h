@@ -1,5 +1,5 @@
-#ifndef REVERSE_NXJSON_H_
-#define REVERSE_NXJSON_H_
+#ifndef NBFC_NXJSON_TO_STRING_H_
+#define NBFC_NXJSON_TO_STRING_H_
 
 #include "nxjson.h"
 #include "stringbuf.h"

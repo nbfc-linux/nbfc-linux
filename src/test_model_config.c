@@ -1,4 +1,9 @@
-#define _XOPEN_SOURCE 500 /* unistd.h: export pwrite()/pread(), string.h: export strdup */
+// The data structures returned by nxjson are temporary and are loaded into proper C structs.
+// We allocate memory from a pool to avoid malloc() and reduce memory usage.
+#define NX_JSON_CALLOC(SIZE) ((nx_json*) NXJSON_Memory_Calloc(1, SIZE))
+#define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
+
+#define _XOPEN_SOURCE 500 // unistd.h: export pwrite()/pread()
 
 #include <string.h>
 #include <locale.h>
@@ -7,19 +12,20 @@
 
 #include "ec.h"
 #include "nbfc.h"
+#include "buffer.c"
 #include "log.c"
 #include "error.c"
 #include "file_utils.c"
 #include "trace.c"
 #include "memory.c"
+#include "nxjson_memory.c"
 #include "nxjson.c"
 #include "model_config.c"
 #include "program_name.c"
 #include "fan.c"
 #include "temperature_threshold_manager.c"
-#include "stack_memory.c"
 
-EC_VTable* ec;
+const EC_VTable* ec;
 
 int test_model_config(const char*);
 
@@ -47,7 +53,7 @@ int main(int argc, char** argv) {
   }
 
   if (optind >= argc) {
-    Log_Error("Missing file\n");
+    Log_Error("Missing file");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -70,22 +76,22 @@ int test_model_config(const char* file) {
   else
     snprintf(path, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, file);
 
-  Log_Info(">>> Processing %s ...\n", file);
+  Log_Info(">>> Processing %s ...", file);
 
-  Error* e = ModelConfig_FromFile(&model_config, path);
+  Error e = ModelConfig_FromFile(&model_config, path);
   e_die();
 
   Trace trace = {0};
   e = ModelConfig_Validate(&trace, &model_config);
   if (e) {
-    e = err_string(e, trace.buf);
-    Log_Error("%s\n", err_print_all(e));
+    e = err_chain_string(e, trace.buf);
+    Log_Error("%s", err_print_all(e));
     ret = 1;
     goto end;
   }
 
   TemperatureThresholdManager_LegacyBehaviour = model_config.LegacyTemperatureThresholdsBehaviour;
-  Log_Info("TemperatureThresholdManager_LegacyBehaviour = %s\n",
+  Log_Info("TemperatureThresholdManager_LegacyBehaviour = %s",
     TemperatureThresholdManager_LegacyBehaviour ? "true" : "false");
 
   for_enumerate_array(ssize_t, i, model_config.FanConfigurations) {
@@ -115,19 +121,19 @@ int test_model_config(const char* file) {
       Fan_SetTemperature(&fan, temp);
       float speed = Fan_GetTargetSpeed(&fan);
       if (options.verbose)
-        Log_Info("[%ld]: temp = %3d, speed = %f\n", i, temp, speed);
+        Log_Info("[%ld]: temp = %3d, speed = %f", i, temp, speed);
       seen_0_speed   |= (speed == 0.0f);
       seen_100_speed |= (speed == 100.0f);
     }
 
     if (! seen_0_speed && seen_0_threshold) {
-      Log_Error("%s[%ld]: Didn't see 0.0 speed\n", file, i);
+      Log_Error("%s[%ld]: Didn't see 0.0 speed", file, i);
       ret = 1;
       goto end;
     }
 
     if (! seen_100_speed) {
-      Log_Error("%s[%ld]: Didn't see 100.0 speed\n", file, i);
+      Log_Error("%s[%ld]: Didn't see 100.0 speed", file, i);
       ret = 1;
       goto end;
     }
@@ -138,19 +144,19 @@ int test_model_config(const char* file) {
       Fan_SetTemperature(&fan, temp);
       float speed = Fan_GetTargetSpeed(&fan);
       if (options.verbose)
-        Log_Info("[%ld]: temp = %3d, speed = %f\n", i, temp, speed);
+        Log_Info("[%ld]: temp = %3d, speed = %f", i, temp, speed);
       seen_0_speed   |= (speed == 0.0f);
       seen_100_speed |= (speed == 100.0f);
     }
 
     if (! seen_0_speed && seen_0_threshold) {
-      Log_Error("%s[%ld]: Didn't see 0.0 speed\n", file, i);
+      Log_Error("%s[%ld]: Didn't see 0.0 speed", file, i);
       ret = 1;
       goto end;
     }
 
     if (! seen_100_speed) {
-      Log_Error("%s[%ld]: Didn't see 100.0 speed\n", file, i);
+      Log_Error("%s[%ld]: Didn't see 100.0 speed", file, i);
       ret = 1;
       goto end;
     }

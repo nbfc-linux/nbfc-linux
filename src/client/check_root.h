@@ -9,7 +9,7 @@
 
 static inline void check_root() {
   if (geteuid()) {
-    Log_Error("This operation must be run as root\n");
+    Log_Error("This operation must be run as root");
     exit(NBFC_EXIT_FAILURE);
   }
 }

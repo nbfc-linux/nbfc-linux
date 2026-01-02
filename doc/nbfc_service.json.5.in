@@ -154,14 +154,14 @@ The register which NBFC uses to control the fan.
 .RE
 
 .PP
-.BR ReadAcpiCommand :
+.BR ReadAcpiMethod :
 .IR String
 .RS
 The ACPI method for reading the fan speed.
 
 Example:
 .RS
-"ReadAcpiCommand": "\\\\_SB.PCI0.LPCB.EC0.GFSD"
+"ReadAcpiMethod": "\\\\_SB.PCI0.LPCB.EC0.GFSD"
 .RE
 
 This option is mutually exclusive to
@@ -170,14 +170,14 @@ Only one of them can be set at a time.
 .RE
 
 .PP
-.BR WriteAcpiCommand :
+.BR WriteAcpiMethod :
 .IR String
 .RS
 The ACPI method for writing the fan speed. The command must contain a placeholder ($) which will be replaced by the fan speed.
 
 Example:
 .RS
-"WriteAcpiCommand": "\\\\_SB.PCI0.LPCB.EC0.SFSD $"
+"WriteAcpiMethod": "\\\\_SB.PCI0.LPCB.EC0.SFSD $"
 .RE
 
 This option is mutually exclusive to
@@ -250,7 +250,7 @@ to reset the EC.
 .RE
 
 .PP
-.BR ResetAcpiCommand :
+.BR ResetAcpiMethod :
 .I String
 .RS
 The ACPI method to call upon fan reset.
@@ -331,9 +331,9 @@ performs a binary OR operation (register = register | value)
 .IP \(bu 2
 .BR Call :
 calls the ACPI method stored in
-.B AcpiCommand
+.B AcpiMethod
 or
-.B ResetAcpiCommand
+.B ResetAcpiMethod
 .RE
 
 .PP
@@ -365,7 +365,7 @@ The value which will be written.
 .RE
 
 .PP
-.BR AcpiCommand :
+.BR AcpiMethod :
 .I String
 .RS
 The ACPI method to call.
@@ -390,7 +390,7 @@ The value which will be written upon reset.
 .RE
 
 .PP
-.BR ResetAcpiCommand :
+.BR ResetAcpiMethod :
 .I String
 .RS
 The ACPI method to call upon reset.

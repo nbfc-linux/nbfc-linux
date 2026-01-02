@@ -59,7 +59,7 @@ int Status() {
     Status_Options.all = true;
 
   while (true) {
-    Error* e = ServiceInfo_TryLoad(&service_info);
+    Error e = ServiceInfo_TryLoad(&service_info);
     e_die();
 
     if (Status_Options.all || Status_Options.service)
@@ -76,7 +76,7 @@ int Status() {
       bool *vis = Mem_Calloc(sizeof(bool), fan_count);
       for_each_array(int*, fan_index, Status_Options.fans) {
         if (*fan_index >= fan_count) {
-          Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", *fan_index);
+          Log_Error("Fan number %d not found! (Fan indexes count from zero!)", *fan_index);
           return NBFC_EXIT_FAILURE;
         }
         if (!vis[*fan_index]) {
