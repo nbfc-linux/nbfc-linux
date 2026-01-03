@@ -10,6 +10,7 @@
 #include "../log.h"
 #include "../macros.h"
 #include "../memory.h"
+#include "../file_utils.h"
 #include "../nxjson_utils.h"
 
 #include "check_root.h"
@@ -143,11 +144,6 @@ static int CurlWithMem_WriteFile(CURL* curl) {
   CurlMemory* mem;
   curl_easy_getinfo(curl, CURLINFO_PRIVATE, &mem);
   return CurlMemory_WriteFile(mem);
-}
-
-// Return true if file exists
-static inline bool file_exists(const char* path) {
-  return (access(path, F_OK) == 0);
 }
 
 // Compute SHA1 sum of `data` with the size of `len` and store a string

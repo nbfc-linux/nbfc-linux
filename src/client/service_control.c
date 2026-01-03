@@ -5,7 +5,7 @@
 #include <stdlib.h> // exit, system, WEXITSTATUS
 #include <string.h> // strcat, strerror, strcspn, memset
 #include <signal.h> // kill, SIGINT
-#include <unistd.h> // access, F_OK, unlink
+#include <unistd.h> // unlink
 #include <limits.h> // INT_MAX
 
 #include <sys/types.h>
@@ -22,6 +22,7 @@
 #include "../protocol.h"
 #include "../nxjson_utils.h"
 #include "../service_config.h"
+#include "../file_utils.h"
 
 int Service_Get_PID() {
   const char* err;
@@ -81,7 +82,7 @@ error:
 }
 
 void ServiceConfig_Load() {
-  if (access(NBFC_SERVICE_CONFIG, F_OK) != 0) {
+  if (! file_exists(NBFC_SERVICE_CONFIG)) {
     memset(&service_config, 0, sizeof(service_config)); // Clear values
     return;
   }

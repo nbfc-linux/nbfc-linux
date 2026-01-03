@@ -10,6 +10,7 @@
 #include "../help/client.help.h"
 #include "../nxjson_utils.h"
 #include "../fs_sensors.h"
+#include "../file_utils.h"
 
 /* nbfc sensors API:
  *
@@ -75,7 +76,7 @@ static Error Sensors_IsValidSensor(const char* sensor) {
       return err_stringf("No such sensor group: %s", sensor);
 
     case '/':
-      if (access(sensor, F_OK) == 0)
+      if (file_exists(sensor))
         return err_success();
 
       errno = ENOENT;

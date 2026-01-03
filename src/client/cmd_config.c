@@ -1,8 +1,7 @@
 #include <errno.h>        // errno
-#include <stdio.h>        // printf, fprintf, snprintf
+#include <stdio.h>        // printf, fprintf
 #include <stdlib.h>       // exit, realpath, qsort
 #include <string.h>       // strcmp, strrchr, strerror
-#include <unistd.h>       // access, F_OK
 #include <linux/limits.h> // PATH_MAX
 
 #include "../nbfc.h"

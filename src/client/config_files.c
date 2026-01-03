@@ -9,6 +9,7 @@
 #include "../log.h"
 #include "../memory.h"
 #include "../nxjson_utils.h"
+#include "../file_utils.h"
 #include "dmi.h"
 #include "str_functions.h"
 
@@ -104,7 +105,7 @@ array_of(ConfigFile) List_All_Configs() {
 
   a = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR);
 
-  if (access(NBFC_MODEL_SUPPORT_FILE_MUTABLE, F_OK) == 0)
+  if (file_exists(NBFC_MODEL_SUPPORT_FILE_MUTABLE))
     b = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR_MUTABLE);
   else
     return a;
@@ -210,7 +211,7 @@ end:
 char* Get_Supported_Config(array_of(ConfigFile)* files, const char* model) {
   char* config = NULL;
 
-  if (access(NBFC_MODEL_SUPPORT_FILE_MUTABLE, F_OK) == 0)
+  if (file_exists(NBFC_MODEL_SUPPORT_FILE_MUTABLE))
     config = Get_Supported_Config_From_SupportFile(NBFC_MODEL_SUPPORT_FILE_MUTABLE, files, model);
 
   if (! config)
