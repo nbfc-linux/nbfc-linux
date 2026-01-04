@@ -274,9 +274,7 @@ warranty        -- Show warranty
 Contributing
 ------------
 
-You can write a configuration file for your laptop model. See the [Wiki of the original NBFC](https://github.com/hirschmann/nbfc/wiki/How-to-create-a-NBFC-config) for more details.
-
-Please **do not** create issues on GitHub requesting a configuration file for your laptop!
+You can write a configuration file for your laptop model. See the [Configuration HowTo](https://nbfc-linux.github.io/creating-config/) and [Wiki of the original NBFC](https://github.com/hirschmann/nbfc/wiki/How-to-create-a-NBFC-config) for more details.
 
 If you found a working configuration for your laptop model, you can register it in the [Compatibility Database](share/nbfc/model_support.json).
 
