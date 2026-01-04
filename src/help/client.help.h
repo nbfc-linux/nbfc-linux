@@ -12,6 +12,7 @@
  "    stop                Stop the service\n"                                  \
  "    restart             Restart the service\n"                               \
  "    status              Show the service status\n"                           \
+ "    sensors             Show or configure temperature sensors\n"             \
  "    config              List or apply configs\n"                             \
  "    set                 Control fan speed\n"                                 \
  "    update              Download new configuration files\n"                  \
