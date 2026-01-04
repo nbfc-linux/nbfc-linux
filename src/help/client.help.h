@@ -156,11 +156,16 @@
  "  -h, --help            Shows this message and exit\n"                       \
  ""
 
-// TODO
 #define CLIENT_SHOW_VARIABLE_HELP_TEXT                                         \
  "Usage: nbfc show-variable [-h] VARIABLE\n"                                   \
  "\n"                                                                          \
- "Print out a variable.\n"                                                     \
+ "Print out a compile time variable.\n"                                        \
+ "\n"                                                                          \
+ "Available variables:\n"                                                      \
+ "  - config_file\n"                                                           \
+ "  - socket_file\n"                                                           \
+ "  - pid_file\n"                                                              \
+ "  - model_configs_dir\n"                                                     \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Shows this message and exit\n"                       \
