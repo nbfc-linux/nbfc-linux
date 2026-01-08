@@ -9,6 +9,8 @@ To check if your laptop is supported, use the [Configuration Search](https://nbf
 
 If you want to write a configuration for your laptop model, see [Configuration HowTo](https://nbfc-linux.github.io/creating-config/).
 
+I regularly purchase laptops to create configuration files, analyze their ACPI firmware, and gain a deeper understanding of how these systems work. The knowledge gained through this process is documented and preserved in the tutorial to help others understand and work with similar hardware.
+
 If you find my work helpful, you can show your appreciation by [buying me a coffee](https://paypal.me/BenjaminAbendroth).
 
 Table of Contents
