@@ -31,13 +31,14 @@ Comparison of NBFC C# and NBFC Linux
 |What                             | NBFC Mono                             | NBFC Linux                                  |
 |---------------------------------|---------------------------------------|----------------------------------------------
 |Portability                      | Crossplatform                         | Linux                                       |
-|Configuration files              | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) (210 files) | [JSON](share/nbfc/configs) (309 files) |
-|Model compatibility database     | No                                    | [Yes](share/nbfc/model_support.json)        |
 |Runtime                          | Mono                                  | Native                                      |
-|Memory consumption (ps\_mem)     | ~50MB                                 | ~230KB                                      |
-|Package size (pkg.tar.gz)        | 448K                                  | 100K                                        |
-|Fan control rights               | Any user                              | Any user                                    |
-|Service control rights           | Any user                              | Only root                                   |
+|Memory Consumption (ps\_mem)     | ~50MB                                 | ~230KB                                      |
+|Model Configuration Files        | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) (210 files) | [JSON](share/nbfc/configs) (309 files) |
+|Model Compatibility Database     | No                                    | [Yes](share/nbfc/model_support.json)        |
+|Fan Control Rights               | Any user                              | Any user                                    |
+|Service Control Rights           | Any user                              | Only root                                   |
+|ACPI Method Support              | No                                    | Yes (via `acpi_call` kernel module)         |
+|Fail-Safe Runtime Design         | No (not OOM-safe)                     | Yes                                         |
 |IPC Concept                      | TCP/IP                                | Unix sockets                                |
 |IPC Protocol                     | Binary                                | JSON                                        |
 |Graphical User Interface         | Windows only                          | Linux only                                  |
@@ -210,6 +211,8 @@ Differences in detail
 |PID File                         | /run/nbfc.pid                         | /run/nbfc\_service.pid                      |
 |Config file                      | ?                                     | /etc/nbfc/nbfc.json                         |
 
+- NBFC-Linux is engineered to be rock solid. It explicitly protects itself from the Linux OOM killer by setting `/proc/self/oom_score_adj` to `-1000`. Additionally, all necessary memory allocations are completed at startup, ensuring that the process cannot run out of memory during runtime. Once running, the program's memory usage is fully deterministic. These stability guarantees are not present in the original NBFC project.
+
 - The original NBFC service adjusts the fan speeds in intervals of `EcPollIntervall` according to `TemperatureThresholds`. - NBFC Linux directly sets the fan speed (also according to `TemperatureThresholds`).
 
 - The original NBFC service selects a TemperatureThreshold and applies its `FanSpeed` when the temperature exceeds its `UpThreshold`. In contrast, NBFC Linux will select the *next* TemperatureThreshold and apply its `FanSpeed` when the temperature exceeds the *current* `UpThreshold`. The provided config files have been reconfigured to account for this change, so that they provide the same behaviour as the original NBFC service. If you have a custom config file that works well with the original service, you can port it to NBFC Linux using the [provided tool](/tools/config_to_json.py) (requires python3-lxml).
@@ -218,6 +221,7 @@ Differences in detail
 
 Troubleshooting
 ---------------
+
 The preferred way of running nbfc is using the `ECSysLinux` implementation, which depends on the `ec_sys` kernel module.
 There is also an alternative implementation which uses `/dev/port`, called `dev_port`.
 It can be specified on the commandline using `--embedded-controller=dev_port` and permanently set in `/etc/nbfc/nbfc.json` with `"EmbeddedControllerType": "dev_port"`.
