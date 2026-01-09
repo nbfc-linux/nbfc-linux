@@ -12,6 +12,9 @@
 #define ACPI_CALL_MODPROBE_CMD "modprobe acpi_call"
 
 Error AcpiCall_Open() {
+  if (file_exists(ACPI_CALL_FILE))
+    return err_success();
+
   return Process_Call(ACPI_CALL_MODPROBE_CMD);
 }
 
