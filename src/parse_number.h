@@ -29,8 +29,15 @@ static int64_t parse_number(const char* s, int64_t min, int64_t max, const char*
   if (s[0] == '-' || s[0] == '+')
     ++start;
 
-  if (s[start] == '0' && (s[start+1] == 'x' || s[start+1] == 'X'))
-    base = 16;
+  if (s[start] == '0') {
+    if (s[start+1] >= '0' && s[start+1] <= '9') {
+      *errmsg = "octal values not supported";
+      return 0;
+    }
+
+    if (s[start+1] == 'x' || s[start+1] == 'X')
+      base = 16;
+  }
 
   errno = 0;
   char* end;

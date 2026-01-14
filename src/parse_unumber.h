@@ -36,8 +36,15 @@ static uint64_t parse_unumber(const char* s, uint64_t min, uint64_t max, const c
   if (s[0] == '-' || s[0] == '+')
     ++start;
 
-  if (s[start] == '0' && (s[start+1] == 'x' || s[start+1] == 'X'))
-    base = 16;
+  if (s[start] == '0') {
+    if (s[start+1] >= '0' && s[start+1] <= '9') {
+      *errmsg = "octal values not supported";
+      return 0;
+    }
+
+    if (s[start+1] == 'x' || s[start+1] == 'X')
+      base = 16;
+  }
 
   errno = 0;
   char* end;
