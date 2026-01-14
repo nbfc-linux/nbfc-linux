@@ -14,8 +14,12 @@ void Trace_Push(Trace* trace, const char* fmt, ...) {
   trace->stack[trace->stack_size] = len;
 
   if (trace->stack_size) {
+    if (len + 3 > sizeof(trace->buf))
+      return;
+
     trace->buf[len++] = ':';
     trace->buf[len++] = ' ';
+    trace->buf[len] = '\0';
   }
 
   va_list args;
