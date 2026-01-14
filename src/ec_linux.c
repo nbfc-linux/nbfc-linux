@@ -123,7 +123,7 @@ static bool EC_Linux_WaitRead()
 
 static bool EC_Linux_TryReadByte(int register_, uint8_t* value)
 {
-  bool success = true
+  return true
     && EC_Linux_WaitWrite()
     && EC_Linux_WritePort(EC_Linux_CommandPort, ECCommand_Read)
     && EC_Linux_WaitWrite()
@@ -131,10 +131,6 @@ static bool EC_Linux_TryReadByte(int register_, uint8_t* value)
     && EC_Linux_WaitWrite()
     && EC_Linux_WaitRead()
     && EC_Linux_ReadPort(EC_Linux_DataPort, value);
-
-  if (! success)
-    *value = 0;
-  return success;
 }
 
 static bool EC_Linux_TryWriteByte(int register_, uint8_t value)
@@ -161,7 +157,6 @@ static bool EC_Linux_TryReadWord(int register_, uint16_t* value)
     return true;
   }
 
-  *value = 0;
   return false;
 }
 
@@ -200,7 +195,6 @@ Error EC_Linux_ReadByte(uint8_t register_, uint8_t* val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryReadByte(register_, val))
       return err_success();
-  *val = 0;
   return err_stdlib("EC_Linux_ReadByte");
 }
 
@@ -208,7 +202,6 @@ Error EC_Linux_ReadWord(uint8_t register_, uint16_t* val) {
   for (int i = EC_Linux_MaxRetries; i--;)
     if (EC_Linux_TryReadWord(register_, val))
       return err_success();
-  *val = 0;
   return err_stdlib("EC_Linux_ReadWord");
 }
 
