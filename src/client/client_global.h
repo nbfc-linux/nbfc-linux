@@ -44,6 +44,10 @@ enum Option {
   Option_Update_Parallel,
   Option_Update_Quiet,
 
+  // Support options
+  Option_Support_Upload_Firmware,
+  Option_Support_Print_Command,
+
   // Show-Variable options
   Option_ShowVariable_Variable,
 };

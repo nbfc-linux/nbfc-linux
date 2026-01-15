@@ -260,13 +260,13 @@ src/nbfc: \
 	src/client/check_root.h \
 	src/client/client_global.h \
 	src/client/cmd_config.c \
-	src/client/cmd_donate.c \
 	src/client/cmd_misc.c \
 	src/client/cmd_sensors.c \
 	src/client/cmd_set.c \
 	src/client/cmd_show_variable.c \
 	src/client/cmd_start_stop.c \
 	src/client/cmd_status.c \
+	src/client/cmd_support.c \
 	src/client/cmd_update.c \
 	src/client/cmd_warranty.c \
 	src/client/config_files.c \

@@ -41,6 +41,10 @@ static inline void Log_Download_Failed(const char* url, CURLcode ret) {
   Log_Error("Download failed: %s (%s)", url, curl_easy_strerror(ret));
 }
 
+static inline void Log_Upload_Failed(const char* url, CURLcode ret) {
+  Log_Error("Upload failed: %s (%s)", url, curl_easy_strerror(ret));
+}
+
 static inline void Log_Write_Failed(const char* path, int err) {
   Log_Error("Write failed: %s: %s", path, strerror(err));
 }

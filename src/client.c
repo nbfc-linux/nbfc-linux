@@ -60,7 +60,7 @@ const cli99_option main_options[] = {
 #include "client/cmd_show_variable.c"
 #include "client/cmd_misc.c"
 #include "client/cmd_warranty.c"
-#include "client/cmd_donate.c"
+#include "client/cmd_support.c"
 
 #define NBFC_CLIENT_COMMANDS \
   o("start",            Start,            START,            start)         \
@@ -77,8 +77,10 @@ const cli99_option main_options[] = {
   o("complete-sensors", Complete_Sensors, COMPLETE_SENSORS, main)          \
   o("show-variable",    Show_Variable,    SHOW_VARIABLE,    show_variable) \
   o("warranty",         Warranty,         WARRANTY,         main)          \
-  o("donate",           Donate,           DONATE,           main)          \
+  o("donate",           Donate,           SUPPORT,          main)          \
+  o("support",          Support,          SUPPORT,          support)       \
   o("help",             Help,             HELP,             main)
+//  COMMAND             ENUM              HELP TEXT         OPTIONS
 
 enum Command {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
@@ -335,6 +337,18 @@ int main(int argc, char *const argv[]) {
       break;
 
     // ========================================================================
+    // Support options
+    // ========================================================================
+
+    case Option_Support_Upload_Firmware:
+      Support_Options.action = Support_Action_Upload_Firmware;
+      break;
+
+    case Option_Support_Print_Command:
+      Support_Options.action = Support_Action_Print_Command;
+      break;
+
+    // ========================================================================
     // Show-Variable options
     // ========================================================================
 
@@ -367,7 +381,8 @@ int main(int argc, char *const argv[]) {
   case Command_Complete_Fans:     return Complete_Fans();
   case Command_Complete_Sensors:  return Complete_Sensors();
   case Command_Warranty:          return Warranty();
-  case Command_Donate:            return Donate();
+  case Command_Donate:            return Support();
+  case Command_Support:           return Support();
   default:                        return NBFC_EXIT_FAILURE;
   }
 }
