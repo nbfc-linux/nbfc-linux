@@ -272,6 +272,8 @@ src/nbfc: \
 	src/client/cmd_warranty.c \
 	src/client/config_files.c \
 	src/client/config_files.h \
+	src/client/curl_utils.h \
+	src/client/curl_utils.c \
 	src/client/dmi.c \
 	src/client/dmi.h \
 	src/client/service_control.c \

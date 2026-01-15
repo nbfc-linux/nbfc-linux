@@ -1,9 +1,6 @@
 #include <stdio.h>        // snprintf
-#include <string.h>       // strcmp, memcpy
-#include <fcntl.h>        // O_WRONLY, O_CREAT, O_TRUNC
-#include <sys/stat.h>     // S_IRUSR, S_IRGRP, S_IROTH etc.
+#include <string.h>       // strcmp
 #include <linux/limits.h> // PATH_MAX
-#include <curl/curl.h>
 #include <openssl/sha.h>
 
 #include "../nbfc.h"
@@ -15,13 +12,11 @@
 
 #include "check_root.h"
 #include "client_global.h"
+#include "curl_utils.h"
 
 #define UpdateParallelDefault 10
 
 #define UpdateConfigVersion "1.0"
-
-#define UserAgent \
-  "NBFC-Linux/" NBFC_VERSION " libcurl/" LIBCURL_VERSION " (+https://github.com/nbfc-linux)"
 
 #define UpdateAPIContentsURL \
   "https://api.github.com/repos/nbfc-linux/configs/contents/" UpdateConfigVersion "/configs"
@@ -44,15 +39,6 @@ struct {
   false
 };
 
-// Data structure for receiving content via `Curl_Write_Memory_Callback`
-struct CurlMemory {
-  char*  data;
-  size_t size;
-  char*  url;  // (optional) stores original URL
-  char*  path; // (optional) stores a file path
-};
-typedef struct CurlMemory CurlMemory;
-
 // Represents if a file is up to date or needs to be downloaded
 enum FileState {
   FileState_UpToDate = 0,
@@ -71,81 +57,6 @@ struct GitHubFile {
 typedef struct GitHubFile GitHubFile;
 declare_array_of(GitHubFile);
 
-static inline void Log_Download_Finished(const char* url) {
-  if (! Update_Options.quiet)
-    Log_Info("Finished downloading %s", url);
-}
-
-static inline void Log_Download_Failed(const char* url, CURLcode ret) {
-  Log_Error("Download failed: %s (%s)", url, curl_easy_strerror(ret));
-}
-
-static inline void Log_Write_Failed(const char* path, int err) {
-  Log_Error("Write failed: %s: %s", path, strerror(err));
-}
-
-// Callback function for `curl_easy_perform()`
-static size_t Curl_Write_Memory_Callback(char* data, size_t size, size_t nmemb, void* clientp)
-{
-  const size_t realsize = size * nmemb;
-  CurlMemory* mem = (CurlMemory*) clientp;
-
-  mem->data = Mem_Realloc(mem->data, mem->size + realsize + 1);
-  memcpy(&(mem->data[mem->size]), data, realsize);
-  mem->size += realsize;
-  mem->data[mem->size] = '\0';
-
-  return realsize;
-}
-
-// Create a CURL instance with a CurlMemory attached to it
-static CURL* CurlWithMem_Create(const char* url, const char* path) {
-  CURL* curl = curl_easy_init();
-  if (! curl) {
-    Log_Error("curl_easy_init() failed");
-    exit(NBFC_EXIT_FAILURE);
-  }
-
-  CurlMemory* mem = Mem_Calloc(1, sizeof(*mem));
-  mem->url = Mem_Strdup(url);
-  if (path)
-    mem->path = Mem_Strdup(path);
-
-  curl_easy_setopt(curl, CURLOPT_URL, url);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Curl_Write_Memory_Callback);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) mem);
-  curl_easy_setopt(curl, CURLOPT_PRIVATE, (void*) mem);
-
-  return curl;
-}
-
-// Destroy a CURL instance and free the attached CurlMemory
-static void CurlWithMem_Destroy(CURL* curl) {
-  CurlMemory* mem;
-  curl_easy_getinfo(curl, CURLINFO_PRIVATE, &mem);
-
-  Mem_Free(mem->data);
-  Mem_Free(mem->url);
-  Mem_Free(mem->path);
-  Mem_Free(mem);
-
-  curl_easy_cleanup(curl);
-}
-
-static int CurlMemory_WriteFile(const CurlMemory* mem) {
-  const int open_flags = O_WRONLY|O_CREAT|O_TRUNC;
-  const int mode_flags = S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH;
-  return write_file(mem->path, open_flags, mode_flags, mem->data, mem->size);
-}
-
-// Write the CurlMemory data to its path
-static int CurlWithMem_WriteFile(CURL* curl) {
-  CurlMemory* mem;
-  curl_easy_getinfo(curl, CURLINFO_PRIVATE, &mem);
-  return CurlMemory_WriteFile(mem);
-}
-
 // Compute SHA1 sum of `data` with the size of `len` and store a string
 // representation of the hash in `out`
 static void compute_sha1(const char* data, size_t len, char* out) {
@@ -160,7 +71,7 @@ static void compute_sha1(const char* data, size_t len, char* out) {
 
 // Checks if `path` equals `sha1sum`.
 // Note: This is actually the checksum of the contents of the file including
-//       a header: `<SIZE>\0<CONTENT>`
+//       a header: `blob <SIZE>\0<CONTENT>`
 static bool File_Equals_Git_SHA1_Sum(const char* path, const char* sha1sum) {
   char buf[NBFC_MAX_FILE_SIZE];
   char size_plus_content[NBFC_MAX_FILE_SIZE + 64];
@@ -303,7 +214,9 @@ static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int paralle
           ret = -1;
         }
         else {
-          Log_Download_Finished(mem->url);
+          if (! Update_Options.quiet)
+            Log_Download_Finished(mem->url);
+
           if (CurlMemory_WriteFile(mem) == -1) {
             Log_Write_Failed(mem->path, errno);
             ret = -1;
@@ -356,12 +269,11 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
     ret = -1;
     goto end;
   }
-  Log_Download_Finished(url);
 
-  CurlMemory* mem;
-  curl_easy_getinfo(curl, CURLINFO_PRIVATE, &mem);
-  data = mem->data;
-  mem->data = NULL;
+  if (! Update_Options.quiet)
+    Log_Download_Finished(url);
+
+  data = CurlWithMem_StealData(curl);
   CurlWithMem_Destroy(curl);
 
   root = nx_json_parse_utf8(data);
@@ -443,7 +355,8 @@ static int UpdateModelCompatibilityDatabase() {
     goto end;
   }
 
-  Log_Download_Finished(UpdateAPIModelSupportURL);
+  if (! Update_Options.quiet)
+    Log_Download_Finished(UpdateAPIModelSupportURL);
 
   if (CurlWithMem_WriteFile(curl) == -1) {
     Log_Write_Failed(NBFC_MODEL_SUPPORT_FILE_MUTABLE, errno);

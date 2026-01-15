@@ -35,6 +35,7 @@
 #include "optparse/optparse.c"
 #include "mkdir_p.c"
 #include "client/dmi.c"
+#include "client/curl_utils.c"
 #include "client/config_files.c"
 #include "client/str_functions.c"
 #include "client/service_control.c"
