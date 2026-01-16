@@ -64,15 +64,21 @@ struct {
  */
 static char* Support_Get_Real_Firmware_Upload_Endpoint_URL() {
   CURL* curl = CurlWithMem_Create(SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL, NULL);
+  CURLcode code;
+  long http_code;
 
-  CURLcode code = curl_easy_perform(curl);
+  code = curl_easy_perform(curl);
   if (code != CURLE_OK) {
     Log_Download_Failed(SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL, code);
     exit(NBFC_EXIT_FAILURE);
   }
 
-  long http_code;
-  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+  code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_getinfo() failed");
+    exit(NBFC_EXIT_FAILURE);
+  }
+
   if (http_code != 200) {
     Log_Error("Download failed: %s (server returned HTTP %ld)\n",
       SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL, http_code);
@@ -123,7 +129,7 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
     goto end;
   }
 
-  code = curl_mime_data(part, DMI_Get_Model_Name(), CURL_ZERO_TERMINATED);
+  code = curl_mime_data(part, model, CURL_ZERO_TERMINATED);
   if (code != CURLE_OK) {
     Log_Error("curl_mime_data() failed");
     goto end;
@@ -141,13 +147,17 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
     goto end;
   }
 
-  code = curl_mime_filedata(part, SUPPORT_ACPI_DSDT);
+  code = curl_mime_filedata(part, firmware_file);
   if (code != CURLE_OK) {
     Log_Error("curl_mime_filedata() failed");
     goto end;
   }
 
-  curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+  code = curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_setopt(%s) failed", Curl_Get_EasyOpt_Name(CURLOPT_MIMEPOST));
+    goto end;
+  }
 
   code = curl_easy_perform(curl);
   if (code != CURLE_OK) {
@@ -155,7 +165,12 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
     goto end;
   }
 
-  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+  code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_getinfo() failed");
+    goto end;
+  }
+
   if (http_code != 200) {
     Log_Error("Upload failed: %s (server returned HTTP %ld)\n",
       endpoint_url, http_code);

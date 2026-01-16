@@ -10,6 +10,14 @@
 #include "../file_utils.h"
 
 /**
+ * Return the name of a CURLoption as string.
+ */
+const char* Curl_Get_EasyOpt_Name(CURLoption id) {
+  const struct curl_easyoption* opt = curl_easy_option_by_id(id);
+  return opt ? opt->name : "?";
+}
+
+/**
  * Write callback used by curl_easy_perform() (CURLOPT_WRITEFUNCTION).
  * Uses CurlMemory as the clientp buffer, stores received data in `mem->data`,
  * and appends a trailing NUL terminator for safe string handling.
@@ -32,22 +40,50 @@ static size_t Curl_Write_Memory_Callback(char* data, size_t size, size_t nmemb, 
  * to it.
  */
 CURL* CurlWithMem_Create(const char* url, const char* path) {
-  CURL* curl = curl_easy_init();
+  CURL* curl;
+  CURLcode code;
+  CurlMemory* mem;
+
+  curl = curl_easy_init();
   if (! curl) {
     Log_Error("curl_easy_init() failed");
     exit(NBFC_EXIT_FAILURE);
   }
 
-  CurlMemory* mem = Mem_Calloc(1, sizeof(*mem));
+  mem = Mem_Calloc(1, sizeof(*mem));
   mem->url = Mem_Strdup(url);
   if (path)
     mem->path = Mem_Strdup(path);
 
-  curl_easy_setopt(curl, CURLOPT_URL, url);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Curl_Write_Memory_Callback);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) mem);
-  curl_easy_setopt(curl, CURLOPT_PRIVATE, (void*) mem);
+  code = curl_easy_setopt(curl, CURLOPT_URL, url);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_setopt(%s) failed", Curl_Get_EasyOpt_Name(CURLOPT_URL));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  code = curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_setopt(%s) failed", Curl_Get_EasyOpt_Name(CURLOPT_USERAGENT));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Curl_Write_Memory_Callback);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_setopt(%s) failed", Curl_Get_EasyOpt_Name(CURLOPT_WRITEFUNCTION));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) mem);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_setopt(%s) failed", Curl_Get_EasyOpt_Name(CURLOPT_WRITEDATA));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  code = curl_easy_setopt(curl, CURLOPT_PRIVATE, (void*) mem);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_setopt(%s) failed", Curl_Get_EasyOpt_Name(CURLOPT_PRIVATE));
+    exit(NBFC_EXIT_FAILURE);
+  }
 
   return curl;
 }

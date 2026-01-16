@@ -47,7 +47,7 @@ enum FileState {
 };
 typedef enum FileState FileState;
 
-// Data structued used for getting file listing using GitHub's API
+// Data structure used for getting file listing using GitHub's API
 struct GitHubFile {
   char* name;
   char* sha;
@@ -164,6 +164,7 @@ next_file:
 static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int parallel) {
   int ret = 0;
   int files_iter = 0;
+  CURLMcode mc;
 
   CURLM* multi = curl_multi_init();
   if (! multi) {
@@ -176,35 +177,39 @@ static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int paralle
     if (! curl)
       break;
 
-    curl_multi_add_handle(multi, curl);
+    mc = curl_multi_add_handle(multi, curl);
+    if (mc != CURLM_OK) {
+      Log_Error("curl_multi_add_handle() failed");
+      ret = -1;
+      goto end;
+    }
   }
 
   int still_running = 0;
 
   do {
-    CURLMcode mc;
     int numfds;
 
     mc = curl_multi_perform(multi, &still_running);
     if (mc != CURLM_OK) {
       Log_Error("curl_multi_perform() failed");
       ret = -1;
-      break;
+      goto end;
     }
 
     mc = curl_multi_wait(multi, NULL, 0, 1000, &numfds);
     if (mc != CURLM_OK) {
       Log_Error("curl_multi_wait() failed");
       ret = -1;
-      break;
+      goto end;
     }
 
-    CURLMsg *msg;
+    CURLMsg* msg;
     int msgs_left;
 
     while ((msg = curl_multi_info_read(multi, &msgs_left))) {
       if (msg->msg == CURLMSG_DONE) {
-        CURL *easy = msg->easy_handle;
+        CURL* easy = msg->easy_handle;
         CURLcode code = msg->data.result;
         CurlMemory* mem;
         curl_easy_getinfo(easy, CURLINFO_PRIVATE, &mem);
@@ -228,13 +233,19 @@ static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int paralle
 
         easy = Get_Next_Download(files, &files_iter);
         if (easy) {
-          curl_multi_add_handle(multi, easy);
+          mc = curl_multi_add_handle(multi, easy);
+          if (mc != CURLM_OK) {
+            Log_Error("curl_multi_add_handle() failed");
+            ret = -1;
+            goto end;
+          }
           ++still_running;
         }
       }
     }
   } while (still_running);
 
+end:
   curl_multi_cleanup(multi);
   return ret;
 }
@@ -247,8 +258,9 @@ static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int paralle
 // Note: `out` has to be freed regardless of the return code.
 static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
   int ret = 0;
-  CURL* curl = NULL;
-  char* data = NULL;
+  CURL* curl;
+  CURLcode code;
+  char* response = NULL;
   const nx_json* root = NULL;
   ssize_t out_capacity = 512;
 
@@ -258,12 +270,32 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
   curl = CurlWithMem_Create(url, NULL);
 
   struct curl_slist* headers = NULL;
-  headers = curl_slist_append(headers, "Accept: application/vnd.github+json");
-  headers = curl_slist_append(headers, "X-GitHub-Api-Version: 2022-11-28");
-  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-  CURLcode code = curl_easy_perform(curl);
-  curl_slist_free_all(headers);
+  struct curl_slist* temp;
 
+  temp = curl_slist_append(headers, "Accept: application/vnd.github+json");
+  if (! temp) {
+    Log_Error("curl_slist_append() failed");
+    ret = -1;
+    goto end;
+  }
+  headers = temp;
+
+  temp = curl_slist_append(headers, "X-GitHub-Api-Version: 2022-11-28");
+  if (! temp) {
+    Log_Error("curl_slist_append() failed");
+    ret = -1;
+    goto end;
+  }
+  headers = temp;
+
+  code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_setopt(%s) failed", Curl_Get_EasyOpt_Name(CURLOPT_HTTPHEADER));
+    ret = -1;
+    goto end;
+  }
+
+  code = curl_easy_perform(curl);
   if (code != CURLE_OK) {
     Log_Download_Failed(url, code);
     ret = -1;
@@ -273,13 +305,11 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
   if (! Update_Options.quiet)
     Log_Download_Finished(url);
 
-  data = CurlWithMem_StealData(curl);
-  CurlWithMem_Destroy(curl);
-
-  root = nx_json_parse_utf8(data);
+  response = CurlWithMem_StealData(curl);
+  root = nx_json_parse_utf8(response);
 
   if (! root) {
-    Log_Error("Invalid JSON: %s", NX_JSON_MSGS[NX_JSON_ERROR]);
+    Log_Error("Received data is not valid JSON: %s", NX_JSON_MSGS[NX_JSON_ERROR]);
     ret = -1;
     goto end;
   }
@@ -312,17 +342,17 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
     }
 
     if (name == NULL) {
-      Log_Error("Field missing: 'name'");
+      Log_Error("Field missing: \"name\"");
       continue;
     }
 
     if (download_url == NULL) {
-      Log_Error("Field missing: 'download_url'");
+      Log_Error("Field missing: \"download_url\"");
       continue;
     }
 
     if (sha == NULL) {
-      Log_Warn("Field missing: 'sha'");
+      Log_Warn("Field missing: \"sha\"");
       sha = "";
     }
 
@@ -338,8 +368,10 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
   }
 
 end:
+  CurlWithMem_Destroy(curl);
+  curl_slist_free_all(headers);
   nx_json_free(root);
-  Mem_Free(data);
+  Mem_Free(response);
   return ret;
 }
 
@@ -391,6 +423,7 @@ static int UpdateConfigurationFiles() {
   if (Curl_Parallel_Download_Files(&files, Update_Options.parallel) == -1) {
     Log_Error("Some configuration files could not be downloaded");
     ret = -1;
+    goto end;
   }
 
 end:
@@ -407,7 +440,8 @@ int Update() {
   check_root();
   int ret = NBFC_EXIT_SUCCESS;
 
-  if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {
+  CURLcode code = curl_global_init(CURL_GLOBAL_DEFAULT);
+  if (code != CURLE_OK) {
     Log_Error("curl_global_init() failed");
     return NBFC_EXIT_FAILURE;
   }
