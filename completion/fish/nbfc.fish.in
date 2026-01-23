@@ -2,65 +2,7 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-function _nbfc__command
-  printf "%s\t%s\n" \
-    start 'Start the service' \
-    stop 'Stop the service' \
-    restart 'Restart the service' \
-    status 'Show the service status' \
-    config 'List or apply configs' \
-    set 'Control fan speed' \
-    sensors 'Configure fan sensors' \
-    update 'Download new configuration files' \
-    wait-for-hwmon 'Wait for /sys/class/hwmon/hwmon* files' \
-    get-model-name 'Print model name for notebook' \
-    warranty 'Show warranty' \
-    donate 'Show how to support the project' \
-    help 'Show help'
-end
-
-function _nbfc_fish_query
-  # ===========================================================================
-  #
-  # This function implements the parsing of options and positionals in the Fish shell.
-  #
-  # Usage: __fish_query <OPTIONS> <COMMAND> [ARGS...]
-  #
-  # The first argument is a comma-separated list of options that the parser should know about.
-  # Short options (-o), long options (--option), and old-style options (-option) are supported.
-  #
-  # If an option takes an argument, it is suffixed by '='.
-  # If an option takes an optional argument, it is suffixed by '=?'.
-  #
-  # For example:
-  #   __fish_query '-f,--flag,-old-style,--with-arg=,--with-optional=?' [...]
-  #
-  #   Here, -f, --flag and -old-style don't take options, --with-arg requires an
-  #   argument and --with-optional takes an optional argument.
-  #
-  # COMMANDS
-  #   positional_contains <NUM> <WORDS...>
-  #     Checks if the positional argument number NUM is one of WORDS.
-  #     NUM counts from one.
-  #
-  #   has_option [WITH_INCOMPLETE] <OPTIONS...>
-  #     Checks if an option given in OPTIONS is passed on commandline.
-  #     If an option requires an argument, this command returns true only if the
-  #     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
-  #     returns true for options missing their arguments.
-  #
-  #   option_is <OPTIONS...> -- <VALUES...>
-  #     Checks if any option in OPTIONS has a value of VALUES.
-  #
-  #   num_of_positionals [<OPERATOR> <NUMBER>]
-  #     Checks the number of positional arguments.
-  #     If no arguments are provided, print the total count of positional arguments.
-  #     If two arguments are provided, the first argument should be one of
-  #     the comparison operators: '-lt', '-le', '-eq', '-ne', '-gt', '-ge'.
-  #     Returns 0 if the count of positional arguments matches the
-  #     specified NUMBER according to the comparison operator, otherwise returns 1.
-  #
-  # ===========================================================================
+function _nbfc__query
 
   set -l positionals
   set -l having_options
@@ -79,9 +21,6 @@ function _nbfc_fish_query
     set having_options $__QUERY_CACHE_HAVING_OPTIONS
     set option_values  $__QUERY_CACHE_OPTION_VALUES
   else
-    # =========================================================================
-    # Parsing of OPTIONS argument
-    # =========================================================================
 
     set -l short_opts_with_arg
     set -l short_opts_without_arg
@@ -93,17 +32,17 @@ function _nbfc_fish_query
     set -l option
 
     if test -n "$options"
-      for option in (string split -- ',' $options)
+      for option in (string split -- ' ' $options)
         if false
           true
         else if string match -qr -- '^--.+=$' $option
-          set -a long_opts_with_arg (string replace -- '='  '' $option)
+          set -a long_opts_with_arg (string replace -- '=' '' $option)
         else if string match -qr -- '^--.+=\?$' $option
           set -a long_opts_with_optional_arg (string replace -- '=?' '' $option)
         else if string match -qr -- '^--.+$' $option
           set -a long_opts_without_arg $option
         else if string match -qr -- '^-.=$' $option
-          set -a short_opts_with_arg (string replace -- '='  '' $option)
+          set -a short_opts_with_arg (string replace -- '=' '' $option)
         else if string match -qr -- '^-.=\?$' $option
           set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
         else if string match -qr -- '^-.$' $option
@@ -111,10 +50,6 @@ function _nbfc_fish_query
         end
       end
     end
-
-    # =========================================================================
-    # Parsing of options and positionals
-    # =========================================================================
 
     set -l cmdline (commandline -poc)
     set -l cmdline_count (count $cmdline)
@@ -128,9 +63,7 @@ function _nbfc_fish_query
         case '-'
           set -a positionals -
         case '--'
-          for argi in (seq (math $argi + 1) $cmdline_count)
-            set -a positionals $cmdline[$argi]
-          end
+          set -a positionals $cmdline[$(math $argi + 1)..]
           break
         case '--*=*'
           set -l split (string split -m 1 -- '=' $arg)
@@ -145,7 +78,7 @@ function _nbfc_fish_query
             end
           else
             set -a having_options $arg
-            set -a option_values ""
+            set -a option_values ''
           end
         case '-*'
           set -l end_of_parsing false
@@ -158,7 +91,7 @@ function _nbfc_fish_query
 
             if contains -- $option $short_opts_without_arg
               set -a having_options $option
-              set -a option_values ""
+              set -a option_values ''
             else if contains -- $option $short_opts_with_arg
               set end_of_parsing true
 
@@ -191,17 +124,8 @@ function _nbfc_fish_query
     set -g __QUERY_CACHE_KEY            $my_cache_key
   end
 
-  # ===========================================================================
-  # Commands
-  # ===========================================================================
-
   switch $cmd
     case 'positional_contains'
-      if test (count $argv) -eq 0
-        echo "_nbfc_fish_query: positional_contains: argv[3]: missing number" >&2
-        return 1
-      end
-
       set -l positional_num $argv[1]
       set -e argv[1]
       contains -- $positionals[$positional_num] $argv && return 0 || return 1
@@ -215,38 +139,30 @@ function _nbfc_fish_query
       switch (count $argv)
         case 0
           count $positionals
-        case 1
-          echo "_nbfc_fish_query: num_of_positionals: $argv[1]: missing operand" >&2
-          return 1
         case 2
           if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
             test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
-          else
-            echo "_nbfc_fish_query: num_of_positionals: $argv[1]: unknown operator" >&2
-            return 1
           end
-        case '*'
-          echo "_nbfc_fish_query: num_of_positionals: too many arguments" >&2
-          return 1
       end
   end
 end
 
-function _nbfc_fish_complete_filedir
-  # Function for completing files or directories
-  #
-  # Options:
-  #   -d|--description=DESC   The description for completed entries
-  #   -c|--comp=STR           Complete STR instead of current command line argument
-  #   -D|--directories        Only complete directories
-  #   -C|--cd=DIR             List contents in DIR
-  #
-  # This function is made out of /usr/share/fish/functions/__fish_complete_directories.fish
+function _nbfc__filedir
 
-  argparse --max-args 0 'd/description=' 'c/comp=' 'D/directories' 'C/cd=' -- $argv || return 1
+  argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' \
+      -- $argv || return 1
 
-  set -l comp
+  set -l comp (_nbfc__get_completing_arg)
   set -l desc
+  set -l files
+
+  if set -q _flag_cd[1]
+    pushd $_flag_cd 2>/dev/null || return 1
+    set files (complete -C"'' $comp")
+    popd
+  else
+    set files (complete -C"'' $comp")
+  end
 
   if set -q _flag_description[1]
     set desc $_flag_description
@@ -254,40 +170,93 @@ function _nbfc_fish_complete_filedir
     set desc 'Directory'
   end
 
-  if set -q _flag_comp[1]
-    set comp $_flag_comp
-  else
-    set comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
-  end
-
-  if set -q _flag_cd[1]
-    pushd $_flag_cd || return 1
-  end
-
-  set -l files (complete -C"'' $comp")
-
-  if set -q _flag_cd[1]
-    popd
-  end
-
   if set -q files[1]
     if set -q _flag_directories[1]
-      set files (printf "%s\n" $files | string match -r '.*/$')
+      set files (printf '%s\n' $files | string match -r '.*/$')
     end
 
-    printf "%s\n" $files\t"$desc"
+    printf '%s\n' $files\t"$desc"
   end
 end
 
-function _nbfc_sensors_command
-  printf "%s\t%s\n" \
+function _nbfc__get_completing_arg
+  set -l arg (commandline -ct | string unescape)
+
+  switch $arg
+    case '--*=' '--*=*'
+      set arg (string replace -r -- '^-[^=]*=' '' $arg)
+    case '-*'
+      set -l prog (commandline -po)[1]
+      set -l progdef (complete -c $prog)
+
+      set -l full_opt (string match -r -- '^-[a-zA-Z0-9]+=' $arg)
+      set -l opt (string sub -s 2 -e -1 -- $full_opt)
+      set -l optdefs (string match -re -- " -(o|-old-option) $opt( |\$)" $progdef)
+      set -l optdefs (string match -re -- " -(x|r|a|-(exclusive|require-parameter|arguments))( |\$)" $optdefs)
+
+      if test (count $optdefs) -gt 0
+        set arg (string replace -m 1 -- $full_opt '' $arg)
+      else
+        set -l i 2
+
+        while test $i -lt (string length -- $arg)
+          set -l opt (string sub -s $i -l 1 -- $arg)
+          set -l optdefs (string match -re -- " -(s|-short-option) $opt( |\$)" $progdef)
+          set -l optdefs (string match -re -- " -(x|r|a|-(exclusive|require-parameter|arguments))( |\$)" $optdefs)
+
+          if test (count $optdefs) -gt 0
+            set arg (string sub -s (math $i + 1) -- "$arg")
+            break
+          end
+
+          set i (math $i + 1)
+        end
+      end
+  end
+
+  if test -n "$__fish_stripprefix"
+    string replace -r -- $__fish_stripprefix '' "$arg"
+  else
+    printf '%s\n' "$arg"
+  end
+end
+
+function _nbfc_sensors__command
+  printf '%s\t%s\n' \
     list 'List available sensors and temperature files' \
     show 'Show all available fans with their configuration' \
     set 'Configure sensors and algorithm type for a fan'
 end
 
-set -l prog "nbfc"
-set -l query "_nbfc_fish_query"
+function _nbfc_acpi_dump__command
+  printf '%s\t%s\n' \
+    registers 'List all available registers' \
+    ec-registers 'List all available EC registers' \
+    methods 'List all available ACPI methods' \
+    dsl 'Disassemble your DSDT'
+end
+
+function _nbfc__command
+  printf '%s\t%s\n' \
+    start 'Start the service' \
+    stop 'Stop the service' \
+    restart 'Restart the service' \
+    status 'Show the service status' \
+    config 'List or apply configs' \
+    set 'Control fan speed' \
+    sensors 'Configure fan sensors' \
+    update 'Download new configuration files' \
+    rate-config 'Rate a configuration file' \
+    acpi-dump 'Dumps information of your ACPI DSDT' \
+    wait-for-hwmon 'Wait for /sys/class/hwmon/hwmon* files' \
+    get-model-name 'Print model name for notebook' \
+    warranty 'Show warranty' \
+    support 'Show how to support the project' \
+    help 'Show help'
+end
+
+set -l prog 'nbfc'
+set -l query '_nbfc__query'
 
 # Delete existing completions
 complete -c $prog -e
@@ -296,29 +265,26 @@ complete -c $prog -e
 complete -c $prog -x
 
 # command nbfc
-set -l opts "-h,--help,--version"
-set -l C000 "not $query '$opts' has_option -h --help && $query '$opts' num_of_positionals -eq 0"
-set -l C001 "not $query '$opts' has_option --version && $query '$opts' num_of_positionals -eq 0"
+set -l opts "-h --help --version"
+set -l C000 "not $query '$opts' has_option -h --help"
+set -l C001 "not $query '$opts' has_option --version"
 set -l C002 "$query '$opts' num_of_positionals -eq 0"
 complete -c $prog -n $C000 -s h -l help -d 'show this help message and exit' -f
 complete -c $prog -n $C001 -l version -d "show program's version number and exit" -f
 complete -c $prog -n $C002 -d Commands -f -a '(_nbfc__command)'
 
 # command nbfc start
-set -l opts "-r,--read-only,-h,--help,--version"
+set -l opts "-r --read-only -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 start && not $query '$opts' has_option -r --read-only"
 complete -c $prog -n $C000 -s r -l read-only -d 'Start in read-only mode' -f
 
-# command nbfc stop
-set -l opts "-h,--help,--version"
-
 # command nbfc restart
-set -l opts "-r,--read-only,-h,--help,--version"
+set -l opts "-r --read-only -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 restart && not $query '$opts' has_option -r --read-only"
 complete -c $prog -n $C000 -s r -l read-only -d 'Restart in read-only mode' -f
 
 # command nbfc status
-set -l opts "-a,--all,-s,--service,-f=,--fan=,-w=,--watch=,-h,--help,--version"
+set -l opts "-a --all -s --service -f= --fan= -w= --watch= -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 status && not $query '$opts' has_option -s --service -f --fan -a --all"
 set -l C001 "$query '$opts' positional_contains 1 status && not $query '$opts' has_option -a --all -f --fan -s --service"
 set -l C002 "$query '$opts' positional_contains 1 status && not $query '$opts' has_option -a --all -s --service -f --fan"
@@ -329,18 +295,18 @@ complete -c $prog -n $C002 -s f -l fan -d 'Show status of fan (zero based)' -x -
 complete -c $prog -n $C003 -s w -l watch -d 'Show status periodically' -x
 
 # command nbfc config
-set -l opts "-l,--list,-s=,--set=,-a=,--apply=,-r,--recommend,-h,--help,--version"
+set -l opts "-l --list -s= --set= -a= --apply= -r --recommend -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 config && not $query '$opts' has_option -s --set -a --apply -r --recommend -l --list"
 set -l C001 "$query '$opts' positional_contains 1 config && not $query '$opts' has_option -l --list -a --apply -r --recommend -s --set"
 set -l C002 "$query '$opts' positional_contains 1 config && not $query '$opts' has_option -l --list -s --set -r --recommend -a --apply"
 set -l C003 "$query '$opts' positional_contains 1 config && not $query '$opts' has_option -l --list -s --set -a --apply -r --recommend"
 complete -c $prog -n $C000 -s l -l list -d 'List all available configs (default)' -f
-complete -c $prog -n $C001 -s s -l set -d 'Set a config' -x -a '(_nbfc_fish_complete_filedir -C @DATADIR@/nbfc/configs)'
-complete -c $prog -n $C002 -s a -l apply -d 'Set a config and enable fan control' -x -a '(_nbfc_fish_complete_filedir -C @DATADIR@/nbfc/configs)'
+complete -c $prog -n $C001 -s s -l set -d 'Set a config' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
+complete -c $prog -n $C002 -s a -l apply -d 'Set a config and enable fan control' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
 complete -c $prog -n $C003 -s r -l recommend -d 'List configs which may work for your device' -f
 
 # command nbfc set
-set -l opts "-a,--auto,-s=,--speed=,-f=,--fan=,-h,--help,--version"
+set -l opts "-a --auto -s= --speed= -f= --fan= -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 set && not $query '$opts' has_option -s --speed -a --auto"
 set -l C001 "$query '$opts' positional_contains 1 set && not $query '$opts' has_option -a --auto -s --speed"
 set -l C002 "$query '$opts' positional_contains 1 set && not $query '$opts' has_option -f --fan"
@@ -349,47 +315,40 @@ complete -c $prog -n $C001 -s s -l speed -d 'Set fan speed to PERCENT' -x
 complete -c $prog -n $C002 -s f -l fan -d 'Fan index (zero based)' -x -a '(nbfc complete-fans)'
 
 # command nbfc sensors
-set -l opts "-h,--help,--version"
-set -l C000 "$query '$opts' positional_contains 1 sensors && $query '$opts' num_of_positionals -eq 1"
-complete -c $prog -n $C000 -d Commands -f -a '(_nbfc_sensors_command)'
-
-# command nbfc sensors list
-set -l opts "-h,--help,--version"
-
-# command nbfc sensors show
-set -l opts "-h,--help,--version"
-
-# command nbfc sensors set
-set -l opts "-f=,--fan=,-a=,--algorithm=,-s=,--sensor=,--force,-h,--help,--version"
-set -l C000 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set && not $query '$opts' has_option -f --fan"
-set -l C001 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set && not $query '$opts' has_option -a --algorithm"
-set -l C002 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set"
-set -l C003 "$query '$opts' positional_contains 1 sensors && $query '$opts' positional_contains 2 set && not $query '$opts' has_option --force"
-complete -c $prog -n $C000 -s f -l fan -d 'Fan index (zero based)' -x -a '(nbfc complete-fans)'
-complete -c $prog -n $C001 -s a -l algorithm -d 'Set the algorithm type' -x -a 'Average Min Max'
-complete -c $prog -n $C002 -s s -l sensor -d 'Set sensor' -x -a '(nbfc complete-sensors)'
-complete -c $prog -n $C003 -l force -d 'Force applying sensors' -f
+set -l opts "-h --help --version"
+set -l C000 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 sensors"
+complete -c $prog -n $C000 -d Commands -f -a '(_nbfc_sensors__command)'
 
 # command nbfc update
-set -l opts "-p=,--parallel=,-q,--quiet,-h,--help,--version"
+set -l opts "-p= --parallel= -q --quiet -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 update && not $query '$opts' has_option -p --parallel"
 set -l C001 "$query '$opts' positional_contains 1 update && not $query '$opts' has_option -q --quiet"
 complete -c $prog -n $C000 -s p -l parallel -d 'Set number of parallel downloads' -x
 complete -c $prog -n $C001 -s q -l quiet -d 'Enable quiet mode' -f
 
-# command nbfc wait-for-hwmon
-set -l opts "-h,--help,--version"
+# command nbfc rate-config
+set -l opts "-H --full-help -a --all -d= --dsdt= -h --help --version"
+set -l C000 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -H --full-help"
+set -l C001 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -a --all"
+set -l C002 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -d --dsdt"
+set -l C003 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 rate-config"
+complete -c $prog -n $C000 -s H -l full-help -d 'Show full help' -f
+complete -c $prog -n $C001 -s a -l all -d 'Rate all available configuration files' -f
+complete -c $prog -n $C002 -s d -l dsdt -d 'Use an alternative DSDT file' -Fr
+complete -c $prog -n $C003 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
 
-# command nbfc get-model-name
-set -l opts "-h,--help,--version"
+# command nbfc acpi-dump
+set -l opts "-f= --file= -h --help --version"
+set -l C000 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -f --file"
+set -l C001 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 acpi-dump"
+complete -c $prog -n $C000 -s f -l file -d 'Use an alternative DSDT file' -Fr
+complete -c $prog -n $C001 -d Commands -f -a '(_nbfc_acpi_dump__command)'
 
-# command nbfc warranty
-set -l opts "-h,--help,--version"
-
-# command nbfc donate
-set -l opts "-h,--help,--version"
-
-# command nbfc help
-set -l opts "-h,--help,--version"
+# command nbfc support
+set -l opts "--upload-firmware --print-command -h --help --version"
+set -l C000 "$query '$opts' positional_contains 1 support && not $query '$opts' has_option --upload-firmware"
+set -l C001 "$query '$opts' positional_contains 1 support && not $query '$opts' has_option --print-command"
+complete -c $prog -n $C000 -l upload-firmware -d 'Upload your notebook firmware without prompting' -f
+complete -c $prog -n $C001 -l print-command -d 'Print command for manual firmware upload' -f
 
 # vim: ft=fish ts=2 sts=2 sw=2 et

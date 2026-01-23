@@ -2,48 +2,7 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-function _nbfc_service_fish_query
-  # ===========================================================================
-  #
-  # This function implements the parsing of options and positionals in the Fish shell.
-  #
-  # Usage: __fish_query <OPTIONS> <COMMAND> [ARGS...]
-  #
-  # The first argument is a comma-separated list of options that the parser should know about.
-  # Short options (-o), long options (--option), and old-style options (-option) are supported.
-  #
-  # If an option takes an argument, it is suffixed by '='.
-  # If an option takes an optional argument, it is suffixed by '=?'.
-  #
-  # For example:
-  #   __fish_query '-f,--flag,-old-style,--with-arg=,--with-optional=?' [...]
-  #
-  #   Here, -f, --flag and -old-style don't take options, --with-arg requires an
-  #   argument and --with-optional takes an optional argument.
-  #
-  # COMMANDS
-  #   positional_contains <NUM> <WORDS...>
-  #     Checks if the positional argument number NUM is one of WORDS.
-  #     NUM counts from one.
-  #
-  #   has_option [WITH_INCOMPLETE] <OPTIONS...>
-  #     Checks if an option given in OPTIONS is passed on commandline.
-  #     If an option requires an argument, this command returns true only if the
-  #     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
-  #     returns true for options missing their arguments.
-  #
-  #   option_is <OPTIONS...> -- <VALUES...>
-  #     Checks if any option in OPTIONS has a value of VALUES.
-  #
-  #   num_of_positionals [<OPERATOR> <NUMBER>]
-  #     Checks the number of positional arguments.
-  #     If no arguments are provided, print the total count of positional arguments.
-  #     If two arguments are provided, the first argument should be one of
-  #     the comparison operators: '-lt', '-le', '-eq', '-ne', '-gt', '-ge'.
-  #     Returns 0 if the count of positional arguments matches the
-  #     specified NUMBER according to the comparison operator, otherwise returns 1.
-  #
-  # ===========================================================================
+function _nbfc_service__query
 
   set -l positionals
   set -l having_options
@@ -62,9 +21,6 @@ function _nbfc_service_fish_query
     set having_options $__QUERY_CACHE_HAVING_OPTIONS
     set option_values  $__QUERY_CACHE_OPTION_VALUES
   else
-    # =========================================================================
-    # Parsing of OPTIONS argument
-    # =========================================================================
 
     set -l short_opts_with_arg
     set -l short_opts_without_arg
@@ -76,17 +32,17 @@ function _nbfc_service_fish_query
     set -l option
 
     if test -n "$options"
-      for option in (string split -- ',' $options)
+      for option in (string split -- ' ' $options)
         if false
           true
         else if string match -qr -- '^--.+=$' $option
-          set -a long_opts_with_arg (string replace -- '='  '' $option)
+          set -a long_opts_with_arg (string replace -- '=' '' $option)
         else if string match -qr -- '^--.+=\?$' $option
           set -a long_opts_with_optional_arg (string replace -- '=?' '' $option)
         else if string match -qr -- '^--.+$' $option
           set -a long_opts_without_arg $option
         else if string match -qr -- '^-.=$' $option
-          set -a short_opts_with_arg (string replace -- '='  '' $option)
+          set -a short_opts_with_arg (string replace -- '=' '' $option)
         else if string match -qr -- '^-.=\?$' $option
           set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
         else if string match -qr -- '^-.$' $option
@@ -94,10 +50,6 @@ function _nbfc_service_fish_query
         end
       end
     end
-
-    # =========================================================================
-    # Parsing of options and positionals
-    # =========================================================================
 
     set -l cmdline (commandline -poc)
     set -l cmdline_count (count $cmdline)
@@ -111,9 +63,7 @@ function _nbfc_service_fish_query
         case '-'
           set -a positionals -
         case '--'
-          for argi in (seq (math $argi + 1) $cmdline_count)
-            set -a positionals $cmdline[$argi]
-          end
+          set -a positionals $cmdline[$(math $argi + 1)..]
           break
         case '--*=*'
           set -l split (string split -m 1 -- '=' $arg)
@@ -128,7 +78,7 @@ function _nbfc_service_fish_query
             end
           else
             set -a having_options $arg
-            set -a option_values ""
+            set -a option_values ''
           end
         case '-*'
           set -l end_of_parsing false
@@ -141,7 +91,7 @@ function _nbfc_service_fish_query
 
             if contains -- $option $short_opts_without_arg
               set -a having_options $option
-              set -a option_values ""
+              set -a option_values ''
             else if contains -- $option $short_opts_with_arg
               set end_of_parsing true
 
@@ -174,10 +124,6 @@ function _nbfc_service_fish_query
     set -g __QUERY_CACHE_KEY            $my_cache_key
   end
 
-  # ===========================================================================
-  # Commands
-  # ===========================================================================
-
   switch $cmd
     case 'has_option'
       for option in $having_options
@@ -188,8 +134,8 @@ function _nbfc_service_fish_query
   end
 end
 
-set -l prog "nbfc_service"
-set -l query "_nbfc_service_fish_query"
+set -l prog 'nbfc_service'
+set -l query '_nbfc_service__query'
 
 # Delete existing completions
 complete -c $prog -e
@@ -198,7 +144,7 @@ complete -c $prog -e
 complete -c $prog -x
 
 # command nbfc_service
-set -l opts "-h,--help,-r,--read-only,-f,--fork,-d,--debug,-c=,--config-file=,-e=,--embedded-controller="
+set -l opts "-h --help -r --read-only -f --fork -d --debug -c= --config-file= -e= --embedded-controller="
 set -l C000 "not $query '$opts' has_option -h --help"
 set -l C001 "not $query '$opts' has_option -r --read-only"
 set -l C002 "not $query '$opts' has_option -f --fork"
