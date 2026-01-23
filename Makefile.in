@@ -231,6 +231,7 @@ src/nbfc_service: \
 	src/nxjson.c src/nxjson.h \
 	src/nxjson_utils.h \
 	src/pidfile.c src/pidfile.h \
+	src/process.h src/process.c \
 	src/protocol.c src/protocol.h \
 	src/server.c src/server.h \
 	src/service.c src/service.h \
@@ -251,7 +252,8 @@ src/ec_probe: \
 	src/help/ec_probe.help.h \
 	src/nbfc.h \
 	src/memory.h src/memory.c \
-	src/optparse/optparse.h src/optparse/optparse.c
+	src/optparse/optparse.h src/optparse/optparse.c \
+	src/process.h src/process.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDLIBS_EC_PROBE) $(LDFLAGS)
 
 src/nbfc: \
@@ -259,8 +261,10 @@ src/nbfc: \
 	src/client.c \
 	src/client/check_root.h \
 	src/client/client_global.h \
+	src/client/cmd_acpi_dump.c \
 	src/client/cmd_config.c \
 	src/client/cmd_misc.c \
+	src/client/cmd_rate_config.c \
 	src/client/cmd_sensors.c \
 	src/client/cmd_set.c \
 	src/client/cmd_show_variable.c \
@@ -279,12 +283,17 @@ src/nbfc: \
 	src/client/service_control.h \
 	src/client/str_functions.c \
 	src/client/str_functions.h \
+	src/acpi_analysis.h src/acpi_analysis.c \
+	src/config_rating.h src/config_rating.c \
 	src/error.h src/error.c \
 	src/help/ec_probe.help.h \
 	src/optparse/optparse.h src/optparse/optparse.c \
 	src/protocol.c src/protocol.h \
+	src/model_config_utils.c src/model_config_utils.h \
 	src/nxjson.c src/nxjson.h \
-	src/nbfc.h
+	src/nbfc.h \
+	src/process.h src/process.c \
+	src/regex_utils.h src/regex_utils.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
 
 src/test_model_config: \

@@ -32,6 +32,16 @@ enum Option {
   Option_Config_Set,
   Option_Config_Apply,
 
+  // Rate-Config options
+  Option_Rate_Config_File,
+  Option_Rate_Config_DSDT_File,
+  Option_Rate_Config_All,
+  Option_Rate_Config_Full_Help,
+
+  // Acpi-Dump options
+  Option_Acpi_Dump_Command,
+  Option_Acpi_Dump_File,
+
   // Set options
   Option_Set_Auto,
   Option_Set_Speed,

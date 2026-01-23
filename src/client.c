@@ -26,6 +26,7 @@
 #include "nvidia.c"
 #include "memory.c"
 #include "nxjson_memory.c"
+#include "process.c"
 #include "program_name.c"
 #include "protocol.c"
 #include "nxjson.c"
@@ -34,6 +35,10 @@
 #include "trace.c"
 #include "optparse/optparse.c"
 #include "mkdir_p.c"
+#include "regex_utils.c"
+#include "acpi_analysis.c"
+#include "config_rating.c"
+#include "model_config_utils.c"
 #include "client/dmi.c"
 #include "client/curl_utils.c"
 #include "client/config_files.c"
@@ -61,6 +66,8 @@ const cli99_option main_options[] = {
 #include "client/cmd_misc.c"
 #include "client/cmd_warranty.c"
 #include "client/cmd_support.c"
+#include "client/cmd_acpi_dump.c"
+#include "client/cmd_rate_config.c"
 
 #define NBFC_CLIENT_COMMANDS \
   o("start",            Start,            START,            start)         \
@@ -69,6 +76,8 @@ const cli99_option main_options[] = {
   o("status",           Status,           STATUS,           status)        \
   o("sensors",          Sensors,          SENSORS,          sensors)       \
   o("config",           Config,           CONFIG,           config)        \
+  o("rate-config",      Rate_Config,      RATE_CONFIG,      rate_config)   \
+  o("acpi-dump",        Acpi_Dump,        ACPI_DUMP,        acpi_dump)     \
   o("set",              Set,              SET,              set)           \
   o("update",           Update,           UPDATE,           update)        \
   o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   main)          \
@@ -349,6 +358,42 @@ int main(int argc, char *const argv[]) {
       break;
 
     // ========================================================================
+    // Rate-Config options
+    // ========================================================================
+
+    case Option_Rate_Config_File:
+      Rate_Config_Options.file = p.optarg;
+      break;
+
+    case Option_Rate_Config_DSDT_File:
+      Rate_Config_Options.dsdt_file = p.optarg;
+      break;
+
+    case Option_Rate_Config_All:
+      Rate_Config_Options.all = 1;
+      break;
+
+    case Option_Rate_Config_Full_Help:
+      Rate_Config_Options.full_help = 1;
+      break;
+
+    // ========================================================================
+    // Acpi-Dump options
+    // ========================================================================
+
+    case Option_Acpi_Dump_File:
+      Acpi_Dump_Options.file = p.optarg;
+      break;
+
+    case Option_Acpi_Dump_Command:
+      Acpi_Dump_Options.action = AcpiDump_CommandFromString(p.optarg);
+      if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
+        Log_Error("%s: Invalid command", p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    // ========================================================================
     // Show-Variable options
     // ========================================================================
 
@@ -371,6 +416,8 @@ int main(int argc, char *const argv[]) {
   case Command_Stop:              return Stop();
   case Command_Restart:           return Restart();
   case Command_Config:            return Config();
+  case Command_Rate_Config:       return RateConfig();
+  case Command_Acpi_Dump:         return AcpiDump();
   case Command_Set:               return Set();
   case Command_Status:            return Status();
   case Command_Sensors:           return Sensors();

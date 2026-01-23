@@ -23,6 +23,8 @@
 #include "model_config.c"
 #include "program_name.c"
 #include "fan.c"
+#include "acpi_call.c"
+#include "process.c"
 #include "temperature_threshold_manager.c"
 
 const EC_VTable* ec;

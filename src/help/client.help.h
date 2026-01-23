@@ -58,6 +58,38 @@
  "  -r, --recommend       List configs which may work for your device\n"       \
  ""
 
+#define CLIENT_RATE_CONFIG_HELP_TEXT                                           \
+ "Usage: nbfc rate-config [-h|-H] [-d|--dsdt=FILE] [-a] <FILE>\n"              \
+ "\n"                                                                          \
+ "Rates a configuration by analyzing whether it appears safe to execute\n"     \
+ "on the current system.\n"                                                    \
+ "\n"                                                                          \
+ "Please run `nbfc rate-config --full-help` for a full explanation of how\n"   \
+ "to interpret these results.\n"                                               \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
+ "  -H, --full-help       Show full help\n"                                    \
+ "  -a, --all             Rate all available configuration files\n"            \
+ "  -d, --dsdt            Use an alternative DSDT file\n"                      \
+ ""
+
+#define CLIENT_ACPI_DUMP_HELP_TEXT                                             \
+ "Usage: nbfc acpi-dump [-h] [-f|--file=FILE] <COMMAND>\n"                     \
+ "\n"                                                                          \
+ "Dumps information of your ACPI DSDT.\n"                                      \
+ "\n"                                                                          \
+ "Commands:\n"                                                                 \
+ "    registers           List all available registers\n"                      \
+ "    ec-registers        List all available EC registers\n"                   \
+ "    methods             List all available ACPI methods\n"                   \
+ "    dsl                 Dissasemble your DSDT\n"                             \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
+ "  -f, --file FILE       Use an alternative DSDT file\n"                      \
+ ""
+
 #define CLIENT_STATUS_HELP_TEXT                                                \
  "Usage: nbfc status [-h] (-a | -s | -f FAN INDEX) [-w SECONDS]\n"             \
  "\n"                                                                          \

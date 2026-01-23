@@ -3,7 +3,7 @@
 
 #include "error.h"
 
-#include <stdlib.h>
+#include <stdlib.h> // system
 
 static inline Error Process_Call(const char* cmd) {
   switch (system(cmd)) {
@@ -12,5 +12,7 @@ static inline Error Process_Call(const char* cmd) {
   default: return err_stringf("Could not execute `%s'", cmd);
   }
 }
+
+int Process_Capture(const char* file, char* const argv[], char** out_stdout, char** out_stderr);
 
 #endif
