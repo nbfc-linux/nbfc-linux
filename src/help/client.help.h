@@ -18,6 +18,8 @@
  "    update              Download new configuration files\n"                  \
  "    wait-for-hwmon      Wait for /sys/class/hwmon/hwmon* files\n"            \
  "    get-model-name      Print out model name\n"                              \
+ "    acpi-dump           Dumps information of your ACPI DSDT\n"               \
+ "    rate-config         Rate a configuration file\n"                         \
  "    help                Show help\n"                                         \
  "    support             Show how to support the project\n"                   \
  "    warranty            Show warranty\n"                                     \
@@ -83,7 +85,7 @@
  "    registers           List all available registers\n"                      \
  "    ec-registers        List all available EC registers\n"                   \
  "    methods             List all available ACPI methods\n"                   \
- "    dsl                 Dissasemble your DSDT\n"                             \
+ "    dsl                 Disassemble your DSDT\n"                             \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
