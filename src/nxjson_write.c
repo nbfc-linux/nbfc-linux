@@ -21,7 +21,12 @@ static void nx_json_write_string_escaped(NX_JSON_Write* obj, const char* s) {
   char buf[16];
 
   for (; *s; ++s) {
-    if (*s == '"' || *s == '\\' || *s < 0x20) {
+    if (*s == '"' || *s == '\\') {
+      buf[0] = '\\';
+      buf[1] = *s;
+      buf[2] = '\0';
+    }
+    else if (*s < 0x20) {
       snprintf(buf, sizeof(buf), "\\u%.4X", *s);
     }
     else {
