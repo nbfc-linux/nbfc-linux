@@ -41,6 +41,7 @@ enum Option {
   // Acpi-Dump options
   Option_Acpi_Dump_Command,
   Option_Acpi_Dump_File,
+  Option_Acpi_Dump_Json,
 
   // Set options
   Option_Set_Auto,

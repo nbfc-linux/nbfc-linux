@@ -77,7 +77,7 @@
  ""
 
 #define CLIENT_ACPI_DUMP_HELP_TEXT                                             \
- "Usage: nbfc acpi-dump [-h] [-f|--file=FILE] <COMMAND>\n"                     \
+ "Usage: nbfc acpi-dump [-h] [-j|--json] [-f|--file=FILE] <COMMAND>\n"         \
  "\n"                                                                          \
  "Dumps information of your ACPI DSDT.\n"                                      \
  "\n"                                                                          \
@@ -90,6 +90,7 @@
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
  "  -f, --file FILE       Use an alternative DSDT file\n"                      \
+ "  -j, --json            Use JSON output\n"                                   \
  ""
 
 #define CLIENT_STATUS_HELP_TEXT                                                \

@@ -338,11 +338,13 @@ complete -c $prog -n $C002 -s d -l dsdt -d 'Use an alternative DSDT file' -Fr
 complete -c $prog -n $C003 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
 
 # command nbfc acpi-dump
-set -l opts "-f= --file= -h --help --version"
+set -l opts "-f= --file= -j --json -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -f --file"
-set -l C001 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 acpi-dump"
+set -l C001 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -j --json"
+set -l C002 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 acpi-dump"
 complete -c $prog -n $C000 -s f -l file -d 'Use an alternative DSDT file' -Fr
-complete -c $prog -n $C001 -d Commands -f -a '(_nbfc_acpi_dump__command)'
+complete -c $prog -n $C001 -s j -l json -d 'Use JSON output' -f
+complete -c $prog -n $C002 -d Commands -f -a '(_nbfc_acpi_dump__command)'
 
 # command nbfc support
 set -l opts "--upload-firmware --print-command -h --help --version"

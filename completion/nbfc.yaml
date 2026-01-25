@@ -166,6 +166,9 @@ options:
     metavar: "FILE"
     help: "Use an alternative DSDT file"
     complete: ["file"]
+
+  - option_strings: ["-j", "--json"]
+    help: "Use JSON output"
 ---
 prog: "nbfc acpi-dump registers"
 help: "List all available registers"

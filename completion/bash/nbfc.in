@@ -69,6 +69,7 @@ _nbfc__parse_commandline() {
     case "$1" in root:acpi-dump*)
       case "$2" in
         -f|--file) VAR=OPT_file; ARGS=1; return;;
+        -j|--json) VAR=OPT_json; ARGS=0; return;;
       esac
     esac
     case "$1" in root:rate-config*)
@@ -225,7 +226,8 @@ _nbfc() {
   local -a OPT_help OPT_version OPT_read_only OPT_all OPT_service OPT_fan
   local -a OPT_watch OPT_list OPT_set OPT_apply OPT_recommend OPT_auto OPT_speed
   local -a OPT_algorithm OPT_sensor OPT_force OPT_parallel OPT_quiet
-  local -a OPT_full_help OPT_dsdt OPT_file OPT_upload_firmware OPT_print_command
+  local -a OPT_full_help OPT_dsdt OPT_file OPT_json OPT_upload_firmware
+  local -a OPT_print_command
   _nbfc__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -642,7 +644,7 @@ _nbfc_acpi_dump() {
 
   case "$prev" in
     --*) __complete_option "$prev" "$cur" && return 0;;
-    -*([h])[f])
+    -*([jh])[f])
          __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
@@ -650,7 +652,7 @@ _nbfc_acpi_dump() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*([h])[f]*)
+    -*([jh])[f]*)
       local i
       for ((i=2; i <= ${#cur}; ++i)); do
         local pre="${cur:0:$i}" value="${cur:$i}"
@@ -664,6 +666,7 @@ _nbfc_acpi_dump() {
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
     (( ! ${#OPT_file[@]} )) && opts+=(-f --file=)
+    (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1

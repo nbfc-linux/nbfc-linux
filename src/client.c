@@ -385,6 +385,10 @@ int main(int argc, char *const argv[]) {
       Acpi_Dump_Options.file = p.optarg;
       break;
 
+    case Option_Acpi_Dump_Json:
+      Acpi_Dump_Options.json = 1;
+      break;
+
     case Option_Acpi_Dump_Command:
       Acpi_Dump_Options.action = AcpiDump_CommandFromString(p.optarg);
       if (Acpi_Dump_Options.action == AcpiDump_Action_None) {

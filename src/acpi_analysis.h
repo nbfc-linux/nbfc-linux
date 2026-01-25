@@ -3,6 +3,7 @@
 
 #include "error.h"
 #include "macros.h"
+#include "nxjson.h"
 
 #include <stdbool.h>
 
@@ -76,6 +77,9 @@ Error Acpi_Analysis_Get_EC_OperationRegions(const char*, array_of(AcpiOperationR
 
 bool  Acpi_Analysis_Path_Equals(const char*, const char*);
 const char* Acpi_Analysis_Get_Register_Basename(const char*);
+
+nx_json* AcpiMethod_ToJson(AcpiMethod*, const char*, nx_json*);
+nx_json* AcpiRegister_ToJson(AcpiRegister*, const char*, nx_json*);
 
 void AcpiMethod_Free(AcpiMethod*);
 void AcpiRegister_Free(AcpiRegister*);

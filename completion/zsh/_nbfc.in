@@ -342,7 +342,7 @@ _nbfc_rate_config() {
 }
 
 _nbfc_acpi_dump() {
-  local opts='-f= --file= -h --help --version'
+  local opts='-f= --file= -j --json -h --help --version'
   local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
   _nbfc__query init "$opts" "${words[@]}"
 
@@ -355,6 +355,7 @@ _nbfc_acpi_dump() {
 
   local -a args=(
     '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -366,6 +367,7 @@ _nbfc_acpi_dump() {
 _nbfc_acpi_dump_registers() {
   local -a args=(
     '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -377,6 +379,7 @@ _nbfc_acpi_dump_registers() {
 _nbfc_acpi_dump_ec_registers() {
   local -a args=(
     '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -388,6 +391,7 @@ _nbfc_acpi_dump_ec_registers() {
 _nbfc_acpi_dump_methods() {
   local -a args=(
     '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -399,6 +403,7 @@ _nbfc_acpi_dump_methods() {
 _nbfc_acpi_dump_dsl() {
   local -a args=(
     '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command

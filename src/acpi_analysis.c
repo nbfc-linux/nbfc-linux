@@ -4,6 +4,7 @@
 #include "process.h"
 #include "file_utils.h"
 #include "regex_utils.h"
+#include "nxjson_utils.h"
 
 #include <stdint.h>
 #include <string.h> // strlen
@@ -553,4 +554,29 @@ const char* Acpi_Analysis_Get_Register_Basename(const char* path) {
   }
 
   return p;
+}
+
+/*
+ * Converts an ACPI method to a JSON object and attaches it to parent under
+ * the given key.
+ */
+nx_json* AcpiMethod_ToJson(AcpiMethod* method, const char* key, nx_json* parent) {
+  nx_json* object = create_json_object(key, parent);
+  create_json_string("name", object, method->name);
+  create_json_integer("length", object, method->length);
+  return object;
+}
+
+/*
+ * Converts an ACPI register to a JSON object and attaches it to parent under
+ * the given key.
+ */
+nx_json* AcpiRegister_ToJson(AcpiRegister* register_, const char* key, nx_json* parent) {
+  nx_json* object = create_json_object(key, parent);
+  create_json_string("name", object, register_->name);
+  create_json_string("region", object, register_->region);
+  create_json_integer("bit_offset", object, register_->bit_offset);
+  create_json_integer("bit_length", object, register_->bit_length);
+  create_json_integer("access_byte_width", object, register_->access_byte_width);
+  return object;
 }

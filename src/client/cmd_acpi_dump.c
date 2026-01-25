@@ -1,6 +1,7 @@
 #include "../log.h"
 #include "../file_utils.h"
 #include "../acpi_analysis.h"
+#include "../nxjson_write.h"
 
 #include "check_root.h"
 #include "client_global.h"
@@ -12,6 +13,7 @@ const cli99_option acpi_dump_options[] = {
   cli99_include_options(&main_options),
   {"command",   Option_Acpi_Dump_Command, 1},
   {"-f|--file", Option_Acpi_Dump_File,    1},
+  {"-j|--json", Option_Acpi_Dump_Json,    0},
   cli99_options_end()
 };
 
@@ -26,9 +28,11 @@ enum AcpiDump_Action {
 struct {
   enum AcpiDump_Action action;
   const char* file;
+  bool json;
 } Acpi_Dump_Options = {
   AcpiDump_Action_None,
-  ACPI_ANALYSIS_ACPI_DSDT
+  ACPI_ANALYSIS_ACPI_DSDT,
+  false
 };
 
 enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
@@ -37,6 +41,14 @@ enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
   if (! strcmp(s, "methods"))      return AcpiDump_Action_Methods;
   if (! strcmp(s, "dsl"))          return AcpiDump_Action_DSL;
   return AcpiDump_Action_None;
+}
+
+/*
+ * Dumps a JSON object to STDOUT.
+ */
+static inline void AcpiDump_WriteJson(const nx_json* json) {
+  NX_JSON_Write write_obj = NX_JSON_Write_Init(STDOUT_FILENO, WriteMode_Write);
+  nx_json_write(&write_obj, json, 0);
 }
 
 /*
@@ -66,7 +78,7 @@ static int AcpiDump_DSL(const char* dsdt_file) {
 /*
  * Dumps the methods of a DSDT to stdout.
  */
-static int AcpiDump_Methods(const char* dsdt_file) {
+static int AcpiDump_Methods(const char* dsdt_file, bool json) {
   Error e;
   array_of(AcpiMethod) methods = {0};
 
@@ -82,8 +94,18 @@ static int AcpiDump_Methods(const char* dsdt_file) {
     return NBFC_EXIT_FAILURE;
   }
 
-  for_each_array(AcpiMethod*, method, methods) {
-    printf("%s args=%d\n", method->name, method->length);
+  if (json) {
+    nx_json root = {0};
+    nx_json* array = create_json_array(NULL, &root);
+    for_each_array(AcpiMethod*, method, methods)
+      AcpiMethod_ToJson(method, NULL, array);
+    AcpiDump_WriteJson(array);
+    nx_json_free(array);
+  }
+  else {
+    for_each_array(AcpiMethod*, method, methods) {
+      printf("%s args=%d\n", method->name, method->length);
+    }
   }
 
   for_each_array(AcpiMethod*, method, methods) {
@@ -111,7 +133,7 @@ static bool AcpiDump_ContainsRegion(array_of(AcpiOperationRegion)* ec_regions, c
  * If `only_ec` is true, only output registers that are available
  * through the embedded controller.
  */
-static int AcpiDump_Registers(const char* dsdt_file, bool only_ec) {
+static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
   Error e;
   array_of(AcpiRegister) registers = {0};
   array_of(AcpiOperationRegion) ec_regions = {0};
@@ -156,19 +178,35 @@ static int AcpiDump_Registers(const char* dsdt_file, bool only_ec) {
   // Output
   // ==========================================================================
 
-  for_each_array(AcpiRegister*, register_, registers) {
-    if (only_ec && !AcpiDump_ContainsRegion(&ec_regions, register_->region))
-      continue;
+  if (json) {
+    nx_json root = {0};
+    nx_json* array = create_json_array(NULL, &root);
 
-    printf("%s [%s] byte=%d byte_hex=0x%X bit=%d total_bit=%d len=%d acc=%d\n",
-      register_->name,
-      register_->region,
-      register_->bit_offset / 8,
-      register_->bit_offset / 8,
-      register_->bit_offset % 8,
-      register_->bit_offset,
-      register_->bit_length,
-      register_->access_byte_width);
+    for_each_array(AcpiRegister*, register_, registers) {
+      if (only_ec && !AcpiDump_ContainsRegion(&ec_regions, register_->region))
+        continue;
+
+      AcpiRegister_ToJson(register_, NULL, array);
+    }
+
+    AcpiDump_WriteJson(array);
+    nx_json_free(array);
+  }
+  else {
+    for_each_array(AcpiRegister*, register_, registers) {
+      if (only_ec && !AcpiDump_ContainsRegion(&ec_regions, register_->region))
+        continue;
+
+      printf("%s [%s] byte=%d byte_hex=0x%X bit=%d total_bit=%d len=%d acc=%d\n",
+        register_->name,
+        register_->region,
+        register_->bit_offset / 8,
+        register_->bit_offset / 8,
+        register_->bit_offset % 8,
+        register_->bit_offset,
+        register_->bit_length,
+        register_->access_byte_width);
+    }
   }
 
   // ==========================================================================
@@ -190,6 +228,7 @@ end:
 
 int AcpiDump() {
   const char* const dsdt_file = Acpi_Dump_Options.file;
+  const bool json = Acpi_Dump_Options.json;
 
   if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
     Log_Error("Missing command");
@@ -208,9 +247,9 @@ int AcpiDump() {
 
   switch (Acpi_Dump_Options.action) {
     case AcpiDump_Action_DSL:         return AcpiDump_DSL(dsdt_file);
-    case AcpiDump_Action_Methods:     return AcpiDump_Methods(dsdt_file);
-    case AcpiDump_Action_Registers:   return AcpiDump_Registers(dsdt_file, false);
-    case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(dsdt_file, true);
+    case AcpiDump_Action_Methods:     return AcpiDump_Methods(dsdt_file, json);
+    case AcpiDump_Action_Registers:   return AcpiDump_Registers(dsdt_file, json, false);
+    case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(dsdt_file, json, true);
     default:                          return NBFC_EXIT_FAILURE;
   }
 }
