@@ -5,6 +5,7 @@
 #include "../config_rating.h"
 #include "../file_utils.h"
 #include "../model_config_utils.h"
+#include "../nxjson_utils.h"
 
 #include <string.h> // memset
 #include <linux/limits.h>
@@ -18,6 +19,7 @@ const cli99_option rate_config_options[] = {
   {"-d|--dsdt",      Option_Rate_Config_DSDT_File, 1},
   {"-a|--all",       Option_Rate_Config_All,       0},
   {"-H|--full-help", Option_Rate_Config_Full_Help, 0},
+  {"-j|--json",      Option_Rate_Config_Json,      0},
   {"file",           Option_Rate_Config_File,      1},
   cli99_options_end()
 };
@@ -25,9 +27,11 @@ const cli99_option rate_config_options[] = {
 struct {
   bool        all;
   bool        full_help;
+  bool        json;
   const char* file;
   const char* dsdt_file;
 } Rate_Config_Options = {
+  false,
   false,
   false,
   NULL,
@@ -157,8 +161,10 @@ static array_of(ConfigWithData) RateConfig_RateConfigs(
  * Groups an array of ConfigWithData by model similarity.
  *
  * Grouping is performed by setting ConfigWithData.group_id.
+ *
+ * Returns the number of groups.
  */
-static void RateConfig_GroupRatingsBySimilarConfig(array_of(ConfigWithData)* configs) {
+static array_size_t RateConfig_GroupRatingsBySimilarConfig(array_of(ConfigWithData)* configs) {
   const array_size_t group_unset = (array_size_t) -1;
   array_size_t next_group = 0;
 
@@ -181,6 +187,8 @@ static void RateConfig_GroupRatingsBySimilarConfig(array_of(ConfigWithData)* con
 
     ++next_group;
   }
+
+  return next_group;
 }
 
 static void RateConfig_SortResultByScore(array_of(ConfigWithData)* result) {
@@ -213,30 +221,54 @@ static void RateConfig_SortResultByPriority(array_of(ConfigWithData)* result) {
   }
 }
 
-static bool RateConfig_PrintResult(array_of(ConfigWithData)* results, array_size_t* group_id) {
+static void RateConfig_PrintResultGroup(array_of(ConfigWithData)* results, array_size_t group_id) {
   ConfigWithData* last_result = NULL;
 
   for_each_array(ConfigWithData*, result, *results) {
-    if (result->group_id != *group_id)
+    if (result->group_id != group_id)
       continue;
 
     printf("%s\n", result->file);
     last_result = result;
   }
 
-  if (last_result) {
-    ConfigRating_RatingPrint(&last_result->rating);
-    (*group_id)++;
-    return true;
-  }
-
-  return false;
+  ConfigRating_RatingPrint(&last_result->rating);
 }
 
-static void RateConfig_PrintResults(array_of(ConfigWithData)* results) {
-  array_size_t group_id = 0;
-  while (RateConfig_PrintResult(results, &group_id))
+static void RateConfig_PrintResults(array_of(ConfigWithData)* results, array_size_t num_groups) {
+  for (array_size_t group_id = 0; group_id < num_groups; ++group_id) {
+    RateConfig_PrintResultGroup(results, group_id);
     printf("\n");
+  }
+}
+
+static void RateConfig_AddJsonResult(nx_json* array, array_of(ConfigWithData)* results, array_size_t group_id) {
+  ConfigWithData* last_result = NULL;
+  nx_json* object = create_json_object(NULL, array);
+  nx_json* files = create_json_array("files", object);
+
+  for_each_array(ConfigWithData*, result, *results) {
+    if (result->group_id != group_id)
+      continue;
+
+    create_json_string(NULL, files, result->file);
+    last_result = result;
+  }
+
+  ConfigRating_ToJson(&last_result->rating, "rating", object);
+}
+
+static void RateConfig_PrintResultsJson(array_of(ConfigWithData)* results, array_size_t num_groups) {
+  nx_json root = {0};
+  nx_json* array = create_json_array(NULL, &root);
+
+  for (array_size_t group_id = 0; group_id < num_groups; ++group_id)
+    RateConfig_AddJsonResult(array, results, group_id);
+
+  NX_JSON_Write write_obj = NX_JSON_Write_Init(STDOUT_FILENO, WriteMode_Write);
+  nx_json_write(&write_obj, array, 0);
+
+  nx_json_free(array);
 }
 
 /*
@@ -244,7 +276,7 @@ static void RateConfig_PrintResults(array_of(ConfigWithData)* results) {
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateFiles(ConfigRating* config_rating, array_of(ConfigFile)* files) {
+static Error RateConfig_RateFiles(ConfigRating* config_rating, bool json, array_of(ConfigFile)* files) {
   array_of(ConfigWithData) ratings;
 
   // Load model configuration and rate them
@@ -257,10 +289,13 @@ static Error RateConfig_RateFiles(ConfigRating* config_rating, array_of(ConfigFi
   RateConfig_SortResultByScore(&ratings);
 
   // Set grouping
-  RateConfig_GroupRatingsBySimilarConfig(&ratings);
+  array_size_t num_groups = RateConfig_GroupRatingsBySimilarConfig(&ratings);
 
   // Print results
-  RateConfig_PrintResults(&ratings);
+  if (json)
+    RateConfig_PrintResultsJson(&ratings, num_groups);
+  else
+    RateConfig_PrintResults(&ratings, num_groups);
 
   // Free
   for_each_array(ConfigWithData*, rating, ratings) {
@@ -282,15 +317,16 @@ static void PrintFullHelpNotice() {
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateAll(ConfigRating* config_rating) {
+static Error RateConfig_RateAll(ConfigRating* config_rating, bool json) {
   Error e;
 
   // Get all configuration files
   array_of(ConfigFile) all_configs = List_All_Configs();
 
   // Rate configs
-  e = RateConfig_RateFiles(config_rating, &all_configs);
-  PrintFullHelpNotice();
+  e = RateConfig_RateFiles(config_rating, json, &all_configs);
+  if (!json)
+    PrintFullHelpNotice();
 
   // Free
   ConfigFiles_Free(&all_configs);
@@ -303,17 +339,20 @@ static Error RateConfig_RateAll(ConfigRating* config_rating) {
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateSingle(ConfigRating* config_rating, const char* dsdt_file) {
+static Error RateConfig_RateSingle(ConfigRating* config_rating, bool json, const char* file) {
   Error e;
   ConfigFile cfg_file;
-  cfg_file.config_name = (char*) dsdt_file;
-
   array_of(ConfigFile) configs;
+
+  cfg_file.config_name = (char*) file;
+
   configs.size = 1;
   configs.data = &cfg_file;
 
-  e = RateConfig_RateFiles(config_rating, &configs);
-  PrintFullHelpNotice();
+  e = RateConfig_RateFiles(config_rating, json, &configs);
+  if (!json)
+    PrintFullHelpNotice();
+
   return e;
 }
 
@@ -385,9 +424,9 @@ int RateConfig() {
   // ==========================================================================
   
   if (Rate_Config_Options.all)
-    e = RateConfig_RateAll(&config_rating);
+    e = RateConfig_RateAll(&config_rating, Rate_Config_Options.json);
   else
-    e = RateConfig_RateSingle(&config_rating, Rate_Config_Options.file);
+    e = RateConfig_RateSingle(&config_rating, Rate_Config_Options.json, Rate_Config_Options.file);
 
   ConfigRating_Free(&config_rating);
 

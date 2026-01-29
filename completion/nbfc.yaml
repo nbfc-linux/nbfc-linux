@@ -149,6 +149,8 @@ options:
     metavar: "FILE"
     complete: ["file"]
 
+  - option_strings: ["-j", "--json"]
+    help: "Use JSON output"
 positionals:
   - number: 1
     metavar: "FILE"

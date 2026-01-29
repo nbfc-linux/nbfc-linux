@@ -2,128 +2,8 @@
 #include "nxjson_utils.h"
 #include "memory.h"
 
-#include <stdio.h>  // printf, snprintf
-#include <string.h> // memset, strcmp, strstr, strlen
-
-/*
- * Parses the JSON string and populates the `ConfigRatingRules` structure.
- *
- * Returns an error if:
- *  - The JSON itself is invalid.
- *  - The JSON structure is invalid (invalid fields, invalid types).
- */
-Error ConfigRatingRules_FromJson(ConfigRatingRules* rules, const char* rules_json) {
-  Error e = err_success();
-  char* rules_json_temp = NULL;
-  const nx_json* root = NULL;
-
-  memset(rules, 0, sizeof(*rules));
-  rules_json_temp = Mem_Strdup(rules_json);
-  root = nx_json_parse_utf8(rules_json_temp);
-  
-  if (! root) {
-    e = err_nxjson(NULL);
-    goto end;
-  }
-
-  if (root->type != NX_JSON_OBJECT) {
-    e = err_string("Not a JSON object");
-    goto end;
-  }
-
-#define READ_REGISTER_ARRAY(PARENT_KEY, KEY, FIELD)                            \
-  if (! strcmp(child->key, KEY)) {                                             \
-    if (child->type != NX_JSON_ARRAY) {                                        \
-      e = err_stringf("%s: %s: Not a JSON array", PARENT_KEY, KEY);            \
-      goto end;                                                                \
-    }                                                                          \
-                                                                               \
-    rules->FIELD.size = 0;                                                     \
-    rules->FIELD.data = Mem_Realloc(                                           \
-      rules->FIELD.data,                                                       \
-      child->val.children.length * sizeof(AcpiRegisterName));                  \
-                                                                               \
-    nx_json_for_each(register_name, child) {                                   \
-      if (register_name->type != NX_JSON_STRING) {                             \
-        e = err_stringf("%s: %s[%d]: Not a string",                            \
-              PARENT_KEY, KEY, rules->FIELD.size);                             \
-        goto end;                                                              \
-      }                                                                        \
-                                                                               \
-      if (strlen(register_name->val.text) > sizeof(AcpiRegisterName) - 1) {    \
-        e = err_stringf("%s: %s[%d]: %s: Invalid length",                      \
-              PARENT_KEY, KEY, rules->FIELD.size, register_name->val.text);    \
-        goto end;                                                              \
-      }                                                                        \
-                                                                               \
-      snprintf(                                                                \
-        rules->FIELD.data[rules->FIELD.size],                                  \
-        sizeof(AcpiRegisterName),                                              \
-        "%s",                                                                  \
-        register_name->val.text);                                              \
-                                                                               \
-      rules->FIELD.size++;                                                     \
-    }                                                                          \
-                                                                               \
-    continue;                                                                  \
-  }
-
-  nx_json_for_each(category, root) {
-    if (! strcmp(category->key, "FanConfiguration")) {
-      if (category->type != NX_JSON_OBJECT) {
-        e = err_stringf("%s: Not a JSON object", "FanConfiguration");
-        goto end;
-      }
-
-      nx_json_for_each(child, category) {
-        READ_REGISTER_ARRAY("FanConfiguration", "RegisterFullMatch", FanRegistersFullMatch)
-        READ_REGISTER_ARRAY("FanConfiguration", "RegisterPartialMatch", FanRegistersPartialMatch)
-      
-        e = err_stringf("%s: Unknown key: %s", "FanConfiguration", child->key);
-        goto end;
-      }
-
-      continue;
-    }
-
-    if (! strcmp(category->key, "RegisterWriteConfiguration")) {
-      if (category->type != NX_JSON_OBJECT) {
-        e = err_stringf("%s: Not a JSON object", "RegisterWriteConfiguration");
-        goto end;
-      }
-
-      nx_json_for_each(child, category) {
-        READ_REGISTER_ARRAY("RegisterWriteConfiguration", "RegisterFullMatch", RegisterWriteFullMatch)
-        READ_REGISTER_ARRAY("RegisterWriteConfiguration", "RegisterPartialMatch", RegisterWritePartialMatch)
-      
-        e = err_stringf("%s: Unknown key: %s", "RegisterWriteConfiguration", child->key);
-        goto end;
-      }
-
-      continue;
-    }
-
-    e = err_stringf("Unknown key: %s", category->key);
-    goto end;
-  }
-
-end:
-  nx_json_free(root);
-  Mem_Free(rules_json_temp);
-
-  if (e)
-    ConfigRatingRules_Free(rules);
-
-  return e;
-}
-
-void ConfigRatingRules_Free(ConfigRatingRules* rules) {
-  Mem_Free(rules->FanRegistersFullMatch.data);
-  Mem_Free(rules->FanRegistersPartialMatch.data);
-  Mem_Free(rules->RegisterWriteFullMatch.data);
-  Mem_Free(rules->RegisterWritePartialMatch.data);
-  memset(rules, 0, sizeof(*rules));
-}
+#include <stdio.h>  // printf
+#include <string.h> // memset, strcmp, strstr
 
 Error ConfigRating_Init(ConfigRating* config_rating, const char* dsdt_file, const char* rules_json) {
   Error e;
@@ -172,12 +52,30 @@ void ConfigRating_Free(ConfigRating* config_rating) {
   memset(config_rating, 0, sizeof(*config_rating));
 }
 
-static bool ConfigRating_IsKnownFanRegister(ConfigRating* config_rating, const char* s) {
-  for_each_array(AcpiRegisterName*, name, config_rating->rules.FanRegistersFullMatch)
-    if (! strcmp(s, *name))
-      return true;
+enum RegisterMatchType {
+  RegisterMatchType_NoMatch,
+  RegisterMatchType_NoModeMatch,
+  RegisterMatchType_FullMatch,
+};
 
-  return false;
+static enum RegisterMatchType ConfigRating_IsKnownFanRegister(
+  ConfigRating* config_rating,
+  enum RegisterType type,
+  const char* s)
+{
+  for_each_array(RegisterRule*, rule, config_rating->rules.FanRegistersFullMatch) {
+    if (! strcmp(s, rule->Name)) {
+      if (type == RegisterType_FanReadRegister && rule->Mode & RegisterRuleFanMode_Read)
+        return RegisterMatchType_FullMatch;
+
+      if (type == RegisterType_FanWriteRegister && rule->Mode & RegisterRuleFanMode_Write)
+        return RegisterMatchType_FullMatch;
+
+      return RegisterMatchType_NoModeMatch;
+    }
+  }
+
+  return RegisterMatchType_NoMatch;
 }
 
 static bool ConfigRating_IsSomeFanRegister(ConfigRating* config_rating, const char* s) {
@@ -243,73 +141,82 @@ static AcpiMethod* ConfigRating_FindMethod(
   return NULL;
 }
 
+static bool ConfigRating_RegisterIsByteAligned(ConfigRating_RegisterRating* rating) {
+  if (! rating->info)
+    return false;
+
+  return (rating->info->bit_offset % 8 == 0);
+}
+
 static ConfigRating_RegisterRating ConfigRating_RateRegister(
   ConfigRating* config_rating,
-  enum RegisterType register_type,
+  enum RegisterType type,
   int offset
 ) {
   ConfigRating_RegisterRating rated = {0};
-  rated.register_type = register_type;
-  rated.register_offset = offset;
-  rated.acpi_register = ConfigRating_FindEcRegister(config_rating, offset);
+  rated.type = type;
+  rated.offset = offset;
+  rated.info= ConfigRating_FindEcRegister(config_rating, offset);
 
-  if (! rated.acpi_register) {
-    rated.register_score = RegisterScore_NotFound;
+  if (! rated.info) {
+    rated.score = RegisterScore_NotFound;
     goto ret;
   }
 
-  if (rated.acpi_register->bit_offset % 8 == 0)
-    rated.register_alignment = RegisterAlignment_OK;
-  else
-    rated.register_alignment = RegisterAlignment_Misaligned;
+  const char* const name = Acpi_Analysis_Get_Register_Basename(rated.info->name);
 
-  const char* const name = Acpi_Analysis_Get_Register_Basename(rated.acpi_register->name);
-
-  if (register_type == RegisterType_FanRegister) {
-    if (ConfigRating_IsKnownFanRegister(config_rating, name)) {
-      rated.register_score = RegisterScore_FullMatch;
-      goto ret;
+  if (type == RegisterType_FanReadRegister || type == RegisterType_FanWriteRegister) {
+    enum RegisterMatchType match = ConfigRating_IsKnownFanRegister(config_rating, type, name);
+    switch (match) {
+      case RegisterMatchType_NoMatch:
+        break;
+      case RegisterMatchType_FullMatch:
+        rated.score = RegisterScore_FullMatch;
+        goto ret;
+      case RegisterMatchType_NoModeMatch:
+        rated.score = RegisterScore_NoMatch;
+        goto ret;
     }
 
     if (ConfigRating_IsBadRegister(name)) {
-      rated.register_score = RegisterScore_BadRegister;
+      rated.score = RegisterScore_BadRegister;
       goto ret;
     }
 
     if (ConfigRating_IsSomeFanRegister(config_rating, name)) {
-      rated.register_score = RegisterScore_PartialMatch;
+      rated.score = RegisterScore_PartialMatch;
       goto ret;
     }
 
     if (ConfigRating_IsMinimalFanRegister(name)) {
-      rated.register_score = RegisterScore_MinimalMatch;
+      rated.score = RegisterScore_MinimalMatch;
       goto ret;
     }
 
-    rated.register_score = RegisterScore_NoMatch;
+    rated.score = RegisterScore_NoMatch;
   }
   else {
     if (ConfigRating_IsKnownRegisterWriteConfigRegister(config_rating, name)) {
-      rated.register_score = RegisterScore_FullMatch;
+      rated.score = RegisterScore_FullMatch;
       goto ret;
     }
 
     if (ConfigRating_IsBadRegister(name)) {
-      rated.register_score = RegisterScore_BadRegister;
+      rated.score = RegisterScore_BadRegister;
       goto ret;
     }
 
     if (ConfigRating_IsSomeRegisterWriteConfigRegister(config_rating, name)) {
-      rated.register_score = RegisterScore_PartialMatch;
+      rated.score = RegisterScore_PartialMatch;
       goto ret;
     }
 
     if (ConfigRating_IsMinimalFanRegister(name)) {
-      rated.register_score = RegisterScore_MinimalMatch;
+      rated.score = RegisterScore_MinimalMatch;
       goto ret;
     }
 
-    rated.register_score = RegisterScore_NoMatch;
+    rated.score = RegisterScore_NoMatch;
   }
 
 ret:
@@ -321,35 +228,38 @@ static ConfigRating_MethodRating ConfigRating_RateMethod(
   const char* method_call
 ) {
   ConfigRating_MethodRating rated = {0};
-  rated.method_call = Mem_Strdup(method_call);
-  rated.acpi_method = ConfigRating_FindMethod(config_rating, method_call);
+  rated.call = Mem_Strdup(method_call);
+  rated.info = ConfigRating_FindMethod(config_rating, method_call);
 
-  if (rated.acpi_method)
-    rated.method_score = MethodScore_Found;
+  if (rated.info)
+    rated.score = MethodScore_Found;
   else
-    rated.method_score = MethodScore_NotFound;
+    rated.score = MethodScore_NotFound;
 
   return rated;
 }
 
 static void ConfigRating_RegisterRatingPrint(ConfigRating_RegisterRating* rating) {
-  printf("\tEC Register %d (0x%X):\n", rating->register_offset, rating->register_offset);
+  printf("\tEC Register %d (0x%X):\n", rating->offset, rating->offset);
 
-  switch (rating->register_type) {
-  case RegisterType_FanRegister:
-    printf("\t\tType:   Fan register\n");
+  switch (rating->type) {
+  case RegisterType_FanReadRegister:
+    printf("\t\tType:   Fan read register\n");
+    break;
+  case RegisterType_FanWriteRegister:
+    printf("\t\tType:   Fan write register\n");
     break;
   case RegisterType_RegisterWriteConfigurationRegister:
     printf("\t\tType:   RegisterWriteConfiguration register\n");
     break;
   }
 
-  if (rating->register_score != RegisterScore_NotFound) {
-    printf("\t\tName:   %s\n", rating->acpi_register->name);
-    printf("\t\tLength: %d\n", rating->acpi_register->bit_length);
+  if (rating->score != RegisterScore_NotFound) {
+    printf("\t\tName:   %s\n", rating->info->name);
+    printf("\t\tLength: %d\n", rating->info->bit_length);
   }
 
-  switch (rating->register_score) {
+  switch (rating->score) {
     case RegisterScore_FullMatch:
       printf("\t\tRating: FULL MATCH\n");
       break;
@@ -377,9 +287,9 @@ static void ConfigRating_RegisterRatingPrint(ConfigRating_RegisterRating* rating
 }
 
 static void ConfigRating_MethodRatingPrint(ConfigRating_MethodRating* rating) {
-  printf("\tACPI Method \"%s\":\n", rating->method_call);
+  printf("\tACPI Method \"%s\":\n", rating->call);
 
-  switch (rating->method_score) {
+  switch (rating->score) {
     case MethodScore_Found:
       printf("\t\tRating: FULL MATCH\n");
       break;
@@ -444,11 +354,11 @@ void ConfigRating_RateModelConfig(
     // Registers
     if (FanConfiguration_IsSet_ReadRegister(fan_config))
       rating->register_ratings.data[rating->register_ratings.size++] = \
-        ConfigRating_RateRegister(config_rating, RegisterType_FanRegister, fan_config->ReadRegister);
+        ConfigRating_RateRegister(config_rating, RegisterType_FanReadRegister, fan_config->ReadRegister);
 
     if (FanConfiguration_IsSet_WriteRegister(fan_config))
       rating->register_ratings.data[rating->register_ratings.size++] = \
-        ConfigRating_RateRegister(config_rating, RegisterType_FanRegister, fan_config->WriteRegister);
+        ConfigRating_RateRegister(config_rating, RegisterType_FanWriteRegister, fan_config->WriteRegister);
 
     // Methods
     if (FanConfiguration_IsSet_ReadAcpiMethod(fan_config))
@@ -490,8 +400,8 @@ void ConfigRating_RateModelConfig(
   for_each_array(ConfigRating_RegisterRating*, reg_rating, rating->register_ratings) {
     int register_points = 0;
 
-    if (reg_rating->register_type == RegisterType_FanRegister) {
-      switch (reg_rating->register_score) {
+    if (reg_rating->type == RegisterType_FanReadRegister || reg_rating->type == RegisterType_FanWriteRegister) {
+      switch (reg_rating->score) {
         case RegisterScore_FullMatch:      register_points = 10; break;
         case RegisterScore_PartialMatch:   register_points = 9;  break;
         case RegisterScore_MinimalMatch:   register_points = 7;  break;
@@ -500,19 +410,19 @@ void ConfigRating_RateModelConfig(
         case RegisterScore_BadRegister:    points = 0;           goto end;
       }
 
-      if (reg_rating->register_score != RegisterScore_NotFound) {
-        if (reg_rating->register_alignment == RegisterAlignment_Misaligned) {
+      if (reg_rating->score != RegisterScore_NotFound) {
+        if (! ConfigRating_RegisterIsByteAligned(reg_rating)) {
           register_points = 0;
         }
 
-        const int bit_length = reg_rating->acpi_register->bit_length;
+        const int bit_length = reg_rating->info->bit_length;
         if (bit_length != 8 && bit_length != 16) {
           register_points = 0;
         }
       }
     }
     else {
-      switch (reg_rating->register_score) {
+      switch (reg_rating->score) {
         case RegisterScore_FullMatch:      register_points = 10; break;
         case RegisterScore_PartialMatch:   register_points = 9;  break;
         case RegisterScore_MinimalMatch:   register_points = 7;  break;
@@ -528,7 +438,7 @@ void ConfigRating_RateModelConfig(
   for_each_array(ConfigRating_MethodRating*, met_rating, rating->method_ratings) {
     int method_points = 0;
 
-    switch (met_rating->method_score) {
+    switch (met_rating->score) {
       case MethodScore_Found:
         method_points = 10;
         priority += 10;
@@ -552,7 +462,7 @@ void ConfigRating_RegisterRatingFree(ConfigRating_RegisterRating* rating) {
 }
 
 void ConfigRating_MethodRatingFree(ConfigRating_MethodRating* rating) {
-  Mem_Free(rating->method_call);
+  Mem_Free(rating->call);
 }
 
 void ConfigRating_RatingFree(ConfigRating_Rating* rating) {
@@ -563,4 +473,91 @@ void ConfigRating_RatingFree(ConfigRating_Rating* rating) {
     ConfigRating_MethodRatingFree(met_rating);
 
   memset(rating, 0, sizeof(*rating));
+}
+
+const char* RegisterType_ToStr(enum RegisterType type) {
+  switch (type) {
+    case RegisterType_FanReadRegister:
+      return "FanReadRegister";
+    case RegisterType_FanWriteRegister:
+      return "FanWriteRegister";
+    case RegisterType_RegisterWriteConfigurationRegister:
+      return "RegisterWriteConfigurationRegister";
+  }
+
+  return "?";
+}
+
+const char* RegisterScore_ToStr(enum RegisterScore score) {
+  switch (score) {
+    case RegisterScore_FullMatch:
+      return "FullMatch";
+    case RegisterScore_PartialMatch:
+      return "PartialMatch";
+    case RegisterScore_MinimalMatch:
+      return "MinimalMatch";
+    case RegisterScore_NoMatch:
+      return "NoMatch";
+    case RegisterScore_NotFound:
+      return "NotFound";
+    case RegisterScore_BadRegister:
+      return "BadRegister";
+  }
+
+  return "?";
+}
+
+const char* MethodScore_ToStr(enum MethodScore score) {
+  switch (score) {
+    case MethodScore_Found:
+      return "Found";
+    case MethodScore_NotFound:
+      return "NotFound";
+  }
+
+  return "?";
+}
+
+static nx_json* RegisterRating_ToJson(ConfigRating_RegisterRating* rating, const char* key, nx_json* parent) {
+  nx_json* object = create_json_object(key, parent);
+
+  create_json_integer("offset", object, rating->offset);
+  create_json_string("type", object, RegisterType_ToStr(rating->type));
+  create_json_string("score", object, RegisterScore_ToStr(rating->score));
+
+  if (rating->score != RegisterScore_NotFound) {
+    AcpiRegister_ToJson(rating->info, "info", object);
+  }
+
+  return object;
+}
+
+static nx_json* MethodRating_ToJson(ConfigRating_MethodRating* rating, const char* key, nx_json* parent) {
+  nx_json* object = create_json_object(key, parent);
+
+  create_json_string("call", object, rating->call);
+  create_json_string("score", object, MethodScore_ToStr(rating->score));
+
+  if (rating->score != MethodScore_NotFound) {
+    AcpiMethod_ToJson(rating->info, "info", object);
+  }
+
+  return object;
+}
+
+nx_json* ConfigRating_ToJson(ConfigRating_Rating* rating, const char* key, nx_json* parent) {
+  nx_json* object = create_json_object(key, parent);
+
+  create_json_double("score", object, rating->score);
+  create_json_integer("priority", object, rating->priority);
+
+  nx_json* register_ratings = create_json_array("register_ratings", object);
+  for_each_array(ConfigRating_RegisterRating*, r, rating->register_ratings)
+    RegisterRating_ToJson(r, NULL, register_ratings);
+
+  nx_json* method_ratings = create_json_array("method_ratings", object);
+  for_each_array(ConfigRating_MethodRating*, r, rating->method_ratings)
+    MethodRating_ToJson(r, NULL, method_ratings);
+
+  return object;
 }

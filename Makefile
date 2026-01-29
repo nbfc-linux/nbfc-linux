@@ -286,6 +286,7 @@ src/nbfc: \
 	src/client/str_functions.h \
 	src/acpi_analysis.h src/acpi_analysis.c \
 	src/config_rating.h src/config_rating.c \
+	src/config_rating_rules.h src/config_rating_rules.c \
 	src/error.h src/error.c \
 	src/help/ec_probe.help.h \
 	src/mkdir_p.c src/mkdir_p.h \

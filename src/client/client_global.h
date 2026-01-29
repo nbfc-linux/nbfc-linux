@@ -37,6 +37,7 @@ enum Option {
   Option_Rate_Config_DSDT_File,
   Option_Rate_Config_All,
   Option_Rate_Config_Full_Help,
+  Option_Rate_Config_Json,
 
   // Acpi-Dump options
   Option_Acpi_Dump_Command,

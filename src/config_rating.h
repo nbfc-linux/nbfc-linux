@@ -4,72 +4,8 @@
 #include "macros.h"
 #include "model_config.h"
 #include "acpi_analysis.h"
-
-/*
- * Default rules for rating a configuration.
- */
-#define CONFIG_RATING_DEFAULT_RULES    \
-  "{"                                  \
-    "\"FanConfiguration\":"            \
-      "{"                              \
-        "\"RegisterFullMatch\":["      \
-          "\"PFAN\","                  \
-          "\"SFAN\","                  \
-          "\"CFAN\","                  \
-          "\"XFAN\","                  \
-          "\"FAN1\","                  \
-          "\"FSW1\","                  \
-          "\"FRDC\","                  \
-          "\"FTGC\","                  \
-          "\"FR2C\","                  \
-          "\"FT2C\""                   \
-        "],"                           \
-                                       \
-        "\"RegisterPartialMatch\":["   \
-          "\"FAN\","                   \
-          "\"RPM\","                   \
-          "\"PWM\""                    \
-        "]"                            \
-      "},"                             \
-                                       \
-    "\"RegisterWriteConfiguration\":"  \
-      "{"                              \
-        "\"RegisterFullMatch\":["      \
-          "\"TEMP\","                  \
-          "\"CRZN\","                  \
-          "\"FSH1\","                  \
-        "],"                           \
-                                       \
-        "\"RegisterPartialMatch\":["   \
-        "]"                            \
-      "}"                              \
-  "}"
-
-/*
- * Rules for rating a configuration.
- *
- * Defines how register names are matched during rating:
- *
- * FanRegistersFullMatch:
- *   Register in FanConfiguration must match exactly (whole name).
- *
- * FanRegistersPartialMatch:
- *   Register in FanConfiguration must contain the given name.
- *
- * RegisterWriteFullMatch:
- *   Register in RegisterWriteConfiguration must match exactly (whole name).
- *
- * RegisterPartialMatch:
- *   Register in RegisterWriteConfiguration must contain the given name.
- */
-struct ConfigRatingRules {
-  array_of(AcpiRegisterName) FanRegistersFullMatch;
-  array_of(AcpiRegisterName) FanRegistersPartialMatch;
-  array_of(AcpiRegisterName) RegisterWriteFullMatch;
-  array_of(AcpiRegisterName) RegisterWritePartialMatch;
-};
-typedef struct ConfigRatingRules ConfigRatingRules;
-declare_array_of(ConfigRatingRules);
+#include "config_rating_rules.h"
+#include "nxjson.h"
 
 /*
  * Main struct for rating.
@@ -103,7 +39,8 @@ declare_array_of(ConfigRating);
  * a miscellaneous register used for register-write configurations.
  */
 enum RegisterType {
-  RegisterType_FanRegister,
+  RegisterType_FanReadRegister,
+  RegisterType_FanWriteRegister,
   RegisterType_RegisterWriteConfigurationRegister
 };
 
@@ -141,21 +78,6 @@ enum RegisterScore {
 };
 
 /*
- * Indicates whether a register is correctly aligned for access or if it is
- * misaligned.
- *
- * OK:
- *   The register is correctly aligned
- *
- * Misaligned:
- *   The register is not correctly aligned
- */
-enum RegisterAlignment {
-  RegisterAlignment_OK,
-  RegisterAlignment_Misaligned
-};
-
-/*
  * Indicates how well an ACPI method name matches the firmware.
  *
  * Found:
@@ -172,30 +94,25 @@ enum MethodScore {
 /*
  * Stores the rating of an EC register.
  *
- * register_offset:
+ * offset:
  *   Original byte offset of the register.
  *
- * register_type:
+ * type:
  *   Type of the register. Indicates whether register is from FanConfiguration
  *   or RegisterWriteConfiguration.
  *
- * register_score:
+ * score:
  *   Score indicating how well the register matches the firwmare.
  *
- * register_alignment:
- *   Indicates whether a register is correctly aligned for access or if it is
- *   misaligned.
- *
- * acpi_register:
+ * info:
  *   Looked up register information.
- *   If `register_score` is `RegisterScore_NotFound` this field is NULL.
+ *   If `score` is `RegisterScore_NotFound` this field is NULL.
  */
 struct ConfigRating_RegisterRating {
-  int register_offset;
-  enum RegisterType register_type;
-  enum RegisterScore register_score;
-  enum RegisterAlignment register_alignment;
-  AcpiRegister* acpi_register;
+  int offset;
+  enum RegisterType type;
+  enum RegisterScore score;
+  AcpiRegister* info;
 };
 typedef struct ConfigRating_RegisterRating ConfigRating_RegisterRating;
 declare_array_of(ConfigRating_RegisterRating);
@@ -203,20 +120,20 @@ declare_array_of(ConfigRating_RegisterRating);
 /*
  * Stores the rating of an ACPI method.
  *
- * method_call:
+ * call:
  *   Stores the original method call string from the configuration file.
  *
- * method_score:
+ * score:
  *   Score indicating how well the method matches the firmware.
  *
- * acpi_method:
+ * info:
  *   Looked up method information.
  *   If `method_score` is `MethodScore_NotFound` this field is NULL.
  */
 struct ConfigRating_MethodRating {
-  char* method_call;
-  enum MethodScore method_score;
-  AcpiMethod* acpi_method;
+  char* call;
+  enum MethodScore score;
+  AcpiMethod* info;
 };
 typedef struct ConfigRating_MethodRating ConfigRating_MethodRating;
 declare_array_of(ConfigRating_MethodRating);
@@ -261,5 +178,10 @@ void  ConfigRating_RatingPrint(ConfigRating_Rating*);
 void  ConfigRating_RatingFree(ConfigRating_Rating*);
 void  ConfigRating_MethodRatingFree(ConfigRating_MethodRating*);
 void  ConfigRating_RegisterRatingFree(ConfigRating_RegisterRating*);
+
+const char* RegisterType_ToStr(enum RegisterType);
+const char* RegisterScore_ToStr(enum RegisterScore);
+const char* MethodScore_ToStr(enum MethodScore);
+nx_json* ConfigRating_ToJson(ConfigRating_Rating*, const char*, nx_json*);
 
 #endif

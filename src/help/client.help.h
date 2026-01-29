@@ -74,6 +74,7 @@
  "  -H, --full-help       Show full help\n"                                    \
  "  -a, --all             Rate all available configuration files\n"            \
  "  -d, --dsdt            Use an alternative DSDT file\n"                      \
+ "  -j, --json            Use JSON output\n"                                   \
  ""
 
 #define CLIENT_ACPI_DUMP_HELP_TEXT                                             \

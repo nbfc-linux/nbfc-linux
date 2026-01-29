@@ -38,6 +38,7 @@
 #include "regex_utils.c"
 #include "acpi_analysis.c"
 #include "config_rating.c"
+#include "config_rating_rules.c"
 #include "model_config_utils.c"
 #include "client/dmi.c"
 #include "client/curl_utils.c"
@@ -375,6 +376,10 @@ int main(int argc, char *const argv[]) {
 
     case Option_Rate_Config_Full_Help:
       Rate_Config_Options.full_help = 1;
+      break;
+
+    case Option_Rate_Config_Json:
+      Rate_Config_Options.json = 1;
       break;
 
     // ========================================================================
