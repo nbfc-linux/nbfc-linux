@@ -115,7 +115,7 @@ int Set_Or_Apply() {
     config = Mem_Strdup(Config_Options.config);
 
     char* dot = strrchr(config, '.');
-    if (dot)
+    if (dot && !strcmp(dot, ".json"))
       *dot = '\0';
 
     if  (! Contains_Config(&files, config)) {
