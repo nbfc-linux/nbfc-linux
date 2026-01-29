@@ -25,13 +25,13 @@ static Error ParseRegisterNamesArray(array_of(AcpiRegisterName)* out, const nx_j
 
   nx_json_for_each(child, json) {
     if (child->type != NX_JSON_STRING) {
-      e = err_stringf("%s[%d]: Not a string", json->key, out->size);
+      e = err_stringf("%s[%zd]: Not a string", json->key, out->size);
       return e;
     }
 
     const size_t slen = strlen(child->val.text);
     if (slen == 0 || slen > sizeof(AcpiRegisterName) - 1) {
-      e = err_stringf("%s[%d]: \"%s\": Invalid length",
+      e = err_stringf("%s[%zd]: \"%s\": Invalid length",
         json->key, out->size, child->val.text);
       return e;
     }
@@ -139,7 +139,7 @@ static Error ParseRegisterRuleArray(array_of(RegisterRule)* out, const nx_json* 
   nx_json_for_each(object, json) {
     e = ParseRegisterRule(&out->data[out->size], object);
     if (e) {
-      e = err_chain_stringf(e, "%s[%d]", json->key, out->size);
+      e = err_chain_stringf(e, "%s[%zd]", json->key, out->size);
       return e;
     }
     out->size++;

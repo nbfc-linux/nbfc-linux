@@ -239,7 +239,7 @@ static Error FanTemperatureControl_SetByModelConfig(
 
     e = FanTemperatureControl_SetByModelConfig0(ftc, fc);
     if (e)
-      return err_chain_stringf(e, "FanConfigurations[%d] (%s)", fan_index, fc->FanDisplayName);
+      return err_chain_stringf(e, "FanConfigurations[%zd] (%s)", fan_index, fc->FanDisplayName);
   }
 
   return err_success();
@@ -340,7 +340,7 @@ void FanTemperatureControl_Log(array_of(FanTemperatureControl)* fans, ModelConfi
     FanTemperatureControl* ftc = &fans->data[fan_index];
 
     for (int i = 0; i < ftc->TemperatureSourcesSize; ++i)
-      Log_Info("Fan #%d (%s) uses '%s' (%s) as temperature source (%s)",
+      Log_Info("Fan #%zd (%s) uses '%s' (%s) as temperature source (%s)",
         fan_index,
         model_config->FanConfigurations.data[fan_index].FanDisplayName,
         ftc->TemperatureSources[i]->name,

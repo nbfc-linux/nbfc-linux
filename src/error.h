@@ -2,6 +2,7 @@
 #define NBFC_ERROR_H_
 
 #include "log.h"
+#include "macros.h"
 
 #include <stddef.h>
 
@@ -35,7 +36,7 @@ typedef struct ErrorImpl* Error;
 #define err_nxjson(MESSAGE)      err_chain_nxjson(0, MESSAGE)
 
 Error err_chain_string(Error,  const char* message);
-Error err_chain_stringf(Error, const char* message, ...);
+Error err_chain_stringf(Error, const char* message, ...) PRINTF_LIKE(2, 3);
 Error err_chain_stdlib(Error,  const char* message);
 Error err_chain_nxjson(Error,  const char* message);
 const char* err_print_all(Error);

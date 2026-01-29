@@ -1,6 +1,8 @@
 #ifndef LOG_H_
 #define LOG_H_
 
+#include "macros.h"
+
 #include <stdbool.h>
 #include <unistd.h> // write
 #include <string.h> // strlen
@@ -18,7 +20,7 @@ extern LogLevel Log_LogLevel;
 
 void Log_Init(bool);
 void Log_Close();
-void Log_Log(LogLevel, const char* fmt, ...);
+void Log_Log(LogLevel, const char* fmt, ...) PRINTF_LIKE(2, 3);
 
 #define Log_Error(...) Log_Log(LogLevel_Error, __VA_ARGS__)
 #define Log_Warn(...)  Log_Log(LogLevel_Warn, __VA_ARGS__)

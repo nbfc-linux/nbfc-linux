@@ -59,9 +59,11 @@ declare_array_of(int);
 #if defined(__GNUC__) || defined(__clang__)
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
+#define PRINTF_LIKE(fmt, args) __attribute__((format(printf, fmt, args)))
 #else
 #define likely(x) (x)
 #define unlikely(x) (x)
+#define PRINTF_LIKE(fmt, args)
 #endif
 
 #endif

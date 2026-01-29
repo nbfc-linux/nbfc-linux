@@ -281,7 +281,7 @@ static int Server_ReceiveMessage(Client* client) {
     else
       size_to_read = space_left;
 
-    Log_Debug("read(%d, ..., %d)", client->fd, size_to_read);
+    Log_Debug("read(%d, ..., %zu)", client->fd, size_to_read);
 
     nread = read(client->fd, client->buf + client->bufsz, size_to_read);
 
@@ -376,7 +376,7 @@ Error Server_Loop(int timeout) {
   const size_t num_clients = Server_GetNumberOfActiveClients();
   Server_PollFDSize = num_clients + 1;
 
-  Log_Debug("Server_Loop(timeout=%d): num clients: %d", timeout, num_clients);
+  Log_Debug("Server_Loop(timeout=%d): num clients: %zu", timeout, num_clients);
 
   // Add server file descriptor to Server_PollFDs
   Server_PollFDs[0].fd = Server_FD;
