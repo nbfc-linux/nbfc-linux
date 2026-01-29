@@ -636,15 +636,27 @@ err:
 }
 
 Error ModelConfig_FindAndLoad(ModelConfig* config, char* resolved, const char* file) {
-  if (file[0] == '/') {
-    snprintf(resolved, PATH_MAX, "%s", file);
+  // Try absolute path
+  snprintf(resolved, PATH_MAX, "%s", file);
+  if (file_exists(file))
     return ModelConfig_FromFile(config, file);
-  }
 
+  // Try NBFC_MODEL_CONFIGS_DIR_MUTABLE (without additional ".json")
+  snprintf(resolved, PATH_MAX, "%s/%s", NBFC_MODEL_CONFIGS_DIR_MUTABLE, file);
+  if (file_exists(resolved))
+    return ModelConfig_FromFile(config, resolved);
+
+  // Try NBFC_MODEL_CONFIGS_DIR_MUTABLE (with additional ".json")
   snprintf(resolved, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR_MUTABLE, file);
   if (file_exists(resolved))
     return ModelConfig_FromFile(config, resolved);
 
+  // Try NBFC_MODEL_CONFIGS_DIR (without additional ".json")
+  snprintf(resolved, PATH_MAX, "%s/%s", NBFC_MODEL_CONFIGS_DIR, file);
+  if (file_exists(resolved))
+    return ModelConfig_FromFile(config, resolved);
+
+  // Try NBFC_MODEL_CONFIGS_DIR (with additional ".json")
   snprintf(resolved, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR, file);
   return ModelConfig_FromFile(config, resolved);
 }
