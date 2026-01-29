@@ -128,7 +128,7 @@ end:
   }
 
   FS_Sensors_Sources.size = n_sources;
-  FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Malloc(n_sources * sizeof(FS_TemperatureSource));
+  FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Calloc(n_sources, sizeof(FS_TemperatureSource));
   memcpy(FS_Sensors_Sources.data, sources, n_sources * sizeof(FS_TemperatureSource));
   Buffer_Release((char*) sources, FS_SENSORS_BUFFER_SIZE);
   return err_success();

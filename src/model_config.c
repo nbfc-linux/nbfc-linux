@@ -262,7 +262,7 @@ static Error array_of_FromJson(FromJson_Callback callback, void** v_data, array_
     return err_success();
   }
 
-  *v_data = Mem_Malloc(json->val.children.length * size);
+  *v_data = Mem_Calloc(json->val.children.length, size);
   nx_json_for_each(child, json) {
     e = callback(((char*) *v_data) + size * *v_size, child);
     e_check();
@@ -321,7 +321,7 @@ static void copy_array_of_TemperatureThreshold(
   array_of(TemperatureThreshold)* dest,
   const array_of_const(TemperatureThreshold)* src) {
   dest->size = src->size;
-  dest->data = Mem_Malloc(src->size * sizeof(TemperatureThreshold));
+  dest->data = Mem_Calloc(src->size, sizeof(TemperatureThreshold));
   memcpy(dest->data, src->data, src->size * sizeof(TemperatureThreshold));
 }
 

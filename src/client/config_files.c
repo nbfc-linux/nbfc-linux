@@ -45,7 +45,7 @@ int compare_config_by_diff(const void *a, const void *b) {
 static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
   ssize_t capacity = 512;
   array_of(ConfigFile) files = {
-    .data = Mem_Malloc(capacity * sizeof(ConfigFile)),
+    .data = Mem_Calloc(capacity, sizeof(ConfigFile)),
     .size = 0
   };
 
@@ -81,7 +81,7 @@ static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
 // removing duplicates based on `config_name`.
 static array_of(ConfigFile) Merge_Configs(array_of(ConfigFile)* a, array_of(ConfigFile)* b) {
   array_of(ConfigFile) files = {
-    .data = Mem_Malloc((a->size + b->size) * sizeof(ConfigFile)),
+    .data = Mem_Calloc((a->size + b->size), sizeof(ConfigFile)),
     .size = 0
   };
 

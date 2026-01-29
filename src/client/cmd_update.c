@@ -264,7 +264,7 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
   const nx_json* root = NULL;
   ssize_t out_capacity = 512;
 
-  out->data = Mem_Malloc(out_capacity * sizeof(GitHubFile));
+  out->data = Mem_Calloc(out_capacity, sizeof(GitHubFile));
   out->size = 0;
 
   curl = CurlWithMem_Create(url, NULL);
