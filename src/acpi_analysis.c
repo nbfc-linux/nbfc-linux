@@ -105,23 +105,29 @@
   ""
 
 // Example:
-//   OperationRegion (ERAM, EmbeddedControl, Zero, 0xFF)
-//   ```````````````  ````  ```````````````  ````  ````
-//                     1                      2     3
+//   \_SB.PC00.LPCB.EC0.ERAM Region 0x58702a437da0 001 [EmbeddedControl] Addr 0000000000000000 Len 00FF
+//   ``````````````````````` `````` `````````````` ```  ```````````````  ```` ```````````````` ``` ````
+//               1                         2        3          4                     5              6
 
-#define ACPI_OPERATION_REGION_RE_GROUPS 3
+#define ACPI_OPERATION_REGION_RE_GROUPS 6
 #define ACPI_OPERATION_REGION_RE                          \
-  "OperationRegion"                                       \
+  REGEX_GROUP("[^[:space:]]+")               /* 1 */      \
   REGEX_WHITESPACE                                        \
-  "\\("                                                   \
-  REGEX_GROUP("[A-Za-z0-9_]+")               /* 1 */      \
-  ", "                                                    \
-  "EmbeddedControl"                                       \
-  ", "                                                    \
-  REGEX_GROUP("[A-Za-z0-9]+")                /* 2 */      \
-  ", "                                                    \
-  REGEX_GROUP("[A-Za-z0-9]+")                /* 3 */      \
-  "\\)"                                                   \
+  "Region"                                                \
+  REGEX_WHITESPACE                                        \
+  REGEX_GROUP(REGEX_HEX_WITH_PREFIX)         /* 2 */      \
+  REGEX_WHITESPACE                                        \
+  REGEX_GROUP(REGEX_HEX)                     /* 3 */      \
+  REGEX_WHITESPACE                                        \
+  "\\[" REGEX_GROUP("[a-zA-Z0-9_]+") "\\]"   /* 4 */      \
+  REGEX_WHITESPACE                                        \
+  "Addr"                                                  \
+  REGEX_WHITESPACE                                        \
+  REGEX_GROUP(REGEX_HEX)                     /* 5 */      \
+  REGEX_WHITESPACE                                        \
+  "Len"                                                   \
+  REGEX_WHITESPACE                                        \
+  REGEX_GROUP(REGEX_HEX)                     /* 6 */      \
   ""
 
 /*
@@ -154,13 +160,38 @@ void AcpiMethod_Free(AcpiMethod* acpi_method) {
   Mem_Free(acpi_method->name);
 }
 
+void AcpiRegion_Free(AcpiOperationRegion* acpi_region) {
+  Mem_Free(acpi_region->name);
+  Mem_Free(acpi_region->type);
+}
+
+void AcpiInfo_Free(AcpiInfo* acpi_info) {
+  for_each_array(AcpiMethod*, method, acpi_info->methods) {
+    AcpiMethod_Free(method);
+  }
+  Mem_Free(acpi_info->methods.data);
+
+  for_each_array(AcpiRegister*, register_, acpi_info->registers) {
+    AcpiRegister_Free(register_);
+  }
+  Mem_Free(acpi_info->registers.data);
+
+  for_each_array(AcpiOperationRegion*, region, acpi_info->regions) {
+    AcpiRegion_Free(region);
+  }
+  Mem_Free(acpi_info->regions.data);
+
+  Mem_Free(acpi_info->ec_region_names.data);
+
+  memset(acpi_info, 0, sizeof(*acpi_info));
+}
+
 /*
- * Extracts a list of registers from DSDT file and stores them in `out`.
+ * Extracts a list or registers.
  *
- * This function requires the `acpiexec` program.
+ * Parses output from `acpiexec -b 'Objects RegionField'`.
  */
-Error Acpi_Analysis_Get_Registers(const char* file, array_of(AcpiRegister)* out) {
-  Error e = err_success();
+static Error Acpi_Analysis_Extract_Registers(const char* output, array_of(AcpiRegister)* out) {
   regex_t regex;
   regmatch_t matches[ACPI_REGION_FIELDS_RE_GROUPS + 1];
   size_t num_matches;
@@ -172,39 +203,12 @@ Error Acpi_Analysis_Get_Registers(const char* file, array_of(AcpiRegister)* out)
   if (regcomp(&regex, ACPI_REGION_FIELDS_RE, REG_EXTENDED))
     return err_string("Invalid regular expression");
 
-  char* stdout_ = NULL;
-  char* stderr_ = NULL;
-  char* argv[] = {
-    Mem_Strdup(ACPI_ANALYSIS_ACPIEXEC),
-    Mem_Strdup("-b"),
-    Mem_Strdup("Object RegionField"),
-    Mem_Strdup(file),
-    NULL
-  };
-
-  int ret = Process_Capture(ACPI_ANALYSIS_ACPIEXEC, argv, &stdout_, &stderr_);
-
-  if (ret == -1) {
-    e = err_stdlib(ACPI_ANALYSIS_ACPIEXEC);
-    goto end;
-  }
-
-  if (ret != 0) {
-    e = err_stringf(ACPI_ANALYSIS_ACPIEXEC " returned %d", ret);
-    goto end;
-  }
-
-  if (! stdout_) {
-    e = err_string(ACPI_ANALYSIS_ACPIEXEC " returned no output");
-    goto end;
-  }
-
   // Allocate space for output array
-  num_matches = RegEx_Count(&regex, matches, ACPI_REGION_FIELDS_RE_GROUPS + 1, stdout_);
+  num_matches = RegEx_Count(&regex, matches, ACPI_REGION_FIELDS_RE_GROUPS + 1, output);
   out->data = Mem_Calloc(num_matches, sizeof(AcpiRegister));
 
   // Iterate over matches and fill output array
-  const char* text = stdout_;
+  const char* text = output;
   while (regexec(&regex, text, ACPI_REGION_FIELDS_RE_GROUPS + 1, matches, 0) == 0) {
     AcpiRegister* acpi_register = &out->data[out->size++];
 
@@ -217,24 +221,16 @@ Error Acpi_Analysis_Get_Registers(const char* file, array_of(AcpiRegister)* out)
     text += matches[0].rm_eo;
   }
 
-end:
   regfree(&regex);
-  Mem_Free(argv[0]);
-  Mem_Free(argv[1]);
-  Mem_Free(argv[2]);
-  Mem_Free(argv[3]);
-  Mem_Free(stdout_);
-  Mem_Free(stderr_);
-  return e;
+  return err_success();
 }
 
 /*
- * Extracts a list of methods from DSDT file and stores them in `out`.
+ * Extracts a list of methods.
  *
- * This function requires the `acpiexec` program.
+ * Parses output from `acpiexec -b 'Methods'`.
  */
-Error Acpi_Analysis_Get_Methods(const char* file, array_of(AcpiMethod)* out) {
-  Error e = err_success();
+static Error Acpi_Analysis_Extract_Methods(const char* output, array_of(AcpiMethod)* out) {
   regex_t regex;
   regmatch_t matches[ACPI_METHODS_RE_GROUPS + 1];
   size_t num_matches;
@@ -246,12 +242,78 @@ Error Acpi_Analysis_Get_Methods(const char* file, array_of(AcpiMethod)* out) {
   if (regcomp(&regex, ACPI_METHODS_RE, REG_EXTENDED))
     return err_string("Invalid regular expression");
 
+  // Allocate space for output array
+  num_matches = RegEx_Count(&regex, matches, ACPI_METHODS_RE_GROUPS + 1, output);
+  out->data = Mem_Calloc(num_matches, sizeof(AcpiMethod));
+
+  // Iterate over matches and fill output array
+  const char* text = output;
+  while (regexec(&regex, text, ACPI_METHODS_RE_GROUPS + 1, matches, 0) == 0) {
+    AcpiMethod* acpi_method = &out->data[out->size++];
+
+    acpi_method->name = RegEx_SubStr(&matches[1], text);
+    acpi_method->length = RegEx_Strtoll(&matches[4], text, 16);
+
+    text += matches[0].rm_eo;
+  }
+
+  regfree(&regex);
+  return err_success();
+}
+
+/*
+ * Extracts a list of operation regions.
+ *
+ * Parses output from `acpiexec -b 'Objects Region'`.
+ */
+static Error Acpi_Analysis_Extract_OperationRegions(const char* output, array_of(AcpiOperationRegion)* out) {
+  regex_t regex;
+  regmatch_t matches[ACPI_OPERATION_REGION_RE_GROUPS + 1];
+  size_t num_matches;
+
+  // Clear output array
+  memset(out, 0, sizeof(*out));
+
+  // Early return (because we cannot free an uninitialized regex_t)
+  if (regcomp(&regex, ACPI_OPERATION_REGION_RE, REG_EXTENDED))
+    return err_string("Invalid regular expression");
+
+  num_matches = RegEx_Count(&regex, matches, ACPI_OPERATION_REGION_RE_GROUPS + 1, output);
+  out->data = Mem_Calloc(num_matches, sizeof(AcpiOperationRegion));
+
+  // Iterate over matches and fill output array
+  const char* text = output;
+  while (regexec(&regex, text, ACPI_OPERATION_REGION_RE_GROUPS + 1, matches, 0) == 0) {
+    AcpiOperationRegion* region = &out->data[out->size++];
+
+    region->name = RegEx_SubStr(&matches[1], text);
+    region->type = RegEx_SubStr(&matches[4], text);
+
+    text += matches[0].rm_eo;
+  }
+
+  regfree(&regex);
+  return err_success();
+}
+
+/*
+ * Extracts a list of registers, methods and operation regions from the
+ * DSDT file.
+ *
+ * This function requires the `acpiexec` program.
+ */
+Error Acpi_Analysis_Get_Info(const char* file, AcpiInfo* out) {
+  Error e = err_success();
+
+  // Clear output arrays
+  memset(out, 0, sizeof(*out));
+
   char* stdout_ = NULL;
   char* stderr_ = NULL;
   char* argv[] = {
     Mem_Strdup(ACPI_ANALYSIS_ACPIEXEC),
     Mem_Strdup("-b"),
-    Mem_Strdup("Methods"),
+    Mem_Strdup("Objects RegionField; Objects Region; Methods"),
     Mem_Strdup(file),
     NULL
   };
@@ -273,23 +335,38 @@ Error Acpi_Analysis_Get_Methods(const char* file, array_of(AcpiMethod)* out) {
     goto end;
   }
 
-  // Allocate space for output array
-  num_matches = RegEx_Count(&regex, matches, ACPI_METHODS_RE_GROUPS + 1, stdout_);
-  out->data = Mem_Calloc(num_matches, sizeof(AcpiMethod));
+  e = Acpi_Analysis_Extract_Registers(stdout_, &out->registers);
+  if (e)
+    goto end;
 
-  // Iterate over matches and fill output array
-  const char* text = stdout_;
-  while (regexec(&regex, text, ACPI_METHODS_RE_GROUPS + 1, matches, 0) == 0) {
-    AcpiMethod* acpi_method = &out->data[out->size++];
+  e = Acpi_Analysis_Extract_Methods(stdout_, &out->methods);
+  if (e)
+    goto end;
 
-    acpi_method->name = RegEx_SubStr(&matches[1], text);
-    acpi_method->length = RegEx_Strtoll(&matches[4], text, 16);
+  e = Acpi_Analysis_Extract_OperationRegions(stdout_, &out->regions);
+  if (e)
+    goto end;
 
-    text += matches[0].rm_eo;
+  array_size_t num_ec_regions = 0;
+  for_each_array(AcpiOperationRegion*, region, out->regions)
+    num_ec_regions += !strcmp(region->type, "EmbeddedControl");
+
+  out->ec_region_names.size = 0;
+  out->ec_region_names.data = Mem_Calloc(num_ec_regions, sizeof(AcpiOperationRegionName));
+
+  for_each_array(AcpiOperationRegion*, region, out->regions) {
+    if (strcmp(region->type, "EmbeddedControl"))
+      continue;
+
+    const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
+    snprintf(
+      out->ec_region_names.data[out->ec_region_names.size++],
+      sizeof(AcpiOperationRegionName),
+      "%s",
+      name);
   }
 
 end:
-  regfree(&regex);
   Mem_Free(argv[0]);
   Mem_Free(argv[1]);
   Mem_Free(argv[2]);
@@ -413,53 +490,6 @@ end:
   Mem_Free(argv[2]);
   Mem_Free(stdout_);
   Mem_Free(stderr_);
-  return e;
-}
-
-/*
- * Extracts a list of EC operation regions from the DSDT file and stores
- * them in `out`.
- *
- * EC operation regions represent memory regions that are accessible
- * through the embedded controller.
- *
- * This function requires the `iasl` program.
- */
-Error Acpi_Analysis_Get_EC_OperationRegions(const char* file, array_of(AcpiOperationRegion)* out) {
-  Error e;
-  regex_t regex;
-  regmatch_t matches[ACPI_OPERATION_REGION_RE_GROUPS + 1];
-  size_t num_matches;
-  char* dsl = NULL;
-
-  // Clear output array
-  memset(out, 0, sizeof(*out));
-
-  // Early return (because we cannot free an uninitialized regex_t)
-  if (regcomp(&regex, ACPI_OPERATION_REGION_RE, REG_EXTENDED))
-    return err_string("Invalid regular expression");
-
-  // Get DSL for the DSDT file
-  e = Acpi_Analysis_Get_DSL(file, &dsl);
-  if (e)
-    goto end;
-
-  // Allocate space for output array
-  num_matches = RegEx_Count(&regex, matches, ACPI_OPERATION_REGION_RE_GROUPS + 1, dsl);
-  out->data = Mem_Calloc(num_matches, sizeof(AcpiOperationRegion));
-
-  // Iterate over matches and fill output array
-  const char* text = dsl;
-  while (regexec(&regex, text, ACPI_OPERATION_REGION_RE_GROUPS + 1, matches, 0) == 0) {
-    AcpiOperationRegion* region = &out->data[out->size++];
-    RegEx_SubStr_Fixed(&matches[1], text, *region, sizeof(AcpiOperationRegion));
-
-    text += matches[0].rm_eo;
-  }
-
-end:
-  regfree(&regex);
-  Mem_Free(dsl);
   return e;
 }
 

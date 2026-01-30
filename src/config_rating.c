@@ -15,15 +15,7 @@ Error ConfigRating_Init(ConfigRating* config_rating, const char* dsdt_file, cons
     goto end;
   }
 
-  e = Acpi_Analysis_Get_Registers(dsdt_file, &config_rating->registers);
-  if (e)
-    goto end;
-
-  e = Acpi_Analysis_Get_Methods(dsdt_file, &config_rating->methods);
-  if (e)
-    goto end;
-
-  e = Acpi_Analysis_Get_EC_OperationRegions(dsdt_file, &config_rating->ec_operation_regions);
+  e = Acpi_Analysis_Get_Info(dsdt_file, &config_rating->acpi_info);
   if (e)
     goto end;
 
@@ -35,20 +27,8 @@ end:
 }
 
 void ConfigRating_Free(ConfigRating* config_rating) {
-  for_each_array(AcpiMethod*, method, config_rating->methods) {
-    AcpiMethod_Free(method);
-  }
-  Mem_Free(config_rating->methods.data);
-
-  for_each_array(AcpiRegister*, register_, config_rating->registers) {
-    AcpiRegister_Free(register_);
-  }
-  Mem_Free(config_rating->registers.data);
-
-  Mem_Free(config_rating->ec_operation_regions.data);
-
+  AcpiInfo_Free(&config_rating->acpi_info);
   ConfigRatingRules_Free(&config_rating->rules);
-
   memset(config_rating, 0, sizeof(*config_rating));
 }
 
@@ -114,11 +94,11 @@ static AcpiRegister* ConfigRating_FindEcRegister(
   ConfigRating* config_rating,
   int offset
 ) {
-  for_each_array(AcpiRegister*, acpi_register, config_rating->registers) {
+  for_each_array(AcpiRegister*, acpi_register, config_rating->acpi_info.registers) {
     if ((acpi_register->bit_offset / 8) != offset)
       continue;
 
-    for_each_array(AcpiOperationRegion*, region, config_rating->ec_operation_regions) {
+    for_each_array(AcpiOperationRegionName*, region, config_rating->acpi_info.ec_region_names) {
       if (! strcmp(acpi_register->region, *region)) {
         return acpi_register;
       }
@@ -132,7 +112,7 @@ static AcpiMethod* ConfigRating_FindMethod(
   ConfigRating* config_rating,
   const char* method_call
 ) {
-  for_each_array(AcpiMethod*, method, config_rating->methods) {
+  for_each_array(AcpiMethod*, method, config_rating->acpi_info.methods) {
     if (Acpi_Analysis_Path_Equals(method_call, method->name)) {
       return method;
     }

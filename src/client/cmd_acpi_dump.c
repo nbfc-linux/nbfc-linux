@@ -80,7 +80,7 @@ static int AcpiDump_DSL(const char* dsdt_file) {
  */
 static int AcpiDump_Methods(const char* dsdt_file, bool json) {
   Error e;
-  array_of(AcpiMethod) methods = {0};
+  AcpiInfo acpi_info = {0};
 
   e = Acpi_Analysis_Is_AcpiExec_Installed();
   if (e) {
@@ -88,7 +88,7 @@ static int AcpiDump_Methods(const char* dsdt_file, bool json) {
     return NBFC_EXIT_FAILURE;
   }
 
-  e = Acpi_Analysis_Get_Methods(dsdt_file, &methods);
+  e = Acpi_Analysis_Get_Info(dsdt_file, &acpi_info);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -97,29 +97,26 @@ static int AcpiDump_Methods(const char* dsdt_file, bool json) {
   if (json) {
     nx_json root = {0};
     nx_json* array = create_json_array(NULL, &root);
-    for_each_array(AcpiMethod*, method, methods)
+    for_each_array(AcpiMethod*, method, acpi_info.methods)
       AcpiMethod_ToJson(method, NULL, array);
     AcpiDump_WriteJson(array);
     nx_json_free(array);
   }
   else {
-    for_each_array(AcpiMethod*, method, methods) {
+    for_each_array(AcpiMethod*, method, acpi_info.methods) {
       printf("%s args=%d\n", method->name, method->length);
     }
   }
 
-  for_each_array(AcpiMethod*, method, methods) {
-    AcpiMethod_Free(method);
-  }
-  Mem_Free(methods.data);
+  AcpiInfo_Free(&acpi_info);
   return NBFC_EXIT_SUCCESS;
 }
 
 /*
  * Check if `name` is a region contained in `ec_regions`.
  */
-static bool AcpiDump_ContainsRegion(array_of(AcpiOperationRegion)* ec_regions, const char* name) {
-  for_each_array(AcpiOperationRegion*, region, *ec_regions) {
+static bool AcpiDump_ContainsRegion(array_of(AcpiOperationRegionName)* ec_regions, const char* name) {
+  for_each_array(AcpiOperationRegionName*, region, *ec_regions) {
     if (! strcmp(*region, name))
       return true;
   }
@@ -135,8 +132,7 @@ static bool AcpiDump_ContainsRegion(array_of(AcpiOperationRegion)* ec_regions, c
  */
 static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
   Error e;
-  array_of(AcpiRegister) registers = {0};
-  array_of(AcpiOperationRegion) ec_regions = {0};
+  AcpiInfo acpi_info = {0};
 
   // ==========================================================================
   // Check if apcica-tools are installed
@@ -148,30 +144,14 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
     return NBFC_EXIT_FAILURE;
   }
 
-  if (only_ec) {
-    e = Acpi_Analysis_Is_IASL_Installed();
-    if (e) {
-      Log_Error("%s", err_print_all(e));
-      return NBFC_EXIT_FAILURE;
-    }
-  }
-
   // ==========================================================================
-  // Get registers and EC operation regions
+  // Get ACPI info
   // ==========================================================================
 
-  e = Acpi_Analysis_Get_Registers(dsdt_file, &registers);
+  e = Acpi_Analysis_Get_Info(dsdt_file, &acpi_info);
   if (e) {
     Log_Error("%s", err_print_all(e));
-    goto end;
-  }
-
-  if (only_ec) {
-    e = Acpi_Analysis_Get_EC_OperationRegions(dsdt_file, &ec_regions);
-    if (e) {
-      Log_Error("%s", err_print_all(e));
-      goto end;
-    }
+    return NBFC_EXIT_FAILURE;
   }
 
   // ==========================================================================
@@ -182,8 +162,8 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
     nx_json root = {0};
     nx_json* array = create_json_array(NULL, &root);
 
-    for_each_array(AcpiRegister*, register_, registers) {
-      if (only_ec && !AcpiDump_ContainsRegion(&ec_regions, register_->region))
+    for_each_array(AcpiRegister*, register_, acpi_info.registers) {
+      if (only_ec && !AcpiDump_ContainsRegion(&acpi_info.ec_region_names, register_->region))
         continue;
 
       AcpiRegister_ToJson(register_, NULL, array);
@@ -193,8 +173,8 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
     nx_json_free(array);
   }
   else {
-    for_each_array(AcpiRegister*, register_, registers) {
-      if (only_ec && !AcpiDump_ContainsRegion(&ec_regions, register_->region))
+    for_each_array(AcpiRegister*, register_, acpi_info.registers) {
+      if (only_ec && !AcpiDump_ContainsRegion(&acpi_info.ec_region_names, register_->region))
         continue;
 
       printf("%s [%s] byte=%d byte_hex=0x%X bit=%d total_bit=%d len=%d acc=%d\n",
@@ -213,17 +193,8 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
   // Free data
   // ==========================================================================
 
-end:
-  for_each_array(AcpiRegister*, register_, registers) {
-    AcpiRegister_Free(register_);
-  }
-  Mem_Free(registers.data);
-  Mem_Free(ec_regions.data);
-
-  if (e)
-    return NBFC_EXIT_FAILURE;
-  else
-    return NBFC_EXIT_SUCCESS;
+  AcpiInfo_Free(&acpi_info);
+  return NBFC_EXIT_SUCCESS;
 }
 
 int AcpiDump() {

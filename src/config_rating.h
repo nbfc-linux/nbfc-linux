@@ -12,23 +12,14 @@
  *
  * Contains ACPI information and the rating rules.
  *
- * methods:
- *   Contains information about ACPI methods.
- *
- * registers:
- *   Contains information about ACPI registers.
- *
- * ec_operation_regions:
- *   Holds the names of EC operation regions that expose registers
- *   accessible via the embedded controller.
+ * acpi_info:
+ *   Contains ACPI information (registers, methods, operation regions).
  *
  * rules:
  *   Contains the rules for rating configurations.
  */
 struct ConfigRating {
-  array_of(AcpiMethod) methods;
-  array_of(AcpiRegister) registers;
-  array_of(AcpiOperationRegion) ec_operation_regions;
+  AcpiInfo acpi_info;
   ConfigRatingRules rules;
 };
 typedef struct ConfigRating ConfigRating;
