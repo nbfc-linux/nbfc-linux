@@ -149,74 +149,6 @@ static Error ParseRegisterRuleArray(array_of(RegisterRule)* out, const nx_json* 
 }
 
 /*
- * Parse a FanConfiguration object:
- *
- * Example input:
- *   {
- *     "RegisterFullMatch": [ ... ],
- *     "RegisterPartialMatch": [ ... ]
- *   }
- */
-static Error ParseFanConfiguration(ConfigRatingRules* rules, const nx_json* json) {
-  Error e;
-
-  if (json->type != NX_JSON_OBJECT) {
-    e = err_stringf("%s: Not a JSON object", "FanConfiguration");
-    return e;
-  }
-
-  nx_json_for_each(child, json) {
-    if (! strcmp(child->key, "RegisterFullMatch"))
-      e = ParseRegisterRuleArray(&rules->FanRegistersFullMatch, child);
-    else if (! strcmp(child->key, "RegisterPartialMatch"))
-      e = ParseRegisterNamesArray(&rules->FanRegistersPartialMatch, child);
-    else
-      e = err_stringf("Unknown key: %s", child->key);
-
-    if (e) {
-      e = err_chain_string(e, "FanConfiguration");
-      return e;
-    }
-  }
-
-  return err_success();
-}
-
-/*
- * Parse a RegisterWriteConfiguration object:
- *
- * Example input:
- *   {
- *     "RegisterFullMatch": [ ... ],
- *     "RegisterPartialMatch": [ ... ]
- *   }
- */
-static Error ParseRegisterWriteConfiguration(ConfigRatingRules* rules, const nx_json* json) {
-  Error e;
-
-  if (json->type != NX_JSON_OBJECT) {
-    e = err_stringf("%s: Not a JSON object", "RegisterWriteConfiguration");
-    return e;
-  }
-
-  nx_json_for_each(child, json) {
-    if (! strcmp(child->key, "RegisterFullMatch"))
-      e = ParseRegisterNamesArray(&rules->RegisterWriteFullMatch, child);
-    else if (! strcmp(child->key, "RegisterPartialMatch"))
-      e = ParseRegisterNamesArray(&rules->RegisterWritePartialMatch, child);
-    else
-      e = err_stringf("Unknown key: %s", child->key);
-
-    if (e) {
-      e = err_chain_string(e, "RegisterWriteConfiguration");
-      return e;
-    }
-  }
-
-  return err_success();
-}
-
-/*
  * Parses the JSON string and populates the `ConfigRatingRules` structure.
  *
  * Returns an error if:
@@ -243,13 +175,33 @@ Error ConfigRatingRules_FromJson(ConfigRatingRules* rules, const char* rules_jso
   }
 
   nx_json_for_each(child, root) {
-    if (! strcmp(child->key, "FanConfiguration")) {
-      e = ParseFanConfiguration(rules, child);
+    if (! strcmp(child->key, "FanRegisterFullMatch")) {
+      e = ParseRegisterRuleArray(&rules->FanRegisterFullMatch, child);
       if (e)
         goto end;
     }
-    else if (! strcmp(child->key, "RegisterWriteConfiguration")) {
-      e = ParseRegisterWriteConfiguration(rules, child);
+    else if (! strcmp(child->key, "FanRegisterPartialMatch")) {
+      e = ParseRegisterNamesArray(&rules->FanRegisterPartialMatch, child);
+      if (e)
+        goto end;
+    }
+    else if (! strcmp(child->key, "RegisterWriteFullMatch")) {
+      e = ParseRegisterNamesArray(&rules->RegisterWriteFullMatch, child);
+      if (e)
+        goto end;
+    }
+    else if (! strcmp(child->key, "RegisterWritePartialMatch")) {
+      e = ParseRegisterNamesArray(&rules->RegisterWritePartialMatch, child);
+      if (e)
+        goto end;
+    }
+    else if (! strcmp(child->key, "BadRegisterFullMatch")) {
+      e = ParseRegisterNamesArray(&rules->BadRegisterFullMatch, child);
+      if (e)
+        goto end;
+    }
+    else if (! strcmp(child->key, "BadRegisterPartialMatch")) {
+      e = ParseRegisterNamesArray(&rules->BadRegisterPartialMatch, child);
       if (e)
         goto end;
     }
@@ -270,9 +222,11 @@ end:
 }
 
 void ConfigRatingRules_Free(ConfigRatingRules* rules) {
-  Mem_Free(rules->FanRegistersFullMatch.data);
-  Mem_Free(rules->FanRegistersPartialMatch.data);
+  Mem_Free(rules->FanRegisterFullMatch.data);
+  Mem_Free(rules->FanRegisterPartialMatch.data);
   Mem_Free(rules->RegisterWriteFullMatch.data);
   Mem_Free(rules->RegisterWritePartialMatch.data);
+  Mem_Free(rules->BadRegisterFullMatch.data);
+  Mem_Free(rules->BadRegisterPartialMatch.data);
   memset(rules, 0, sizeof(*rules));
 }

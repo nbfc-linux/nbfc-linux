@@ -6,41 +6,51 @@
 /*
  * Default rules for rating a configuration.
  */
-#define CONFIG_RATING_DEFAULT_RULES                 \
-  "{"                                               \
-    "\"FanConfiguration\":"                         \
-      "{"                                           \
-        "\"RegisterFullMatch\":["                   \
-          "{\"Name\":\"PFAN\",\"Mode\":\"rw\"},"    \
-          "{\"Name\":\"SFAN\",\"Mode\":\"rw\"},"    \
-          "{\"Name\":\"CFAN\",\"Mode\":\"rw\"},"    \
-          "{\"Name\":\"XFAN\",\"Mode\":\"rw\"},"    \
-          "{\"Name\":\"FAN1\",\"Mode\":\"rw\"},"    \
-          "{\"Name\":\"FSW1\",\"Mode\":\"rw\"},"    \
-          "{\"Name\":\"FRDC\",\"Mode\":\"r\"},"     \
-          "{\"Name\":\"FTGC\",\"Mode\":\"w\"},"     \
-          "{\"Name\":\"FR2C\",\"Mode\":\"r\"},"     \
-          "{\"Name\":\"FT2C\",\"Mode\":\"w\"},"     \
-        "],"                                        \
-                                                    \
-        "\"RegisterPartialMatch\":["                \
-          "\"FAN\","                                \
-          "\"RPM\","                                \
-          "\"PWM\""                                 \
-        "]"                                         \
-      "},"                                          \
-                                                    \
-    "\"RegisterWriteConfiguration\":"               \
-      "{"                                           \
-        "\"RegisterFullMatch\":["                   \
-          "\"TEMP\","                               \
-          "\"CRZN\","                               \
-          "\"FSH1\","                               \
-        "],"                                        \
-                                                    \
-        "\"RegisterPartialMatch\":["                \
-        "]"                                         \
-      "}"                                           \
+#define CONFIG_RATING_DEFAULT_RULES             \
+  "{"                                           \
+    "\"FanRegisterFullMatch\":["                \
+      "{\"Name\":\"PFAN\",\"Mode\":\"rw\"},"    \
+      "{\"Name\":\"SFAN\",\"Mode\":\"rw\"},"    \
+      "{\"Name\":\"CFAN\",\"Mode\":\"rw\"},"    \
+      "{\"Name\":\"XFAN\",\"Mode\":\"rw\"},"    \
+      "{\"Name\":\"FAN1\",\"Mode\":\"rw\"},"    \
+      "{\"Name\":\"FSW1\",\"Mode\":\"rw\"},"    \
+      "{\"Name\":\"FRDC\",\"Mode\":\"r\"},"     \
+      "{\"Name\":\"FTGC\",\"Mode\":\"w\"},"     \
+      "{\"Name\":\"FR2C\",\"Mode\":\"r\"},"     \
+      "{\"Name\":\"FT2C\",\"Mode\":\"w\"}"      \
+    "],"                                        \
+                                                \
+    "\"FanRegisterPartialMatch\":["             \
+      "\"FAN\","                                \
+      "\"RPM\","                                \
+      "\"PWM\""                                 \
+    "],"                                        \
+                                                \
+    "\"RegisterWriteFullMatch\":["              \
+      "\"TEMP\","                               \
+      "\"CRZN\","                               \
+      "\"FSH1\""                                \
+    "],"                                        \
+                                                \
+    "\"RegisterWritePartialMatch\":["           \
+    "],"                                        \
+                                                \
+    "\"BadRegisterFullMatch\":["                \
+      "\"FBCM\","                               \
+      "\"FBGI\","                               \
+      "\"FBAE\","                               \
+      "\"FBCB\","                               \
+      "\"FBW1\","                               \
+      "\"FBW2\","                               \
+      "\"FBID\","                               \
+      "\"FUAE\","                               \
+      "\"FRPS\""                                \
+    "],"                                        \
+                                                \
+    "\"BadRegisterPartialMatch\":["             \
+      "\"BAT\""                                 \
+    "]"                                         \
   "}"
 
 /*
@@ -79,10 +89,10 @@ declare_array_of(RegisterRule);
  *
  * Defines how register names are matched during rating:
  *
- * FanRegistersFullMatch:
+ * FanRegisterFullMatch:
  *   Register in FanConfiguration must match exactly (whole name + mode).
  *
- * FanRegistersPartialMatch:
+ * FanRegisterPartialMatch:
  *   Register in FanConfiguration must contain the given name.
  *
  * RegisterWriteFullMatch:
@@ -90,12 +100,20 @@ declare_array_of(RegisterRule);
  *
  * RegisterPartialMatch:
  *   Register in RegisterWriteConfiguration must contain the given name.
+ *
+ * BadRegisterFullMatch:
+ *   Register must match exactly (whole name).
+ *
+ * BadRegisterPartialMatch:
+ *   Register must contain given name.
  */
 struct ConfigRatingRules {
-  array_of(RegisterRule)     FanRegistersFullMatch;
-  array_of(AcpiRegisterName) FanRegistersPartialMatch;
+  array_of(RegisterRule)     FanRegisterFullMatch;
+  array_of(AcpiRegisterName) FanRegisterPartialMatch;
   array_of(AcpiRegisterName) RegisterWriteFullMatch;
   array_of(AcpiRegisterName) RegisterWritePartialMatch;
+  array_of(AcpiRegisterName) BadRegisterFullMatch;
+  array_of(AcpiRegisterName) BadRegisterPartialMatch;
 };
 typedef struct ConfigRatingRules ConfigRatingRules;
 declare_array_of(ConfigRatingRules);

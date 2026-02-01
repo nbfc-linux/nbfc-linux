@@ -43,7 +43,7 @@ static enum RegisterMatchType ConfigRating_IsKnownFanRegister(
   enum RegisterType type,
   const char* s)
 {
-  for_each_array(RegisterRule*, rule, config_rating->rules.FanRegistersFullMatch) {
+  for_each_array(RegisterRule*, rule, config_rating->rules.FanRegisterFullMatch) {
     if (! strcmp(s, rule->Name)) {
       if (type == RegisterType_FanReadRegister && rule->Mode & RegisterRuleFanMode_Read)
         return RegisterMatchType_FullMatch;
@@ -59,7 +59,7 @@ static enum RegisterMatchType ConfigRating_IsKnownFanRegister(
 }
 
 static bool ConfigRating_IsSomeFanRegister(ConfigRating* config_rating, const char* s) {
-  for_each_array(AcpiRegisterName*, name, config_rating->rules.FanRegistersPartialMatch)
+  for_each_array(AcpiRegisterName*, name, config_rating->rules.FanRegisterPartialMatch)
     if (strstr(s, *name))
       return true;
 
@@ -86,8 +86,19 @@ static bool ConfigRating_IsMinimalFanRegister(const char* s) {
   return (s[0] == 'F');
 }
 
-static bool ConfigRating_IsBadRegister(const char* s) {
-  return (s[0] == 'B');
+static bool ConfigRating_IsBadRegister(ConfigRating* config_rating, const char* s) {
+  if (s[0] == 'B')
+    return true;
+
+  for_each_array(AcpiRegisterName*, name, config_rating->rules.BadRegisterFullMatch)
+    if (! strcmp(s, *name))
+      return true;
+
+  for_each_array(AcpiRegisterName*, name, config_rating->rules.BadRegisterPartialMatch)
+    if (strstr(s, *name))
+      return true;
+
+  return false;
 }
 
 static AcpiRegister* ConfigRating_FindEcRegister(
@@ -158,7 +169,7 @@ static ConfigRating_RegisterRating ConfigRating_RateRegister(
         goto ret;
     }
 
-    if (ConfigRating_IsBadRegister(name)) {
+    if (ConfigRating_IsBadRegister(config_rating, name)) {
       rated.score = RegisterScore_BadRegister;
       goto ret;
     }
@@ -181,7 +192,7 @@ static ConfigRating_RegisterRating ConfigRating_RateRegister(
       goto ret;
     }
 
-    if (ConfigRating_IsBadRegister(name)) {
+    if (ConfigRating_IsBadRegister(config_rating, name)) {
       rated.score = RegisterScore_BadRegister;
       goto ret;
     }
