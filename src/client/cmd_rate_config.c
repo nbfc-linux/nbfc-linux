@@ -368,7 +368,7 @@ static int RateConfig_PrintRules(bool json) {
 
   e = ConfigRatingRules_FromJson(&rules, CONFIG_RATING_DEFAULT_RULES);
   if (e) {
-    Log_Error("%s", err_print_all());
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 
