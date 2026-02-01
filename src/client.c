@@ -382,6 +382,10 @@ int main(int argc, char *const argv[]) {
       Rate_Config_Options.json = 1;
       break;
 
+    case Option_Rate_Config_Print_Rules:
+      Rate_Config_Options.print_rules = 1;
+      break;
+
     // ========================================================================
     // Acpi-Dump options
     // ========================================================================

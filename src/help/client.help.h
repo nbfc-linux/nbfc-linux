@@ -61,7 +61,7 @@
  ""
 
 #define CLIENT_RATE_CONFIG_HELP_TEXT                                           \
- "Usage: nbfc rate-config [-h|-H] [-d|--dsdt=FILE] [-a] <FILE>\n"              \
+ "Usage: nbfc rate-config [-h|-H] [-d|--dsdt=FILE] [-a] [-j] <FILE>\n"         \
  "\n"                                                                          \
  "Rates a configuration by analyzing whether it appears safe to execute\n"     \
  "on the current system.\n"                                                    \
@@ -75,6 +75,7 @@
  "  -a, --all             Rate all available configuration files\n"            \
  "  -d, --dsdt            Use an alternative DSDT file\n"                      \
  "  -j, --json            Use JSON output\n"                                   \
+ "  --print-rules         Print configuration rating rules\n"                  \
  ""
 
 #define CLIENT_ACPI_DUMP_HELP_TEXT                                             \

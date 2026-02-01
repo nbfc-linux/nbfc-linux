@@ -2,7 +2,7 @@
 #include "nxjson_utils.h"
 #include "memory.h"
 
-#include <stdio.h>  // snprintf
+#include <stdio.h>  // printf, snprintf
 #include <string.h> // memset, strcmp, strlen
 
 /*
@@ -219,6 +219,78 @@ end:
     ConfigRatingRules_Free(rules);
 
   return e;
+}
+
+static const char* RegisterRuleFanMode_ToStr(enum RegisterRuleFanMode mode) {
+  switch (mode) {
+    case RegisterRuleFanMode_Read:  return "r";
+    case RegisterRuleFanMode_Write: return "w";
+    default: return "rw";
+  }
+}
+
+static void ConfigRatingRules_RegisterRulesToJson(
+  array_of(RegisterRule)* rules,
+  const char* key,
+  nx_json* parent)
+{
+  nx_json* array = create_json_array(key, parent);
+
+  for_each_array(RegisterRule*, rule, *rules) {
+    nx_json* object = create_json_object(NULL, array);
+    create_json_string("Name", object, rule->Name);
+    create_json_string("Mode", object, RegisterRuleFanMode_ToStr(rule->Mode));
+  }
+}
+
+static void ConfigRatingRules_RegisterNamesToJson(
+  array_of(AcpiRegisterName)* names,
+  const char* key,
+  nx_json* parent)
+{
+  nx_json* array = create_json_array(key, parent);
+
+  for_each_array(AcpiRegisterName*, name, *names) {
+    create_json_string(NULL, array, *name);
+  }
+}
+
+nx_json* ConfigRatingRules_ToJson(ConfigRatingRules* rules) {
+  nx_json root = {0};
+  nx_json* object = create_json_object(NULL, &root);
+  ConfigRatingRules_RegisterRulesToJson(&rules->FanRegisterFullMatch, "FanRegisterFullMatch", object);
+  ConfigRatingRules_RegisterNamesToJson(&rules->FanRegisterPartialMatch, "FanRegisterPartialMatch", object);
+  ConfigRatingRules_RegisterNamesToJson(&rules->RegisterWriteFullMatch, "RegisterWriteFullMatch", object);
+  ConfigRatingRules_RegisterNamesToJson(&rules->RegisterWritePartialMatch, "RegisterWritePartialMatch", object);
+  ConfigRatingRules_RegisterNamesToJson(&rules->BadRegisterFullMatch, "BadRegisterFullMatch", object);
+  ConfigRatingRules_RegisterNamesToJson(&rules->BadRegisterPartialMatch, "BadRegisterPartialMatch", object);
+  return object;
+}
+
+void ConfigRatingRules_Print(ConfigRatingRules* rules) {
+  printf("FanRegisterFullMatch:\n");
+  for_each_array(RegisterRule*, rule, rules->FanRegisterFullMatch)
+    printf("\t%s (%s)\n", rule->Name, RegisterRuleFanMode_ToStr(rule->Mode));
+
+  printf("\nFanRegisterPartialMatch:\n");
+  for_each_array(AcpiRegisterName*, name, rules->FanRegisterPartialMatch)
+    printf("\t%s\n", *name);
+
+  printf("\nRegisterWriteFullMatch:\n");
+  for_each_array(AcpiRegisterName*, name, rules->RegisterWriteFullMatch)
+    printf("\t%s\n", *name);
+
+  printf("\nRegisterWritePartialMatch:\n");
+  for_each_array(AcpiRegisterName*, name, rules->RegisterWritePartialMatch)
+    printf("\t%s\n", *name);
+
+  printf("\nBadRegisterFullMatch:\n");
+  for_each_array(AcpiRegisterName*, name, rules->BadRegisterFullMatch)
+    printf("\t%s\n", *name);
+
+  printf("\nBadRegisterPartialMatch:\n");
+  for_each_array(AcpiRegisterName*, name, rules->BadRegisterPartialMatch)
+    printf("\t%s\n", *name);
 }
 
 void ConfigRatingRules_Free(ConfigRatingRules* rules) {

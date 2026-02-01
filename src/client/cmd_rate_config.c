@@ -16,11 +16,12 @@
 
 const cli99_option rate_config_options[] = {
   cli99_include_options(&main_options),
-  {"-d|--dsdt",      Option_Rate_Config_DSDT_File, 1},
-  {"-a|--all",       Option_Rate_Config_All,       0},
-  {"-H|--full-help", Option_Rate_Config_Full_Help, 0},
-  {"-j|--json",      Option_Rate_Config_Json,      0},
-  {"file",           Option_Rate_Config_File,      1},
+  {"-d|--dsdt",      Option_Rate_Config_DSDT_File,   1},
+  {"-a|--all",       Option_Rate_Config_All,         0},
+  {"-H|--full-help", Option_Rate_Config_Full_Help,   0},
+  {"-j|--json",      Option_Rate_Config_Json,        0},
+  {"--print-rules",  Option_Rate_Config_Print_Rules, 0},
+  {"file",           Option_Rate_Config_File,        1},
   cli99_options_end()
 };
 
@@ -28,9 +29,11 @@ struct {
   bool        all;
   bool        full_help;
   bool        json;
+  bool        print_rules;
   const char* file;
   const char* dsdt_file;
 } Rate_Config_Options = {
+  false,
   false,
   false,
   false,
@@ -356,6 +359,34 @@ static Error RateConfig_RateSingle(ConfigRating* config_rating, bool json, const
   return e;
 }
 
+/*
+ * Print configuration rules to stdout.
+ */
+static int RateConfig_PrintRules(bool json) {
+  Error e;
+  ConfigRatingRules rules = {0};
+
+  e = ConfigRatingRules_FromJson(&rules, CONFIG_RATING_DEFAULT_RULES);
+  if (e) {
+    Log_Error("%s", err_print_all());
+    return NBFC_EXIT_FAILURE;
+  }
+
+  if (json) {
+    nx_json* json = ConfigRatingRules_ToJson(&rules);
+    NX_JSON_Write write_obj = NX_JSON_Write_Init(STDOUT_FILENO, WriteMode_Write);
+    nx_json_write(&write_obj, json, 0);
+    nx_json_free(json);
+  }
+  else {
+    ConfigRatingRules_Print(&rules);
+  }
+
+  ConfigRatingRules_Free(&rules);
+
+  return NBFC_EXIT_SUCCESS;
+}
+
 int RateConfig() {
   Error e;
   ConfigRating config_rating = {0};
@@ -369,7 +400,7 @@ int RateConfig() {
   // Check command line arguments
   // ==========================================================================
 
-  if (! Rate_Config_Options.all && ! Rate_Config_Options.file) {
+  if (! Rate_Config_Options.print_rules && ! Rate_Config_Options.all && ! Rate_Config_Options.file) {
     Log_Error("Missing configuration file");
     return NBFC_EXIT_CMDLINE;
   }
@@ -378,6 +409,23 @@ int RateConfig() {
     Log_Error("-a|--all cannot be used together with a filename");
     return NBFC_EXIT_CMDLINE;
   }
+
+  if (Rate_Config_Options.print_rules && Rate_Config_Options.all) {
+    Log_Error("--print-rules cannot be used together with -a");
+    return NBFC_EXIT_CMDLINE;
+  }
+
+  if (Rate_Config_Options.print_rules && Rate_Config_Options.file) {
+    Log_Error("--print-rules cannot be used together with a filename");
+    return NBFC_EXIT_CMDLINE;
+  }
+
+  // ==========================================================================
+  // Print configuration rules
+  // ==========================================================================
+
+  if (Rate_Config_Options.print_rules)
+    return RateConfig_PrintRules(Rate_Config_Options.json);
 
   // ==========================================================================
   // Check if DSDT file exists and is readable
@@ -403,12 +451,6 @@ int RateConfig() {
     return NBFC_EXIT_FAILURE;
   }
 
-  e = Acpi_Analysis_Is_IASL_Installed();
-  if (e) {
-    Log_Error("%s", err_print_all(e));
-    return NBFC_EXIT_FAILURE;
-  }
-
   // ==========================================================================
   // Initialize ConfigRating
   // ==========================================================================
@@ -422,7 +464,7 @@ int RateConfig() {
   // ==========================================================================
   // Call desired function
   // ==========================================================================
-  
+
   if (Rate_Config_Options.all)
     e = RateConfig_RateAll(&config_rating, Rate_Config_Options.json);
   else

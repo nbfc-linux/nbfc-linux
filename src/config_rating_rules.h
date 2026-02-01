@@ -1,6 +1,7 @@
 #ifndef NBFC_CONFIG_RATING_RULES_H_
 #define NBFC_CONFIG_RATING_RULES_H_
 
+#include "nxjson.h"
 #include "acpi_analysis.h"
 
 /*
@@ -120,5 +121,7 @@ declare_array_of(ConfigRatingRules);
 
 Error ConfigRatingRules_FromJson(ConfigRatingRules*, const char*);
 void  ConfigRatingRules_Free(ConfigRatingRules*);
+void  ConfigRatingRules_Print(ConfigRatingRules*);
+nx_json* ConfigRatingRules_ToJson(ConfigRatingRules*);
 
 #endif

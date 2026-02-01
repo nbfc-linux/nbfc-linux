@@ -151,6 +151,9 @@ options:
 
   - option_strings: ["-j", "--json"]
     help: "Use JSON output"
+
+  - option_strings: ["--print-rules"]
+    help: "Print configuration rules"
 positionals:
   - number: 1
     metavar: "FILE"

@@ -38,6 +38,7 @@ enum Option {
   Option_Rate_Config_All,
   Option_Rate_Config_Full_Help,
   Option_Rate_Config_Json,
+  Option_Rate_Config_Print_Rules,
 
   // Acpi-Dump options
   Option_Acpi_Dump_Command,

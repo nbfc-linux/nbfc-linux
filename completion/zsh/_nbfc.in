@@ -334,6 +334,7 @@ _nbfc_rate_config() {
     '(--all -a)'{-a,--all}'[Rate all available configuration files]'
     '(--dsdt -d)'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--json -j)'{-j,--json}'[Use JSON output]'
+    '(--print-rules)'--print-rules'[Print configuration rules]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command

@@ -78,6 +78,7 @@ _nbfc__parse_commandline() {
         -a|--all) VAR=OPT_all; ARGS=0; return;;
         -d|--dsdt) VAR=OPT_dsdt; ARGS=1; return;;
         -j|--json) VAR=OPT_json; ARGS=0; return;;
+        --print-rules) VAR=OPT_print_rules; ARGS=0; return;;
       esac
     esac
     case "$1" in root:update*)
@@ -227,8 +228,8 @@ _nbfc() {
   local -a OPT_help OPT_version OPT_read_only OPT_all OPT_service OPT_fan
   local -a OPT_watch OPT_list OPT_set OPT_apply OPT_recommend OPT_auto OPT_speed
   local -a OPT_algorithm OPT_sensor OPT_force OPT_parallel OPT_quiet
-  local -a OPT_full_help OPT_dsdt OPT_json OPT_file OPT_upload_firmware
-  local -a OPT_print_command
+  local -a OPT_full_help OPT_dsdt OPT_json OPT_print_rules OPT_file
+  local -a OPT_upload_firmware OPT_print_command
   _nbfc__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -597,6 +598,7 @@ _nbfc_rate_config() {
     (( ! ${#OPT_all[@]} )) && opts+=(-a --all)
     (( ! ${#OPT_dsdt[@]} )) && opts+=(-d --dsdt=)
     (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
+    (( ! ${#OPT_print_rules[@]} )) && opts+=(--print-rules)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
