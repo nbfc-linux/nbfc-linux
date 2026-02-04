@@ -312,8 +312,10 @@ Error Acpi_Analysis_Get_Info(const char* file, AcpiInfo* out) {
   char* stderr_ = NULL;
   char* argv[] = {
     Mem_Strdup(ACPI_ANALYSIS_ACPIEXEC),
+    Mem_Strdup("-dt"),
+    Mem_Strdup("-di"),
     Mem_Strdup("-b"),
-    Mem_Strdup("Objects RegionField; Objects Region; Methods"),
+    Mem_Strdup("Objects RegionField; Objects Region; Methods; Exit"),
     Mem_Strdup(file),
     NULL
   };
@@ -371,6 +373,8 @@ end:
   Mem_Free(argv[1]);
   Mem_Free(argv[2]);
   Mem_Free(argv[3]);
+  Mem_Free(argv[4]);
+  Mem_Free(argv[5]);
   Mem_Free(stdout_);
   Mem_Free(stderr_);
   return e;
