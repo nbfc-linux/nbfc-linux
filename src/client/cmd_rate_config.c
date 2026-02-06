@@ -268,8 +268,7 @@ static void RateConfig_PrintResultsJson(array_of(ConfigWithData)* results, array
   for (array_size_t group_id = 0; group_id < num_groups; ++group_id)
     RateConfig_AddJsonResult(array, results, group_id);
 
-  NX_JSON_Write write_obj = NX_JSON_Write_Init(STDOUT_FILENO, WriteMode_Write);
-  nx_json_write(&write_obj, array, 0);
+  nxjson_write_to_fd(array, STDOUT_FILENO);
 
   nx_json_free(array);
 }
@@ -374,8 +373,7 @@ static int RateConfig_PrintRules(bool json) {
 
   if (json) {
     nx_json* json = ConfigRatingRules_ToJson(&rules);
-    NX_JSON_Write write_obj = NX_JSON_Write_Init(STDOUT_FILENO, WriteMode_Write);
-    nx_json_write(&write_obj, json, 0);
+    nxjson_write_to_fd(json, STDOUT_FILENO);
     nx_json_free(json);
   }
   else {

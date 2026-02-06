@@ -76,12 +76,15 @@ Error ServiceState_Write() {
   if (fd == -1)
     return err_stdlib(NBFC_STATE_FILE);
 
-  NX_JSON_Write write_obj = NX_JSON_Write_Init(fd, WriteMode_Write);
-  nx_json_write(&write_obj, o, 0);
-  nx_json_free(o);
-  close(fd);
+  bool success = nxjson_write_to_fd(o, fd);
 
-  if (write_obj.success)
+  int errno_save = errno;
+  close(fd);
+  errno = errno_save;
+
+  nx_json_free(o);
+
+  if (success)
     return err_success();
   else
     return err_stdlib(NBFC_STATE_FILE);

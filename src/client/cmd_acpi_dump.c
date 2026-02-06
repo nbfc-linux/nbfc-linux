@@ -44,14 +44,6 @@ enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
 }
 
 /*
- * Dumps a JSON object to STDOUT.
- */
-static inline void AcpiDump_WriteJson(const nx_json* json) {
-  NX_JSON_Write write_obj = NX_JSON_Write_Init(STDOUT_FILENO, WriteMode_Write);
-  nx_json_write(&write_obj, json, 0);
-}
-
-/*
  * Dumps the disassembled DSDT to stdout.
  */
 static int AcpiDump_DSL(const char* dsdt_file) {
@@ -99,7 +91,7 @@ static int AcpiDump_Methods(const char* dsdt_file, bool json) {
     nx_json* array = create_json_array(NULL, &root);
     for_each_array(AcpiMethod*, method, acpi_info.methods)
       AcpiMethod_ToJson(method, NULL, array);
-    AcpiDump_WriteJson(array);
+    nxjson_write_to_fd(array, STDOUT_FILENO);
     nx_json_free(array);
   }
   else {
@@ -169,7 +161,7 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
       AcpiRegister_ToJson(register_, NULL, array);
     }
 
-    AcpiDump_WriteJson(array);
+    nxjson_write_to_fd(array, STDOUT_FILENO);
     nx_json_free(array);
   }
   else {

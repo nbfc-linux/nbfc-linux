@@ -9,11 +9,7 @@
 #include <sys/socket.h>
 
 Error Protocol_Send_Json(int socket, const nx_json* json) {
-  NX_JSON_Write write_obj = NX_JSON_Write_Init(socket, WriteMode_Send);
-
-  nx_json_write(&write_obj, json, 0);
-
-  if (! write_obj.success)
+  if (! nxjson_send_to_fd(json, socket))
     return err_stdlib("send()");
 
   return Protocol_Send_End(socket);

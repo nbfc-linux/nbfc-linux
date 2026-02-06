@@ -5,6 +5,18 @@
 #include <string.h> // strlen
 #include <unistd.h> // write
 
+enum NX_JSON_WriteMode {
+  WriteMode_Send,
+  WriteMode_Write
+};
+
+struct NX_JSON_Write {
+  int fd;
+  enum NX_JSON_WriteMode mode;
+  bool success;
+};
+typedef struct NX_JSON_Write NX_JSON_Write;
+
 static void _nx_json_write(NX_JSON_Write* obj, const char* s) {
   const size_t len = strlen(s);
 
@@ -108,4 +120,26 @@ void nx_json_write(NX_JSON_Write* obj, const nx_json *nx, int indent) {
     if (nx != NULL)
       _nx_json_write(obj, ",");
   }
+}
+
+bool nxjson_send_to_fd(const nx_json* json, int fd) {
+  struct NX_JSON_Write write_obj;
+  write_obj.fd = fd;
+  write_obj.mode = WriteMode_Send;
+  write_obj.success = true;
+
+  nx_json_write(&write_obj, json, 0);
+
+  return write_obj.success;
+}
+
+bool nxjson_write_to_fd(const nx_json* json, int fd) {
+  struct NX_JSON_Write write_obj;
+  write_obj.fd = fd;
+  write_obj.mode = WriteMode_Write;
+  write_obj.success = true;
+
+  nx_json_write(&write_obj, json, 0);
+
+  return write_obj.success;
 }
