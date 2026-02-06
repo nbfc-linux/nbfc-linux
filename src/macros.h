@@ -52,8 +52,10 @@ declare_array_of(int);
 
 #ifndef NDEBUG
 #define debug(...) fprintf(stderr, __VA_ARGS__)
+#define STRICT_CLEANUP 1
 #else
 #define debug(...) (void)0
+#define STRICT_CLEANUP 0
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
