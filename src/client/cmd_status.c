@@ -82,7 +82,7 @@ int Status() {
         if (!vis[*fan_index]) {
           printf("\n");
           print_fan_status(&service_info.Fans.data[*fan_index]);
-          vis[*fan_index] = 1;
+          vis[*fan_index] = true;
         }
       }
       Mem_Free(vis);

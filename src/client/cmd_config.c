@@ -80,10 +80,10 @@ int Recommend() {
     "[!] and configuration names.\n"
     "\n");
 
-  bool have_match = 0;
+  bool have_match = false;
   for_each_array(ConfigFile*, file, files) {
     if (file->diff >= RecommendedConfigMatchThreshold) {
-      have_match = 1;
+      have_match = true;
       printf("%s\n", file->config_name);
     }
   }

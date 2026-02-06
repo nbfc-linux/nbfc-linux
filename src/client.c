@@ -186,11 +186,11 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Status_All:
-      Status_Options.all = 1;
+      Status_Options.all = true;
       break;
 
     case Option_Status_Service:
-      Status_Options.service = 1;
+      Status_Options.service = true;
       break;
 
     case Option_Status_Fan:
@@ -335,7 +335,7 @@ int main(int argc, char *const argv[]) {
       break;
 
     case Option_Update_Quiet:
-      Update_Options.quiet = 1;
+      Update_Options.quiet = true;
       break;
 
     // ========================================================================
@@ -343,7 +343,7 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Start_ReadOnly:
-      Start_Options.read_only = 1;
+      Start_Options.read_only = true;
       break;
 
     // ========================================================================
@@ -371,19 +371,19 @@ int main(int argc, char *const argv[]) {
       break;
 
     case Option_Rate_Config_All:
-      Rate_Config_Options.all = 1;
+      Rate_Config_Options.all = true;
       break;
 
     case Option_Rate_Config_Full_Help:
-      Rate_Config_Options.full_help = 1;
+      Rate_Config_Options.full_help = true;
       break;
 
     case Option_Rate_Config_Json:
-      Rate_Config_Options.json = 1;
+      Rate_Config_Options.json = true;
       break;
 
     case Option_Rate_Config_Print_Rules:
-      Rate_Config_Options.print_rules = 1;
+      Rate_Config_Options.print_rules = true;
       break;
 
     // ========================================================================
@@ -395,7 +395,7 @@ int main(int argc, char *const argv[]) {
       break;
 
     case Option_Acpi_Dump_Json:
-      Acpi_Dump_Options.json = 1;
+      Acpi_Dump_Options.json = true;
       break;
 
     case Option_Acpi_Dump_Command:

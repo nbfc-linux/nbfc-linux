@@ -61,7 +61,7 @@ static void parse_opts(int argc, char* const argv[]) {
       }
       break;
     case 'd':
-      options.debug = 1;
+      options.debug = true;
       Log_LogLevel = LogLevel_Debug;
       break;
     case 'c':
@@ -80,10 +80,10 @@ static void parse_opts(int argc, char* const argv[]) {
       exit(0);
       break;
     case 'r':
-      options.read_only = 1;
+      options.read_only = true;
       break;
     case 'f':
-      options.fork = 1;
+      options.fork = true;
       break;
     default:
       exit(NBFC_EXIT_CMDLINE);
