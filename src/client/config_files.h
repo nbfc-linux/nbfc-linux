@@ -1,5 +1,5 @@
-#ifndef CONFIG_FILES_H_
-#define CONFIG_FILES_H_
+#ifndef NBFC_CONFIG_FILES_H_
+#define NBFC_CONFIG_FILES_H_
 
 #include "../macros.h"
 

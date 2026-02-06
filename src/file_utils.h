@@ -1,5 +1,5 @@
-#ifndef FILE_UTILS_H_
-#define FILE_UTILS_H_
+#ifndef NBFC_FILE_UTILS_H_
+#define NBFC_FILE_UTILS_H_
 
 #include <stddef.h>    // size_t
 #include <fcntl.h>     // mode_t

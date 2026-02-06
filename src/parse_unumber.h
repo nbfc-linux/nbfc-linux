@@ -1,5 +1,5 @@
-#ifndef PARSE_UNUMBER_H_
-#define PARSE_UNUMBER_H_
+#ifndef NBFC_PARSE_UNUMBER_H_
+#define NBFC_PARSE_UNUMBER_H_
 
 #include <errno.h>
 #include <stdlib.h>

@@ -1,5 +1,5 @@
-#ifndef NBFC_PROCESS_H
-#define NBFC_PROCESS_H
+#ifndef NBFC_PROCESS_H_
+#define NBFC_PROCESS_H_
 
 #include "error.h"
 

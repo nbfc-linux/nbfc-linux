@@ -1,5 +1,5 @@
-#ifndef SERVER_H_
-#define SERVER_H_
+#ifndef NBFC_SERVER_H_
+#define NBFC_SERVER_H_
 
 #include "error.h"
 

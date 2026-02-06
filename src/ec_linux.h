@@ -1,5 +1,5 @@
-#ifndef EC_LINUX_H_
-#define EC_LINUX_H_
+#ifndef NBFC_EC_LINUX_H_
+#define NBFC_EC_LINUX_H_
 
 #include "ec.h"
 

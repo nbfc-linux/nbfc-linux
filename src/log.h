@@ -1,5 +1,5 @@
-#ifndef LOG_H_
-#define LOG_H_
+#ifndef NBFC_LOG_H_
+#define NBFC_LOG_H_
 
 #include "macros.h"
 

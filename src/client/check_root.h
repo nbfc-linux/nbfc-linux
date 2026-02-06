@@ -1,5 +1,5 @@
-#ifndef CHECK_ROOT_H_
-#define CHECK_ROOT_H_
+#ifndef NBFC_CHECK_ROOT_H_
+#define NBFC_CHECK_ROOT_H_
 
 #include <stdlib.h> // exit
 #include <unistd.h> // geteuid

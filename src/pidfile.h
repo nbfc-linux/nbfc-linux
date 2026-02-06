@@ -1,5 +1,5 @@
-#ifndef PIDFILE_H
-#define PIDFILE_H
+#ifndef NBFC_PIDFILE_H_
+#define NBFC_PIDFILE_H_
 
 #include "error.h"
 

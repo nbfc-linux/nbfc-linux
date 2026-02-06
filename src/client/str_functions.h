@@ -1,5 +1,5 @@
-#ifndef STR_FUNCTIONS_H_
-#define STR_FUNCTIONS_H_
+#ifndef NBFC_STR_FUNCTIONS_H_
+#define NBFC_STR_FUNCTIONS_H_
 
 #include <stdbool.h>
 

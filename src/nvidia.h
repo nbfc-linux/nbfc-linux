@@ -1,5 +1,5 @@
-#ifndef NVIDIA_H_
-#define NVIDIA_H_
+#ifndef NBFC_NVIDIA_H_
+#define NBFC_NVIDIA_H_
 
 #include "error.h"
 

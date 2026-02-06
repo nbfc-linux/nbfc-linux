@@ -1,5 +1,5 @@
-#ifndef SERVICE_CONTROL_H_
-#define SERVICE_CONTROL_H_
+#ifndef NBFC_SERVICE_CONTROL_H_
+#define NBFC_SERVICE_CONTROL_H_
 
 #include <stdbool.h>
 

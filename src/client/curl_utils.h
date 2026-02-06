@@ -1,5 +1,5 @@
-#ifndef NBFC_CURL_UTILS_H
-#define NBFC_CURL_UTILS_H
+#ifndef NBFC_CURL_UTILS_H_
+#define NBFC_CURL_UTILS_H_
 
 #include <string.h> // strerror
 

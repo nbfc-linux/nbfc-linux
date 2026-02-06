@@ -1,5 +1,5 @@
-#ifndef CLIENT_GLOBAL_H_
-#define CLIENT_GLOBAL_H_
+#ifndef NBFC_CLIENT_GLOBAL_H_
+#define NBFC_CLIENT_GLOBAL_H_
 
 #include "../optparse/optparse.h"
 

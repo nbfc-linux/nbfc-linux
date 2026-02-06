@@ -1,5 +1,5 @@
-#ifndef PROTOCOL_H_
-#define PROTOCOL_H_
+#ifndef NBFC_PROTOCOL_H_
+#define NBFC_PROTOCOL_H_
 
 #include "error.h"
 #include "nxjson.h"
