@@ -71,15 +71,15 @@ const cli99_option main_options[] = {
 #include "client/cmd_rate_config.c"
 
 #define NBFC_CLIENT_COMMANDS \
+  o("set",              Set,              SET,              set)           \
+  o("status",           Status,           STATUS,           status)        \
   o("start",            Start,            START,            start)         \
   o("stop",             Stop,             STOP,             main)          \
   o("restart",          Restart,          RESTART,          start)         \
-  o("status",           Status,           STATUS,           status)        \
   o("sensors",          Sensors,          SENSORS,          sensors)       \
   o("config",           Config,           CONFIG,           config)        \
   o("rate-config",      Rate_Config,      RATE_CONFIG,      rate_config)   \
   o("acpi-dump",        Acpi_Dump,        ACPI_DUMP,        acpi_dump)     \
-  o("set",              Set,              SET,              set)           \
   o("update",           Update,           UPDATE,           update)        \
   o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   main)          \
   o("get-model-name",   Get_Model_Name,   GET_MODEL,        main)          \
