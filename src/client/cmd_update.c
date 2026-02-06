@@ -50,8 +50,8 @@ typedef enum FileState FileState;
 // Data structure used for getting file listing using GitHub's API
 struct GitHubFile {
   char* name;
-  char* sha;
   char* download_url;
+  char  sha[SHA_DIGEST_LENGTH * 2 + 1];
   FileState state;
 };
 typedef struct GitHubFile GitHubFile;
@@ -262,10 +262,8 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
   CURLcode code;
   char* response = NULL;
   const nx_json* root = NULL;
-  ssize_t out_capacity = 512;
 
-  out->data = Mem_Calloc(out_capacity, sizeof(GitHubFile));
-  out->size = 0;
+  memset(out, 0, sizeof(*out));
 
   curl = CurlWithMem_Create(url, NULL);
 
@@ -320,6 +318,8 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
     goto end;
   }
 
+  out->data = Mem_Calloc(root->val.children.length, sizeof(GitHubFile));
+
   nx_json_for_each(file, root) {
     if (file->type != NX_JSON_OBJECT) {
       Log_Error("Item is not a JSON object");
@@ -356,15 +356,10 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
       sha = "";
     }
 
-    if (out->size == out_capacity) {
-      out_capacity *= 2;
-      out->data = Mem_Realloc(out->data, out_capacity * sizeof(GitHubFile));
-    }
-
-    out->data[out->size].name = Mem_Strdup(name);
-    out->data[out->size].sha = Mem_Strdup(sha);
-    out->data[out->size].download_url = Mem_Strdup(download_url);
-    out->size++;
+    GitHubFile* file = &out->data[out->size++];
+    file->name = Mem_Strdup(name);
+    file->download_url = Mem_Strdup(download_url);
+    snprintf(file->sha, sizeof(file->sha), "%s", sha);
   }
 
 end:
@@ -430,7 +425,6 @@ end:
   for_each_array(GitHubFile*, file, files) {
     Mem_Free(file->name);
     Mem_Free(file->download_url);
-    Mem_Free(file->sha);
   }
   Mem_Free(files.data);
   return ret;
