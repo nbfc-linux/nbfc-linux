@@ -86,9 +86,12 @@ int Set() {
   }
 
 error:
+
+#if STRICT_CLEANUP
   nx_json_free(in);
   nx_json_free(out);
   Mem_Free(buf);
+#endif
 
   if (e) {
     Log_Error("%s", err_print_all(e));
