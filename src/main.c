@@ -250,7 +250,7 @@ int main(int argc, char* const argv[])
     }
 
     // ========================================================================
-    // Run the server loop for Service_Model_Config.EcPollInterval miliseconds.
+    // Run the server loop for Service_ModelConfig.EcPollInterval miliseconds.
     // ========================================================================
     struct timeval start, current;
     gettimeofday(&start, NULL);
@@ -258,7 +258,7 @@ int main(int argc, char* const argv[])
     while (!quit) {
       gettimeofday(&current, NULL);
       int elapsed = (current.tv_sec - start.tv_sec) * 1000 + (current.tv_usec - start.tv_usec) / 1000;
-      int timeout = Service_Model_Config.EcPollInterval - elapsed;
+      int timeout = Service_ModelConfig.EcPollInterval - elapsed;
 
       if (timeout <= 0)
         break;

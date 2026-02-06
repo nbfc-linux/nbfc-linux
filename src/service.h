@@ -20,7 +20,7 @@ struct Service_Options {
   char                   service_config[PATH_MAX];
 };
 
-extern ModelConfig     Service_Model_Config;
+extern ModelConfig     Service_ModelConfig;
 extern array_of(FanTemperatureControl) Service_Fans;
 extern Service_Options options;
 

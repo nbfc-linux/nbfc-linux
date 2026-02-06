@@ -4,10 +4,10 @@
 #include "service.h"
 
 void Sponsor_Print() {
-  if (! ModelConfig_IsSet_Sponsor(&Service_Model_Config))
+  if (! ModelConfig_IsSet_Sponsor(&Service_ModelConfig))
     return;
 
-  const Sponsor* sponsor = &Service_Model_Config.Sponsor;
+  const Sponsor* sponsor = &Service_ModelConfig.Sponsor;
 
   Log_Info("This configuration is sponsored by:");
 

@@ -49,7 +49,7 @@ static nfds_t             Server_PollFDSize = 0;
 static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
   int fan = -1;
   float speed = -2;
-  const int fancount = Service_Model_Config.FanConfigurations.size;
+  const int fancount = Service_ModelConfig.FanConfigurations.size;
 
   nx_json_for_each(c, json) {
     if (!strcmp(c->key, "Command"))

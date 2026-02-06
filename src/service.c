@@ -36,7 +36,7 @@ enum Service_Initialization {
   Initialized_6_Temperature_Filter,
 };
 
-ModelConfig              Service_Model_Config;
+ModelConfig              Service_ModelConfig;
 array_of(FanTemperatureControl) Service_Fans;
 static enum Service_Initialization Service_State;
 
@@ -81,7 +81,7 @@ Error Service_Init() {
 
   // Model config =============================================================
   Log_Info("Using '%s' as model config", service_config.SelectedConfigId);
-  e = ModelConfig_FindAndLoad(&Service_Model_Config, path, service_config.SelectedConfigId);
+  e = ModelConfig_FindAndLoad(&Service_ModelConfig, path, service_config.SelectedConfigId);
   if (e) {
     e = err_chain_string(e, path);
     goto error;
@@ -90,13 +90,13 @@ Error Service_Init() {
   Service_State = Initialized_2_Model_Config;
 
   Trace_Push(trace, path);
-  e = ModelConfig_Validate(trace, &Service_Model_Config);
+  e = ModelConfig_Validate(trace, &Service_ModelConfig);
   if (e)
     goto error;
 
   Sponsor_Print();
 
-  TemperatureThresholdManager_LegacyBehaviour = Service_Model_Config.LegacyTemperatureThresholdsBehaviour;
+  TemperatureThresholdManager_LegacyBehaviour = Service_ModelConfig.LegacyTemperatureThresholdsBehaviour;
 
   // Sensor ===================================================================
   e = FS_Sensors_Init();
@@ -106,15 +106,15 @@ Error Service_Init() {
   Service_State = Initialized_3_Sensors;
 
   // Fans =====================================================================
-  Service_Fans.size = Service_Model_Config.FanConfigurations.size;
+  Service_Fans.size = Service_ModelConfig.FanConfigurations.size;
   Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
   Service_State = Initialized_4_Fans;
 
   for_enumerate_array(array_size_t, i, Service_Fans) {
     e = Fan_Init(
         &Service_Fans.data[i].Fan,
-        &Service_Model_Config.FanConfigurations.data[i],
-        &Service_Model_Config
+        &Service_ModelConfig.FanConfigurations.data[i],
+        &Service_ModelConfig
     );
     if (e)
       goto error;
@@ -180,12 +180,12 @@ Error Service_Init() {
   }
 
   // Initialize fans with sensors and temperature filter ======================
-  e = FanTemperatureControl_Init(&Service_Fans, &service_config, &Service_Model_Config);
+  e = FanTemperatureControl_Init(&Service_Fans, &service_config, &Service_ModelConfig);
   if (e)
     goto error;
   Service_State = Initialized_6_Temperature_Filter;
 
-  FanTemperatureControl_Log(&Service_Fans, &Service_Model_Config);
+  FanTemperatureControl_Log(&Service_Fans, &Service_ModelConfig);
 
 error:
 
@@ -324,7 +324,7 @@ static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
 
 static Error ResetRegisterWriteConfigurations() {
   Error e = err_success();
-  for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations)
+  for_each_array(RegisterWriteConfiguration*, cfg, Service_ModelConfig.RegisterWriteConfigurations)
     if (cfg->ResetRequired) {
       e = ResetRegisterWriteConfig(cfg);
       e_warn();
@@ -364,7 +364,7 @@ static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
 }
 
 static Error ApplyRegisterWriteConfigurations(bool initializing) {
-  for_each_array(RegisterWriteConfiguration*, cfg, Service_Model_Config.RegisterWriteConfigurations) {
+  for_each_array(RegisterWriteConfiguration*, cfg, Service_ModelConfig.RegisterWriteConfigurations) {
     if (initializing || cfg->WriteOccasion == RegisterWriteOccasion_OnWriteFanSpeed) {
        Error e = ApplyRegisterWriteConfig(cfg);
        e_check();
@@ -374,7 +374,7 @@ static Error ApplyRegisterWriteConfigurations(bool initializing) {
 }
 
 static bool IsAcpiCallUsed() {
-  for_each_array(FanConfiguration*, fc, Service_Model_Config.FanConfigurations) {
+  for_each_array(FanConfiguration*, fc, Service_ModelConfig.FanConfigurations) {
     if (FanConfiguration_IsSet_WriteAcpiMethod(fc))
       return true;
 
@@ -385,7 +385,7 @@ static bool IsAcpiCallUsed() {
       return true;
   }
 
-  for_each_array(RegisterWriteConfiguration*, rwc, Service_Model_Config.RegisterWriteConfigurations) {
+  for_each_array(RegisterWriteConfiguration*, rwc, Service_ModelConfig.RegisterWriteConfigurations) {
     if (rwc->WriteMode == RegisterWriteMode_Call)
       return true;
 
@@ -397,7 +397,7 @@ static bool IsAcpiCallUsed() {
 }
 
 void Service_WriteTargetFanSpeedsToState() {
-  const array_size_t fancount = Service_Model_Config.FanConfigurations.size;
+  const array_size_t fancount = Service_ModelConfig.FanConfigurations.size;
 
   service_state.TargetFanSpeeds.data = Mem_Realloc(service_state.TargetFanSpeeds.data, sizeof(float) * fancount);
   service_state.TargetFanSpeeds.size = fancount;
@@ -429,7 +429,7 @@ void Service_Cleanup() {
       FS_Sensors_Cleanup();
       /* fall through */
     case Initialized_2_Model_Config:
-      ModelConfig_Free(&Service_Model_Config);
+      ModelConfig_Free(&Service_ModelConfig);
       /* fall through */
     case Initialized_1_Service_Config:
       ServiceState_Write();
