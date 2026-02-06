@@ -1,7 +1,5 @@
 #include "trace.h"
 
-#include "macros.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>

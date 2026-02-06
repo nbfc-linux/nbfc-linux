@@ -1,6 +1,7 @@
 #ifndef NBFC_TRACE_H_
 #define NBFC_TRACE_H_
 
+#include "macros.h"
 #include <string.h> // memset
 
 struct Trace {
@@ -10,7 +11,7 @@ struct Trace {
 };
 typedef struct Trace Trace;
 
-void Trace_Push(Trace*, const char*, ...);
+void Trace_Push(Trace*, const char*, ...) PRINTF_LIKE(2, 3);
 void Trace_Pop(Trace*);
 
 static inline void Trace_Init(Trace* trace) {
