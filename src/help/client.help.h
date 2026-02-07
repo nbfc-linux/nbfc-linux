@@ -73,7 +73,7 @@
  "  -h, --help            Show this help message and exit\n"                   \
  "  -H, --full-help       Show full help\n"                                    \
  "  -a, --all             Rate all available configuration files\n"            \
- "  -d, --dsdt            Use an alternative DSDT file\n"                      \
+ "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
  "  -j, --json            Use JSON output\n"                                   \
  "  --print-rules         Print configuration rating rules\n"                  \
  ""
