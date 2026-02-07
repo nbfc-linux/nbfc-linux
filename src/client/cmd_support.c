@@ -301,7 +301,7 @@ int Support() {
   else if (Support_Options.action == Support_Action_Print_Command)
     ret = Support_Print_Command();
 
-#ifdef STRICT_CLEANUP
+#if STRICT_CLEANUP
   curl_global_cleanup();
 #endif
 
