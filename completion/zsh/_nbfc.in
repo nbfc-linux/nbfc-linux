@@ -333,6 +333,7 @@ _nbfc_rate_config() {
     '(--full-help -H)'{-H,--full-help}'[Show full help]'
     '(--all -a)'{-a,--all}'[Rate all available configuration files]'
     '(--dsdt -d)'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--min-score -m)'{-m+,--min-score=}'[Set minimum rating threshold for configurations]':SCORE:"_numbers -f 'Set minimum rating threshold for configurations'"
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--print-rules)'--print-rules'[Print configuration rules]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'

@@ -14,12 +14,15 @@
 #include "check_root.h"
 #include "client_global.h"
 
+#define RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE 9.0
+
 const cli99_option rate_config_options[] = {
   cli99_include_options(&main_options),
   {"-d|--dsdt",      Option_Rate_Config_DSDT_File,   1},
   {"-a|--all",       Option_Rate_Config_All,         0},
   {"-H|--full-help", Option_Rate_Config_Full_Help,   0},
   {"-j|--json",      Option_Rate_Config_Json,        0},
+  {"-m|--min-score", Option_Rate_Config_Min_Score,   1},
   {"--print-rules",  Option_Rate_Config_Print_Rules, 0},
   {"file",           Option_Rate_Config_File,        1},
   cli99_options_end()
@@ -30,6 +33,8 @@ struct {
   bool        full_help;
   bool        json;
   bool        print_rules;
+  bool        min_score_set;
+  float       min_score;
   const char* file;
   const char* dsdt_file;
 } Rate_Config_Options = {
@@ -37,6 +42,8 @@ struct {
   false,
   false,
   false,
+  false,
+  RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE,
   NULL,
   ACPI_ANALYSIS_ACPI_DSDT,
 };
@@ -224,7 +231,23 @@ static void RateConfig_SortResultByPriority(array_of(ConfigWithData)* result) {
   }
 }
 
-static void RateConfig_PrintResultGroup(array_of(ConfigWithData)* results, array_size_t group_id) {
+static bool RateConfig_GroupHasMinScore(
+  array_of(ConfigWithData)* results,
+  array_size_t group_id,
+  float min_score
+) {
+  for_each_array(ConfigWithData*, result, *results) {
+    if (result->group_id == group_id)
+      return (result->rating.score >= min_score);
+  }
+
+  return false;
+}
+
+static void RateConfig_PrintResultGroup(
+  array_of(ConfigWithData)* results,
+  array_size_t group_id
+) {
   ConfigWithData* last_result = NULL;
 
   for_each_array(ConfigWithData*, result, *results) {
@@ -238,14 +261,25 @@ static void RateConfig_PrintResultGroup(array_of(ConfigWithData)* results, array
   ConfigRating_RatingPrint(&last_result->rating);
 }
 
-static void RateConfig_PrintResults(array_of(ConfigWithData)* results, array_size_t num_groups) {
+static void RateConfig_PrintResults(
+  array_of(ConfigWithData)* results,
+  array_size_t num_groups,
+  float min_score
+) {
   for (array_size_t group_id = 0; group_id < num_groups; ++group_id) {
+    if (! RateConfig_GroupHasMinScore(results, group_id, min_score))
+      continue;
+
     RateConfig_PrintResultGroup(results, group_id);
     printf("\n");
   }
 }
 
-static void RateConfig_AddJsonResult(nx_json* array, array_of(ConfigWithData)* results, array_size_t group_id) {
+static void RateConfig_AddJsonResult(
+  nx_json* array,
+  array_of(ConfigWithData)* results,
+  array_size_t group_id
+) {
   ConfigWithData* last_result = NULL;
   nx_json* object = create_json_object(NULL, array);
   nx_json* files = create_json_array("files", object);
@@ -261,12 +295,20 @@ static void RateConfig_AddJsonResult(nx_json* array, array_of(ConfigWithData)* r
   ConfigRating_ToJson(&last_result->rating, "rating", object);
 }
 
-static void RateConfig_PrintResultsJson(array_of(ConfigWithData)* results, array_size_t num_groups) {
+static void RateConfig_PrintResultsJson(
+  array_of(ConfigWithData)* results,
+  array_size_t num_groups,
+  float min_score
+) {
   nx_json root = {0};
   nx_json* array = create_json_array(NULL, &root);
 
-  for (array_size_t group_id = 0; group_id < num_groups; ++group_id)
+  for (array_size_t group_id = 0; group_id < num_groups; ++group_id) {
+    if (! RateConfig_GroupHasMinScore(results, group_id, min_score))
+      continue;
+
     RateConfig_AddJsonResult(array, results, group_id);
+  }
 
   nxjson_write_to_fd(array, STDOUT_FILENO);
 
@@ -278,7 +320,12 @@ static void RateConfig_PrintResultsJson(array_of(ConfigWithData)* results, array
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateFiles(ConfigRating* config_rating, bool json, array_of(ConfigFile)* files) {
+static Error RateConfig_RateFiles(
+  ConfigRating* config_rating,
+  array_of(ConfigFile)* files,
+  bool json,
+  float min_score
+) {
   array_of(ConfigWithData) ratings;
 
   // Load model configuration and rate them
@@ -295,9 +342,9 @@ static Error RateConfig_RateFiles(ConfigRating* config_rating, bool json, array_
 
   // Print results
   if (json)
-    RateConfig_PrintResultsJson(&ratings, num_groups);
+    RateConfig_PrintResultsJson(&ratings, num_groups, min_score);
   else
-    RateConfig_PrintResults(&ratings, num_groups);
+    RateConfig_PrintResults(&ratings, num_groups, min_score);
 
   // Free
   for_each_array(ConfigWithData*, rating, ratings) {
@@ -308,7 +355,7 @@ static Error RateConfig_RateFiles(ConfigRating* config_rating, bool json, array_
   return err_success();
 }
 
-static void PrintFullHelpNotice() {
+static inline void PrintFullHelpNotice() {
   printf(
     "Please run `nbfc rate-config --full-help` for a full explanation of how "
     "to interpret these results.\n");
@@ -319,16 +366,24 @@ static void PrintFullHelpNotice() {
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateAll(ConfigRating* config_rating, bool json) {
+static Error RateConfig_RateAll(ConfigRating* config_rating, bool json, float min_score) {
   Error e;
 
   // Get all configuration files
   array_of(ConfigFile) all_configs = List_All_Configs();
 
   // Rate configs
-  e = RateConfig_RateFiles(config_rating, json, &all_configs);
-  if (!json)
+  e = RateConfig_RateFiles(config_rating, &all_configs, json, min_score);
+  if (!json) {
+    if (! Rate_Config_Options.min_score_set) {
+      printf(
+        "Only configurations with the minimum recommended score of %.2f are shown.\n"
+        "You can change this threshold by using -m|--min-score, but doing so can lead\n"
+        "to unsafe configurations being displayed.\n\n", RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE
+      );
+    }
     PrintFullHelpNotice();
+  }
 
   // Free
   ConfigFiles_Free(&all_configs);
@@ -351,7 +406,7 @@ static Error RateConfig_RateSingle(ConfigRating* config_rating, bool json, const
   configs.size = 1;
   configs.data = &cfg_file;
 
-  e = RateConfig_RateFiles(config_rating, json, &configs);
+  e = RateConfig_RateFiles(config_rating, &configs, json, 0.0);
   if (!json)
     PrintFullHelpNotice();
 
@@ -464,7 +519,7 @@ int RateConfig() {
   // ==========================================================================
 
   if (Rate_Config_Options.all)
-    e = RateConfig_RateAll(&config_rating, Rate_Config_Options.json);
+    e = RateConfig_RateAll(&config_rating, Rate_Config_Options.json, Rate_Config_Options.min_score);
   else
     e = RateConfig_RateSingle(&config_rating, Rate_Config_Options.json, Rate_Config_Options.file);
 

@@ -149,6 +149,11 @@ options:
     metavar: "FILE"
     complete: ["file"]
 
+  - option_strings: ["-m", "--min-score"]
+    help: "Set minimum rating threshold for configurations"
+    metavar: "SCORE"
+    complete: ["float"]
+
   - option_strings: ["-j", "--json"]
     help: "Use JSON output"
 

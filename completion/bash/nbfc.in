@@ -77,6 +77,7 @@ _nbfc__parse_commandline() {
         -H|--full-help) VAR=OPT_full_help; ARGS=0; return;;
         -a|--all) VAR=OPT_all; ARGS=0; return;;
         -d|--dsdt) VAR=OPT_dsdt; ARGS=1; return;;
+        -m|--min-score) VAR=OPT_min_score; ARGS=1; return;;
         -j|--json) VAR=OPT_json; ARGS=0; return;;
         --print-rules) VAR=OPT_print_rules; ARGS=0; return;;
       esac
@@ -228,8 +229,8 @@ _nbfc() {
   local -a OPT_help OPT_version OPT_read_only OPT_all OPT_service OPT_fan
   local -a OPT_watch OPT_list OPT_set OPT_apply OPT_recommend OPT_auto OPT_speed
   local -a OPT_algorithm OPT_sensor OPT_force OPT_parallel OPT_quiet
-  local -a OPT_full_help OPT_dsdt OPT_json OPT_print_rules OPT_file
-  local -a OPT_upload_firmware OPT_print_command
+  local -a OPT_full_help OPT_dsdt OPT_min_score OPT_json OPT_print_rules
+  local -a OPT_file OPT_upload_firmware OPT_print_command
   _nbfc__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -565,6 +566,7 @@ _nbfc_rate_config() {
     case "$opt" in
       -d|--dsdt)
         _filedir;;
+      -m|--min-score);;
       *) ret=1;;
     esac
 
@@ -573,7 +575,7 @@ _nbfc_rate_config() {
 
   case "$prev" in
     --*) __complete_option "$prev" "$cur" && return 0;;
-    -*([Hajh])[d])
+    -*([Hajh])[dm])
          __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
@@ -581,7 +583,7 @@ _nbfc_rate_config() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*([Hajh])[d]*)
+    -*([Hajh])[dm]*)
       local i
       for ((i=2; i <= ${#cur}; ++i)); do
         local pre="${cur:0:$i}" value="${cur:$i}"
@@ -597,6 +599,7 @@ _nbfc_rate_config() {
     (( ! ${#OPT_full_help[@]} )) && opts+=(-H --full-help)
     (( ! ${#OPT_all[@]} )) && opts+=(-a --all)
     (( ! ${#OPT_dsdt[@]} )) && opts+=(-d --dsdt=)
+    (( ! ${#OPT_min_score[@]} )) && opts+=(-m --min-score=)
     (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
     (( ! ${#OPT_print_rules[@]} )) && opts+=(--print-rules)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))

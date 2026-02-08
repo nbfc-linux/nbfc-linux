@@ -327,19 +327,21 @@ complete -c $prog -n $C000 -s p -l parallel -d 'Set number of parallel downloads
 complete -c $prog -n $C001 -s q -l quiet -d 'Enable quiet mode' -f
 
 # command nbfc rate-config
-set -l opts "-H --full-help -a --all -d= --dsdt= -j --json --print-rules -h --help --version"
+set -l opts "-H --full-help -a --all -d= --dsdt= -m= --min-score= -j --json --print-rules -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -H --full-help"
 set -l C001 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -a --all"
 set -l C002 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -d --dsdt"
-set -l C003 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -j --json"
-set -l C004 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option --print-rules"
-set -l C005 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 rate-config"
+set -l C003 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -m --min-score"
+set -l C004 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -j --json"
+set -l C005 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option --print-rules"
+set -l C006 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 rate-config"
 complete -c $prog -n $C000 -s H -l full-help -d 'Show full help' -f
 complete -c $prog -n $C001 -s a -l all -d 'Rate all available configuration files' -f
 complete -c $prog -n $C002 -s d -l dsdt -d 'Use an alternative DSDT file' -Fr
-complete -c $prog -n $C003 -s j -l json -d 'Use JSON output' -f
-complete -c $prog -n $C004 -l print-rules -d 'Print configuration rules' -f
-complete -c $prog -n $C005 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
+complete -c $prog -n $C003 -s m -l min-score -d 'Set minimum rating threshold for configurations' -x
+complete -c $prog -n $C004 -s j -l json -d 'Use JSON output' -f
+complete -c $prog -n $C005 -l print-rules -d 'Print configuration rules' -f
+complete -c $prog -n $C006 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
 
 # command nbfc acpi-dump
 set -l opts "-f= --file= -j --json -h --help --version"

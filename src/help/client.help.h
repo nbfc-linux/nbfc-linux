@@ -75,6 +75,7 @@
  "  -a, --all             Rate all available configuration files\n"            \
  "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
  "  -j, --json            Use JSON output\n"                                   \
+ "  -m, --min-score SCORE Set minimum rating threshold for configurations\n"   \
  "  --print-rules         Print configuration rating rules\n"                  \
  ""
 

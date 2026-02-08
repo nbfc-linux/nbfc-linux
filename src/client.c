@@ -386,6 +386,15 @@ int main(int argc, char *const argv[]) {
       Rate_Config_Options.print_rules = true;
       break;
 
+    case Option_Rate_Config_Min_Score:
+      Rate_Config_Options.min_score_set = true;
+      Rate_Config_Options.min_score = parse_double(p.optarg, 0, 10, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", "-m|--min-score", err, p.optarg);
+        return NBFC_EXIT_FAILURE;
+      }
+      break;
+
     // ========================================================================
     // Acpi-Dump options
     // ========================================================================
