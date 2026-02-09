@@ -1,6 +1,7 @@
 #ifndef NBFC_CONFIG_RATING_RULES_H_
 #define NBFC_CONFIG_RATING_RULES_H_
 
+#include "macros.h"
 #include "nxjson.h"
 #include "acpi_analysis.h"
 
@@ -63,7 +64,7 @@
  * Write:
  *   Match fan registers used for writing.
  */
-enum RegisterRuleFanMode {
+enum NBFC_PACKED_ENUM RegisterRuleFanMode {
   RegisterRuleFanMode_None  = 0x00,
   RegisterRuleFanMode_Read  = 0x01,
   RegisterRuleFanMode_Write = 0x02,

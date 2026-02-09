@@ -7,10 +7,6 @@
 #include "error.h"
 #include "trace.h"
 
-#if defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
-
-#define NBFC_PACKED_ENUM  __attribute__((packed))
-
 enum NBFC_PACKED_ENUM RegisterWriteMode_ {
   RegisterWriteMode_Set,
   RegisterWriteMode_And,
@@ -46,6 +42,8 @@ enum NBFC_PACKED_ENUM TemperatureAlgorithmType_ {
   TemperatureAlgorithmType_Max,
   TemperatureAlgorithmType_Unset,
 };
+
+#if defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
 
 typedef enum RegisterWriteMode_        RegisterWriteMode;
 typedef enum RegisterWriteOccasion_    RegisterWriteOccasion;

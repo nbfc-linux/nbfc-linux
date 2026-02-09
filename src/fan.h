@@ -8,7 +8,7 @@
 
 #include <stdbool.h>
 
-typedef enum {
+typedef enum NBFC_PACKED_ENUM {
   Fan_ModeAuto  = 0x0,
   Fan_ModeFixed = 0x1,
 } Fan_Mode;

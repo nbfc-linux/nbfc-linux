@@ -29,7 +29,7 @@ declare_array_of(ConfigRating);
  * Specifies the category of a register, e.g. whether it is a fan register or
  * a miscellaneous register used for register-write configurations.
  */
-enum RegisterType {
+enum NBFC_PACKED_ENUM RegisterType {
   RegisterType_FanReadRegister,
   RegisterType_FanWriteRegister,
   RegisterType_RegisterWriteConfigurationRegister
@@ -59,7 +59,7 @@ enum RegisterType {
  *   The register is bad.
  *   Register name starts with 'B' (probably a battery register)
  */
-enum RegisterScore {
+enum NBFC_PACKED_ENUM RegisterScore {
   RegisterScore_FullMatch,
   RegisterScore_PartialMatch,
   RegisterScore_MinimalMatch,
@@ -77,7 +77,7 @@ enum RegisterScore {
  * NotFound:
  *   Method could not be found.
  */
-enum MethodScore {
+enum NBFC_PACKED_ENUM MethodScore {
   MethodScore_Found,
   MethodScore_NotFound,
 };
