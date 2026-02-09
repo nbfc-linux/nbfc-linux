@@ -166,7 +166,7 @@ EmbeddedControllerType EmbeddedControllerType_FromString(const char* s) {
     return EmbeddedControllerType_ECSysLinux;
 #else
 ec_sys_disabled:
-    Log_Error("EmbeddedControllerType 'ec_sys' has been disabled at compile time.");
+    Log_Error("EmbeddedControllerType \"ec_sys\" has been disabled at compile time.");
     return EmbeddedControllerType_Unset;
 #endif
   }
@@ -176,7 +176,7 @@ ec_sys_disabled:
     return EmbeddedControllerType_ECSysLinuxACPI;
 #else
 ec_acpi_disabled:
-    Log_Error("EmbeddedControllerType 'acpi_ec' has been disabled at compile time.");
+    Log_Error("EmbeddedControllerType \"acpi_ec\" has been disabled at compile time.");
     return EmbeddedControllerType_Unset;
 #endif
   }
@@ -186,7 +186,7 @@ ec_acpi_disabled:
     return EmbeddedControllerType_ECLinux;
 #else
 ec_dev_port_disabled:
-    Log_Error("EmbeddedControllerType 'dev_port' has been disabled at compile time.");
+    Log_Error("EmbeddedControllerType \"dev_port\" has been disabled at compile time.");
     return EmbeddedControllerType_Unset;
 #endif
   }
@@ -195,7 +195,7 @@ ec_dev_port_disabled:
 #if ENABLE_EC_DUMMY
     return EmbeddedControllerType_ECDummy;
 #else
-    Log_Error("EmbeddedControllerType 'dummy' has been disabled at compile time.");
+    Log_Error("EmbeddedControllerType \"dummy\" has been disabled at compile time.");
 #endif
   }
 

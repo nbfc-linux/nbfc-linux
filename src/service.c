@@ -80,7 +80,7 @@ Error Service_Init() {
   Service_State = Initialized_1_Service_Config;
 
   // Model config =============================================================
-  Log_Info("Using '%s' as model config", service_config.SelectedConfigId);
+  Log_Info("Using \"%s\" as model config", service_config.SelectedConfigId);
   e = ModelConfig_FindAndLoad(&Service_ModelConfig, path, service_config.SelectedConfigId);
   if (e) {
     e = err_chain_string(e, path);
@@ -147,7 +147,7 @@ Error Service_Init() {
   }
 
   EmbeddedControllerType t = EmbeddedControllerType_By_EC(ec);
-  Log_Info("Using '%s' as EmbeddedControllerType", EmbeddedControllerType_ToString(t));
+  Log_Info("Using \"%s\" as EmbeddedControllerType", EmbeddedControllerType_ToString(t));
   e = ec->Open();
   if (e)
     goto error;
@@ -167,7 +167,7 @@ Error Service_Init() {
   if (IsAcpiCallUsed()) {
     e = AcpiCall_Open();
     if (e) {
-      e = err_string("Could not load kernel module 'acpi_call'. Is it installed?");
+      e = err_string("Could not load kernel module \"acpi_call\". Is it installed?");
       goto error;
     }
   }

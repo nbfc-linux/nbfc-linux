@@ -130,9 +130,9 @@ int main(int argc, char* const argv[])
 
   Log_Info("NBFC-Linux comes with no warranty. Run `nbfc warranty` for details.");
   Log_Info("Running version " NBFC_VERSION);
-  Log_Info("SYSCONFDIR is '%s'", SYSCONFDIR);
-  Log_Info("DATADIR is '%s'", DATADIR);
-  Log_Info("RUNSTATEDIR is '%s'", RUNSTATEDIR);
+  Log_Info("SYSCONFDIR is \"%s\"", SYSCONFDIR);
+  Log_Info("DATADIR is \"%s\"", DATADIR);
+  Log_Info("RUNSTATEDIR is \"%s\"", RUNSTATEDIR);
   Log_Info("Available Embedded Controllers: "
 #if ENABLE_EC_SYS
     "ec_sys "

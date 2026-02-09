@@ -347,7 +347,7 @@ static void Server_HandleClient(Client* client) {
 
   const nx_json* command = nx_json_get(json, "Command");
   if (! command) {
-    e = err_string("Missing 'Command' field");
+    e = err_string("Missing \"Command\" field");
     goto end;
   }
 

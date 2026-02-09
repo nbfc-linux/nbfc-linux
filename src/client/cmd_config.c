@@ -129,7 +129,7 @@ int Set_Or_Apply() {
     config = realpath(Config_Options.config, NULL);
 
     if (! config) {
-      Log_Error("Failed to resolve path '%s': %s", Config_Options.config, strerror(errno));
+      Log_Error("Failed to resolve path \"%s\": %s", Config_Options.config, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }

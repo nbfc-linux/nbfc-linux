@@ -51,7 +51,7 @@ static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
 
   DIR* directory = opendir(path);
   if (!directory) {
-    Log_Error("Failed to open directory `%s': %s", path, strerror(errno));
+    Log_Error("Failed to open directory \"%s\": %s", path, strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }
 
@@ -170,11 +170,11 @@ char* Get_Supported_Config_From_SupportFile(const char* support_file, array_of(C
 
   nx_json_for_each(model, root) {
     if (model->type != NX_JSON_STRING) {
-      Log_Warn("%s: Invalid value for model `%s`: Not a string", support_file, model->key);
+      Log_Warn("%s: Invalid value for model \"%s\": Not a string", support_file, model->key);
     }
     else if (!strcmp(model->key, model_name)) {
       if (config) {
-        Log_Warn("%s: Duplicate model key: `%s`", support_file, model->key);
+        Log_Warn("%s: Duplicate model key: \"%s\"", support_file, model->key);
       }
       config = Mem_Strdup(model->val.text);
     }
@@ -191,7 +191,7 @@ end:
       }
     }
 
-    Log_Warn("%s: The model `%s` was found in the support database, but the specified configuration file (`%s`) is missing",
+    Log_Warn("%s: The model \"%s\" was found in the support database, but the specified configuration file (\"%s\") is missing",
         support_file, model_name, config);
 
     Mem_Free(config);

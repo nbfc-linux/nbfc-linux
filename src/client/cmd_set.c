@@ -61,7 +61,7 @@ int Set() {
   const nx_json* err = nx_json_get(out, "Error");
   if (err) {
     if (err->type != NX_JSON_STRING) {
-      e = err_string("'Error' is not a string");
+      e = err_string("\"Error\" is not a string");
       goto error;
     }
 

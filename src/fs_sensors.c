@@ -136,7 +136,7 @@ end:
 
 void FS_Sensors_Log() {
   for_each_array(FS_TemperatureSource*, source, FS_Sensors_Sources)
-    Log_Info("Available temperature source: '%s' (%s)", source->name, source->file);
+    Log_Info("Available temperature source: \"%s\" (%s)", source->name, source->file);
 }
 
 Error FS_Sensors_Init() {
