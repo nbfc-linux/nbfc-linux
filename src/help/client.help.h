@@ -149,7 +149,7 @@
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
- "  -a, --auto            Set fan speed to 'auto'\n"                           \
+ "  -a, --auto            Set fan speed to profile-based control\n"            \
  "  -s PERCENT, --speed PERCENT\n"                                             \
  "                        Set fan speed to PERCENT\n"                          \
  "  -f FAN INDEX, --fan FAN INDEX\n"                                           \
