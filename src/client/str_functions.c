@@ -5,9 +5,8 @@
 
 #include "../memory.h"
 
-const char* bool_to_str(bool val) {
-  static const char strings[2][6] = {"false", "true"};
-  return strings[val];
+const char* str_from_bool(bool val) {
+  return val ? "true" : "false";
 }
 
 char *str_to_lower(const char *a) {

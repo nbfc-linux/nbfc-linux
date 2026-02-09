@@ -36,8 +36,8 @@ static void Status_Print_Fan(const FanInfo* fan) {
     "Fan Speed Steps          : %d\n",
     fan->Name,
     fan->Temperature,
-    bool_to_str(fan->AutoMode),
-    bool_to_str(fan->Critical),
+    str_from_bool(fan->AutoMode),
+    str_from_bool(fan->Critical),
     fan->CurrentSpeed,
     fan->TargetSpeed,
     fan->RequestedSpeed,
@@ -48,7 +48,7 @@ static void Status_Print_Service(const ServiceInfo* service_info) {
   printf(
     "Read-only                : %s\n"
     "Selected Config Name     : %s\n",
-    bool_to_str(service_info->ReadOnly),
+    str_from_bool(service_info->ReadOnly),
     service_info->SelectedConfigId);
 }
 
