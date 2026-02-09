@@ -35,10 +35,10 @@ const cli99_option sensors_set_options[] = {
 };
 
 enum Sensors_Command {
+  Sensors_Command_None,
   Sensors_Command_Set,
   Sensors_Command_List,
   Sensors_Command_Show,
-  Sensors_Command_End,
 };
 typedef enum Sensors_Command Sensors_Command;
 
@@ -46,7 +46,7 @@ Sensors_Command Sensors_Command_FromString(const char* s) {
   if (! strcmp(s, "set"))    return Sensors_Command_Set;
   if (! strcmp(s, "list"))   return Sensors_Command_List;
   if (! strcmp(s, "show"))   return Sensors_Command_Show;
-  return Sensors_Command_End;
+  return Sensors_Command_None;
 }
 
 struct {
@@ -56,7 +56,7 @@ struct {
   TemperatureAlgorithmType algorithm;
   bool                     force;
 } Sensors_Options = {
-  Sensors_Command_End,
+  Sensors_Command_None,
   -1,
   {NULL, 0},
   TemperatureAlgorithmType_Unset,

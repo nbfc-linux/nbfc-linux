@@ -222,7 +222,7 @@ int main(int argc, char *const argv[]) {
 
     case Option_Sensors_Command:
       Sensors_Options.command = Sensors_Command_FromString(p.optarg);
-      if (Sensors_Options.command == Sensors_Command_End) {
+      if (Sensors_Options.command == Sensors_Command_None) {
         Log_Error("Invalid command: sensors %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
