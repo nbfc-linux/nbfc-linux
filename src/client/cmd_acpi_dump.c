@@ -1,4 +1,5 @@
 #include "../log.h"
+#include "../macros.h"
 #include "../file_utils.h"
 #include "../acpi_analysis.h"
 #include "../nxjson_write.h"
@@ -17,7 +18,7 @@ const cli99_option acpi_dump_options[] = {
   cli99_options_end()
 };
 
-enum AcpiDump_Action {
+enum NBFC_PACKED_ENUM AcpiDump_Action {
   AcpiDump_Action_None,
   AcpiDump_Action_Registers,
   AcpiDump_Action_ECRegisters,
@@ -27,12 +28,12 @@ enum AcpiDump_Action {
 
 struct {
   enum AcpiDump_Action action;
-  const char* file;
   bool json;
+  const char* file;
 } Acpi_Dump_Options = {
   AcpiDump_Action_None,
-  ACPI_ANALYSIS_ACPI_DSDT,
-  false
+  false,
+  ACPI_ANALYSIS_ACPI_DSDT
 };
 
 enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
