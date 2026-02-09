@@ -299,6 +299,6 @@ int Sensors() {
     case Sensors_Command_Show:   return Sensors_Show();
     default:
       printf("%s\n", CLIENT_SENSORS_HELP_TEXT);
-      return NBFC_EXIT_FAILURE;
+      return NBFC_EXIT_CMDLINE;
   }
 }

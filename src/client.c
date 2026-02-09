@@ -198,7 +198,7 @@ int main(int argc, char *const argv[]) {
         const int fan = parse_number(p.optarg, 0, INT_MAX, &err);
         if (err) {
           Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
-          return NBFC_EXIT_FAILURE;
+          return NBFC_EXIT_CMDLINE;
         }
 
         array_of(int)* fans = &Status_Options.fans;
@@ -212,7 +212,7 @@ int main(int argc, char *const argv[]) {
       Status_Options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", "-w|--watch", err, p.optarg);
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
       break;
 
@@ -236,7 +236,7 @@ int main(int argc, char *const argv[]) {
       Sensors_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
       break;
 
@@ -253,7 +253,7 @@ int main(int argc, char *const argv[]) {
       Sensors_Options.algorithm = TemperatureAlgorithmType_FromString(p.optarg);
       if (Sensors_Options.algorithm == TemperatureAlgorithmType_Unset) {
         Log_Error("%s: %s: %s", "-a|--algorithm", "Invalid value", p.optarg);
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
       break;
 
@@ -290,7 +290,7 @@ int main(int argc, char *const argv[]) {
     case Option_Set_Auto:
       if (Set_Options.speed != -2.0) {
         Log_Error("Options -a|--auto or -s|--speed may only be specified once");
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
 
       Set_Options.speed = -1.0;
@@ -299,26 +299,26 @@ int main(int argc, char *const argv[]) {
     case Option_Set_Speed:
       if (Set_Options.speed != -2.0) {
         Log_Error("Options -a|--auto or -s|--speed may only be specified once");
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
 
       Set_Options.speed = parse_double(p.optarg, 0, 100, &err);
       if (err) {
         Log_Error("%s: %s: %s", "-s|--speed", err, p.optarg);
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
       break;
 
     case Option_Set_Fan:
       if (Set_Options.fan != -1) {
         Log_Error("Option -f|--fan may only be specified once");
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
 
       Set_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
       break;
 
@@ -330,7 +330,7 @@ int main(int argc, char *const argv[]) {
       Update_Options.parallel = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", "-p|--parallel", err, p.optarg);
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
       break;
 
@@ -391,7 +391,7 @@ int main(int argc, char *const argv[]) {
       Rate_Config_Options.min_score = parse_double(p.optarg, 0, 10, &err);
       if (err) {
         Log_Error("%s: %s: %s", "-m|--min-score", err, p.optarg);
-        return NBFC_EXIT_FAILURE;
+        return NBFC_EXIT_CMDLINE;
       }
       break;
 
