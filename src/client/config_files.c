@@ -31,12 +31,12 @@ void ConfigFiles_Free(array_of(ConfigFile)* files) {
 }
 
 // Compare function for qsort
-int compare_config_by_name(const void *a, const void *b) {
+int ConfigFile_CompareByName(const void *a, const void *b) {
   return strcmp(((struct ConfigFile *)a)->config_name, ((struct ConfigFile *)b)->config_name);
 }
 
 // Compare function for qsort
-int compare_config_by_diff(const void *a, const void *b) {
+int ConfigFile_CompareByDiff(const void *a, const void *b) {
   return (((struct ConfigFile *)b)->diff > ((struct ConfigFile *)a)->diff)
        - (((struct ConfigFile *)b)->diff < ((struct ConfigFile *)a)->diff);
 }
@@ -124,7 +124,7 @@ array_of(ConfigFile) List_Recommended_Configs() {
   for_each_array(ConfigFile*, file, files) {
     file->diff = str_similarity(model_name, file->config_name);
   }
-  qsort(files.data, files.size, sizeof(struct ConfigFile), compare_config_by_diff);
+  qsort(files.data, files.size, sizeof(struct ConfigFile), ConfigFile_CompareByDiff);
   return files;
 }
 

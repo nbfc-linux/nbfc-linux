@@ -50,7 +50,7 @@ void Set_Config_Action(enum Config_Action action) {
 int List() {
   array_of(ConfigFile) files = List_All_Configs();
 
-  qsort(files.data, files.size, sizeof(ConfigFile), compare_config_by_name);
+  qsort(files.data, files.size, sizeof(ConfigFile), ConfigFile_CompareByName);
 
   for_each_array(ConfigFile*, file, files) {
     printf("%s\n", file->config_name);
