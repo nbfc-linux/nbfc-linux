@@ -26,7 +26,7 @@ struct {
 
 int Set() {
   if (Set_Options.speed == -2.0) {
-    printf(CLIENT_SET_HELP_TEXT);
+    printf("%s", CLIENT_SET_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
 

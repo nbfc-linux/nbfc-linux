@@ -160,7 +160,7 @@ int Config() {
   case Config_Action_Set:       return Set_Or_Apply();
   case Config_Action_Apply:     return Set_Or_Apply();
   default:
-    printf(CLIENT_CONFIG_HELP_TEXT);
+    printf("%s", CLIENT_CONFIG_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
 }
