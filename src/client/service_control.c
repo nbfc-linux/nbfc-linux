@@ -187,9 +187,9 @@ int Service_Start(bool read_only) {
     return NBFC_EXIT_SUCCESS;
   }
 
-  char cmd[64] = "nbfc_service -f";
+  const char* cmd = "nbfc_service -f";
   if (read_only)
-    strcat(cmd, " -r");
+    cmd = "nbfc_service -f -r";
 
   int ret = system(cmd);
   if (ret == -1) {
