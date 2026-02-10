@@ -6,29 +6,23 @@
 #include <float.h>
 #include <string.h>
 
-static const char* const CPUSensorNames[] = {
-  "coretemp", "k10temp", "zenpower"
-};
-
-static const char* const GPUSensorNames[] = {
-  "amdgpu", "nvidia", "nvidia-ml", "nouveau", "radeon"
-};
-
 static inline int IsCPUSensorName(const char* s) {
-  for (int i = 0; i < ARRAY_SSIZE(CPUSensorNames); ++i)
-    if (! strcmp(s, CPUSensorNames[i]))
-      return true;
-  return false;
+  return
+    !strcmp(s, "coretemp") ||
+    !strcmp(s, "k10temp")  ||
+    !strcmp(s, "zenpower");
 }
 
 static inline int IsGPUSensorName(const char* s) {
-  for (int i = 0; i < ARRAY_SSIZE(GPUSensorNames); ++i)
-    if (! strcmp(s, GPUSensorNames[i]))
-      return true;
-  return false;
+  return
+    !strcmp(s, "amdgpu")    ||
+    !strcmp(s, "nvidia")    ||
+    !strcmp(s, "nvidia-ml") ||
+    !strcmp(s, "nouveau")   ||
+    !strcmp(s, "radeon");
 }
 
-static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, float* out) {
+static Error FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, float* out) {
   float tmp;
   float sum = 0;
   float min = FLT_MAX;
@@ -37,18 +31,18 @@ static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, f
 
   for (int i = 0; i < ftc->TemperatureSourcesSize; ++i) {
     FS_TemperatureSource* ts = ftc->TemperatureSources[i];
-    Error* e = FS_TemperatureSource_GetTemperature(ts, &tmp);
+    Error e = FS_TemperatureSource_GetTemperature(ts, &tmp);
     e_warn();
     if (! e) {
-      min = min(min, tmp);
-      max = max(max, tmp);
+      min = MIN(min, tmp);
+      max = MAX(max, tmp);
       sum += tmp;
       ++total;
     }
   }
 
   if (! total)
-    return err_string(0, "No temperatures available");
+    return err_string("No temperatures available");
 
   switch (ftc->TemperatureAlgorithmType) {
     case TemperatureAlgorithmType_Average:
@@ -61,18 +55,18 @@ static Error* FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, f
       *out = max;
       return err_success();
     default:
-      return err_string(0, "FanTemperatureControl_GetTemperature: Invalid value for type");
+      return err_string("ERR-03");
   }
 }
 
 // Add a TemperatureSource to a FanTemperatureControl.
 // Return error if maxiumum size of TemperatureSources is exceeded.
-static Error* FanTemperatureControl_AddTemperatureSource(
+static Error FanTemperatureControl_AddTemperatureSource(
   FanTemperatureControl* ftc,
   FS_TemperatureSource* ts)
 {
   if (ftc->TemperatureSourcesSize >= FAN_TEMPERATURE_CONTROL_MAX_SOURCES)
-    return err_string(0, "Too many temperature sources found");
+    return err_string("Too many temperature sources found");
 
   ftc->TemperatureSources[ftc->TemperatureSourcesSize++] = ts;
   return err_success();
@@ -86,15 +80,15 @@ static Error* FanTemperatureControl_AddTemperatureSource(
 //
 // Return error if `sensor` is not found in available temperature sources
 // or `sensor` is not a valid file path to a temperature file.
-static Error* FanTemperatureControl_AddTemperatureSources(
+static Error FanTemperatureControl_AddTemperatureSources(
   FanTemperatureControl* ftc,
   const char* sensor)
 {
-  Error* e;
+  Error e;
   bool found_sensors = false;
 
   // ==========================================================================
-  // Sensor group "@CPU": Add all sensors found in `CPUSensorNames`
+  // Sensor group "@CPU": Add all sensors found in `IsCPUSensorName`
   // ==========================================================================
   if (!strcmp(sensor, "@CPU")) {
     for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
@@ -109,11 +103,11 @@ static Error* FanTemperatureControl_AddTemperatureSources(
 
     return found_sensors
       ? err_success()
-      : err_stringf(0, "%s: No sensors found", "@CPU");
+      : err_stringf("%s: No sensors found", "@CPU");
   }
 
   // ==========================================================================
-  // Sensor group "@GPU": Add all sensors found in `GPUSensorNames`
+  // Sensor group "@GPU": Add all sensors found in `IsGPUSensorName`
   // ==========================================================================
   if (!strcmp(sensor, "@GPU")) {
     for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
@@ -128,7 +122,7 @@ static Error* FanTemperatureControl_AddTemperatureSources(
 
     return found_sensors
       ? err_success()
-      : err_stringf(0, "%s: No sensors found", "@GPU");
+      : err_stringf("%s: No sensors found", "@GPU");
   }
 
   // ==========================================================================
@@ -188,8 +182,8 @@ static Error* FanTemperatureControl_AddTemperatureSources(
 // That means:
 //   - Use "Average" as TemperatureAlgorithmType
 //   - Utilize every sensor that is matched by `IsCPUSensorName`
-static Error* FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)* fans) {
-  Error* e;
+static Error FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)* fans) {
+  Error e;
 
   for_each_array(FanTemperatureControl*, ftc, *fans) {
     ftc->TemperatureAlgorithmType = TemperatureAlgorithmType_Average;
@@ -207,11 +201,11 @@ static Error* FanTemperatureControl_SetDefaults(array_of(FanTemperatureControl)*
   return err_success();
 }
 
-static Error* FanTemperatureControl_SetByModelConfig0(
+static Error FanTemperatureControl_SetByModelConfig0(
   FanTemperatureControl* ftc,
   FanConfiguration* fc)
 {
-  Error* e;
+  Error e;
 
   if (FanConfiguration_IsSet_TemperatureAlgorithmType(fc))
     ftc->TemperatureAlgorithmType = fc->TemperatureAlgorithmType;
@@ -233,34 +227,34 @@ static Error* FanTemperatureControl_SetByModelConfig0(
 }
 
 // Set fan temperature sources by model config
-static Error* FanTemperatureControl_SetByModelConfig(
+static Error FanTemperatureControl_SetByModelConfig(
   array_of(FanTemperatureControl)* fans,
   ModelConfig* model_config)
 {
-  Error* e;
+  Error e;
 
-  for_enumerate_array(int, fan_index, *fans) {
+  for_enumerate_array(array_size_t, fan_index, *fans) {
     FanTemperatureControl* ftc = &fans->data[fan_index];
     FanConfiguration* fc = &model_config->FanConfigurations.data[fan_index];
 
     e = FanTemperatureControl_SetByModelConfig0(ftc, fc);
     if (e)
-      return err_stringf(e, "FanConfigurations[%d] (%s)", fan_index, fc->FanDisplayName);
+      return err_chain_stringf(e, "FanConfigurations[%zd] (%s)", fan_index, fc->FanDisplayName);
   }
 
   return err_success();
 }
 
 // Initialize `fans` by `service_config`
-static Error* FanTemperatureControl_SetByServiceConfig(
+static Error FanTemperatureControl_SetByServiceConfig(
   array_of(FanTemperatureControl)* fans,
   ServiceConfig* service_config) 
 {
-  Error* e;
+  Error e;
 
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config->FanTemperatureSources) {
     if (ftsc->FanIndex >= fans->size)
-      return err_stringf(0, "Invalid FanIndex in FanTemperatureSources: %d", ftsc->FanIndex);
+      return err_stringf("Invalid FanIndex in FanTemperatureSources: %d", ftsc->FanIndex);
 
     FanTemperatureControl* ftc = &fans->data[ftsc->FanIndex];
 
@@ -277,7 +271,7 @@ static Error* FanTemperatureControl_SetByServiceConfig(
     for_each_array(const char**, sensor, ftsc->Sensors) {
       e = FanTemperatureControl_AddTemperatureSources(ftc, *sensor);
       if (e)
-        return err_stringf(e, "FanTemperatureSources[%d]", ftsc->FanIndex);
+        return err_chain_stringf(e, "FanTemperatureSources[%d]", ftsc->FanIndex);
     }
   }
 
@@ -285,11 +279,11 @@ static Error* FanTemperatureControl_SetByServiceConfig(
 }
 
 // Initialize temperature filters in `fans`
-static Error* FanTemperatureControl_InitializeTemperatureFilters(
+static Error FanTemperatureControl_InitializeTemperatureFilters(
   array_of(FanTemperatureControl)* fans,
   int poll_interval)
 {
-  Error* e;
+  Error e;
 
   for_each_array(FanTemperatureControl*, ftc, *fans) {
     e = TemperatureFilter_Init(&ftc->TemperatureFilter, poll_interval, NBFC_TEMPERATURE_FILTER_TIMESPAN);
@@ -301,12 +295,12 @@ static Error* FanTemperatureControl_InitializeTemperatureFilters(
 }
 
 // Initialize FanTemperatureControls in `fans`
-Error* FanTemperatureControl_Init(
+Error FanTemperatureControl_Init(
   array_of(FanTemperatureControl)* fans,
   ServiceConfig* service_config,
   ModelConfig* model_config)
 {
-  Error* e;
+  Error e;
 
   // Set default TemperatureAlgorithmType and temperature sources.
   e = FanTemperatureControl_SetDefaults(fans);
@@ -331,9 +325,9 @@ Error* FanTemperatureControl_Init(
   return err_success();
 }
 
-Error* FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
+Error FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
   float temp; // NOLINT
-  Error* e = FanTemperatureControl_GetTemperature(ftc, &temp);
+  Error e = FanTemperatureControl_GetTemperature(ftc, &temp);
   if (e)
     return e;
 
@@ -342,11 +336,11 @@ Error* FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
 }
 
 void FanTemperatureControl_Log(array_of(FanTemperatureControl)* fans, ModelConfig* model_config) {
-  for_enumerate_array(int, fan_index, *fans) {
+  for_enumerate_array(array_size_t, fan_index, *fans) {
     FanTemperatureControl* ftc = &fans->data[fan_index];
 
     for (int i = 0; i < ftc->TemperatureSourcesSize; ++i)
-      Log_Info("Fan #%d (%s) uses '%s' (%s) as temperature source (%s)\n",
+      Log_Info("Fan #%zd (%s) uses \"%s\" (%s) as temperature source (%s)",
         fan_index,
         model_config->FanConfigurations.data[fan_index].FanDisplayName,
         ftc->TemperatureSources[i]->name,

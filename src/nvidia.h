@@ -1,5 +1,5 @@
-#ifndef NVIDIA_H_
-#define NVIDIA_H_
+#ifndef NBFC_NVIDIA_H_
+#define NBFC_NVIDIA_H_
 
 #include "error.h"
 
@@ -12,6 +12,6 @@ typedef enum Nvidia_Error Nvidia_Error;
 
 Nvidia_Error Nvidia_Init();
 void         Nvidia_Close();
-Error*       Nvidia_GetTemperature(float*);
+Error        Nvidia_GetTemperature(float*);
 
 #endif

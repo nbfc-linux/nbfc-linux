@@ -16,18 +16,14 @@ int mkdir_p(const char *path, mode_t mode) {
   while (*p) {
     if (*p == '/') {
       *p = '\0';
-      if (mkdir(tmp, mode) != 0) {
-        if (errno != EEXIST) {
-          ret = -1;
-          break;
-        }
-      }
+      mkdir(tmp, mode);
       *p = '/';
     }
     p++;
   }
 
-  if (ret == 0 && mkdir(tmp, mode) != 0 && errno != EEXIST)
+  errno = 0;
+  if (mkdir(tmp, mode) != 0 && errno != EEXIST)
     ret = -1;
 
   Mem_Free(tmp);

@@ -1,10 +1,12 @@
 #include "log.h"
 
 #include "config.h"
+#include "macros.h"
 #include "program_name.h"
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <unistd.h>
 #if ENABLE_SYSLOG
 #include <syslog.h>
 #endif
@@ -33,116 +35,39 @@ void Log_Close() {
 #endif
 }
 
-void Log_Error(const char* fmt, ...) {
-  if (Log_LogLevel < LogLevel_Error)
+void Log_Log(LogLevel level, const char* fmt, ...) {
+  if (Log_LogLevel < level)
     return;
+
+  char buf[LOG_BUFFER_SIZE];
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, args);
+  va_end(args);
 
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
-    va_list args;
-    va_start(args, fmt);
-
-    char buf[LOG_BUFFER_SIZE];
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    syslog(LOG_ERR, "%s", buf);
-
-    va_end(args);
+    switch (level) {
+      case LogLevel_Error: syslog(LOG_ERR,     "%s", buf); break;
+      case LogLevel_Warn:  syslog(LOG_WARNING, "%s", buf); break;
+      case LogLevel_Info:  syslog(LOG_INFO,    "%s", buf); break;
+      case LogLevel_Debug: syslog(LOG_DEBUG,   "%s", buf); break;
+      default: break;
+    }
   }
-  //else
 #endif
-  {
-    va_list args;
-    va_start(args, fmt);
 
-    fprintf(stderr, "%s: ERROR: ", Program_Name);
-    vfprintf(stderr, fmt, args);
-
-    va_end(args);
-  }
-}
-
-void Log_Warn(const char* fmt, ...) {
-  if (Log_LogLevel < LogLevel_Warn)
-    return;
-
-
-#if ENABLE_SYSLOG
-  if (Log_UseSyslog) {
-    va_list args;
-    va_start(args, fmt);
-
-    char buf[LOG_BUFFER_SIZE];
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    syslog(LOG_WARNING, "%s", buf);
-
-    va_end(args);
-  }
-  //else
-#endif
-  {
-    va_list args;
-    va_start(args, fmt);
-
-    fprintf(stderr, "%s: WARNING: ", Program_Name);
-    vfprintf(stderr, fmt, args);
-
-    va_end(args);
-  }
-}
-
-void Log_Info(const char* fmt, ...) {
-  if (Log_LogLevel < LogLevel_Info)
-    return;
-
-#if ENABLE_SYSLOG
-  if (Log_UseSyslog) {
-    va_list args;
-    va_start(args, fmt);
-
-    char buf[LOG_BUFFER_SIZE];
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    syslog(LOG_INFO, "%s", buf);
-
-    va_end(args);
-  }
-  //else
-#endif
-  {
-    va_list args;
-    va_start(args, fmt);
-
-    fprintf(stderr, "%s: INFO: ", Program_Name);
-    vfprintf(stderr, fmt, args);
-
-    va_end(args);
+  switch (level) {
+    case LogLevel_Error: WriteToErr("ERROR");   break;
+    case LogLevel_Warn:  WriteToErr("WARNING"); break;
+    case LogLevel_Info:  WriteToErr("INFO");    break;
+    case LogLevel_Debug: WriteToErr("DEBUG");   break;
+    default: break;
   }
 
-}
-
-void Log_Debug(const char* fmt, ...) {
-  if (Log_LogLevel < LogLevel_Debug)
-    return;
-
-#if ENABLE_SYSLOG
-  if (Log_UseSyslog) {
-    va_list args;
-    va_start(args, fmt);
-
-    char buf[LOG_BUFFER_SIZE];
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    syslog(LOG_DEBUG, "%s", buf);
-
-    va_end(args);
-  }
-  //else
-#endif
-  {
-    va_list args;
-    va_start(args, fmt);
-
-    fprintf(stderr, "%s: DEBUG: ", Program_Name);
-    vfprintf(stderr, fmt, args);
-
-    va_end(args);
-  }
+  WriteToErr(": ");
+  WriteToErr(Program_Name);
+  WriteToErr(": ");
+  WriteToErr(buf);
+  WriteToErr("\n");
 }

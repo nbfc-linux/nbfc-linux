@@ -10,6 +10,7 @@
 #include "../help/client.help.h"
 #include "../nxjson_utils.h"
 #include "../fs_sensors.h"
+#include "../file_utils.h"
 
 /* nbfc sensors API:
  *
@@ -34,10 +35,10 @@ const cli99_option sensors_set_options[] = {
 };
 
 enum Sensors_Command {
+  Sensors_Command_None,
   Sensors_Command_Set,
   Sensors_Command_List,
   Sensors_Command_Show,
-  Sensors_Command_End,
 };
 typedef enum Sensors_Command Sensors_Command;
 
@@ -45,7 +46,7 @@ Sensors_Command Sensors_Command_FromString(const char* s) {
   if (! strcmp(s, "set"))    return Sensors_Command_Set;
   if (! strcmp(s, "list"))   return Sensors_Command_List;
   if (! strcmp(s, "show"))   return Sensors_Command_Show;
-  return Sensors_Command_End;
+  return Sensors_Command_None;
 }
 
 struct {
@@ -55,14 +56,14 @@ struct {
   TemperatureAlgorithmType algorithm;
   bool                     force;
 } Sensors_Options = {
-  Sensors_Command_End,
+  Sensors_Command_None,
   -1,
   {NULL, 0},
   TemperatureAlgorithmType_Unset,
   false,
 };
 
-static Error* Sensors_IsValidSensor(const char* sensor) {
+static Error Sensors_IsValidSensor(const char* sensor) {
   switch (sensor[0]) {
     case '@':
       // TODO: Check if sensor group can be resolved to a sensor
@@ -72,14 +73,14 @@ static Error* Sensors_IsValidSensor(const char* sensor) {
       if (!strcmp(sensor, "@GPU"))
         return err_success();
 
-      return err_stringf(0, "No such sensor group: %s", sensor);
+      return err_stringf("No such sensor group: %s", sensor);
 
     case '/':
-      if (access(sensor, F_OK) == 0)
+      if (file_exists(sensor))
         return err_success();
 
       errno = ENOENT;
-      return err_stdlib(0, sensor);
+      return err_stdlib(sensor);
 
     case '$':
       return err_success();
@@ -89,7 +90,7 @@ static Error* Sensors_IsValidSensor(const char* sensor) {
         if (!strcmp(ts->name, sensor))
           return err_success();
 
-      return err_stringf(0, "No such sensor name: %s", sensor);
+      return err_stringf("No such sensor name: %s", sensor);
   }
 }
 
@@ -105,13 +106,13 @@ static FanTemperatureSourceConfig* Sensors_GetFTSCByFanIndex(int fanIndex) {
 }
 
 static int Sensors_Set() {
-  Error* e;
+  Error e;
   ModelConfig model_config = {0};
 
   check_root();
 
   if (Sensors_Options.fan == -1) {
-    Log_Error("Missing option: %s\n", "-f|--fan");
+    Log_Error("Missing option: %s", "-f|--fan");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -119,7 +120,7 @@ static int Sensors_Set() {
   Service_LoadAllConfigFiles(&model_config);
 
   if (Sensors_Options.fan >= model_config.FanConfigurations.size) {
-    Log_Error("%s: No such fan: %d\n", "-f|--fan", Sensors_Options.fan);
+    Log_Error("%s: No such fan: %d", "-f|--fan", Sensors_Options.fan);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -127,8 +128,8 @@ static int Sensors_Set() {
     for_each_array(str*, sensor, Sensors_Options.sensors) {
       e = Sensors_IsValidSensor(*sensor);
       if (e) {
-        Log_Error("%s: %s\n", "-s|--sensor", err_print_all(e));
-        Log_Info("You can use --force to apply the sensor anyway\n");
+        Log_Error("%s: %s", "-s|--sensor", err_print_all(e));
+        Log_Info("You can use --force to apply the sensor anyway");
         return NBFC_EXIT_FAILURE;
       }
     }
@@ -298,6 +299,6 @@ int Sensors() {
     case Sensors_Command_Show:   return Sensors_Show();
     default:
       printf("%s\n", CLIENT_SENSORS_HELP_TEXT);
-      return NBFC_EXIT_FAILURE;
+      return NBFC_EXIT_CMDLINE;
   }
 }

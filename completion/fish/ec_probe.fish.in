@@ -2,60 +2,7 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-function _ec_probe__command
-  printf "%s\t%s\n" \
-    dump 'Dump all EC registers' \
-    load 'Load a previously made dump into the embedded controller' \
-    read 'Read a byte from a EC register' \
-    write 'Write a byte to a EC register' \
-    monitor 'Monitor all EC registers for changes' \
-    watch 'Monitor all EC registers for changes (alternative version)' \
-    acpi_call 'Call an ACPI method' \
-    shell 'Read commands from STDIN'
-end
-
-function _ec_probe_fish_query
-  # ===========================================================================
-  #
-  # This function implements the parsing of options and positionals in the Fish shell.
-  #
-  # Usage: __fish_query <OPTIONS> <COMMAND> [ARGS...]
-  #
-  # The first argument is a comma-separated list of options that the parser should know about.
-  # Short options (-o), long options (--option), and old-style options (-option) are supported.
-  #
-  # If an option takes an argument, it is suffixed by '='.
-  # If an option takes an optional argument, it is suffixed by '=?'.
-  #
-  # For example:
-  #   __fish_query '-f,--flag,-old-style,--with-arg=,--with-optional=?' [...]
-  #
-  #   Here, -f, --flag and -old-style don't take options, --with-arg requires an
-  #   argument and --with-optional takes an optional argument.
-  #
-  # COMMANDS
-  #   positional_contains <NUM> <WORDS...>
-  #     Checks if the positional argument number NUM is one of WORDS.
-  #     NUM counts from one.
-  #
-  #   has_option [WITH_INCOMPLETE] <OPTIONS...>
-  #     Checks if an option given in OPTIONS is passed on commandline.
-  #     If an option requires an argument, this command returns true only if the
-  #     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
-  #     returns true for options missing their arguments.
-  #
-  #   option_is <OPTIONS...> -- <VALUES...>
-  #     Checks if any option in OPTIONS has a value of VALUES.
-  #
-  #   num_of_positionals [<OPERATOR> <NUMBER>]
-  #     Checks the number of positional arguments.
-  #     If no arguments are provided, print the total count of positional arguments.
-  #     If two arguments are provided, the first argument should be one of
-  #     the comparison operators: '-lt', '-le', '-eq', '-ne', '-gt', '-ge'.
-  #     Returns 0 if the count of positional arguments matches the
-  #     specified NUMBER according to the comparison operator, otherwise returns 1.
-  #
-  # ===========================================================================
+function _ec_probe__query
 
   set -l positionals
   set -l having_options
@@ -74,9 +21,6 @@ function _ec_probe_fish_query
     set having_options $__QUERY_CACHE_HAVING_OPTIONS
     set option_values  $__QUERY_CACHE_OPTION_VALUES
   else
-    # =========================================================================
-    # Parsing of OPTIONS argument
-    # =========================================================================
 
     set -l short_opts_with_arg
     set -l short_opts_without_arg
@@ -88,17 +32,17 @@ function _ec_probe_fish_query
     set -l option
 
     if test -n "$options"
-      for option in (string split -- ',' $options)
+      for option in (string split -- ' ' $options)
         if false
           true
         else if string match -qr -- '^--.+=$' $option
-          set -a long_opts_with_arg (string replace -- '='  '' $option)
+          set -a long_opts_with_arg (string replace -- '=' '' $option)
         else if string match -qr -- '^--.+=\?$' $option
           set -a long_opts_with_optional_arg (string replace -- '=?' '' $option)
         else if string match -qr -- '^--.+$' $option
           set -a long_opts_without_arg $option
         else if string match -qr -- '^-.=$' $option
-          set -a short_opts_with_arg (string replace -- '='  '' $option)
+          set -a short_opts_with_arg (string replace -- '=' '' $option)
         else if string match -qr -- '^-.=\?$' $option
           set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
         else if string match -qr -- '^-.$' $option
@@ -106,10 +50,6 @@ function _ec_probe_fish_query
         end
       end
     end
-
-    # =========================================================================
-    # Parsing of options and positionals
-    # =========================================================================
 
     set -l cmdline (commandline -poc)
     set -l cmdline_count (count $cmdline)
@@ -123,9 +63,7 @@ function _ec_probe_fish_query
         case '-'
           set -a positionals -
         case '--'
-          for argi in (seq (math $argi + 1) $cmdline_count)
-            set -a positionals $cmdline[$argi]
-          end
+          set -a positionals $cmdline[$(math $argi + 1)..]
           break
         case '--*=*'
           set -l split (string split -m 1 -- '=' $arg)
@@ -140,7 +78,7 @@ function _ec_probe_fish_query
             end
           else
             set -a having_options $arg
-            set -a option_values ""
+            set -a option_values ''
           end
         case '-*'
           set -l end_of_parsing false
@@ -153,7 +91,7 @@ function _ec_probe_fish_query
 
             if contains -- $option $short_opts_without_arg
               set -a having_options $option
-              set -a option_values ""
+              set -a option_values ''
             else if contains -- $option $short_opts_with_arg
               set end_of_parsing true
 
@@ -186,17 +124,8 @@ function _ec_probe_fish_query
     set -g __QUERY_CACHE_KEY            $my_cache_key
   end
 
-  # ===========================================================================
-  # Commands
-  # ===========================================================================
-
   switch $cmd
     case 'positional_contains'
-      if test (count $argv) -eq 0
-        echo "_ec_probe_fish_query: positional_contains: argv[3]: missing number" >&2
-        return 1
-      end
-
       set -l positional_num $argv[1]
       set -e argv[1]
       contains -- $positionals[$positional_num] $argv && return 0 || return 1
@@ -210,25 +139,28 @@ function _ec_probe_fish_query
       switch (count $argv)
         case 0
           count $positionals
-        case 1
-          echo "_ec_probe_fish_query: num_of_positionals: $argv[1]: missing operand" >&2
-          return 1
         case 2
           if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
             test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
-          else
-            echo "_ec_probe_fish_query: num_of_positionals: $argv[1]: unknown operator" >&2
-            return 1
           end
-        case '*'
-          echo "_ec_probe_fish_query: num_of_positionals: too many arguments" >&2
-          return 1
       end
   end
 end
 
-set -l prog "ec_probe"
-set -l query "_ec_probe_fish_query"
+function _ec_probe__command
+  printf '%s\t%s\n' \
+    dump 'Dump all EC registers' \
+    load 'Load a previously made dump into the embedded controller' \
+    read 'Read a byte from a EC register' \
+    write 'Write a byte to a EC register' \
+    monitor 'Monitor all EC registers for changes' \
+    watch 'Monitor all EC registers for changes (alternative version)' \
+    acpi_call 'Call an ACPI method' \
+    shell 'Read commands from STDIN'
+end
+
+set -l prog 'ec_probe'
+set -l query '_ec_probe__query'
 
 # Delete existing completions
 complete -c $prog -e
@@ -237,44 +169,44 @@ complete -c $prog -e
 complete -c $prog -x
 
 # command ec_probe
-set -l opts "-h,--help,-e=,--embedded-controller="
-set -l C000 "not $query '$opts' has_option -h --help && $query '$opts' num_of_positionals -eq 0"
-set -l C001 "not $query '$opts' has_option -e --embedded-controller && $query '$opts' num_of_positionals -eq 0"
+set -l opts "-h --help -e= --embedded-controller="
+set -l C000 "not $query '$opts' has_option -h --help"
+set -l C001 "not $query '$opts' has_option -e --embedded-controller"
 set -l C002 "$query '$opts' num_of_positionals -eq 0"
 complete -c $prog -n $C000 -s h -l help -d 'show this help message and exit' -f
 complete -c $prog -n $C001 -s e -l embedded-controller -d 'Specify embedded controller to use' -x -a 'acpi_ec ec_sys dev_port'
 complete -c $prog -n $C002 -d Commands -f -a '(_ec_probe__command)'
 
 # command ec_probe dump
-set -l opts "-c,--color,-C,--no-color,-h,--help,-e=,--embedded-controller="
+set -l opts "-c --color -C --no-color -h --help -e= --embedded-controller="
 set -l C000 "$query '$opts' positional_contains 1 dump && not $query '$opts' has_option -c --color"
 set -l C001 "$query '$opts' positional_contains 1 dump && not $query '$opts' has_option -C --no-color"
 complete -c $prog -n $C000 -s c -l color -d 'Force colored output' -f
 complete -c $prog -n $C001 -s C -l no-color -d 'Disable colored output' -f
 
 # command ec_probe load
-set -l opts "-h,--help,-e=,--embedded-controller="
-set -l C000 "$query '$opts' positional_contains 1 load && $query '$opts' num_of_positionals -eq 1"
+set -l opts "-h --help -e= --embedded-controller="
+set -l C000 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 load"
 complete -c $prog -n $C000 -Fr
 
 # command ec_probe read
-set -l opts "-w,--word,-h,--help,-e=,--embedded-controller="
+set -l opts "-w --word -h --help -e= --embedded-controller="
 set -l C000 "$query '$opts' positional_contains 1 read && not $query '$opts' has_option -w --word"
-set -l C001 "$query '$opts' positional_contains 1 read && $query '$opts' num_of_positionals -eq 1"
+set -l C001 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 read"
 complete -c $prog -n $C000 -s w -l word -d 'Combine two registers into one' -f
-complete -c $prog -n $C001 -d 'Register source' -x -a '(command seq 0 255)'
+complete -c $prog -n $C001 -d 'Register source' -x -a '(seq 0 255)'
 
 # command ec_probe write
-set -l opts "-w,--word,-h,--help,-e=,--embedded-controller="
+set -l opts "-w --word -h --help -e= --embedded-controller="
 set -l C000 "$query '$opts' positional_contains 1 write && not $query '$opts' has_option -w --word"
-set -l C001 "$query '$opts' positional_contains 1 write && $query '$opts' num_of_positionals -eq 1"
-set -l C002 "$query '$opts' positional_contains 1 write && $query '$opts' num_of_positionals -eq 2"
+set -l C001 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 write"
+set -l C002 "$query '$opts' num_of_positionals -eq 2 && $query '$opts' positional_contains 1 write"
 complete -c $prog -n $C000 -s w -l word -d 'Combine two registers into one' -f
-complete -c $prog -n $C001 -d 'Register destination' -x -a '(command seq 0 255)'
+complete -c $prog -n $C001 -d 'Register destination' -x -a '(seq 0 255)'
 complete -c $prog -n $C002 -d 'Value to write' -x
 
 # command ec_probe monitor
-set -l opts "-i=,--interval=,-t=,--timespan=,-r=,--report=,-c,--clearly,-d,--decimal,-h,--help,-e=,--embedded-controller="
+set -l opts "-i= --interval= -t= --timespan= -r= --report= -c --clearly -d --decimal -h --help -e= --embedded-controller="
 set -l C000 "$query '$opts' positional_contains 1 monitor && not $query '$opts' has_option -i --interval"
 set -l C001 "$query '$opts' positional_contains 1 monitor && not $query '$opts' has_option -t --timespan"
 set -l C002 "$query '$opts' positional_contains 1 monitor && not $query '$opts' has_option -r --report"
@@ -287,23 +219,23 @@ complete -c $prog -n $C003 -s c -l clearly -d 'Blanks out consecutive duplicate 
 complete -c $prog -n $C004 -s d -l decimal -d 'Output readings in decimal format instead of hexadecimal format' -f
 
 # command ec_probe watch
-set -l opts "-i=,--interval=,-t=,--timespan=,-h,--help,-e=,--embedded-controller="
+set -l opts "-i= --interval= -t= --timespan= -h --help -e= --embedded-controller="
 set -l C000 "$query '$opts' positional_contains 1 watch && not $query '$opts' has_option -i --interval"
 set -l C001 "$query '$opts' positional_contains 1 watch && not $query '$opts' has_option -t --timespan"
 complete -c $prog -n $C000 -s i -l interval -d 'Sets the update interval in seconds' -x
 complete -c $prog -n $C001 -s t -l timespan -d 'Sets how many seconds the program will run' -x
 
 # command ec_probe acpi_call
-set -l opts "-h,--help,-e=,--embedded-controller="
-set -l C000 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 1"
-set -l C001 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 2"
-set -l C002 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 3"
-set -l C003 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 4"
-set -l C004 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 5"
-set -l C005 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 6"
-set -l C006 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 7"
-set -l C007 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 8"
-set -l C008 "$query '$opts' positional_contains 1 acpi_call && $query '$opts' num_of_positionals -eq 9"
+set -l opts "-h --help -e= --embedded-controller="
+set -l C000 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 acpi_call"
+set -l C001 "$query '$opts' num_of_positionals -eq 2 && $query '$opts' positional_contains 1 acpi_call"
+set -l C002 "$query '$opts' num_of_positionals -eq 3 && $query '$opts' positional_contains 1 acpi_call"
+set -l C003 "$query '$opts' num_of_positionals -eq 4 && $query '$opts' positional_contains 1 acpi_call"
+set -l C004 "$query '$opts' num_of_positionals -eq 5 && $query '$opts' positional_contains 1 acpi_call"
+set -l C005 "$query '$opts' num_of_positionals -eq 6 && $query '$opts' positional_contains 1 acpi_call"
+set -l C006 "$query '$opts' num_of_positionals -eq 7 && $query '$opts' positional_contains 1 acpi_call"
+set -l C007 "$query '$opts' num_of_positionals -eq 8 && $query '$opts' positional_contains 1 acpi_call"
+set -l C008 "$query '$opts' num_of_positionals -eq 9 && $query '$opts' positional_contains 1 acpi_call"
 complete -c $prog -n $C000 -d 'Method to call' -x
 complete -c $prog -n $C001 -d 'First argument' -x
 complete -c $prog -n $C002 -d 'Second argument' -x
@@ -313,8 +245,5 @@ complete -c $prog -n $C005 -d 'Fifth argument' -x
 complete -c $prog -n $C006 -d 'Sixth argument' -x
 complete -c $prog -n $C007 -d 'Seventh argument' -x
 complete -c $prog -n $C008 -d 'Eighth argument' -x
-
-# command ec_probe shell
-set -l opts "-h,--help,-e=,--embedded-controller="
 
 # vim: ft=fish ts=2 sts=2 sw=2 et

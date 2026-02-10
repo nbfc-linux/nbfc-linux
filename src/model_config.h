@@ -7,10 +7,6 @@
 #include "error.h"
 #include "trace.h"
 
-#if defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
-
-#define NBFC_PACKED_ENUM  __attribute__((packed))
-
 enum NBFC_PACKED_ENUM RegisterWriteMode_ {
   RegisterWriteMode_Set,
   RegisterWriteMode_And,
@@ -47,6 +43,8 @@ enum NBFC_PACKED_ENUM TemperatureAlgorithmType_ {
   TemperatureAlgorithmType_Unset,
 };
 
+#if defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
+
 typedef enum RegisterWriteMode_        RegisterWriteMode;
 typedef enum RegisterWriteOccasion_    RegisterWriteOccasion;
 typedef enum OverrideTargetOperation_  OverrideTargetOperation;
@@ -68,14 +66,14 @@ declare_array_of(str);
 
 #include "generated/model_config.generated.h"
 
-EmbeddedControllerType    EmbeddedControllerType_FromString(const char*);
-const char*               EmbeddedControllerType_ToString(EmbeddedControllerType);
-TemperatureAlgorithmType  TemperatureAlgorithmType_FromString(const char*);
-const char*               TemperatureAlgorithmType_ToString(TemperatureAlgorithmType);
+EmbeddedControllerType   EmbeddedControllerType_FromString(const char*);
+const char*              EmbeddedControllerType_ToString(EmbeddedControllerType);
+TemperatureAlgorithmType TemperatureAlgorithmType_FromString(const char*);
+const char*              TemperatureAlgorithmType_ToString(TemperatureAlgorithmType);
 
-Error* ModelConfig_Validate(Trace*, ModelConfig*);
-Error* ModelConfig_FromFile(ModelConfig*, const char*);
-Error* ModelConfig_FindAndLoad(ModelConfig*, char*, const char*);
-void   ModelConfig_Free(ModelConfig*);
+Error ModelConfig_Validate(Trace*, ModelConfig*);
+Error ModelConfig_FromFile(ModelConfig*, const char*);
+Error ModelConfig_FindAndLoad(ModelConfig*, char*, const char*);
+void  ModelConfig_Free(ModelConfig*);
 
 #endif

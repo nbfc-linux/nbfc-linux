@@ -9,8 +9,8 @@ struct TemperatureThreshold {
 
 typedef struct TemperatureThreshold TemperatureThreshold;
 declare_array_of(TemperatureThreshold);
-Error* TemperatureThreshold_FromJson(TemperatureThreshold*, const nx_json*);
-Error* TemperatureThreshold_ValidateFields(TemperatureThreshold*);
+Error TemperatureThreshold_FromJson(TemperatureThreshold*, const nx_json*);
+Error TemperatureThreshold_ValidateFields(TemperatureThreshold*);
 
 static inline void TemperatureThreshold_Set_UpThreshold(TemperatureThreshold* o) {
 	o->_set |= (1 << 0);
@@ -57,8 +57,8 @@ struct FanSpeedPercentageOverride {
 
 typedef struct FanSpeedPercentageOverride FanSpeedPercentageOverride;
 declare_array_of(FanSpeedPercentageOverride);
-Error* FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride*, const nx_json*);
-Error* FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride*);
+Error FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride*, const nx_json*);
+Error FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride*);
 
 static inline void FanSpeedPercentageOverride_Set_FanSpeedPercentage(FanSpeedPercentageOverride* o) {
 	o->_set |= (1 << 0);
@@ -112,8 +112,8 @@ struct RegisterWriteConfiguration {
 
 typedef struct RegisterWriteConfiguration RegisterWriteConfiguration;
 declare_array_of(RegisterWriteConfiguration);
-Error* RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration*, const nx_json*);
-Error* RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration*);
+Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration*, const nx_json*);
+Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration*);
 
 static inline void RegisterWriteConfiguration_Set_WriteMode(RegisterWriteConfiguration* o) {
 	o->_set |= (1 << 0);
@@ -258,8 +258,8 @@ struct FanConfiguration {
 
 typedef struct FanConfiguration FanConfiguration;
 declare_array_of(FanConfiguration);
-Error* FanConfiguration_FromJson(FanConfiguration*, const nx_json*);
-Error* FanConfiguration_ValidateFields(FanConfiguration*);
+Error FanConfiguration_FromJson(FanConfiguration*, const nx_json*);
+Error FanConfiguration_ValidateFields(FanConfiguration*);
 
 static inline void FanConfiguration_Set_FanDisplayName(FanConfiguration* o) {
 	o->_set |= (1 << 0);
@@ -475,8 +475,8 @@ struct Sponsor {
 
 typedef struct Sponsor Sponsor;
 declare_array_of(Sponsor);
-Error* Sponsor_FromJson(Sponsor*, const nx_json*);
-Error* Sponsor_ValidateFields(Sponsor*);
+Error Sponsor_FromJson(Sponsor*, const nx_json*);
+Error Sponsor_ValidateFields(Sponsor*);
 
 static inline void Sponsor_Set_Name(Sponsor* o) {
 	o->_set |= (1 << 0);
@@ -542,8 +542,8 @@ struct ModelConfig {
 
 typedef struct ModelConfig ModelConfig;
 declare_array_of(ModelConfig);
-Error* ModelConfig_FromJson(ModelConfig*, const nx_json*);
-Error* ModelConfig_ValidateFields(ModelConfig*);
+Error ModelConfig_FromJson(ModelConfig*, const nx_json*);
+Error ModelConfig_ValidateFields(ModelConfig*);
 
 static inline void ModelConfig_Set_NotebookModel(ModelConfig* o) {
 	o->_set |= (1 << 0);
@@ -674,8 +674,8 @@ struct FanTemperatureSourceConfig {
 
 typedef struct FanTemperatureSourceConfig FanTemperatureSourceConfig;
 declare_array_of(FanTemperatureSourceConfig);
-Error* FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig*, const nx_json*);
-Error* FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig*);
+Error FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig*, const nx_json*);
+Error FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig*);
 
 static inline void FanTemperatureSourceConfig_Set_FanIndex(FanTemperatureSourceConfig* o) {
 	o->_set |= (1 << 0);
@@ -723,8 +723,8 @@ struct ServiceConfig {
 
 typedef struct ServiceConfig ServiceConfig;
 declare_array_of(ServiceConfig);
-Error* ServiceConfig_FromJson(ServiceConfig*, const nx_json*);
-Error* ServiceConfig_ValidateFields(ServiceConfig*);
+Error ServiceConfig_FromJson(ServiceConfig*, const nx_json*);
+Error ServiceConfig_ValidateFields(ServiceConfig*);
 
 static inline void ServiceConfig_Set_SelectedConfigId(ServiceConfig* o) {
 	o->_set |= (1 << 0);
@@ -781,8 +781,8 @@ struct ServiceState {
 
 typedef struct ServiceState ServiceState;
 declare_array_of(ServiceState);
-Error* ServiceState_FromJson(ServiceState*, const nx_json*);
-Error* ServiceState_ValidateFields(ServiceState*);
+Error ServiceState_FromJson(ServiceState*, const nx_json*);
+Error ServiceState_ValidateFields(ServiceState*);
 
 static inline void ServiceState_Set_TargetFanSpeeds(ServiceState* o) {
 	o->_set |= (1 << 0);
@@ -810,8 +810,8 @@ struct FanInfo {
 
 typedef struct FanInfo FanInfo;
 declare_array_of(FanInfo);
-Error* FanInfo_FromJson(FanInfo*, const nx_json*);
-Error* FanInfo_ValidateFields(FanInfo*);
+Error FanInfo_FromJson(FanInfo*, const nx_json*);
+Error FanInfo_ValidateFields(FanInfo*);
 
 static inline void FanInfo_Set_Name(FanInfo* o) {
 	o->_set |= (1 << 0);
@@ -919,8 +919,8 @@ struct ServiceInfo {
 
 typedef struct ServiceInfo ServiceInfo;
 declare_array_of(ServiceInfo);
-Error* ServiceInfo_FromJson(ServiceInfo*, const nx_json*);
-Error* ServiceInfo_ValidateFields(ServiceInfo*);
+Error ServiceInfo_FromJson(ServiceInfo*, const nx_json*);
+Error ServiceInfo_ValidateFields(ServiceInfo*);
 
 static inline void ServiceInfo_Set_PID(ServiceInfo* o) {
 	o->_set |= (1 << 0);

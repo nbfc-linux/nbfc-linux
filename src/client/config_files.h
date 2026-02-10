@@ -1,5 +1,5 @@
-#ifndef CONFIG_FILES_H_
-#define CONFIG_FILES_H_
+#ifndef NBFC_CONFIG_FILES_H_
+#define NBFC_CONFIG_FILES_H_
 
 #include "../macros.h"
 
@@ -19,7 +19,7 @@ char* Get_Supported_Config(array_of(ConfigFile)*, const char*);
 bool  Contains_Config(array_of(ConfigFile)*, const char*);
 void  ConfigFiles_Free(array_of(ConfigFile)*);
 
-int compare_config_by_name(const void*, const void*);
-int compare_config_by_diff(const void*, const void*);
+int ConfigFile_CompareByName(const void*, const void*);
+int ConfigFile_CompareByDiff(const void*, const void*);
 
 #endif

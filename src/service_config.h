@@ -5,8 +5,8 @@
 
 extern ServiceConfig service_config;
 
-Error* ServiceConfig_Init(const char*);
-void   ServiceConfig_Free(ServiceConfig*);
-Error* ServiceConfig_Write(const char*);
+Error ServiceConfig_Init(const char*);
+void  ServiceConfig_Free(ServiceConfig*);
+Error ServiceConfig_Write(const char*);
 
 #endif

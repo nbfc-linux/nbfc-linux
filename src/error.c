@@ -8,27 +8,34 @@
 #include <string.h>
 #include <stdarg.h>
 
-static Error error_stack[16];
+static ErrorImpl error_stack[16];
 
-static inline Error* err_allocate(Error* e) {
+static inline Error err_allocate(Error e) {
   return e ? ++e : error_stack;
 }
 
-static void err_print(const Error* e, StringBuf* s) {
+static void err_print(Error e, StringBuf* s) {
   if (! e)
     return;
 
   switch (e->system) {
-  case ErrorSystem_Stdlib:  StringBuf_Printf(s, "%s", strerror(e->value.code)); break;
-  case ErrorSystem_NxJson:  StringBuf_Printf(s, "%s", NX_JSON_MSGS[e->value.code]); break;
-  case ErrorSystem_String:  StringBuf_Printf(s, "%s", e->value.message); break;
+    case ErrorSystem_Stdlib:
+      StringBuf_Printf(s, "%s", strerror(e->value.code));
+      break;
+
+    case ErrorSystem_NxJson:
+      StringBuf_Printf(s, "%s", NX_JSON_MSGS[e->value.code]);
+      break;
+
+    case ErrorSystem_String:
+      StringBuf_Printf(s, "%s", e->value.message);
+      break;
   }
 }
 
-const char* err_print_all(const Error* e) {
+const char* err_print_all(Error e) {
   static char buf[4096];
   StringBuf s = { buf, 0, sizeof(buf) - 1 };
-
   buf[0] = '\0';
 
   if (! e)
@@ -45,14 +52,14 @@ const char* err_print_all(const Error* e) {
   return buf;
 }
 
-Error* err_string(Error* e, const char* message) {
+Error err_chain_string(Error e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_String;
   snprintf(e->value.message, sizeof(e->value.message), "%s", message);
   return e;
 }
 
-Error* err_stringf(Error* e, const char* message, ...) {
+Error err_chain_stringf(Error e, const char* message, ...) {
   e = err_allocate(e);
   e->system = ErrorSystem_String;
 
@@ -64,20 +71,20 @@ Error* err_stringf(Error* e, const char* message, ...) {
   return e;
 }
 
-Error* err_stdlib(Error* e, const char* message) {
+Error err_chain_stdlib(Error e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_Stdlib;
   e->value.code = errno;
   if (message)
-    return err_string(e, message);
+    return err_chain_string(e, message);
   return e;
 }
 
-Error* err_nxjson(Error* e, const char* message) {
+Error err_chain_nxjson(Error e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_NxJson;
   e->value.code = NX_JSON_ERROR;
   if (message)
-    return err_string(e, message);
+    return err_chain_string(e, message);
   return e;
 }

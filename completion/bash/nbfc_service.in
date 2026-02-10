@@ -2,166 +2,183 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-_nbfc_service_prefix_compreply() {
-  local i=0 prefix="$1"
+_nbfc_service__prefix_compreply() {
+  [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
+
+  local i prefix="$1"
   for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
     COMPREPLY[i]="$prefix${COMPREPLY[i]}"
   done
 }
 
-_nbfc_service_parse_commandline() {
-  POSITIONALS=()
+_nbfc_service__dequote_words() {
+  local word dequoted break_pos in_quotes
+
+  words_dequoted=()
+
+  for word in "${words[@]}"; do
+    _nbfc_service__dequote "$word" dequoted break_pos in_quotes
+    words_dequoted+=("$dequoted")
+  done
+}
+
+_nbfc_service__dequote() {
+  local in="$1" len=${#1} i=0 result='' ___break_pos=-1 ___in_quotes=0
+
+  for ((; i < len; ++i)); do
+    case "${in:i:1}" in
+      "'")
+        ___in_quotes=1
+        for ((++i; i < len; ++i)); do
+          [[ "${in:i:1}" == "'" ]] && { ___in_quotes=0; break; }
+          result+="${in:i:1}"
+        done;;
+      '"')
+        ___in_quotes=1
+        for ((++i; i < len; ++i)); do
+          [[ "${in:i:1}" == '"' ]] && { ___in_quotes=0; break; }
+
+          if [[ "${in:i:1}" == '\' ]]; then
+            result+="${in:$((++i)):1}"
+          else
+            result+="${in:i:1}"
+          fi
+        done;;
+      '\')
+        result+="${in:$((++i)):1}";;
+      [$COMP_WORDBREAKS])
+        result+="${in:i:1}"
+        ___break_pos=${#result};;
+      *)
+        result+="${in:i:1}";;
+    esac
+  done
+
+  local -n ___RESULT=$2
+  local -n ___BREAK_POS=$3
+  local -n ___IN_QUOTES=$4
+  ___RESULT="$result"
+  ___BREAK_POS=$___break_pos
+  ___IN_QUOTES=$___in_quotes
+}
+
+_nbfc_service__parse_commandline() {
   END_OF_OPTIONS=0
-  POSITIONAL_NUM=0
 
-  local cmd="${words[0]}" argi arg i char trailing_chars
+  local cmd="root" argi arg i char trailing_chars VAR ARGS
 
-  for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
-    arg="${words[argi]}"
+  __find_option() {
+    case "$2" in
+      -h|--help) VAR=OPT_help; ARGS=0; return;;
+      -r|--read-only) VAR=OPT_read_only; ARGS=0; return;;
+      -f|--fork) VAR=OPT_fork; ARGS=0; return;;
+      -d|--debug) VAR=OPT_debug; ARGS=0; return;;
+      -c|--config-file) VAR=OPT_config_file; ARGS=1; return;;
+      -e|--embedded-controller) VAR=OPT_embedded_controller; ARGS=1; return;;
+    esac
+    return 1
+  }
+
+  __append_to_array() {
+    local -n arr=$1
+    arr+=("$2")
+  }
+
+  for ((argi=1; argi < cword; ++argi)); do
+    arg="${words_dequoted[argi]}"
 
     case "$arg" in
       --)
         END_OF_OPTIONS=1
-        for ((++argi; argi < ${#words[@]}; ++argi)); do
-          POSITIONALS[POSITIONAL_NUM++]="${words[argi]}"
-        done
-        break;;
-      -)
-        POSITIONALS[POSITIONAL_NUM++]="-";;
-      -*)
-        case "$cmd" in nbfc_service)
-          case "$arg" in
-            --help)
-              OPT_help+=(_OPT_ISSET_)
-              continue;;
-            --read-only)
-              OPT_read_only+=(_OPT_ISSET_)
-              continue;;
-            --fork)
-              OPT_fork+=(_OPT_ISSET_)
-              continue;;
-            --debug)
-              OPT_debug+=(_OPT_ISSET_)
-              continue;;
-            --config-file)
-              OPT_config_file+=("${words[++argi]}")
-              continue;;
-            --config-file=*)
-              OPT_config_file+=("${arg#*=}")
-              continue;;
-            --embedded-controller)
-              OPT_embedded_controller+=("${words[++argi]}")
-              continue;;
-            --embedded-controller=*)
-              OPT_embedded_controller+=("${arg#*=}")
-              continue;;
-          esac
-        esac
+        return;;
+      --*=*)
+        if __find_option "$cmd" "${arg%%=*}"
+        then __append_to_array "$VAR" "${arg#*=}"
+        fi;;
+      --*)
+        if __find_option "$cmd" "$arg"; then
+          if [[ "$ARGS" == 1 ]]
+          then __append_to_array "$VAR" "${words_dequoted[++argi]}"
+          else __append_to_array "$VAR" "_OPT_ISSET_"
+          fi
+        fi;;
+      -?*) # ignore '-'
+
         for ((i=1; i < ${#arg}; ++i)); do
           char="${arg:$i:1}"
           trailing_chars="${arg:$((i + 1))}"
-          case "$cmd" in nbfc_service)
-            case "$char" in
-              h)
-                OPT_help+=(_OPT_ISSET_);;
-              r)
-                OPT_read_only+=(_OPT_ISSET_);;
-              f)
-                OPT_fork+=(_OPT_ISSET_);;
-              d)
-                OPT_debug+=(_OPT_ISSET_);;
-              c)
-                if [[ -n "$trailing_chars" ]]
-                then OPT_config_file+=("$trailing_chars")
-                else OPT_config_file+=("${words[++argi]}")
-                fi
-                continue 2;;
-              e)
-                if [[ -n "$trailing_chars" ]]
-                then OPT_embedded_controller+=("$trailing_chars")
-                else OPT_embedded_controller+=("${words[++argi]}")
-                fi
-                continue 2;;
-            esac
-          esac
-        done;;
-      *)
-        POSITIONALS[POSITIONAL_NUM++]="$arg"
+
+          if __find_option "$cmd" "-$char"; then
+            if [[ "$ARGS" == 1 ]]; then
+              if [[ -n "$trailing_chars" ]]
+              then __append_to_array "$VAR" "$trailing_chars"
+              else __append_to_array "$VAR" "${words_dequoted[++argi]}"
+              fi
+              break;
+            else
+              __append_to_array "$VAR" "_OPT_ISSET_"
+            fi
+          fi
+        done
         ;;
-    esac
-  done
-
-  for ((; argi < ${#words[@]}; ++argi)); do
-    arg="${words[$argi]}"
-
-    case "$arg" in
-      -) POSITIONALS[POSITIONAL_NUM++]="$arg";;
-      -*);;
-      *) POSITIONALS[POSITIONAL_NUM++]="$arg";;
     esac
   done
 }
 
 _nbfc_service() {
-  local cur prev words cword split
-  _init_completion -n = || return
+  local cur prev words cword split words_dequoted
+  _init_completion -n =: || return
+  _nbfc_service__dequote_words
 
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_help OPT_read_only OPT_fork OPT_debug OPT_config_file OPT_embedded_controller
-
-  _nbfc_service_parse_commandline
-
-  local COMP_WORDBREAKS=''
+  local END_OF_OPTIONS POSITIONALS
+  local -a OPT_help OPT_read_only OPT_fork OPT_debug OPT_config_file
+  local -a OPT_embedded_controller
+  _nbfc_service__parse_commandline
 
   __complete_option() {
-    local opt="$1" cur="$2" mode="$3"
+    local opt="$1" cur="$2" ret=0
 
     case "$opt" in
-      --config-file|-c)
-        _filedir
-        return 0;;
-      --embedded-controller|-e)
-        COMPREPLY=($(compgen -W 'dummy dev_port ec_sys acpi_ec' -- "$cur"))
-        return 0;;
+      -c|--config-file)
+        _filedir;;
+      -e|--embedded-controller)
+        COMPREPLY=($(compgen -W 'dummy dev_port ec_sys acpi_ec' -- "$cur"));;
+      *) ret=1;;
     esac
 
-    return 1
+    return $ret
   }
 
   case "$prev" in
-    --*)
-      __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0;;
-    -*)
-      case "$prev" in -*([hrfd])[ce])
-        __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONALS && return 0
-      esac;;
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([hrfd])[ce])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
   case "$cur" in
     --*=*)
-      __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0;;
-    -*=*);;
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*)
-        local i
-        for ((i=2; i <= ${#cur}; ++i)); do
-          local pre="${cur:0:$i}" value="${cur:$i}"
-          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {
-            _nbfc_service_prefix_compreply "$pre"
-            return 0
-          }
-        done;;
+    -*([hrfd])[ce]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _nbfc_service__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
   esac
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
-    local -a opts=()
-    (( ! ${#OPT_help} )) && opts+=(-h --help)
-    (( ! ${#OPT_read_only} )) && opts+=(-r --read-only)
-    (( ! ${#OPT_fork} )) && opts+=(-f --fork)
-    (( ! ${#OPT_debug} )) && opts+=(-d --debug)
-    (( ! ${#OPT_config_file} )) && opts+=(-c --config-file=)
-    (( ! ${#OPT_embedded_controller} )) && opts+=(-e --embedded-controller=)
-    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    local -a opts
+    (( ! ${#OPT_help[@]} )) && opts+=(-h --help)
+    (( ! ${#OPT_read_only[@]} )) && opts+=(-r --read-only)
+    (( ! ${#OPT_fork[@]} )) && opts+=(-f --fork)
+    (( ! ${#OPT_debug[@]} )) && opts+=(-d --debug)
+    (( ! ${#OPT_config_file[@]} )) && opts+=(-c --config-file=)
+    (( ! ${#OPT_embedded_controller[@]} )) && opts+=(-e --embedded-controller=)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi

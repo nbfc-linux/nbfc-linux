@@ -1,5 +1,5 @@
-#ifndef FAN_TEMPERATURE_CONTROL_H_
-#define FAN_TEMPERATURE_CONTROL_H_
+#ifndef NBFC_FAN_TEMPERATURE_CONTROL_H_
+#define NBFC_FAN_TEMPERATURE_CONTROL_H_
 
 #include "fan.h"
 #include "fs_sensors.h"
@@ -19,8 +19,8 @@ struct FanTemperatureControl {
 typedef struct FanTemperatureControl FanTemperatureControl;
 declare_array_of(FanTemperatureControl);
 
-Error* FanTemperatureControl_Init(array_of(FanTemperatureControl)*, ServiceConfig*, ModelConfig*);
-Error* FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl*);
-void   FanTemperatureControl_Log(array_of(FanTemperatureControl)*, ModelConfig*);
+Error FanTemperatureControl_Init(array_of(FanTemperatureControl)*, ServiceConfig*, ModelConfig*);
+Error FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl*);
+void  FanTemperatureControl_Log(array_of(FanTemperatureControl)*, ModelConfig*);
 
 #endif

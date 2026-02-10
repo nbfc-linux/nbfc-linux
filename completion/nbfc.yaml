@@ -55,13 +55,21 @@ options:
     metavar: "config"
     help: "Set a config"
     groups: ["group1"]
-    complete: ["file", {"directory": "@DATADIR@/nbfc/configs"}]
+    complete: ['combine', [
+      ["file", {"directory": "/@DATADIR@/nbfc/configs"}],
+      ["file", {"directory": "/var/lib/nbfc/configs"}],
+      ["file"]
+    ]]
 
   - option_strings: ["-a", "--apply"]
     metavar: "config"
     help: "Set a config and enable fan control"
     groups: ["group1"]
-    complete: ["file", {"directory": "@DATADIR@/nbfc/configs"}]
+    complete: ['combine', [
+      ["file", {"directory": "/@DATADIR@/nbfc/configs"}],
+      ["file", {"directory": "/var/lib/nbfc/configs"}],
+      ["file"]
+    ]]
 
   - option_strings: ["-r", "--recommend"]
     help: "List configs which may work for your device"
@@ -127,6 +135,63 @@ options:
   - option_strings: ["-q", "--quiet"]
     help: "Enable quiet mode"
 ---
+prog: "nbfc rate-config"
+help: "Rate a configuration file"
+options:
+  - option_strings: ["-H", "--full-help"]
+    help: "Show full help"
+
+  - option_strings: ["-a", "--all"]
+    help: "Rate all available configuration files"
+
+  - option_strings: ["-d", "--dsdt"]
+    help: "Use an alternative DSDT file"
+    metavar: "FILE"
+    complete: ["file"]
+
+  - option_strings: ["-m", "--min-score"]
+    help: "Set minimum rating threshold for configurations"
+    metavar: "SCORE"
+    complete: ["float"]
+
+  - option_strings: ["-j", "--json"]
+    help: "Use JSON output"
+
+  - option_strings: ["--print-rules"]
+    help: "Print configuration rules"
+positionals:
+  - number: 1
+    metavar: "FILE"
+    help: "Specify configuration file"
+    complete: ['combine', [
+      ["file", {"directory": "/@DATADIR@/nbfc/configs"}],
+      ["file", {"directory": "/var/lib/nbfc/configs"}],
+      ["file"]
+    ]]
+---
+prog: "nbfc acpi-dump"
+help: "Dumps information of your ACPI DSDT"
+options:
+  - option_strings: ["-f", "--file"]
+    metavar: "FILE"
+    help: "Use an alternative DSDT file"
+    complete: ["file"]
+
+  - option_strings: ["-j", "--json"]
+    help: "Use JSON output"
+---
+prog: "nbfc acpi-dump registers"
+help: "List all available registers"
+---
+prog: "nbfc acpi-dump ec-registers"
+help: "List all available EC registers"
+---
+prog: "nbfc acpi-dump methods"
+help: "List all available ACPI methods"
+---
+prog: "nbfc acpi-dump dsl"
+help: "Disassemble your DSDT"
+---
 prog: "nbfc wait-for-hwmon"
 help: "Wait for /sys/class/hwmon/hwmon* files"
 ---
@@ -136,8 +201,14 @@ help: "Print model name for notebook"
 prog: "nbfc warranty"
 help: "Show warranty"
 ---
-prog: "nbfc donate"
+prog: "nbfc support"
 help: "Show how to support the project"
+options:
+  - option_strings: ["--upload-firmware"]
+    help: "Upload your notebook firmware without prompting"
+
+  - option_strings: ["--print-command"]
+    help: "Print command for manual firmware upload"
 ---
 prog: "nbfc help"
 help: "Show help"

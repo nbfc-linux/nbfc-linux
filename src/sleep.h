@@ -1,5 +1,5 @@
-#ifndef SLEEP_H
-#define SLEEP_H
+#ifndef NBFC_SLEEP_H_
+#define NBFC_SLEEP_H_
 
 #include <time.h>
 

@@ -5,15 +5,20 @@
 #include <stdlib.h>
 #include <sys/types.h> // ssize_t
 
-#define my               (*self)
-#define max(A, B)        ((A) > (B) ? (A) : (B))
-#define min(A, B)        ((A) < (B) ? (A) : (B))
+#define STRINGIFY_(S)     #S
+#define STRINGIFY(S)      STRINGIFY_(S)
 
-#define PTR_DIFF(A, B) ((int) (A - B))
+#define my                (*self)
+#define MAX(A, B)         ((A) > (B) ? (A) : (B))
+#define MIN(A, B)         ((A) < (B) ? (A) : (B))
+#define STRLEN(S)         (sizeof(S) - 1)
 
-#define ARRAY_SIZE(A)    (sizeof(A) / sizeof(*A))
-#define ARRAY_SSIZE(A)   ((ssize_t) ARRAY_SIZE(A))
-#define array_of(T)      array_of_ ## T
+#define PTR_DIFF(A, B)    ((int) (A - B))
+
+#define ARRAY_SIZE(A)     (sizeof(A) / sizeof(*A))
+#define ARRAY_SSIZE(A)    ((ssize_t) ARRAY_SIZE(A))
+#define array_of(T)       array_of_ ## T
+#define array_of_const(T) array_of_const_ ## T
 
 #define range(TYPE, VAR, START, STOP) \
   TYPE VAR = START; VAR < STOP; ++VAR
@@ -27,11 +32,19 @@
 #define for_each_array_reverse(TYPE, VAR, ARRAY) \
   for (TYPE VAR = (ARRAY).data + (ARRAY).size; --VAR != (ARRAY).data;)
 
-#define declare_array_of(T)                  \
-  typedef struct array_of(T) array_of(T);    \
-  struct array_of(T) {                       \
-    T*  data;                                \
-    ssize_t size;                            \
+typedef ssize_t array_size_t;
+
+#define declare_array_of(T)                           \
+  typedef struct array_of(T) array_of(T);             \
+  struct array_of(T) {                                \
+    T* data;                                          \
+    array_size_t size;                                \
+  };                                                  \
+                                                      \
+  typedef struct array_of_const(T) array_of_const(T); \
+  struct array_of_const(T) {                          \
+    const T* data;                                    \
+    array_size_t size;                                \
   }
 
 declare_array_of(float);
@@ -39,16 +52,22 @@ declare_array_of(int);
 
 #ifndef NDEBUG
 #define debug(...) fprintf(stderr, __VA_ARGS__)
+#define STRICT_CLEANUP 1
 #else
 #define debug(...) (void)0
+#define STRICT_CLEANUP 0
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
+#define NBFC_PACKED_ENUM  __attribute__((packed))
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
+#define PRINTF_LIKE(fmt, args) __attribute__((format(printf, fmt, args)))
 #else
+#define NBFC_PACKED_ENUM
 #define likely(x) (x)
 #define unlikely(x) (x)
+#define PRINTF_LIKE(fmt, args)
 #endif
 
 #endif

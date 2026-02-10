@@ -8,20 +8,17 @@
 #include <unistd.h> // getpid
 #include <sys/stat.h>
 
-Error* PID_Write(bool acquire_lock) {
-  Error* e = NULL;
-  int flags = 0;
+Error PID_Write(enum PID_LockMode lock_mode) {
+  Error e = err_success();
+  int flags = lock_mode;
   char buf[32];
   int len = snprintf(buf, sizeof(buf), "%d", getpid());
 
-  if (acquire_lock)
-    flags = O_EXCL;
-
   if (write_file(NBFC_PID_FILE, flags|O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, buf, len) == -1) {
-    e = err_stdlib(e, NBFC_PID_FILE);
+    e = err_stdlib(NBFC_PID_FILE);
 
     if (errno == EEXIST)
-      e = err_string(e, "Failed to acquire lock file");
+      e = err_chain_string(e, "Failed to acquire lock file");
   }
 
   return e;

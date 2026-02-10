@@ -1,0 +1,26 @@
+{
+  "NotebookModel": "Acer Aspire E1-570G",
+  "Author": "Benjamin Abendroth",
+  "EcPollInterval": 500,
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "CPU Fan",
+      "ResetRequired": true,
+      "ReadAcpiMethod": "\\_SB.PCI0.LPCB.EC0.FANG 33026",
+      "WriteAcpiMethod": "\\_SB.PCI0.LPCB.EC0.FANW 33026 $",
+      "ResetAcpiMethod": "\\_SB.PCI0.LPCB.EC0.FANW 33026 0xFF",
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 255
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Call",
+      "WriteOccasion": "OnWriteFanSpeed",
+      "AcpiMethod": "\\_SB.PCI0.LPCB.EC0.FANW 33030 0xFF",
+      "ResetRequired": true,
+      "ResetWriteMode": "Call",
+      "ResetAcpiMethod": "\\_SB.PCI0.LPCB.EC0.FANW 33030 0x8"
+    }
+  ]
+}

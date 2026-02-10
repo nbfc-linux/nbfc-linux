@@ -1,0 +1,50 @@
+name: Request New Model Configuration
+description: Use this template to request a configuration for a notebook model
+title: "[Model Request]: <MODEL>"
+labels: ["model-request"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before requesting a new model configuration**
+        
+        Please make sure you have **already attempted to create a configuration yourself** using the official documentation:
+        
+        - https://nbfc-linux.github.io/creating-config/
+        
+        **NOTE**:
+        
+        Creating a model configuration requires correspondence between the maintainer and the requester, including running probing tools and providing feedback.
+
+  - type: input
+    id: model
+    attributes:
+      label: Model (required)
+      placeholder: Output of `nbfc get-model-name`
+    validations:
+      required: true
+
+  - type: textarea
+    id: sensors 
+    attributes:
+      label: Sensors (required)
+      description: |
+        Output of `nbfc sensors list`
+    validations:
+      required: true
+
+  - type: textarea
+    id: dsdt
+    attributes:
+      label: DSDT (required)
+      description: |
+        Please upload the DSDT of your ACPI firmware.
+        
+        This command will create a file called `DSDT.gz` which can be uploaded:
+        
+        `sudo gzip -c /sys/firmware/acpi/tables/DSDT > DSDT.gz`
+        
+        You can attach files by **drag & drop** or using the file picker.
+    validations:
+      required: true

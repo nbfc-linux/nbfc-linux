@@ -1,0 +1,93 @@
+{
+ "LegacyTemperatureThresholdsBehaviour": true,
+ "NotebookModel": "HP Pavilion Gaming 15 - ec2xxx",
+ "Author": "saddex",
+ "EcPollInterval": 1000,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 80,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 47,
+	 "WriteRegister": 45,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "CPU",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 64,
+	   "DownThreshold": 56,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 58,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 62,
+	   "FanSpeed": 60.0000038
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 66,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 100,
+	   "DownThreshold": 70,
+	   "FanSpeed": 100.0
+	  }
+	 ]
+	},
+	{
+	 "ReadRegister": 46,
+	 "WriteRegister": 44,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 0,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 255,
+	 "FanDisplayName": "GPU",
+	 "TemperatureThresholds": [
+	  {
+	   "UpThreshold": 52,
+	   "DownThreshold": 45,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 49,
+	   "FanSpeed": 30.0000019
+	  },
+	  {
+	   "UpThreshold": 70,
+	   "DownThreshold": 56,
+	   "FanSpeed": 60.0000038
+	  },
+	  {
+	   "UpThreshold": 75,
+	   "DownThreshold": 60,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 80,
+	   "DownThreshold": 65,
+	   "FanSpeed": 100.0
+	  }
+	 ]
+	}
+ ]
+}

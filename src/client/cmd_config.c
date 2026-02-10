@@ -1,8 +1,7 @@
 #include <errno.h>        // errno
-#include <stdio.h>        // printf, fprintf, snprintf
+#include <stdio.h>        // printf, fprintf
 #include <stdlib.h>       // exit, realpath, qsort
 #include <string.h>       // strcmp, strrchr, strerror
-#include <unistd.h>       // access, F_OK
 #include <linux/limits.h> // PATH_MAX
 
 #include "../nbfc.h"
@@ -41,7 +40,7 @@ struct {
 
 void Set_Config_Action(enum Config_Action action) {
   if (Config_Options.action && Config_Options.action != action) {
-    Log_Error("Options --apply, --set, --list and --recommend are mutually exclusive\n");
+    Log_Error("Options --apply, --set, --list and --recommend are mutually exclusive");
     exit(NBFC_EXIT_CMDLINE);
   }
 
@@ -51,7 +50,7 @@ void Set_Config_Action(enum Config_Action action) {
 int List() {
   array_of(ConfigFile) files = List_All_Configs();
 
-  qsort(files.data, files.size, sizeof(ConfigFile), compare_config_by_name);
+  qsort(files.data, files.size, sizeof(ConfigFile), ConfigFile_CompareByName);
 
   for_each_array(ConfigFile*, file, files) {
     printf("%s\n", file->config_name);
@@ -81,16 +80,16 @@ int Recommend() {
     "[!] and configuration names.\n"
     "\n");
 
-  bool have_match = 0;
+  bool have_match = false;
   for_each_array(ConfigFile*, file, files) {
     if (file->diff >= RecommendedConfigMatchThreshold) {
-      have_match = 1;
+      have_match = true;
       printf("%s\n", file->config_name);
     }
   }
 
   if (! have_match) {
-    Log_Error("No recommended configuration files found\n");
+    Log_Error("No recommended configuration files found");
   }
 
   return NBFC_EXIT_SUCCESS;
@@ -106,7 +105,7 @@ int Set_Or_Apply() {
     config = Get_Supported_Config(&files, DMI_Get_Model_Name());
 
     if (! config) {
-      Log_Error("No config found to apply automatically\n");
+      Log_Error("No config found to apply automatically");
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -116,11 +115,11 @@ int Set_Or_Apply() {
     config = Mem_Strdup(Config_Options.config);
 
     char* dot = strrchr(config, '.');
-    if (dot)
+    if (dot && !strcmp(dot, ".json"))
       *dot = '\0';
 
     if  (! Contains_Config(&files, config)) {
-      Log_Error("No such configuration available: %s\n", config);
+      Log_Error("No such configuration available: %s", config);
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -130,7 +129,7 @@ int Set_Or_Apply() {
     config = realpath(Config_Options.config, NULL);
 
     if (! config) {
-      Log_Error("Failed to resolve path '%s': %s\n", Config_Options.config, strerror(errno));
+      Log_Error("Failed to resolve path \"%s\": %s", Config_Options.config, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -140,11 +139,11 @@ int Set_Or_Apply() {
   service_config.SelectedConfigId = config;
   ServiceConfig_Set_SelectedConfigId(&service_config);
 
-  Error* e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
+  Error e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
   Mem_Free(config);
 
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 

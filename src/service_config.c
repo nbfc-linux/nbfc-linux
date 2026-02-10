@@ -4,11 +4,11 @@
 #include "error.h"
 #include "macros.h"
 #include "memory.h"
+#include "buffer.h"
 #include "trace.h"
-#include "stack_memory.h"
 #include "model_config.h"
 #include "nxjson_utils.h"
-#include "reverse_nxjson.h"
+#include "nxjson_write.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,19 +17,16 @@
 
 ServiceConfig service_config = {0};
 
-Error* ServiceConfig_Init(const char* file) {
-  Error* e;
-  Trace trace = {0};
-  char file_content[NBFC_MAX_FILE_SIZE];
-  char nxjson_memory[NBFC_MAX_FILE_SIZE];
+Error ServiceConfig_Init(const char* file) {
+  Error e;
+  Trace* trace = (Trace*) Buffer_Get(sizeof(Trace));
+  char* file_content = Buffer_Get(NBFC_MAX_FILE_SIZE);
   const nx_json* js = NULL;
 
-  Trace_Push(&trace, file);
+  Trace_Init(trace);
+  Trace_Push(trace, file);
 
-  // Use memory from the stack to allocate data structures from nxjson
-  StackMemory_Init(nxjson_memory, sizeof(nxjson_memory));
-
-  e = nx_json_parse_file(&js, file_content, sizeof(file_content), file);
+  e = nx_json_parse_file(&js, file_content, NBFC_MAX_FILE_SIZE, file);
   if (e)
     goto err;
 
@@ -42,23 +39,23 @@ Error* ServiceConfig_Init(const char* file) {
     goto err;
 
   for_each_array(float*, f, service_config.TargetFanSpeeds) {
-    Trace_Push(&trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_config.TargetFanSpeeds.data));
+    Trace_Push(trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_config.TargetFanSpeeds.data));
 
     if (*f > 100.0f) {
-      Log_Warn("%s: Value cannot be greater than 100.0\n", trace.buf);
+      Log_Warn("%s: Value cannot be greater than 100.0", trace->buf);
       *f = 100.0f;
     }
 
     if (*f < 0.0f && *f != -1.0f) {
-      Log_Warn("%s: Please use `-1' for selecting auto mode\n", trace.buf);
+      Log_Warn("%s: Please use `-1' for selecting auto mode", trace->buf);
       *f = -1.0f;
     }
 
-    Trace_Pop(&trace);
+    Trace_Pop(trace);
   }
 
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config.FanTemperatureSources) {
-    Trace_Push(&trace, "FanTemperatureSources[%d]", PTR_DIFF(ftsc, service_config.FanTemperatureSources.data));
+    Trace_Push(trace, "FanTemperatureSources[%d]", PTR_DIFF(ftsc, service_config.FanTemperatureSources.data));
 
     e = FanTemperatureSourceConfig_ValidateFields(ftsc);
     if (e)
@@ -66,24 +63,27 @@ Error* ServiceConfig_Init(const char* file) {
 
     for_each_array(FanTemperatureSourceConfig*, ftsc1, service_config.FanTemperatureSources) {
       if (ftsc != ftsc1 && ftsc->FanIndex == ftsc1->FanIndex) {
-        e = err_string(0, "Duplicate FanIndex");
+        e = err_string("Duplicate FanIndex");
         goto err;
       }
     }
 
-    Trace_Pop(&trace);
+    Trace_Pop(trace);
   }
 
 err:
   nx_json_free(js);
-  StackMemory_Destroy();
-  if (e)
-    return err_string(e, trace.buf);
 
-  return err_success();
+  if (e)
+    e = err_chain_string(e, trace->buf);
+
+  Buffer_Release(file_content, NBFC_MAX_FILE_SIZE);
+  Buffer_Release((char*) trace, sizeof(Trace));
+
+  return e;
 }
 
-Error* ServiceConfig_Write(const char* file) {
+Error ServiceConfig_Write(const char* file) {
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
 
@@ -120,18 +120,22 @@ Error* ServiceConfig_Write(const char* file) {
     }
   }
 
-  char buf[NBFC_MAX_FILE_SIZE];
-  StringBuf s = { buf, 0, sizeof(buf) };
-  buf[0] = '\0';
+  int fd = open(file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+  if (fd == -1)
+    return err_stdlib(file);
 
-  nx_json_to_string(o, &s, 0);
+  bool success = nxjson_write_to_fd(o, fd);
+
+  int errno_save = errno;
+  close(fd);
+  errno = errno_save;
+
   nx_json_free(o);
 
-  if (write_file(file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, s.s, s.size) == -1) {
-    return err_stdlib(0, file);
-  }
-
-  return err_success();
+  if (success)
+    return err_success();
+  else
+    return err_stdlib(file);
 }
 
 void ServiceConfig_Free(ServiceConfig* c) {

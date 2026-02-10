@@ -1,10 +1,10 @@
-#define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread(), string.h: strdup()
+#define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread()
 #define _DEFAULT_SOURCE   // endian.h: htole16(), le16toh()
 
 // The data structures returned by nxjson are temporary and are loaded into proper C structs.
-// We allocate memory on the stack to avoid malloc() and reduce memory usage.
-#define NX_JSON_CALLOC(SIZE) ((nx_json*) StackMemory_Calloc(1, SIZE))
-#define NX_JSON_FREE(JSON)   (StackMemory_Free((void*) (JSON)))
+// We allocate memory from a pool to avoid malloc() and reduce memory usage.
+#define NX_JSON_CALLOC(SIZE) ((nx_json*) NXJSON_Memory_Calloc(1, SIZE))
+#define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
 
 #include "config.h"
 #include "ec.c"
@@ -26,6 +26,7 @@
 #endif
 
 #include "acpi_call.c"
+#include "buffer.c"
 #include "log.c"
 #include "error.c"
 #include "trace.c"
@@ -34,14 +35,15 @@
 #include "fs_sensors.c"
 #include "file_utils.c"
 #include "memory.c"
-#include "stack_memory.c"
+#include "nxjson_memory.c"
 #include "model_config.c"
 #include "nxjson.c"
 #include "nvidia.c"
+#include "process.c"
 #include "program_name.c"
 #include "protocol.c"
 #include "pidfile.c"
-#include "reverse_nxjson.c"
+#include "nxjson_write.c"
 #include "service.c"
 #include "service_config.c"
 #include "service_state.c"

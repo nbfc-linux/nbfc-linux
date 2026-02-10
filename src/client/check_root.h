@@ -1,5 +1,5 @@
-#ifndef CHECK_ROOT_H_
-#define CHECK_ROOT_H_
+#ifndef NBFC_CHECK_ROOT_H_
+#define NBFC_CHECK_ROOT_H_
 
 #include <stdlib.h> // exit
 #include <unistd.h> // geteuid
@@ -9,7 +9,7 @@
 
 static inline void check_root() {
   if (geteuid()) {
-    Log_Error("This operation must be run as root\n");
+    Log_Error("This operation must be run as root");
     exit(NBFC_EXIT_FAILURE);
   }
 }

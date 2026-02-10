@@ -31,7 +31,7 @@ int Set() {
   }
 
   if (Service_Get_PID() == -1) {
-    Log_Error("Service not running\n");
+    Log_Error("Service not running");
     return NBFC_EXIT_FAILURE;
   }
 
@@ -49,49 +49,52 @@ int Set() {
 
   char* buf = NULL;
   const nx_json* out = NULL;
-  Error* e = Client_Communicate(in, &buf, &out);
+  Error e = Client_Communicate(in, &buf, &out);
   if (e)
     goto error;
 
   if (out->type != NX_JSON_OBJECT) {
-    e = err_string(0, "Not a JSON object");
+    e = err_string("Not a JSON object");
     goto error;
   }
 
   const nx_json* err = nx_json_get(out, "Error");
   if (err) {
     if (err->type != NX_JSON_STRING) {
-      e = err_string(0, "'Error' is not a string");
+      e = err_string("\"Error\" is not a string");
       goto error;
     }
 
-    Log_Error("Service returned: %s\n", err->val.text);
+    Log_Error("Service returned: %s", err->val.text);
     return NBFC_EXIT_FAILURE;
   }
 
   const nx_json* status = nx_json_get(out, "Status");
   if (! status) {
-    e = err_string(0, "Missing status in JSON output");
+    e = err_string("Missing status in JSON output");
     goto error;
   }
 
   if (status->type != NX_JSON_STRING) {
-    e = err_string(0, "Status: not a JSON string");
+    e = err_string("Status: not a JSON string");
     goto error;
   }
 
   if (strcmp(status->val.text, "OK")) {
-    e = err_string(0, "Status != OK");
+    e = err_string("Status != OK");
     goto error;
   }
 
 error:
+
+#if STRICT_CLEANUP
   nx_json_free(in);
   nx_json_free(out);
   Mem_Free(buf);
+#endif
 
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 

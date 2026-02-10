@@ -1,7 +1,11 @@
-#ifndef LOG_H_
-#define LOG_H_
+#ifndef NBFC_LOG_H_
+#define NBFC_LOG_H_
+
+#include "macros.h"
 
 #include <stdbool.h>
+#include <unistd.h> // write
+#include <string.h> // strlen
 
 enum LogLevel {
   LogLevel_Quiet,
@@ -16,9 +20,19 @@ extern LogLevel Log_LogLevel;
 
 void Log_Init(bool);
 void Log_Close();
-void Log_Error(const char* fmt, ...);
-void Log_Warn(const char* fmt, ...);
-void Log_Info(const char* fmt, ...);
-void Log_Debug(const char* fmt, ...);
+void Log_Log(LogLevel, const char* fmt, ...) PRINTF_LIKE(2, 3);
+
+#define Log_Error(...) Log_Log(LogLevel_Error, __VA_ARGS__)
+#define Log_Warn(...)  Log_Log(LogLevel_Warn, __VA_ARGS__)
+#define Log_Info(...)  Log_Log(LogLevel_Info, __VA_ARGS__)
+#define Log_Debug(...) Log_Log(LogLevel_Debug, __VA_ARGS__)
+
+static inline void WriteToErr(const char* s) {
+  write(STDERR_FILENO, s, strlen(s));
+}
+
+static inline void WriteToOut(const char* s) {
+  write(STDOUT_FILENO, s, strlen(s));
+}
 
 #endif

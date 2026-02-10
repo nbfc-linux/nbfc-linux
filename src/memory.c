@@ -1,50 +1,87 @@
-#undef _XOPEN_SOURCE
-
-#define _XOPEN_SOURCE 500 // string.h: strdup()
-
 #include "memory.h"
 
 #include "macros.h" // unlikely
 #include "nbfc.h"   // NBFC_EXIT_FATAL
+#include "log.h"    // WriteToErr
 
 #include <stdlib.h> // malloc, calloc, realloc, free, exit
-#include <string.h> // strerror
+#include <string.h> // strlen, strcpy, strerror
 #include <stdio.h>  // fprintf
-#include <errno.h>  // ENOMEM
 
-static void Mem_FatalError() {
-  fprintf(stderr, "FATAL ERROR: %s\n", strerror(ENOMEM));
+void Memory_FatalError() {
+  WriteToErr("FATAL ERROR: Cannot allocate memory\n");
   exit(NBFC_EXIT_FATAL);
 }
 
-void* Mem_Malloc(const size_t size) {
-  void* p = malloc(size);
+#if MEMORY_TRACE_ALLOCS
+void* Memory_Malloc(const char* trace, const size_t size)
+#else
+void* Memory_Malloc(const size_t size)
+#endif
+{
+
+#if MEMORY_TRACE_ALLOCS
+  fprintf(stderr, "MALLOC(%zu) [%s]\n", size, trace);
+#endif
+
+  void* p = calloc(1, size);
   if (unlikely(!p))
-    Mem_FatalError();
+    Memory_FatalError();
   return p;
 }
 
-void* Mem_Calloc(const size_t nmemb, const size_t size) {
+#if MEMORY_TRACE_ALLOCS
+void* Memory_Calloc(const char* trace, const size_t nmemb, const size_t size)
+#else
+void* Memory_Calloc(const size_t nmemb, const size_t size)
+#endif
+{
+
+#if MEMORY_TRACE_ALLOCS
+  fprintf(stderr, "CALLOC(%zu, %zu) [%s]\n", nmemb, size, trace);
+#endif
+
   void* p = calloc(nmemb, size);
   if (unlikely(!p))
-    Mem_FatalError();
+    Memory_FatalError();
   return p;
 }
 
-void* Mem_Realloc(void* p, const size_t size) {
+#if MEMORY_TRACE_ALLOCS
+void* Memory_Realloc(const char* trace, void* p, const size_t size)
+#else
+void* Memory_Realloc(void* p, const size_t size)
+#endif
+{
+
+#if MEMORY_TRACE_ALLOCS
+  fprintf(stderr, "REALLOC(%zu) [%s]\n", size, trace);
+#endif
+
   void* new_p = realloc(p, size);
   if (unlikely(! new_p))
-    Mem_FatalError();
+    Memory_FatalError();
   return new_p;
 }
 
-char* Mem_Strdup(const char* s) {
-  char* p = strdup(s);
-  if (unlikely(!p))
-    Mem_FatalError();
+#if MEMORY_TRACE_ALLOCS
+char* Memory_Strdup(const char* trace, const char* s)
+#else
+char* Memory_Strdup(const char* s)
+#endif
+{
+  const size_t len = strlen(s);
+
+#if MEMORY_TRACE_ALLOCS
+  char* p = Memory_Malloc(trace, len + 1);
+#else
+  char* p = Memory_Malloc(len + 1);
+#endif
+
+  strcpy(p, s);
   return p;
 }
 
-void Mem_Free(void* p) {
+void Memory_Free(void* p) {
   free(p);
 }

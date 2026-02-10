@@ -6,7 +6,7 @@
 #include "service_control.h"
 #include "client_global.h"
 
-#define CLEAR_SCREEN "\033c"
+#define STATUS_CLEAR_SCREEN "\033c"
 
 const cli99_option status_options[] = {
   cli99_include_options(&main_options),
@@ -24,7 +24,7 @@ struct {
   float         watch;
 } Status_Options = {0};
 
-static void print_fan_status(const FanInfo* fan) {
+static void Status_Print_Fan(const FanInfo* fan) {
   printf(
     "Fan Display Name         : %s\n"
     "Temperature              : %.2f\n"
@@ -36,19 +36,19 @@ static void print_fan_status(const FanInfo* fan) {
     "Fan Speed Steps          : %d\n",
     fan->Name,
     fan->Temperature,
-    bool_to_str(fan->AutoMode),
-    bool_to_str(fan->Critical),
+    str_from_bool(fan->AutoMode),
+    str_from_bool(fan->Critical),
     fan->CurrentSpeed,
     fan->TargetSpeed,
     fan->RequestedSpeed,
     fan->SpeedSteps);
 }
 
-static void print_service_status(const ServiceInfo* service_info) {
+static void Status_Print_Service(const ServiceInfo* service_info) {
   printf(
     "Read-only                : %s\n"
     "Selected Config Name     : %s\n",
-    bool_to_str(service_info->ReadOnly),
+    str_from_bool(service_info->ReadOnly),
     service_info->SelectedConfigId);
 }
 
@@ -59,30 +59,30 @@ int Status() {
     Status_Options.all = true;
 
   while (true) {
-    Error* e = ServiceInfo_TryLoad(&service_info);
+    Error e = ServiceInfo_TryLoad(&service_info);
     e_die();
 
     if (Status_Options.all || Status_Options.service)
-      print_service_status(&service_info);
+      Status_Print_Service(&service_info);
 
     if (Status_Options.all) {
       for_each_array(const FanInfo*, f, service_info.Fans) {
         printf("\n");
-        print_fan_status(f);
+        Status_Print_Fan(f);
       }
     }
     else if (Status_Options.fans.size) {
       const int fan_count = service_info.Fans.size;
-      bool *vis = Mem_Calloc(sizeof(bool), fan_count);
+      bool* vis = Mem_Calloc(fan_count, sizeof(bool));
       for_each_array(int*, fan_index, Status_Options.fans) {
         if (*fan_index >= fan_count) {
-          Log_Error("Fan number %d not found! (Fan indexes count from zero!)\n", *fan_index);
+          Log_Error("Fan number %d not found! (Fan indexes count from zero!)", *fan_index);
           return NBFC_EXIT_FAILURE;
         }
         if (!vis[*fan_index]) {
           printf("\n");
-          print_fan_status(&service_info.Fans.data[*fan_index]);
-          vis[*fan_index] = 1;
+          Status_Print_Fan(&service_info.Fans.data[*fan_index]);
+          vis[*fan_index] = true;
         }
       }
       Mem_Free(vis);
@@ -92,7 +92,7 @@ int Status() {
       break;
 
     sleep_ms(Status_Options.watch * 1000);
-    printf("%s", CLEAR_SCREEN);
+    printf("%s", STATUS_CLEAR_SCREEN);
   }
 
   return NBFC_EXIT_SUCCESS;

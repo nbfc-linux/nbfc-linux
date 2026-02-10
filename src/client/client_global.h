@@ -1,5 +1,5 @@
-#ifndef CLIENT_GLOBAL_H_
-#define CLIENT_GLOBAL_H_
+#ifndef NBFC_CLIENT_GLOBAL_H_
+#define NBFC_CLIENT_GLOBAL_H_
 
 #include "../optparse/optparse.h"
 
@@ -32,6 +32,20 @@ enum Option {
   Option_Config_Set,
   Option_Config_Apply,
 
+  // Rate-Config options
+  Option_Rate_Config_File,
+  Option_Rate_Config_DSDT_File,
+  Option_Rate_Config_All,
+  Option_Rate_Config_Full_Help,
+  Option_Rate_Config_Json,
+  Option_Rate_Config_Print_Rules,
+  Option_Rate_Config_Min_Score,
+
+  // Acpi-Dump options
+  Option_Acpi_Dump_Command,
+  Option_Acpi_Dump_File,
+  Option_Acpi_Dump_Json,
+
   // Set options
   Option_Set_Auto,
   Option_Set_Speed,
@@ -43,6 +57,10 @@ enum Option {
   // Update options
   Option_Update_Parallel,
   Option_Update_Quiet,
+
+  // Support options
+  Option_Support_Upload_Firmware,
+  Option_Support_Print_Command,
 
   // Show-Variable options
   Option_ShowVariable_Variable,

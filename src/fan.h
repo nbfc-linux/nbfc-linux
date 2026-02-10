@@ -8,7 +8,7 @@
 
 #include <stdbool.h>
 
-typedef enum {
+typedef enum NBFC_PACKED_ENUM {
   Fan_ModeAuto  = 0x0,
   Fan_ModeFixed = 0x1,
 } Fan_Mode;
@@ -35,20 +35,20 @@ struct Fan {
   bool isCritical;
 };
 
-Error*   Fan_Init(Fan*, FanConfiguration*, ModelConfig*);
+Error    Fan_Init(Fan*, FanConfiguration*, ModelConfig*);
 
-Error*   Fan_UpdateCurrentSpeed(Fan*);
+Error    Fan_UpdateCurrentSpeed(Fan*);
 float    Fan_GetCurrentSpeed(const Fan*);
 float    Fan_GetTargetSpeed(const Fan*);
 float    Fan_GetRequestedSpeed(const Fan*);
 uint16_t Fan_GetSpeedSteps(const Fan*);
 
 void     Fan_SetTemperature(Fan*, float temperature);
-Error*   Fan_SetFixedSpeed(Fan*, float speed);
+Error    Fan_SetFixedSpeed(Fan*, float speed);
 void     Fan_SetAutoSpeed(Fan*);
 
-Error*   Fan_ECReset(Fan*);
-Error*   Fan_ECFlush(Fan*);
+Error    Fan_ECReset(Fan*);
+Error    Fan_ECFlush(Fan*);
 
 declare_array_of(Fan);
 

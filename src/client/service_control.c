@@ -5,7 +5,7 @@
 #include <stdlib.h> // exit, system, WEXITSTATUS
 #include <string.h> // strcat, strerror, strcspn, memset
 #include <signal.h> // kill, SIGINT
-#include <unistd.h> // access, F_OK, unlink
+#include <unistd.h> // unlink
 #include <limits.h> // INT_MAX
 
 #include <sys/types.h>
@@ -22,6 +22,7 @@
 #include "../protocol.h"
 #include "../nxjson_utils.h"
 #include "../service_config.h"
+#include "../file_utils.h"
 
 int Service_Get_PID() {
   const char* err;
@@ -41,29 +42,29 @@ int Service_Get_PID() {
   int pid = parse_number(buf, 0, INT_MAX, &err);
   if (err) {
 error:
-    Log_Error("Failed to read the pid file: " NBFC_PID_FILE ": %s\n", err);
+    Log_Error("Failed to read the pid file: " NBFC_PID_FILE ": %s", err);
     exit(NBFC_EXIT_FAILURE);
   }
 
   return pid;
 }
 
-Error* Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
+Error Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
   int sock;
   struct sockaddr_un serv_addr;
-  Error* e = NULL;
+  Error e = err_success();
 
   sock = socket(AF_UNIX, SOCK_STREAM, 0);
   if (sock < 0)
-    return err_stdlib(0, "socket()");
+    return err_stdlib("socket()");
 
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sun_family = AF_UNIX;
   snprintf(serv_addr.sun_path, sizeof(serv_addr.sun_path), NBFC_SOCKET_PATH);
 
   if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-    e = err_string(0, NBFC_SOCKET_PATH);
-    e = err_stdlib(e, "connect()");
+    e = err_string(NBFC_SOCKET_PATH);
+    e = err_chain_stdlib(e, "connect()");
     goto error;
   }
 
@@ -81,14 +82,14 @@ error:
 }
 
 void ServiceConfig_Load() {
-  if (access(NBFC_SERVICE_CONFIG, F_OK) != 0) {
+  if (! file_exists(NBFC_SERVICE_CONFIG)) {
     memset(&service_config, 0, sizeof(service_config)); // Clear values
     return;
   }
 
   char buf[NBFC_MAX_FILE_SIZE];
   const nx_json* js = NULL;
-  Error* e = nx_json_parse_file(&js, buf, sizeof(buf), NBFC_SERVICE_CONFIG);
+  Error e = nx_json_parse_file(&js, buf, sizeof(buf), NBFC_SERVICE_CONFIG);
   if (e)
     goto error;
 
@@ -97,13 +98,13 @@ void ServiceConfig_Load() {
 
   if (e) {
 error:
-    e = err_string(e, NBFC_SERVICE_CONFIG);
+    e = err_chain_string(e, NBFC_SERVICE_CONFIG);
     e_die();
   }
 }
 
-Error* ServiceInfo_TryLoad(ServiceInfo* service_info) {
-  Error* e;
+Error ServiceInfo_TryLoad(ServiceInfo* service_info) {
+  Error e;
   nx_json root = {0};
   nx_json* in = create_json_object(NULL, &root);
   create_json_string("Command", in, "status");
@@ -115,18 +116,18 @@ Error* ServiceInfo_TryLoad(ServiceInfo* service_info) {
     goto error;
 
   if (out->type != NX_JSON_OBJECT) {
-    e = err_string(0, "Not a JSON object");
+    e = err_string("Not a JSON object");
     goto error;
   }
 
   const nx_json* err = nx_json_get(out, "Error");
   if (err) {
     if (err->type != NX_JSON_STRING) {
-      e = err_string(0, "'Error' is not a string");
+      e = err_string("'Error' is not a string");
       goto error;
     }
 
-    e = err_string(0, err->val.text);
+    e = err_string(err->val.text);
     goto error;
   }
 
@@ -153,29 +154,29 @@ error:
 }
 
 void Service_LoadAllConfigFiles(ModelConfig* model_config) {
-  Error* e;
+  Error e;
   Trace trace = {0};
   char path[PATH_MAX];
 
   e = ServiceConfig_Init(NBFC_SERVICE_CONFIG);
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
-    Log_Error("This command needs a valid and configured `%s`\n", NBFC_SERVICE_CONFIG);
+    Log_Error("%s", err_print_all(e));
+    Log_Error("This command needs a valid and configured `%s`", NBFC_SERVICE_CONFIG);
     exit(NBFC_EXIT_FAILURE);
   }
 
   e = ModelConfig_FindAndLoad(model_config, path, service_config.SelectedConfigId);
   if (e) {
-    Log_Error("%s\n", err_print_all(e));
-    Log_Error("This command needs a valid model configuration (%s)\n", path);
+    Log_Error("%s", err_print_all(e));
+    Log_Error("This command needs a valid model configuration (%s)", path);
     exit(NBFC_EXIT_FAILURE);
   }
 
   Trace_Push(&trace, path);
   e = ModelConfig_Validate(&trace, model_config);
   if (e) {
-    Log_Error("%s: %s\n", trace.buf, err_print_all(e));
-    Log_Error("This command needs a valid model configuration (%s)\n", path);
+    Log_Error("%s: %s", trace.buf, err_print_all(e));
+    Log_Error("This command needs a valid model configuration (%s)", path);
     exit(NBFC_EXIT_FAILURE);
   }
 }
@@ -183,7 +184,7 @@ void Service_LoadAllConfigFiles(ModelConfig* model_config) {
 int Service_Start(bool read_only) {
   int pid = Service_Get_PID();
   if (pid != -1) {
-    Log_Info("Service already running (pid: %d)\n", pid);
+    Log_Info("Service already running (pid: %d)", pid);
     return NBFC_EXIT_SUCCESS;
   }
 
@@ -193,11 +194,11 @@ int Service_Start(bool read_only) {
 
   int ret = system(cmd);
   if (ret == -1) {
-    Log_Error("Failed to start process: %s\n", strerror(errno));
+    Log_Error("Failed to start process: %s", strerror(errno));
     return NBFC_EXIT_FAILURE;
   }
   if (WEXITSTATUS(ret) == 127) {
-    Log_Error("Can't run nbfc_service, make sure the binary is installed\n");
+    Log_Error("Can't run nbfc_service, make sure the binary is installed");
     return NBFC_EXIT_FAILURE;
   }
 
@@ -207,13 +208,13 @@ int Service_Start(bool read_only) {
 int Service_Stop() {
   int pid = Service_Get_PID();
   if (pid == -1) {
-    Log_Error("Service not running\n");
+    Log_Error("Service not running");
     return NBFC_EXIT_SUCCESS;
   }
 
-  Log_Info("Killing nbfc_service (%d)\n", pid);
+  Log_Info("Killing nbfc_service (%d)", pid);
   if (kill(pid, SIGINT) == -1) {
-    Log_Error("Failed to kill nbfc_service process (%d): %s\n", pid, strerror(errno));
+    Log_Error("Failed to kill nbfc_service process (%d): %s", pid, strerror(errno));
     return NBFC_EXIT_FAILURE;
   }
 

@@ -73,14 +73,14 @@ int main(int argc, char* const argv[]) {
         case EmbeddedControllerType_ECSysLinuxACPI: ec = &EC_SysLinux_ACPI_VTable; break;
         case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable;         break;
         default:
-          Log_Error("-e|--embedded-controller: Invalid value: %s\n", optarg);
+          Log_Error("-e|--embedded-controller: Invalid value: %s", optarg);
           return NBFC_EXIT_CMDLINE;
       }
       break;
     case 'f':
       options.fan_register = parse_number(optarg, 0, 255, &err);
       if (err) {
-        Log_Error("-f|--fan-register: %s\n", err);
+        Log_Error("-f|--fan-register: %s", err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -111,7 +111,7 @@ int main(int argc, char* const argv[]) {
     case 's':
       options.sleep = parse_double(optarg, 0.1, 100, &err);
       if (err) {
-        Log_Error("Invalid value for -s|--sleep: %s\n", optarg);
+        Log_Error("Invalid value for -s|--sleep: %s", optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -121,36 +121,36 @@ int main(int argc, char* const argv[]) {
   }
 
   if (options.fan_register == -1) {
-    Log_Error("Option -f|--fan-register not given\n");
+    Log_Error("Option -f|--fan-register not given");
     return NBFC_EXIT_CMDLINE;
   }
 
   if (options.fan_values.size == 0) {
-    Log_Error("Option -F|--fan-values not given\n");
+    Log_Error("Option -F|--fan-values not given");
     return NBFC_EXIT_CMDLINE;
   }
 
   if (options.bruteforce_registers.size == 0) {
-    Log_Error("Option -b|--bruteforce-registers not given\n");
+    Log_Error("Option -b|--bruteforce-registers not given");
     return NBFC_EXIT_CMDLINE;
   }
 
   if (options.bruteforce_values.size == 0) {
-    Log_Error("Option -v|--bruteforce-values not given\n");
+    Log_Error("Option -v|--bruteforce-values not given");
     return NBFC_EXIT_CMDLINE;
   }
 
   if (geteuid()) {
-    Log_Error("This program must be run as root\n");
+    Log_Error("This program must be run as root");
     return NBFC_EXIT_FAILURE;
   }
 
   if (ec == NULL) {
-    Error* e = EC_FindWorking(&ec);
+    Error e = EC_FindWorking(&ec);
     e_die();
   }
 
-  Error* e = ec->Open();
+  Error e = ec->Open();
   e_die();
 
   atexit(reset_embedded_controller);
@@ -174,18 +174,18 @@ static int expand_ints(const char* s, array_of(int)* array) {
 
       int from = parse_number(first, 0, 255, &err);
       if (err) {
-        Log_Error("Invalid number: %s: %s\n", first, err);
+        Log_Error("Invalid number: %s: %s", first, err);
         return false;
       }
 
       int to = parse_number(second, 0, 255, &err);
       if (err) {
-        Log_Error("Invalid number: %s: %s\n", second, err);
+        Log_Error("Invalid number: %s: %s", second, err);
         return false;
       }
 
       if (from > to) {
-        Log_Error("From (%d) is larger than to (%d): %s\n", from, to, s);
+        Log_Error("From (%d) is larger than to (%d): %s", from, to, s);
         return false;
       }
 
@@ -198,7 +198,7 @@ static int expand_ints(const char* s, array_of(int)* array) {
     else {
       int from_and_to = parse_number(s, 0, 255, &err);
       if (err) {
-        Log_Error("Invalid number: %s: %s\n", s, err);
+        Log_Error("Invalid number: %s: %s", s, err);
         return false;
       }
 
@@ -237,7 +237,7 @@ static void reset_embedded_controller() {
 
 static void bruteforce() {
   uint8_t byte;
-  Error* e;
+  Error e;
 
   e = ec->ReadByte(options.fan_register, &byte);
   e_die();

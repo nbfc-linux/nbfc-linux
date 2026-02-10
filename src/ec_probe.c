@@ -1,3 +1,8 @@
+// The data structures returned by nxjson are temporary and are loaded into proper C structs.
+// We allocate memory from a pool to avoid malloc() and reduce memory usage.
+#define NX_JSON_CALLOC(SIZE) ((nx_json*) NXJSON_Memory_Calloc(1, SIZE))
+#define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
+
 #define _XOPEN_SOURCE  500 // unistd.h: export pwrite()/pread()
 #define _DEFAULT_SOURCE    // endian.h:
 
@@ -39,14 +44,16 @@
 #endif
 
 #include "acpi_call.c"         // src
+#include "buffer.c"            // src
 #include "log.c"               // src
 #include "optparse/optparse.c" // src
 #include "memory.c"            // src
+#include "nxjson_memory.c"     // src
 #include "nxjson.c"            // src
 #include "model_config.c"      // src
-#include "stack_memory.c"      // src
 #include "trace.c"             // src
 #include "file_utils.c"        // src
+#include "process.c"           // src
 
 #define Console_Black       "\033[0;30m"
 #define Console_Red         "\033[0;31m"
@@ -86,7 +93,7 @@ static void         Register_PrintDump(RegisterBuf*, bool);
 static int          Register_LoadDump(RegisterBuf*, FILE*);
 static void         Handle_Signal(int);
 
-static EC_VTable*   ec;
+static const EC_VTable* ec;
 static volatile int quit;
 
 static int Read();
@@ -284,7 +291,7 @@ int main(int argc, char* const argv[]) {
       cmd = Command_FromString(p.optarg);
 
       if (cmd == Command_End) {
-        Log_Error("Invalid command: %s\n", p.optarg);
+        Log_Error("Invalid command: %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
 
@@ -298,14 +305,14 @@ int main(int argc, char* const argv[]) {
     case Option_Register:
       options.register_ = parse_number(p.optarg, 0, 255, &err);
       if (err) {
-        Log_Error("Register: %s: %s\n", p.optarg, err);
+        Log_Error("Register: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Value:
       options.value = parse_number(p.optarg, 0, 65535, &err);
       if (err) {
-        Log_Error("Value: %s: %s\n", p.optarg, err);
+        Log_Error("Value: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -330,21 +337,21 @@ int main(int argc, char* const argv[]) {
         case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable;         break;
 #endif
         default:
-          Log_Error("-e|--embedded-controller: Invalid value: %s\n", p.optarg);
+          Log_Error("-e|--embedded-controller: Invalid value: %s", p.optarg);
           return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Timespan:
       options.timespan = parse_number(p.optarg, 1, INT_MAX, &err);
       if (err) {
-        Log_Error("-t|--timespan: %s: %s\n", p.optarg, err);
+        Log_Error("-t|--timespan: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Interval:
       options.interval = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
-        Log_Error("-i|--interval: %s: %s\n", p.optarg, err);
+        Log_Error("-i|--interval: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -354,7 +361,7 @@ int main(int argc, char* const argv[]) {
     case Option_AcpiCallArgument:
       options.acpi_call_args[options.acpi_call_args_size++] = parse_unumber(p.optarg, 0, UINT64_MAX, &err);
       if (err) {
-        Log_Error("Argument: %s: %s\n", p.optarg, err);
+        Log_Error("Argument: %s: %s", p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -365,7 +372,7 @@ int main(int argc, char* const argv[]) {
   }
 
   if (! cli99_End(&p)) {
-    Log_Error("Too much arguments\n");
+    Log_Error("Too much arguments");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -375,7 +382,7 @@ int main(int argc, char* const argv[]) {
   }
 
   if (geteuid()) {
-    Log_Error("This program must be run as root\n");
+    Log_Error("This program must be run as root");
     return NBFC_EXIT_FAILURE;
   }
 
@@ -383,11 +390,11 @@ int main(int argc, char* const argv[]) {
   signal(SIGTERM, Handle_Signal);
 
   if (ec == NULL) {
-    Error* e = EC_FindWorking(&ec);
+    Error e = EC_FindWorking(&ec);
     e_die();
   }
 
-  Error* e = ec->Open();
+  Error e = ec->Open();
   e_die();
 
   switch (cmd) {
@@ -406,13 +413,13 @@ int main(int argc, char* const argv[]) {
 static int Read() {
   if (options.use_word) {
     uint16_t word;
-    Error* e = ec->ReadWord(options.register_, &word);
+    Error e = ec->ReadWord(options.register_, &word);
     e_die();
     printf("%d (0x%.2X)\n", word, word);
   }
   else {
     uint8_t byte;
-    Error* e = ec->ReadByte(options.register_, &byte);
+    Error e = ec->ReadByte(options.register_, &byte);
     e_die();
     printf("%d (0x%.2X)\n", byte, byte);
   }
@@ -422,15 +429,15 @@ static int Read() {
 
 static int Write() {
   if (options.use_word) {
-    Error* e = ec->WriteWord(options.register_, options.value);
+    Error e = ec->WriteWord(options.register_, options.value);
     e_die();
   }
   else {
     if (options.value > 255) {
-      Log_Error("write: Value too big: %d\n", options.value);
+      Log_Error("write: Value too big: %d", options.value);
       return NBFC_EXIT_CMDLINE;
     }
-    Error* e = ec->WriteByte(options.register_, options.value);
+    Error e = ec->WriteByte(options.register_, options.value);
     e_die();
   }
 
@@ -461,7 +468,7 @@ static int Load() {
   else {
     infile = fopen(options.file, "r");
     if (! infile) {
-      Log_Error("Error opening file: %s: %s\n", options.file, strerror(errno));
+      Log_Error("Error opening file: %s: %s", options.file, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -495,7 +502,7 @@ static int Monitor() {
   if (options.report) {
     FILE* fh = fopen(options.report, "w");
     if (! fh) {
-      Log_Error("%s: %s\n", options.report, strerror(errno));
+      Log_Error("%s: %s", options.report, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
     Register_WriteMonitorReport(regs, loops, fh);
@@ -524,7 +531,7 @@ static int Watch() {
 }
 
 static int AcpiCall() {
-  Error* e;
+  Error e;
   char cmd[1024];
 
   e = AcpiCall_Open();
@@ -546,12 +553,12 @@ static int AcpiCall() {
   );
 
   if (cmd_len == -1 || cmd_len >= (sizeof(cmd))) {
-    Log_Error("Method (including arguments) is too long\n");
+    Log_Error("Method (including arguments) is too long");
     return NBFC_EXIT_FAILURE;
   }
 
   uint64_t out;
-  e = AcpiCall_Call(cmd, cmd_len, &out);
+  e = AcpiCall_Call(cmd, 0, &out);
   e_die();
   printf("0x%lX\n", out);
 
@@ -644,7 +651,7 @@ static void Register_PrintMonitor(RegisterBuf* readings, int size) {
 
     printf(Console_Green "0x%.2X:", register_);
     uint8_t byte = readings[0][register_];
-    for (range(int, i, max(size - 24, 0), size)) {
+    for (range(int, i, MAX(size - 24, 0), size)) {
       const uint8_t diff = byte - readings[i][register_];
       byte = readings[i][register_];
       if (diff)
@@ -770,7 +777,7 @@ static void ShellRead(const struct Args* args) {
 
   if (word) {
     uint16_t value;
-    Error* e = ec->ReadWord(register_, &value);
+    Error e = ec->ReadWord(register_, &value);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
 
@@ -778,7 +785,7 @@ static void ShellRead(const struct Args* args) {
   }
   else {
     uint8_t value;
-    Error* e = ec->ReadByte(register_, &value);
+    Error e = ec->ReadByte(register_, &value);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
 
@@ -824,12 +831,12 @@ static void ShellWrite(const struct Args* args) {
     return (void) printf("ERR: Argument (VALUE): %s\n", err);
 
   if (word) {
-    Error* e = ec->WriteWord(register_, value);
+    Error e = ec->WriteWord(register_, value);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
   }
   else {
-    Error* e = ec->WriteByte(register_, value);
+    Error e = ec->WriteByte(register_, value);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
   }
@@ -841,7 +848,7 @@ static void ShellReadAll(struct Args* args) {
   uint8_t values[256];
 
   for (int register_ = 0; register_ <= 255; ++register_) {
-    Error* e = ec->ReadByte(register_, &values[register_]);
+    Error e = ec->ReadByte(register_, &values[register_]);
     if (e)
       return (void) printf("ERR: %s\n", err_print_all(e));
   }

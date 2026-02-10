@@ -2,311 +2,239 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-_ec_probe_prefix_compreply() {
-  local i=0 prefix="$1"
+_ec_probe__prefix_compreply() {
+  [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
+
+  local i prefix="$1"
   for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
     COMPREPLY[i]="$prefix${COMPREPLY[i]}"
   done
 }
 
-_ec_probe_parse_commandline() {
+_ec_probe__dequote_words() {
+  local word dequoted break_pos in_quotes
+
+  words_dequoted=()
+
+  for word in "${words[@]}"; do
+    _ec_probe__dequote "$word" dequoted break_pos in_quotes
+    words_dequoted+=("$dequoted")
+  done
+}
+
+_ec_probe__dequote() {
+  local in="$1" len=${#1} i=0 result='' ___break_pos=-1 ___in_quotes=0
+
+  for ((; i < len; ++i)); do
+    case "${in:i:1}" in
+      "'")
+        ___in_quotes=1
+        for ((++i; i < len; ++i)); do
+          [[ "${in:i:1}" == "'" ]] && { ___in_quotes=0; break; }
+          result+="${in:i:1}"
+        done;;
+      '"')
+        ___in_quotes=1
+        for ((++i; i < len; ++i)); do
+          [[ "${in:i:1}" == '"' ]] && { ___in_quotes=0; break; }
+
+          if [[ "${in:i:1}" == '\' ]]; then
+            result+="${in:$((++i)):1}"
+          else
+            result+="${in:i:1}"
+          fi
+        done;;
+      '\')
+        result+="${in:$((++i)):1}";;
+      [$COMP_WORDBREAKS])
+        result+="${in:i:1}"
+        ___break_pos=${#result};;
+      *)
+        result+="${in:i:1}";;
+    esac
+  done
+
+  local -n ___RESULT=$2
+  local -n ___BREAK_POS=$3
+  local -n ___IN_QUOTES=$4
+  ___RESULT="$result"
+  ___BREAK_POS=$___break_pos
+  ___IN_QUOTES=$___in_quotes
+}
+
+_ec_probe__parse_commandline() {
   POSITIONALS=()
   END_OF_OPTIONS=0
-  POSITIONAL_NUM=0
 
-  local cmd="${words[0]}" argi arg i char trailing_chars
+  local cmd="root" argi arg i char trailing_chars VAR ARGS
 
-  for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
-    arg="${words[argi]}"
+  __find_option() {
+    case "$1" in root:watch*)
+      case "$2" in
+        -i|--interval) VAR=OPT_interval; ARGS=1; return;;
+        -t|--timespan) VAR=OPT_timespan; ARGS=1; return;;
+      esac
+    esac
+    case "$1" in root:monitor*)
+      case "$2" in
+        -i|--interval) VAR=OPT_interval; ARGS=1; return;;
+        -t|--timespan) VAR=OPT_timespan; ARGS=1; return;;
+        -r|--report) VAR=OPT_report; ARGS=1; return;;
+        -c|--clearly) VAR=OPT_clearly; ARGS=0; return;;
+        -d|--decimal) VAR=OPT_decimal; ARGS=0; return;;
+      esac
+    esac
+    case "$1" in root:write*)
+      case "$2" in
+        -w|--word) VAR=OPT_word; ARGS=0; return;;
+      esac
+    esac
+    case "$1" in root:read*)
+      case "$2" in
+        -w|--word) VAR=OPT_word; ARGS=0; return;;
+      esac
+    esac
+    case "$1" in root:dump*)
+      case "$2" in
+        -c|--color) VAR=OPT_color; ARGS=0; return;;
+        -C|--no-color) VAR=OPT_no_color; ARGS=0; return;;
+      esac
+    esac
+    case "$1" in root*)
+      case "$2" in
+        -h|--help) VAR=OPT_help; ARGS=0; return;;
+        -e|--embedded-controller) VAR=OPT_embedded_controller; ARGS=1; return;;
+      esac
+    esac
+    return 1
+  }
+
+  __append_to_array() {
+    local -n arr=$1
+    arr+=("$2")
+  }
+
+  for ((argi=1; argi < cword; ++argi)); do
+    arg="${words_dequoted[argi]}"
 
     case "$arg" in
       --)
         END_OF_OPTIONS=1
-        for ((++argi; argi < ${#words[@]}; ++argi)); do
-          POSITIONALS[POSITIONAL_NUM++]="${words[argi]}"
-        done
-        break;;
-      -)
-        POSITIONALS[POSITIONAL_NUM++]="-";;
-      -*)
-        case "$cmd" in 'ec_probe watch')
-          case "$arg" in
-            --interval)
-              OPT_interval+=("${words[++argi]}")
-              continue;;
-            --interval=*)
-              OPT_interval+=("${arg#*=}")
-              continue;;
-            --timespan)
-              OPT_timespan+=("${words[++argi]}")
-              continue;;
-            --timespan=*)
-              OPT_timespan+=("${arg#*=}")
-              continue;;
-          esac
-        esac
+        POSITIONALS+=("${words_dequoted[@]:$((++argi))}")
+        return;;
+      --*=*)
+        if __find_option "$cmd" "${arg%%=*}"
+        then __append_to_array "$VAR" "${arg#*=}"
+        fi;;
+      --*)
+        if __find_option "$cmd" "$arg"; then
+          if [[ "$ARGS" == 1 ]]
+          then __append_to_array "$VAR" "${words_dequoted[++argi]}"
+          else __append_to_array "$VAR" "_OPT_ISSET_"
+          fi
+        fi;;
+      -?*) # ignore '-'
 
-        case "$cmd" in 'ec_probe monitor')
-          case "$arg" in
-            --interval)
-              OPT_interval+=("${words[++argi]}")
-              continue;;
-            --interval=*)
-              OPT_interval+=("${arg#*=}")
-              continue;;
-            --timespan)
-              OPT_timespan+=("${words[++argi]}")
-              continue;;
-            --timespan=*)
-              OPT_timespan+=("${arg#*=}")
-              continue;;
-            --report)
-              OPT_report+=("${words[++argi]}")
-              continue;;
-            --report=*)
-              OPT_report+=("${arg#*=}")
-              continue;;
-            --clearly)
-              OPT_clearly+=(_OPT_ISSET_)
-              continue;;
-            --decimal)
-              OPT_decimal+=(_OPT_ISSET_)
-              continue;;
-          esac
-        esac
-
-        case "$cmd" in 'ec_probe write')
-          case "$arg" in
-            --word)
-              OPT_word+=(_OPT_ISSET_)
-              continue;;
-          esac
-        esac
-
-        case "$cmd" in 'ec_probe read')
-          case "$arg" in
-            --word)
-              OPT_word+=(_OPT_ISSET_)
-              continue;;
-          esac
-        esac
-
-        case "$cmd" in 'ec_probe dump')
-          case "$arg" in
-            --color)
-              OPT_color+=(_OPT_ISSET_)
-              continue;;
-            --no-color)
-              OPT_no_color+=(_OPT_ISSET_)
-              continue;;
-          esac
-        esac
-
-        case "$cmd" in ec_probe)
-          case "$arg" in
-            --help)
-              OPT_help+=(_OPT_ISSET_)
-              continue;;
-            --embedded-controller)
-              OPT_embedded_controller+=("${words[++argi]}")
-              continue;;
-            --embedded-controller=*)
-              OPT_embedded_controller+=("${arg#*=}")
-              continue;;
-          esac
-        esac
         for ((i=1; i < ${#arg}; ++i)); do
           char="${arg:$i:1}"
           trailing_chars="${arg:$((i + 1))}"
-          case "$cmd" in 'ec_probe watch')
-            case "$char" in
-              i)
-                if [[ -n "$trailing_chars" ]]
-                then OPT_interval+=("$trailing_chars")
-                else OPT_interval+=("${words[++argi]}")
-                fi
-                continue 2;;
-              t)
-                if [[ -n "$trailing_chars" ]]
-                then OPT_timespan+=("$trailing_chars")
-                else OPT_timespan+=("${words[++argi]}")
-                fi
-                continue 2;;
-            esac
-          esac
 
-          case "$cmd" in 'ec_probe monitor')
-            case "$char" in
-              i)
-                if [[ -n "$trailing_chars" ]]
-                then OPT_interval+=("$trailing_chars")
-                else OPT_interval+=("${words[++argi]}")
-                fi
-                continue 2;;
-              t)
-                if [[ -n "$trailing_chars" ]]
-                then OPT_timespan+=("$trailing_chars")
-                else OPT_timespan+=("${words[++argi]}")
-                fi
-                continue 2;;
-              r)
-                if [[ -n "$trailing_chars" ]]
-                then OPT_report+=("$trailing_chars")
-                else OPT_report+=("${words[++argi]}")
-                fi
-                continue 2;;
-              c)
-                OPT_clearly+=(_OPT_ISSET_);;
-              d)
-                OPT_decimal+=(_OPT_ISSET_);;
-            esac
-          esac
-
-          case "$cmd" in 'ec_probe write')
-            case "$char" in
-              w)
-                OPT_word+=(_OPT_ISSET_);;
-            esac
-          esac
-
-          case "$cmd" in 'ec_probe read')
-            case "$char" in
-              w)
-                OPT_word+=(_OPT_ISSET_);;
-            esac
-          esac
-
-          case "$cmd" in 'ec_probe dump')
-            case "$char" in
-              c)
-                OPT_color+=(_OPT_ISSET_);;
-              C)
-                OPT_no_color+=(_OPT_ISSET_);;
-            esac
-          esac
-
-          case "$cmd" in ec_probe)
-            case "$char" in
-              h)
-                OPT_help+=(_OPT_ISSET_);;
-              e)
-                if [[ -n "$trailing_chars" ]]
-                then OPT_embedded_controller+=("$trailing_chars")
-                else OPT_embedded_controller+=("${words[++argi]}")
-                fi
-                continue 2;;
-            esac
-          esac
-        done;;
+          if __find_option "$cmd" "-$char"; then
+            if [[ "$ARGS" == 1 ]]; then
+              if [[ -n "$trailing_chars" ]]
+              then __append_to_array "$VAR" "$trailing_chars"
+              else __append_to_array "$VAR" "${words_dequoted[++argi]}"
+              fi
+              break;
+            else
+              __append_to_array "$VAR" "_OPT_ISSET_"
+            fi
+          fi
+        done
+        ;;
       *)
-        POSITIONALS[POSITIONAL_NUM++]="$arg"
-        if (( POSITIONAL_NUM == 1 )); then
-          case "$arg" in
-            dump)
-              cmd+=" dump";;
-            load)
-              cmd+=" load";;
-            read)
-              cmd+=" read";;
-            write)
-              cmd+=" write";;
-            monitor)
-              cmd+=" monitor";;
-            watch)
-              cmd+=" watch";;
-            acpi_call)
-              cmd+=" acpi_call";;
-            shell)
-              cmd+=" shell";;
-            *) cmd+=" $arg";;
-          esac
-        fi
+        POSITIONALS+=("$arg")
+        case "$cmd|${#POSITIONALS[@]}" in
+          'root|1') cmd+=":$arg";;
+        esac
         ;;
     esac
   done
 
-  for ((; argi < ${#words[@]}; ++argi)); do
-    arg="${words[$argi]}"
-
-    case "$arg" in
-      -) POSITIONALS[POSITIONAL_NUM++]="$arg";;
-      -*);;
-      *) POSITIONALS[POSITIONAL_NUM++]="$arg";;
+  for ((; argi <= cword; ++argi)); do
+    case "${words_dequoted[argi]}" in
+      -?*);;
+      *) POSITIONALS+=("${words_dequoted[argi]}");;
     esac
   done
 }
 
 _ec_probe() {
-  local cur prev words cword split
-  _init_completion -n = || return
+  local cur prev words cword split words_dequoted
+  _init_completion -n =: || return
+  _ec_probe__dequote_words
 
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_help OPT_embedded_controller
+  local END_OF_OPTIONS POSITIONALS
+  local -a OPT_help OPT_embedded_controller OPT_color OPT_no_color OPT_word
+  local -a OPT_interval OPT_timespan OPT_report OPT_clearly OPT_decimal
+  _ec_probe__parse_commandline
 
-  _ec_probe_parse_commandline
-
-  local COMP_WORDBREAKS=''
-
-  if (( 0 < POSITIONAL_NUM )); then
+  if (( 0 < ${#POSITIONALS[@]} )); then
     case "${POSITIONALS[0]}" in
-      dump) _ec_probe_dump && return 0 || return 1;;
-      load) _ec_probe_load && return 0 || return 1;;
-      read) _ec_probe_read && return 0 || return 1;;
-      write) _ec_probe_write && return 0 || return 1;;
-      monitor) _ec_probe_monitor && return 0 || return 1;;
-      watch) _ec_probe_watch && return 0 || return 1;;
-      acpi_call) _ec_probe_acpi_call && return 0 || return 1;;
-      shell) _ec_probe_shell && return 0 || return 1;;
+      dump) _ec_probe_dump && return 0;;
+      load) _ec_probe_load && return 0;;
+      read) _ec_probe_read && return 0;;
+      write) _ec_probe_write && return 0;;
+      monitor) _ec_probe_monitor && return 0;;
+      watch) _ec_probe_watch && return 0;;
+      acpi_call);;
+      shell);;
     esac
   fi
 
   __complete_option() {
-    local opt="$1" cur="$2" mode="$3"
+    local opt="$1" cur="$2" ret=0
 
     case "$opt" in
-      --embedded-controller|-e)
-        COMPREPLY=($(compgen -W 'acpi_ec ec_sys dev_port' -- "$cur"))
-        return 0;;
+      -e|--embedded-controller)
+        COMPREPLY=($(compgen -W 'acpi_ec ec_sys dev_port' -- "$cur"));;
+      *) ret=1;;
     esac
 
-    return 1
+    return $ret
   }
 
   case "$prev" in
-    --*)
-      __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0;;
-    -*)
-      case "$prev" in -*([h])[e])
-        __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONALS && return 0
-      esac;;
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([h])[e])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
   case "$cur" in
     --*=*)
-      __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0;;
-    -*=*);;
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*)
-        local i
-        for ((i=2; i <= ${#cur}; ++i)); do
-          local pre="${cur:0:$i}" value="${cur:$i}"
-          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {
-            _ec_probe_prefix_compreply "$pre"
-            return 0
-          }
-        done;;
+    -*([h])[e]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _ec_probe__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
   esac
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
-    local -a opts=()
-    (( ! ${#OPT_help} )) && opts+=(-h --help)
-    (( ! ${#OPT_embedded_controller} )) && opts+=(-e --embedded-controller=)
-    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    local -a opts
+    (( ! ${#OPT_help[@]} )) && opts+=(-h --help)
+    (( ! ${#OPT_embedded_controller[@]} )) && opts+=(-e --embedded-controller=)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
-  test "$POSITIONAL_NUM" -eq 1 && {
+  (( ${#POSITIONALS[@]} == 1 )) && {
     COMPREPLY=($(compgen -W 'dump load read write monitor watch acpi_call shell' -- "$cur"))
     return 0;
   }
@@ -315,18 +243,11 @@ _ec_probe() {
 }
 
 _ec_probe_dump() {
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_color OPT_no_color OPT_help OPT_embedded_controller
-
-  _ec_probe_parse_commandline
-
-  local COMP_WORDBREAKS=''
-
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
-    local -a opts=()
-    (( ! ${#OPT_color} )) && opts+=(-c --color)
-    (( ! ${#OPT_no_color} )) && opts+=(-C --no-color)
-    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    local -a opts
+    (( ! ${#OPT_color[@]} )) && opts+=(-c --color)
+    (( ! ${#OPT_no_color[@]} )) && opts+=(-C --no-color)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
@@ -335,14 +256,7 @@ _ec_probe_dump() {
 }
 
 _ec_probe_load() {
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_help OPT_embedded_controller
-
-  _ec_probe_parse_commandline
-
-  local COMP_WORDBREAKS=''
-
-  test "$POSITIONAL_NUM" -eq 2 && {
+  (( ${#POSITIONALS[@]} == 2 )) && {
     _filedir
     return 0;
   }
@@ -351,22 +265,15 @@ _ec_probe_load() {
 }
 
 _ec_probe_read() {
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_word OPT_help OPT_embedded_controller
-
-  _ec_probe_parse_commandline
-
-  local COMP_WORDBREAKS=''
-
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
-    local -a opts=()
-    (( ! ${#OPT_word} )) && opts+=(-w --word)
-    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    local -a opts
+    (( ! ${#OPT_word[@]} )) && opts+=(-w --word)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
-  test "$POSITIONAL_NUM" -eq 2 && {
+  (( ${#POSITIONALS[@]} == 2 )) && {
     COMPREPLY=($(compgen -W '{0..255}' -- "$cur"))
     return 0;
   }
@@ -375,27 +282,20 @@ _ec_probe_read() {
 }
 
 _ec_probe_write() {
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_word OPT_help OPT_embedded_controller
-
-  _ec_probe_parse_commandline
-
-  local COMP_WORDBREAKS=''
-
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
-    local -a opts=()
-    (( ! ${#OPT_word} )) && opts+=(-w --word)
-    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    local -a opts
+    (( ! ${#OPT_word[@]} )) && opts+=(-w --word)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
-  test "$POSITIONAL_NUM" -eq 2 && {
+  (( ${#POSITIONALS[@]} == 2 )) && {
     COMPREPLY=($(compgen -W '{0..255}' -- "$cur"))
     return 0;
   }
 
-  test "$POSITIONAL_NUM" -eq 3 && {
+  (( ${#POSITIONALS[@]} == 3 )) && {
     return 0;
   }
 
@@ -403,60 +303,48 @@ _ec_probe_write() {
 }
 
 _ec_probe_monitor() {
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_interval OPT_timespan OPT_report OPT_clearly OPT_decimal OPT_help OPT_embedded_controller
-
-  _ec_probe_parse_commandline
-
-  local COMP_WORDBREAKS=''
-
   __complete_option() {
-    local opt="$1" cur="$2" mode="$3"
+    local opt="$1" cur="$2" ret=0
 
     case "$opt" in
-      --interval|-i|--timespan|-t)
-        return 0;;
-      --report|-r)
-        _filedir
-        return 0;;
+      -i|--interval|-t|--timespan);;
+      -r|--report)
+        _filedir;;
+      *) ret=1;;
     esac
 
-    return 1
+    return $ret
   }
 
   case "$prev" in
-    --*)
-      __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0;;
-    -*)
-      case "$prev" in -*([cdh])[itre])
-        __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONALS && return 0
-      esac;;
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([cdh])[itre])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
   case "$cur" in
     --*=*)
-      __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0;;
-    -*=*);;
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*)
-        local i
-        for ((i=2; i <= ${#cur}; ++i)); do
-          local pre="${cur:0:$i}" value="${cur:$i}"
-          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {
-            _ec_probe_prefix_compreply "$pre"
-            return 0
-          }
-        done;;
+    -*([cdh])[itre]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _ec_probe__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
   esac
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
-    local -a opts=()
-    (( ! ${#OPT_interval} )) && opts+=(-i --interval=)
-    (( ! ${#OPT_timespan} )) && opts+=(-t --timespan=)
-    (( ! ${#OPT_report} )) && opts+=(-r --report=)
-    (( ! ${#OPT_clearly} )) && opts+=(-c --clearly)
-    (( ! ${#OPT_decimal} )) && opts+=(-d --decimal)
-    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    local -a opts
+    (( ! ${#OPT_interval[@]} )) && opts+=(-i --interval=)
+    (( ! ${#OPT_timespan[@]} )) && opts+=(-t --timespan=)
+    (( ! ${#OPT_report[@]} )) && opts+=(-r --report=)
+    (( ! ${#OPT_clearly[@]} )) && opts+=(-c --clearly)
+    (( ! ${#OPT_decimal[@]} )) && opts+=(-d --decimal)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
@@ -465,110 +353,48 @@ _ec_probe_monitor() {
 }
 
 _ec_probe_watch() {
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_interval OPT_timespan OPT_help OPT_embedded_controller
-
-  _ec_probe_parse_commandline
-
-  local COMP_WORDBREAKS=''
-
   __complete_option() {
-    local opt="$1" cur="$2" mode="$3"
+    local opt="$1" cur="$2" ret=0
 
     case "$opt" in
-      --interval|-i|--timespan|-t)
-        return 0;;
+      -i|--interval|-t|--timespan);;
+      *) ret=1;;
     esac
 
-    return 1
+    return $ret
   }
 
   case "$prev" in
-    --*)
-      __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0;;
-    -*)
-      case "$prev" in -*([h])[ite])
-        __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONALS && return 0
-      esac;;
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([h])[ite])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
   case "$cur" in
     --*=*)
-      __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0;;
-    -*=*);;
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*)
-        local i
-        for ((i=2; i <= ${#cur}; ++i)); do
-          local pre="${cur:0:$i}" value="${cur:$i}"
-          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {
-            _ec_probe_prefix_compreply "$pre"
-            return 0
-          }
-        done;;
+    -*([h])[ite]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _ec_probe__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
   esac
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
-    local -a opts=()
-    (( ! ${#OPT_interval} )) && opts+=(-i --interval=)
-    (( ! ${#OPT_timespan} )) && opts+=(-t --timespan=)
-    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+    local -a opts
+    (( ! ${#OPT_interval[@]} )) && opts+=(-i --interval=)
+    (( ! ${#OPT_timespan[@]} )) && opts+=(-t --timespan=)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
   return 1
-}
-
-_ec_probe_acpi_call() {
-  local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local -a OPT_help OPT_embedded_controller
-
-  _ec_probe_parse_commandline
-
-  local COMP_WORDBREAKS=''
-
-  test "$POSITIONAL_NUM" -eq 2 && {
-    return 0;
-  }
-
-  test "$POSITIONAL_NUM" -eq 3 && {
-    return 0;
-  }
-
-  test "$POSITIONAL_NUM" -eq 4 && {
-    return 0;
-  }
-
-  test "$POSITIONAL_NUM" -eq 5 && {
-    return 0;
-  }
-
-  test "$POSITIONAL_NUM" -eq 6 && {
-    return 0;
-  }
-
-  test "$POSITIONAL_NUM" -eq 7 && {
-    return 0;
-  }
-
-  test "$POSITIONAL_NUM" -eq 8 && {
-    return 0;
-  }
-
-  test "$POSITIONAL_NUM" -eq 9 && {
-    return 0;
-  }
-
-  test "$POSITIONAL_NUM" -eq 10 && {
-    return 0;
-  }
-
-  return 1
-}
-
-_ec_probe_shell() {
-  return 0
 }
 
 complete -F _ec_probe ec_probe

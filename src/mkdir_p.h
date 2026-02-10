@@ -1,5 +1,5 @@
-#ifndef MKDIR_P_H_
-#define MKDIR_P_H_
+#ifndef NBFC_MKDIR_P_H_
+#define NBFC_MKDIR_P_H_
 
 #include <sys/types.h> // mode_t
 

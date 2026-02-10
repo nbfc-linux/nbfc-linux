@@ -1,7 +1,5 @@
 #include "trace.h"
 
-#include "macros.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -14,8 +12,12 @@ void Trace_Push(Trace* trace, const char* fmt, ...) {
   trace->stack[trace->stack_size] = len;
 
   if (trace->stack_size) {
+    if (len + 3 > sizeof(trace->buf))
+      return;
+
     trace->buf[len++] = ':';
     trace->buf[len++] = ' ';
+    trace->buf[len] = '\0';
   }
 
   va_list args;
@@ -30,6 +32,6 @@ void Trace_Pop(Trace* trace) {
   if (! trace->stack_size)
     return;
 
-  const size_t previous_len = trace->stack[--trace->stack_size];
+  const unsigned int previous_len = trace->stack[--trace->stack_size];
   trace->buf[previous_len] = '\0';
 }
