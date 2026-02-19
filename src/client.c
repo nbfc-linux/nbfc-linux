@@ -33,7 +33,7 @@
 #include "nxjson_write.c"
 #include "service_config.c"
 #include "trace.c"
-#include "optparse/optparse.c"
+#include "cli99.c"
 #include "mkdir_p.c"
 #include "regex_utils.c"
 #include "acpi_analysis.c"
@@ -46,11 +46,11 @@
 #include "client/str_functions.c"
 #include "client/service_control.c"
 
-const cli99_option main_options[] = {
-  {"-h|--help",     Option_Help,       0},
-  {"-v|--version",  Option_Version,    0},
-  {"command",       Option_Command,    1 | cli99_required_option},
-  cli99_options_end()
+const struct cli99_Option main_options[] = {
+  {"-h|--help",     Option_Help,       cli99_NoArgument      },
+  {"-v|--version",  Option_Version,    cli99_NoArgument      },
+  {"command",       Option_Command,    cli99_NormalPositional},
+  cli99_Options_End()
 };
 
 // ============================================================================
@@ -119,7 +119,7 @@ static enum Command Command_FromString(const char* s) {
   return Command_End;
 }
 
-static const cli99_option *Options[] = {
+static const struct cli99_Option *Options[] = {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _options,
   NBFC_CLIENT_COMMANDS
 #undef o
@@ -146,8 +146,8 @@ int main(int argc, char *const argv[]) {
   int o;
   const char* err;
   enum Command cmd = Command_Help;
-  cli99 p;
-  cli99_Init(&p, argc, argv, main_options, cli99_options_python);
+  struct cli99 p;
+  cli99_Init(&p, main_options, argv, argc);
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
 
@@ -178,7 +178,8 @@ int main(int argc, char *const argv[]) {
         printf("%s", HelpTexts[Command_Help]);
         return NBFC_EXIT_SUCCESS;
       }
-      cli99_SetOptions(&p, Options[cmd], false);
+
+      p.options = Options[cmd];
       break;
 
     // ========================================================================
@@ -197,7 +198,7 @@ int main(int argc, char *const argv[]) {
       {
         const int fan = parse_number(p.optarg, 0, INT_MAX, &err);
         if (err) {
-          Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
+          Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
           return NBFC_EXIT_CMDLINE;
         }
 
@@ -211,7 +212,7 @@ int main(int argc, char *const argv[]) {
     case Option_Status_Watch:
       Status_Options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-w|--watch", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -228,14 +229,14 @@ int main(int argc, char *const argv[]) {
       }
 
       if (Sensors_Options.command == Sensors_Command_Set)
-        cli99_SetOptions(&p, sensors_set_options, false);
+        p.options = sensors_set_options;
 
       break;
 
     case Option_Sensors_Fan:
       Sensors_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -252,7 +253,7 @@ int main(int argc, char *const argv[]) {
     case Option_Sensors_Algorithm:
       Sensors_Options.algorithm = TemperatureAlgorithmType_FromString(p.optarg);
       if (Sensors_Options.algorithm == TemperatureAlgorithmType_Unset) {
-        Log_Error("%s: %s: %s", "-a|--algorithm", "Invalid value", p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, "Invalid value", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -304,20 +305,20 @@ int main(int argc, char *const argv[]) {
 
       Set_Options.speed = parse_double(p.optarg, 0, 100, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-s|--speed", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
 
     case Option_Set_Fan:
       if (Set_Options.fan != -1) {
-        Log_Error("Option -f|--fan may only be specified once");
+        Log_Error("Option %s may only be specified once", p.option->optstring);
         return NBFC_EXIT_CMDLINE;
       }
 
       Set_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -329,7 +330,7 @@ int main(int argc, char *const argv[]) {
     case Option_Update_Parallel:
       Update_Options.parallel = parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-p|--parallel", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -390,7 +391,7 @@ int main(int argc, char *const argv[]) {
       Rate_Config_Options.min_score_set = true;
       Rate_Config_Options.min_score = parse_double(p.optarg, 0, 10, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-m|--min-score", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -410,7 +411,7 @@ int main(int argc, char *const argv[]) {
     case Option_Acpi_Dump_Command:
       Acpi_Dump_Options.action = AcpiDump_CommandFromString(p.optarg);
       if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
-        Log_Error("%s: Invalid command", p.optarg);
+        Log_Error("Invalid command: %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -428,7 +429,7 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     default:
-      cli99_ExplainError(&p);
+      Log_Error("%s: %s", cli99_StrError(p.error), p.error_cause);
       return NBFC_EXIT_CMDLINE;
     }
   }

@@ -19,19 +19,19 @@
  * nbfc sensors set -f <FAN_INDEX> [-s sensor...] [-a algorithm]
  */
 
-const cli99_option sensors_options[] = {
-  cli99_include_options(&main_options),
-  {"sensors_command", Option_Sensors_Command,     1 | cli99_required_option},
-  cli99_options_end()
+const struct cli99_Option sensors_options[] = {
+  cli99_Options_Include(&main_options),
+  {"sensors_command", Option_Sensors_Command,   cli99_NormalPositional},
+  cli99_Options_End()
 };
 
-const cli99_option sensors_set_options[] = {
-  cli99_include_options(&sensors_options),
-  {"-f|--fan",        Option_Sensors_Fan,         1},
-  {"-s|--sensor",     Option_Sensors_Sensor,      1},
-  {"-a|--algorithm",  Option_Sensors_Algorithm,   1},
-  {"--force",         Option_Sensors_Force,       0},
-  cli99_options_end()
+const struct cli99_Option sensors_set_options[] = {
+  cli99_Options_Include(&sensors_options),
+  {"-f|--fan",        Option_Sensors_Fan,       cli99_RequiredArgument},
+  {"-s|--sensor",     Option_Sensors_Sensor,    cli99_RequiredArgument},
+  {"-a|--algorithm",  Option_Sensors_Algorithm, cli99_RequiredArgument},
+  {"--force",         Option_Sensors_Force,     cli99_NoArgument      },
+  cli99_Options_End()
 };
 
 enum Sensors_Command {

@@ -1,7 +1,7 @@
 #ifndef NBFC_CLIENT_GLOBAL_H_
 #define NBFC_CLIENT_GLOBAL_H_
 
-#include "../optparse/optparse.h"
+#include "../cli99.h"
 
 enum Option {
   Option_None = 0,
@@ -66,6 +66,6 @@ enum Option {
   Option_ShowVariable_Variable,
 };
 
-extern const cli99_option main_options[];
+extern const struct cli99_Option main_options[];
 
 #endif

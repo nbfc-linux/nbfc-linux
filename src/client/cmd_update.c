@@ -24,11 +24,11 @@
 #define UpdateAPIModelSupportURL \
   "https://raw.githubusercontent.com/nbfc-linux/configs/main/" UpdateConfigVersion "/model_support.json"
 
-const cli99_option update_options[] = {
-  cli99_include_options(&main_options),
-  {"-p|--parallel", Option_Update_Parallel, 1},
-  {"-q|--quiet",    Option_Update_Quiet,    0},
-  cli99_options_end()
+const struct cli99_Option update_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-p|--parallel", Option_Update_Parallel, cli99_RequiredArgument},
+  {"-q|--quiet",    Option_Update_Quiet,    cli99_NoArgument      },
+  cli99_Options_End()
 };
 
 struct {

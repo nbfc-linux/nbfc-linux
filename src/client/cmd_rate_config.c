@@ -16,16 +16,16 @@
 
 #define RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE 9.0
 
-const cli99_option rate_config_options[] = {
-  cli99_include_options(&main_options),
-  {"-d|--dsdt",      Option_Rate_Config_DSDT_File,   1},
-  {"-a|--all",       Option_Rate_Config_All,         0},
-  {"-H|--full-help", Option_Rate_Config_Full_Help,   0},
-  {"-j|--json",      Option_Rate_Config_Json,        0},
-  {"-m|--min-score", Option_Rate_Config_Min_Score,   1},
-  {"--print-rules",  Option_Rate_Config_Print_Rules, 0},
-  {"file",           Option_Rate_Config_File,        1},
-  cli99_options_end()
+const struct cli99_Option rate_config_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-d|--dsdt",      Option_Rate_Config_DSDT_File,   cli99_RequiredArgument},
+  {"-a|--all",       Option_Rate_Config_All,         cli99_NoArgument      },
+  {"-H|--full-help", Option_Rate_Config_Full_Help,   cli99_NoArgument      },
+  {"-j|--json",      Option_Rate_Config_Json,        cli99_NoArgument      },
+  {"-m|--min-score", Option_Rate_Config_Min_Score,   cli99_RequiredArgument},
+  {"--print-rules",  Option_Rate_Config_Print_Rules, cli99_NoArgument      },
+  {"file",           Option_Rate_Config_File,        cli99_NormalPositional},
+  cli99_Options_End()
 };
 
 struct {

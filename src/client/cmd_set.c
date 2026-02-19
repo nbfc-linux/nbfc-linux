@@ -8,12 +8,12 @@
 #include "../memory.h"
 #include "../nbfc.h"
 
-const cli99_option set_options[] = {
-  cli99_include_options(&main_options),
-  {"-a|--auto",  Option_Set_Auto,  0},
-  {"-s|--speed", Option_Set_Speed, 1},
-  {"-f|--fan",   Option_Set_Fan,   1},
-  cli99_options_end()
+const struct cli99_Option set_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-a|--auto",  Option_Set_Auto,  cli99_NoArgument      },
+  {"-s|--speed", Option_Set_Speed, cli99_RequiredArgument},
+  {"-f|--fan",   Option_Set_Fan,   cli99_RequiredArgument},
+  cli99_Options_End()
 };
 
 struct {

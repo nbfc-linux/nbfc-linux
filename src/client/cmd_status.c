@@ -8,13 +8,13 @@
 
 #define STATUS_CLEAR_SCREEN "\033c"
 
-const cli99_option status_options[] = {
-  cli99_include_options(&main_options),
-  {"-a|--all",     Option_Status_All,     0},
-  {"-s|--service", Option_Status_Service, 0},
-  {"-f|--fan",     Option_Status_Fan,     1},
-  {"-w|--watch",   Option_Status_Watch,   1},
-  cli99_options_end()
+const struct cli99_Option status_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-a|--all",     Option_Status_All,     cli99_NoArgument      },
+  {"-s|--service", Option_Status_Service, cli99_NoArgument      },
+  {"-f|--fan",     Option_Status_Fan,     cli99_RequiredArgument},
+  {"-w|--watch",   Option_Status_Watch,   cli99_RequiredArgument},
+  cli99_Options_End()
 };
 
 struct {

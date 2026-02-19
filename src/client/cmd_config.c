@@ -24,13 +24,13 @@ enum Config_Action {
   Config_Action_Recommend
 };
 
-const cli99_option config_options[] = {
-  cli99_include_options(&main_options),
-  {"-l|--list",      Option_Config_List,      0},
-  {"-r|--recommend", Option_Config_Recommend, 0},
-  {"-s|--set",       Option_Config_Set,       1},
-  {"-a|--apply",     Option_Config_Apply,     1},
-  cli99_options_end()
+const struct cli99_Option config_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-l|--list",      Option_Config_List,      cli99_NoArgument      },
+  {"-r|--recommend", Option_Config_Recommend, cli99_NoArgument      },
+  {"-s|--set",       Option_Config_Set,       cli99_RequiredArgument},
+  {"-a|--apply",     Option_Config_Apply,     cli99_RequiredArgument},
+  cli99_Options_End()
 };
 
 struct {
