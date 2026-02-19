@@ -5,6 +5,7 @@
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
+ "  --version             Show program's version number and exit\n"            \
  "  -e EC, --embedded-controller EC\n"                                         \
  "                        Specify embedded controller to use\n"                \
  "\n"                                                                          \
@@ -17,22 +18,25 @@
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
  "  acpi_call             Call an ACPI method\n"                               \
  "\n"                                                                          \
- "All input values are interpreted as decimal numbers by default. Hexadecimal values may be entered by prefixing them with \"0x\".\n"\
+ "All input values are interpreted as decimal numbers by default.\n"           \
+ "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
  ""
 
 #define EC_PROBE_DUMP_HELP_TEXT                                                \
- "Usage: %s dump [-h]\n"                                                       \
+ "Usage: %s dump [-h] [-cC]\n"                                                 \
  "\n"                                                                          \
- "Dump all EC registers\n"                                                     \
+ "Dump all EC registers.\n"                                                    \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help  Show this help message and exit\n"                             \
+ "  -h, --help      Show this help message and exit\n"                         \
+ "  -c, --color     Force colored output\n"                                    \
+ "  -C, --no-color  Disable colored output\n"                                  \
  ""
 
 #define EC_PROBE_LOAD_HELP_TEXT                                                \
  "Usage: %s load [-h] FILE\n"                                                  \
  "\n"                                                                          \
- "Load a dump and write it to the EC registers\n"                              \
+ "Load a dump and write it to the EC registers.\n"                             \
  "\n"                                                                          \
  "Positional arguments:\n"                                                     \
  "  FILE        Dump file\n"                                                   \
@@ -42,9 +46,9 @@
  ""
 
 #define EC_PROBE_READ_HELP_TEXT                                                \
- "Usage: %s read [-h] REGISTER\n"                                              \
+ "Usage: %s read [-h] [-w] REGISTER\n"                                         \
  "\n"                                                                          \
- "Read a byte from a EC register\n"                                            \
+ "Read a byte from a EC register.\n"                                           \
  "\n"                                                                          \
  "Positional arguments:\n"                                                     \
  "  REGISTER    Register source\n"                                             \
@@ -53,13 +57,14 @@
  "  -h, --help  Show this help message and exit\n"                             \
  "  -w, --word  Read two registers as one word\n"                              \
  "\n"                                                                          \
- "All input values are interpreted as decimal numbers by default. Hexadecimal values may be entered by prefixing them with \"0x\".\n"\
+ "All input values are interpreted as decimal numbers by default.\n"           \
+ "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
  ""
 
 #define EC_PROBE_WRITE_HELP_TEXT                                               \
- "Usage: %s write [-h] REGISTER VALUE\n"                                       \
+ "Usage: %s write [-h] [-w] REGISTER VALUE\n"                                  \
  "\n"                                                                          \
- "Write a byte to a EC register\n"                                             \
+ "Write a byte to a EC register.\n"                                            \
  "\n"                                                                          \
  "Positional arguments:\n"                                                     \
  "  REGISTER    Register destination\n"                                        \
@@ -69,19 +74,20 @@
  "  -h, --help  Show this help message and exit\n"                             \
  "  -w, --word  Write VALUE to two registers\n"                                \
  "\n"                                                                          \
- "All input values are interpreted as decimal numbers by default. Hexadecimal values may be entered by prefixing them with \"0x\".\n"\
+ "All input values are interpreted as decimal numbers by default.\n"           \
+ "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
  ""
 
 #define EC_PROBE_MONITOR_HELP_TEXT                                             \
- "Usage: %s monitor [-h] [-i seconds] [-t seconds] [-r FILE] [-c] [-d]\n"      \
+ "Usage: %s monitor [-h] [-i SECONDS] [-t SECONDS] [-r FILE] [-c] [-d]\n"      \
  "\n"                                                                          \
- "Monitor all EC registers for changes\n"                                      \
+ "Monitor all EC registers for changes.\n"                                     \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
- "  -i seconds, --interval SECONDS\n"                                          \
+ "  -i SECONDS, --interval SECONDS\n"                                          \
  "                        Sets the update interval in seconds\n"               \
- "  -t seconds, --timespan SECONDS\n"                                          \
+ "  -t SECONDS, --timespan SECONDS\n"                                          \
  "                        Sets how many seconds the program will run\n"        \
  "  -r FILE, --report FILE\n"                                                  \
  "                        Save all readings as a CSV file\n"                   \
@@ -90,15 +96,15 @@
  ""
 
 #define EC_PROBE_WATCH_HELP_TEXT                                               \
- "Usage: %s watch [-h] [-i seconds] [-t seconds]\n"                            \
+ "Usage: %s watch [-h] [-i SECONDS] [-t SECONDS]\n"                            \
  "\n"                                                                          \
- "Monitor all EC registers for changes (alternative version)\n"                \
+ "Monitor all EC registers for changes (alternative version).\n"               \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
- "  -i seconds, --interval SECONDS\n"                                          \
+ "  -i SECONDS, --interval SECONDS\n"                                          \
  "                        Sets the update interval in seconds\n"               \
- "  -t seconds, --timespan SECONDS\n"                                          \
+ "  -t SECONDS, --timespan SECONDS\n"                                          \
  "                        Sets how many seconds the program will run\n"        \
  ""
 
@@ -116,7 +122,7 @@
 #define EC_PROBE_SHELL_HELP_TEXT                                               \
  "Usage: %s shell [-h]\n"                                                      \
  "\n"                                                                          \
- "Read commands from STDIN\n"                                                  \
+ "Read commands from STDIN.\n"                                                 \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \

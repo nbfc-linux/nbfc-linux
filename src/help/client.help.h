@@ -28,7 +28,7 @@
 #define CLIENT_START_HELP_TEXT                                                 \
  "Usage: nbfc start [-h] [-r]\n"                                               \
  "\n"                                                                          \
- "Start the NBFC service\n"                                                    \
+ "Start the NBFC service.\n"                                                   \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -r, --read-only       Start in read-only mode\n"                           \
@@ -38,7 +38,7 @@
 #define CLIENT_RESTART_HELP_TEXT                                               \
  "Usage: nbfc restart [-h] [-r]\n"                                             \
  "\n"                                                                          \
- "Restart the NBFC service\n"                                                  \
+ "Restart the NBFC service.\n"                                                 \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -r, --read-only       Restart in read-only mode\n"                         \
@@ -48,20 +48,23 @@
 #define CLIENT_CONFIG_HELP_TEXT                                                \
  "Usage: nbfc config [-h] (-l | -s config | -a config | -r)\n"                 \
  "\n"                                                                          \
- "Set or list configurations for the NBFC service\n"                           \
+ "Set or list configurations for the NBFC service.\n"                          \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
- "  -l, --list            List all available configs (default)\n"              \
- "  -s config, --set config\n"                                                 \
+ "  -l, --list            List all available configs\n"                        \
+ "  -s CONFIG, --set CONFIG\n"                                                 \
  "                        Set a config\n"                                      \
- "  -a config, --apply config\n"                                               \
- "                        Set a config and enable fan control\n"               \
+ "  -a CONFIG, --apply CONFIG\n"                                               \
+ "                        Set a config and start the service\n"                \
  "  -r, --recommend       List configs which may work for your device\n"       \
+ "\n"                                                                          \
+ "If CONFIG is \"auto\", the service will attempt to automatically select\n"   \
+ "a matching configuration.\n"                                                 \
  ""
 
 #define CLIENT_RATE_CONFIG_HELP_TEXT                                           \
- "Usage: nbfc rate-config [-h|-H] [-d|--dsdt=FILE] [-a] [-j] <FILE>\n"         \
+ "Usage: nbfc rate-config [-h|-H] [-d|--dsdt=FILE] [-j] (-a | <FILE>)\n"       \
  "\n"                                                                          \
  "Rates a configuration by analyzing whether it appears safe to execute\n"     \
  "on the current system.\n"                                                    \
@@ -114,7 +117,7 @@
 #define CLIENT_SENSORS_HELP_TEXT                                               \
  "Usage: nbfc sensors (list | set | show) [OPTIONS...]\n"                      \
  "\n"                                                                          \
- "Configure fan sensors\n"                                                     \
+ "Configure fan sensors.\n"                                                    \
  "\n"                                                                          \
  "  list\n"                                                                    \
  "    List all available sensors and their temperature files.\n"               \
@@ -145,6 +148,7 @@
  "Usage: nbfc set [-h] (-a | -s PERCENT) [-f FAN INDEX]\n"                     \
  "\n"                                                                          \
  "Set the speed of fans.\n"                                                    \
+ "\n"                                                                          \
  "If -f|--fan is not given, apply speed to all available fans.\n"              \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
