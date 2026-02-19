@@ -328,7 +328,7 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Update_Parallel:
-      Update_Options.parallel = parse_number(p.optarg, 0, INT_MAX, &err);
+      Update_Options.parallel = parse_number(p.optarg, 1, INT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
