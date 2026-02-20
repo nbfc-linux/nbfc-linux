@@ -8,14 +8,22 @@ This program is used to control the NoteBook FanControl service.
 
 # SYNOPSIS
 
+## SERVICE CONTROL COMMANDS
+
 **nbfc** {**start** \| **stop** \| **restart** \| **status** \|
-**config** \| **set** \| **update** \| **help**} \[*OPTIONS*\]
+**config** \| **set** \| **sensors**} \[*OPTIONS*\]
+
+## MISCELLANEOUS COMMANDS
+
+**nbfc** {**update** \| **rate-config** \| **acpi-dump** \|
+**get-model-name** \| **support** \| **warranty** \| **help**}
+\[*OPTIONS*\]
 
 # OPTIONS
 
 **-h**, **\--help**
 
-> Show this help message and exit.
+> Show help message and exit.
 
 **\--version**
 
@@ -31,7 +39,7 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Start in read-only mode.
 
-**stop** \[*OPTIONS*\]
+**stop**
 
 > Stop the service.
 
@@ -69,7 +77,7 @@ This program is used to control the NoteBook FanControl service.
 >
 > **-l**, **\--list**
 >
-> > List all available configs (default).
+> > List all available configs.
 >
 > **-r**, **\--recommend**
 >
@@ -81,7 +89,7 @@ This program is used to control the NoteBook FanControl service.
 >
 > **-a**, **\--apply** *CONFIG*
 >
-> > Set a config and enable fan control.
+> > Set a config and start the service.
 
 **set** \[*OPTIONS*\]
 
@@ -89,7 +97,7 @@ This program is used to control the NoteBook FanControl service.
 >
 > **-a**, **\--auto**
 >
-> > Set fan speed to \'auto\'.
+> > Set fan speed to profile-based control.
 >
 > **-s**, **\--speed** *PERCENT*
 >
@@ -100,17 +108,127 @@ This program is used to control the NoteBook FanControl service.
 > > Fan index (zero based). If not given, all available fans are set to
 > > speed.
 
+**sensors** {**list** \| **set** \| **show**} \[*OPTIONS*\]
+
+> Configure fan sensors.
+>
+> **list**
+>
+> > List all available sensors and their temperature files.
+>
+> **show**
+>
+> > Show all available fans and their sensor configuration.
+>
+> **set** \[*OPTIONS*\]
+>
+> > Configure which sensors are attached to a fan.
+> >
+> > **-f**, **\--fan** *FAN INDEX*
+> >
+> > > Specifies the fan to configure.
+> >
+> > **-s**, **\--sensor** *SENSOR*
+> >
+> > > Sensor to add. Can be specified multiple times.
+> >
+> > **-a**, **\--algorithm** *ALGORITHM*
+> >
+> > > Algorithm (**Average**, **Min**, **Max**)
+> >
+> > **\--force**
+> >
+> > > Force applying a sensor if it could not be found.
+
 **update** \[*OPTIONS*\]
 
-> Download new configuration files.
+> Download new configuration files from the internet.
 >
 > **-p**, **\--parallel** *NUM*
 >
-> > Set the number of parallel downloads.
+> > Set the number of parallel downloads (default: 10).
 >
 > **-q**, **\--quiet**
 >
 > > Set quiet mode.
+
+**rate-config** \[*OPTIONS*\]
+
+> Rates a configuration by analyzing whether it appears safe to execute
+> on the current system.
+>
+> **-H**, **\--full-help**
+>
+> > Show help on how to interpret the results.
+>
+> **-a**, **\--all**
+>
+> > Rate all available configuration files.
+>
+> **-d**, **\--dsdt** *FILE*
+>
+> > Use an alternative DSDT file.
+>
+> **-j**, **\--json**
+>
+> > Use JSON output.
+>
+> **-m**, **\--min-score** *SCORE*
+>
+> > Set minimum rating threshold for configurations.
+>
+> **\--print-rules**
+>
+> > Print configuration rating rules.
+
+**acpi-dump** {**registers** \| **ec-registers** \| **methods** \|
+**dsl**} \[*OPTIONS*\]
+
+> Dumps information of your ACPI DSDT.
+>
+> **registers**
+>
+> > List all available registers.
+>
+> **ec-registers**
+>
+> > List all available embedded controller registers.
+>
+> **methods**
+>
+> > List all available ACPI methods.
+>
+> **dsl**
+>
+> > Disassemble your DSDT.
+>
+> **-f**, **\--file** *FILE*
+>
+> > Use an alternative DSDT file.
+>
+> **-j**, **\--json**
+>
+> > Use JSON output.
+
+**support** \[*OPTIONS*\]
+
+> Show how to support the project.
+>
+> **\--upload-firmare**
+>
+> > Upload your notebook firmware without prompting.
+>
+> **\--print-command**
+>
+> > Print command for manual firmware upload.
+
+**get-model-name**
+
+> Print out the notebook\'s model name.
+
+**warranty**
+
+> Show warranty.
 
 **help**
 
@@ -118,7 +236,7 @@ This program is used to control the NoteBook FanControl service.
 
 # FILES
 
-*/etc/nbfc.json*
+*/etc/nbfc/nbfc.json*
 
 > The main configuration file for nbfc_service. See
 > **nbfc_service.json**(5) for further details.
@@ -156,9 +274,21 @@ This program is used to control the NoteBook FanControl service.
 
 > State file of nbfc_service. This holds the current fan speeds.
 
+# EXIT STATUS
+
+> 0.  Everything fine
+>
+> 1.  Generic error
+>
+> 2.  Command-line error
+>
+> 3.  Initialization error
+>
+> 4.  Fatal error (memory allocation failure)
+
 # BUGS
 
-Report bugs to https://github.com/nbfc-/nbfc-linux
+Report bugs to https://github.com/nbfc-linux/nbfc-linux
 
 # AUTHOR
 

@@ -9,7 +9,7 @@ nbfc_service.json - Notebook FanControl service configuration
 
 ## ServiceConfig
 
-Main configuration file of nbfc_service (*/etc/nbfc.json*)
+Main configuration file of nbfc_service (*/etc/nbfc/nbfc.json*).
 
 **SelectedConfigId**: *String*
 
@@ -18,20 +18,44 @@ Main configuration file of nbfc_service (*/etc/nbfc.json*)
 
 **EmbeddedControllerType**: *String*
 
-> > -   **ec_sys**: Use the ec_sys kernel module for writing to the
-> >     embedded controller.
+> Selects the implementation used to access the embedded controller.
+>
+> > -   **ec_sys**: Use the ec_sys kernel module.
 > >
-> > -   **acpi_ec**: Use the acpi_ec kernel module for writing to the
-> >     embedded controller.
+> > -   **acpi_ec**: Use the acpi_ec kernel module.
 > >
-> > -   **dev_port**: Write to the embedded controller using /dev/port.
+> > -   **dev_port**: Access the embedded controller via /dev/port.
 > >
-> > -   **dummy**: Don\'t write to the embedded controller at all.
+> > -   **dummy**: Do not access the embedded controller at all.
 >
 > If not given, the embedded controller type will be automatically
 > selected.
 
-**TargetFanSpeeds**: *Array of Floats*
+**FanTemperatureSources**: *Array of FanTemperatureSourceConfig*
+
+> Used for configuring which sensors are attached to a fan.
+
+## FanTemperatureSourceConfig
+
+Configures which sensors are attached to a fan.
+
+**FanIndex**: *Integer \>= 0 && \<= 255*
+
+> Specify which fan should be configured.
+
+**TemperatureAlgorithmType**: *String*
+
+> See **FanConfiguration**-\>**TemperatureAlgorithmType**.
+
+**Sensors**: *Array of String*
+
+> See **FanConfiguration**-\>**Sensors**.
+
+## ServiceState
+
+State file of the service (*/var/run/nbfc/state.json*).
+
+**TargetFanSpeeds**: *Array of Float*
 
 > This holds the fixed speed of the fans. A value of **-1** means the
 > fan should be left in auto mode.
@@ -66,14 +90,14 @@ Main configuration file of nbfc_service (*/etc/nbfc.json*)
 
 **CriticalTemperatureOffset**: *Integer* \> 0
 
-> See **CriticalTemperature**
+> See **CriticalTemperature**.
 
 **ReadWriteWords**: *Boolean*
 
 > If **true**, NBFC will combine two 8 bit registers to one 16-bit
 > register when reading from or writing to the EC registers.
 
-**FanConfigurations**: *Array of FanConfigurations*
+**FanConfigurations**: *Array of FanConfiguration*
 
 > Array of at least one FanConfiguration
 
@@ -83,7 +107,7 @@ Main configuration file of nbfc_service (*/etc/nbfc.json*)
 
 ## FanConfiguration
 
-Defines how NBFC controls a fan
+Defines how NBFC controls a fan.
 
 **FanDisplayName**: *String*
 
@@ -188,13 +212,13 @@ Defines how NBFC controls a fan
 > -   **Max**: Selects the highest temperature among all specified
 >     sensors
 
-**TemperatureThresholds**: *Array of TemperatureThresholds*
+**TemperatureThresholds**: *Array of TemperatureThreshold*
 
 **FanSpeedPercentageOverrides**: *Array of FanSpeedPercentageOverride*
 
 ## RegisterWriteConfiguration
 
-Allows to write to any EC register
+Allows to write to any EC register.
 
 **WriteMode**: *String*
 
@@ -296,12 +320,12 @@ Defines how fast the fan runs at different temperatures.
 **UpThreshold**: *Integer*
 
 > NBFC will select the next upper threshold as soon as the temperature
-> exceeds *UpThreshold*(in celsius).
+> exceeds *UpThreshold* (in celsius).
 
 **DownThreshold**: *Integer*
 
 > NBFC will select the next lower threshold as soon as the temperature
-> falls below the *DownThreshold*(in celsius).
+> falls below the *DownThreshold* (in celsius).
 
 **FanSpeed**: *Float* \>= 0.0 && *Float* \<= 100.0
 
@@ -309,7 +333,7 @@ Defines how fast the fan runs at different temperatures.
 
 # FILES
 
-*/etc/nbfc.json*
+*/etc/nbfc/nbfc.json*
 
 > The main configuration file for nbfc_service.
 

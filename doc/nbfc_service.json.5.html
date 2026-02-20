@@ -4,7 +4,8 @@
 <p><strong>NOTE</strong>: Comments can be added in any JSON object by
 using the <strong>Comment</strong> field.</p>
 <h2>ServiceConfig</h2>
-<p>Main configuration file of nbfc_service (<em>/etc/nbfc.json</em>)</p>
+<p>Main configuration file of nbfc_service
+(<em>/etc/nbfc/nbfc.json</em>).</p>
 <p><strong>SelectedConfigId</strong>: <em>String</em></p>
 <blockquote>
 <p>The selected config model. This equals the basename of a notebook
@@ -12,22 +13,46 @@ model configuration file. Absolute file paths can also be specified.</p>
 </blockquote>
 <p><strong>EmbeddedControllerType</strong>: <em>String</em></p>
 <blockquote>
+<p>Selects the implementation used to access the embedded
+controller.</p>
 <blockquote>
 <ul>
-<li><p><strong>ec_sys</strong>: Use the ec_sys kernel module for writing
-to the embedded controller.</p></li>
-<li><p><strong>acpi_ec</strong>: Use the acpi_ec kernel module for
-writing to the embedded controller.</p></li>
-<li><p><strong>dev_port</strong>: Write to the embedded controller using
+<li><p><strong>ec_sys</strong>: Use the ec_sys kernel module.</p></li>
+<li><p><strong>acpi_ec</strong>: Use the acpi_ec kernel module.</p></li>
+<li><p><strong>dev_port</strong>: Access the embedded controller via
 /dev/port.</p></li>
-<li><p><strong>dummy</strong>: Don't write to the embedded controller at
+<li><p><strong>dummy</strong>: Do not access the embedded controller at
 all.</p></li>
 </ul>
 </blockquote>
 <p>If not given, the embedded controller type will be automatically
 selected.</p>
 </blockquote>
-<p><strong>TargetFanSpeeds</strong>: <em>Array of Floats</em></p>
+<p><strong>FanTemperatureSources</strong>: <em>Array of
+FanTemperatureSourceConfig</em></p>
+<blockquote>
+<p>Used for configuring which sensors are attached to a fan.</p>
+</blockquote>
+<h2>FanTemperatureSourceConfig</h2>
+<p>Configures which sensors are attached to a fan.</p>
+<p><strong>FanIndex</strong>: <em>Integer &gt;= 0 &amp;&amp; &lt;=
+255</em></p>
+<blockquote>
+<p>Specify which fan should be configured.</p>
+</blockquote>
+<p><strong>TemperatureAlgorithmType</strong>: <em>String</em></p>
+<blockquote>
+<p>See
+<strong>FanConfiguration</strong>-&gt;<strong>TemperatureAlgorithmType</strong>.</p>
+</blockquote>
+<p><strong>Sensors</strong>: <em>Array of String</em></p>
+<blockquote>
+<p>See
+<strong>FanConfiguration</strong>-&gt;<strong>Sensors</strong>.</p>
+</blockquote>
+<h2>ServiceState</h2>
+<p>State file of the service (<em>/var/run/nbfc/state.json</em>).</p>
+<p><strong>TargetFanSpeeds</strong>: <em>Array of Float</em></p>
 <blockquote>
 <p>This holds the fixed speed of the fans. A value of
 <strong>-1</strong> means the fan should be left in auto mode.</p>
@@ -65,7 +90,7 @@ temperature drops below
 <p><strong>CriticalTemperatureOffset</strong>: <em>Integer</em> &gt;
 0</p>
 <blockquote>
-<p>See <strong>CriticalTemperature</strong></p>
+<p>See <strong>CriticalTemperature</strong>.</p>
 </blockquote>
 <p><strong>ReadWriteWords</strong>: <em>Boolean</em></p>
 <blockquote>
@@ -74,7 +99,7 @@ one 16-bit register when reading from or writing to the EC
 registers.</p>
 </blockquote>
 <p><strong>FanConfigurations</strong>: <em>Array of
-FanConfigurations</em></p>
+FanConfiguration</em></p>
 <blockquote>
 <p>Array of at least one FanConfiguration</p>
 </blockquote>
@@ -84,7 +109,7 @@ RegisterWriteConfiguration</em></p>
 <p>Array of RegisterWriteConfiguration</p>
 </blockquote>
 <h2>FanConfiguration</h2>
-<p>Defines how NBFC controls a fan</p>
+<p>Defines how NBFC controls a fan.</p>
 <p><strong>FanDisplayName</strong>: <em>String</em></p>
 <blockquote>
 <p>Fan display name</p>
@@ -194,11 +219,11 @@ specified sensors</p></li>
 </ul>
 </blockquote>
 <p><strong>TemperatureThresholds</strong>: <em>Array of
-TemperatureThresholds</em></p>
+TemperatureThreshold</em></p>
 <p><strong>FanSpeedPercentageOverrides</strong>: <em>Array of
 FanSpeedPercentageOverride</em></p>
 <h2>RegisterWriteConfiguration</h2>
-<p>Allows to write to any EC register</p>
+<p>Allows to write to any EC register.</p>
 <p><strong>WriteMode</strong>: <em>String</em></p>
 <blockquote>
 <p>Defines how the value will be written:</p>
@@ -298,12 +323,12 @@ operations.</p></li>
 <p><strong>UpThreshold</strong>: <em>Integer</em></p>
 <blockquote>
 <p>NBFC will select the next upper threshold as soon as the temperature
-exceeds <em>UpThreshold</em>(in celsius).</p>
+exceeds <em>UpThreshold</em> (in celsius).</p>
 </blockquote>
 <p><strong>DownThreshold</strong>: <em>Integer</em></p>
 <blockquote>
 <p>NBFC will select the next lower threshold as soon as the temperature
-falls below the <em>DownThreshold</em>(in celsius).</p>
+falls below the <em>DownThreshold</em> (in celsius).</p>
 </blockquote>
 <p><strong>FanSpeed</strong>: <em>Float</em> &gt;= 0.0 &amp;&amp;
 <em>Float</em> &lt;= 100.0</p>
@@ -311,7 +336,7 @@ falls below the <em>DownThreshold</em>(in celsius).</p>
 <p>The fan speed in percent.</p>
 </blockquote>
 <h1>FILES</h1>
-<p><em>/etc/nbfc.json</em></p>
+<p><em>/etc/nbfc/nbfc.json</em></p>
 <blockquote>
 <p>The main configuration file for nbfc_service.</p>
 </blockquote>

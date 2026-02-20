@@ -1,5 +1,5 @@
 .nh
-.TH "NBFC" "1" "MAY 2025" "Notebook FanControl @VERSION@"
+.TH "NBFC" "1" "FEBRUARY 2026" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 nbfc \- Notebook FanControl client
@@ -10,15 +10,20 @@ This program is used to control the NoteBook FanControl service.
 
 .SH SYNOPSIS
 .PP
+.SS SERVICE CONTROL COMMANDS
 .B nbfc
-.RB { start " | " stop " | " restart " | " status " | " config " | "  set " | "  update " | " help }
+.RB { start " | " stop " | " restart " | " status " | " config " | " set " | " sensors }
+.RI [ OPTIONS ]
+.SS MISCELLANEOUS COMMANDS
+.B nbfc
+.RB { update " | " rate\-config " | " acpi\-dump " | " get\-model\-name " | " support " | " warranty " | " help }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
 .PP
 .BR \-h ", " \-\-help
 .RS
-Show this help message and exit.
+Show help message and exit.
 .RE
 
 .PP
@@ -42,7 +47,6 @@ Start in read\-only mode.
 .RE
 
 .B stop
-.RI [ OPTIONS ]
 .RS
 Stop the service.
 .RE
@@ -93,7 +97,7 @@ List or apply configs.
 
 .BR \-l ", " \-\-list
 .RS
-List all available configs (default).
+List all available configs.
 .RE
 
 .BR \-r ", " \-\-recommend
@@ -110,7 +114,7 @@ Set a config.
 .BR \-a ", " \-\-apply
 .I CONFIG
 .RS
-Set a config and enable fan control.
+Set a config and start the service.
 .RE
 .RE
 
@@ -121,7 +125,7 @@ Control fan speed.
 
 .BR \-a ", " \-\-auto
 .RS
-Set fan speed to 'auto'.
+Set fan speed to profile-based control.
 .RE
 
 .BR \-s ", " \-\-speed
@@ -137,21 +141,171 @@ Fan index (zero based). If not given, all available fans are set to speed.
 .RE
 .RE
 
+.B sensors
+.RB { list " | " set " | " show }
+.RI [ OPTIONS ]
+.RS
+Configure fan sensors.
+
+.B list
+.RS
+List all available sensors and their temperature files.
+.RE
+
+.B show
+.RS
+Show all available fans and their sensor configuration.
+.RE
+
+.B set
+.RI [ OPTIONS ]
+.RS
+Configure which sensors are attached to a fan.
+
+.BR \-f ", " \-\-fan
+.I FAN INDEX
+.RS
+Specifies the fan to configure.
+.RE
+
+.BR \-s ", " \-\-sensor
+.I SENSOR
+.RS
+Sensor to add. Can be specified multiple times.
+.RE
+
+.BR \-a ", " \-\-algorithm
+.I ALGORITHM
+.RS
+Algorithm
+.RB ( Average ", " Min ", " Max )
+.RE
+
+.B \-\-force
+.RS
+Force applying a sensor if it could not be found.
+.RE
+.RE
+.RE
+
 .B update
 .RI [ OPTIONS ]
 .RS
-Download new configuration files.
+Download new configuration files from the internet.
 
 .BR \-p ", " \-\-parallel
 .I NUM
 .RS
-Set the number of parallel downloads.
+Set the number of parallel downloads (default: 10).
 .RE
 
 .BR \-q ", " \-\-quiet
 .RS
 Set quiet mode.
 .RE
+.RE
+
+.B rate-config
+.RI [ OPTIONS ]
+.RS
+Rates a configuration by analyzing whether it appears safe to execute on the
+current system.
+
+.BR \-H ", " \-\-full\-help
+.RS
+Show help on how to interpret the results.
+.RE
+
+.BR \-a ", " \-\-all
+.RS
+Rate all available configuration files.
+.RE
+
+.BR \-d ", " \-\-dsdt
+.I FILE
+.RS
+Use an alternative DSDT file.
+.RE
+
+.BR \-j ", " \-\-json
+.RS
+Use JSON output.
+.RE
+
+.BR \-m ", " \-\-min-score
+.I SCORE
+.RS
+Set minimum rating threshold for configurations.
+.RE
+
+.B \-\-print\-rules
+.RS
+Print configuration rating rules.
+.RE
+.RE
+
+.B acpi\-dump
+.RB { registers " | " ec\-registers " | " methods " | " dsl }
+.RI [ OPTIONS ]
+.RS
+Dumps information of your ACPI DSDT.
+
+.B registers
+.RS
+List all available registers.
+.RE
+
+.B ec\-registers
+.RS
+List all available embedded controller registers.
+.RE
+
+.B methods
+.RS
+List all available ACPI methods.
+.RE
+
+.B dsl
+.RS
+Disassemble your DSDT.
+.RE
+
+.BR \-f ", " \-\-file
+.I FILE
+.RS
+Use an alternative DSDT file.
+.RE
+
+.BR \-j ", " \-\-json
+.RS
+Use JSON output.
+.RE
+.RE
+
+.B support
+.RI [ OPTIONS ]
+.RS
+Show how to support the project.
+
+.B \-\-upload\-firmare
+.RS
+Upload your notebook firmware without prompting.
+.RE
+
+.B \-\-print\-command
+.RS
+Print command for manual firmware upload.
+.RE
+.RE
+
+.B get\-model\-name
+.RS
+Print out the notebook's model name.
+.RE
+
+.B warranty
+.RS
+Show warranty.
 .RE
 
 .B help
@@ -162,7 +316,7 @@ Show help.
 .SH FILES
 .PP
 
-.I @SYSCONFDIR@/nbfc.json
+.I @SYSCONFDIR@/nbfc/nbfc.json
 .RS
 The main configuration file for nbfc_service. See
 .BR nbfc_service.json (5)
@@ -211,9 +365,23 @@ are taken into account.
 State file of nbfc_service. This holds the current fan speeds.
 .RE
 
+.SH EXIT STATUS
+.RS
+.IP 0
+Everything fine
+.IP 1
+Generic error
+.IP 2
+Command-line error
+.IP 3
+Initialization error
+.IP 5
+Fatal error (memory allocation failure)
+.RE
+
 .SH BUGS
 .PP
-Report bugs to https://github.com/nbfc\-/nbfc\-linux
+Report bugs to https://github.com/nbfc\-linux/nbfc\-linux
 
 .SH AUTHOR
 .PP

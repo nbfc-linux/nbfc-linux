@@ -1,5 +1,5 @@
 .nh
-.TH "NBFC-SERVICE" "1" "MAY 2025" "Notebook FanControl @VERSION@"
+.TH "NBFC-SERVICE" "1" "FEBRUARY 2026" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 nbfc_service \- Notebook FanControl service
@@ -17,7 +17,7 @@ NoteBook FanControl service
 .PP
 .BR \-h ", " \-\-help
 .RS
-Show this help message and exit.
+Show help message and exit.
 .RE
 
 .PP
@@ -48,32 +48,30 @@ Enable tracing of reads and writes of the embedded controller.
 .BR \-c ", " \-\-config\-file
 .I CONFIG
 .RS
-Use alternative config file (default @SYSCONFDIR@/nbfc/nbfc.json).
+Use an alternative config file (default @SYSCONFDIR@/nbfc/nbfc.json).
 .RE
 
 .PP
-.B \-e, \-\-embedded\-controller
-.RI [ dummy ", " dev_port ", " ec_sys ", " acpi_ec ]
+.BR \-e ", " \-\-embedded\-controller
+.RI { ec_sys ", " acpi_ec ", " dev_port ", " dummy }
 .RS
-Specify embedded controller to use.
+Select the implementation used to access the embedded controller.
 .IP \(bu 2
 .BR ec_sys :
-Use the ec_sys kernel module for writing to the embedded controller.
+Use the ec_sys kernel module.
 .IP \(bu 2
 .BR acpi_ec :
-Use the acpi_ec kernel module for writing to the embedded controller.
+Use the acpi_ec kernel module.
 .IP \(bu 2
 .BR dev_port :
-Write to the embedded controller using /dev/port.
+Access the embedded controller via /dev/port.
 .IP \(bu 2
 .BR dummy :
-Don't write to the embedded controller at all.
-
-.RI
+Do not access the embedded controller at all.
 
 .SH FILES
 .PP
-.I @SYSCONFDIR@/nbfc.json
+.I @SYSCONFDIR@/nbfc/nbfc.json
 .RS
 The main configuration file for nbfc_service. See
 .BR nbfc_service.json (5)
@@ -127,17 +125,16 @@ State file of nbfc_service. This holds the current fan speeds.
 
 .SH EXIT STATUS
 .RS
-.IP \(bu 2
-0    Everything fine
-.IP \(bu 2
-1    Generic error
-.IP \(bu 2
-2    Command line error
-.IP \(bu 2
-3    Initialization error
-.IP \(bu 2
-5    Fatal error
-
+.IP 0
+Everything fine
+.IP 1
+Generic error
+.IP 2
+Command-line error
+.IP 3
+Initialization error
+.IP 5
+Fatal error (memory allocation failure)
 .RE
 
 .SH BUGS

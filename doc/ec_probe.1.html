@@ -11,29 +11,27 @@
 <h1>OPTIONS</h1>
 <p><strong>-h</strong>, <strong>--help</strong></p>
 <blockquote>
-<p>Show the help message and exit</p>
+<p>Show help message and exit.</p>
 </blockquote>
 <p><strong>--version</strong></p>
 <blockquote>
-<p>Show program's version number and exit</p>
+<p>Show program's version number and exit.</p>
 </blockquote>
 <p><strong>-e</strong>,
-<strong>--embedded-controller</strong>=[<strong>dev_port</strong>,<strong>ec_sys</strong>,<strong>acpi_ec</strong>]</p>
+<strong>--embedded-controller</strong>={<strong>ec_sys</strong>,<strong>acpi_ec</strong>,<strong>dev_port</strong>}</p>
 <blockquote>
-<p>Specify embedded controller to use</p>
+<p>Select the implementation used to access the embedded controller.</p>
 <ul>
-<li><p><strong>ec_sys</strong>: Use the ec_sys kernel module for writing
-to the embedded controller.</p></li>
-<li><p><strong>acpi_ec</strong>: Use the acpi_ec kernel module for
-writing to the embedded controller.</p></li>
-<li><p><strong>dev_port</strong>: Write to the embedded controller using
+<li><p><strong>ec_sys</strong>: Use the ec_sys kernel module.</p></li>
+<li><p><strong>acpi_ec</strong>: Use the acpi_ec kernel module.</p></li>
+<li><p><strong>dev_port</strong>: Access the embedded controller via
 /dev/port.</p></li>
 </ul>
 </blockquote>
 <h1>COMMANDS</h1>
 <p><strong>dump</strong> [<em>OPTIONS</em>]</p>
 <blockquote>
-<p>Dump all EC registers</p>
+<p>Dump all EC registers.</p>
 <p><strong>-c</strong>, <strong>--color</strong></p>
 <blockquote>
 <p>Force colored output.</p>
@@ -118,12 +116,22 @@ version).</p>
 </blockquote>
 <p><strong>shell</strong></p>
 <blockquote>
-<p>Read commands from STDIN</p>
+<p>Read commands from STDIN.</p>
 </blockquote>
 <p>All input values are interpreted as decimal numbers by default.
 Hexadecimal values may be entered by prefixing them with "0x".</p>
+<h1>EXIT STATUS</h1>
+<blockquote>
+<ol start="0" type="1">
+<li><p>Everything fine</p></li>
+<li><p>Generic error</p></li>
+<li><p>Command-line error</p></li>
+<li><p>Initialization error</p></li>
+<li><p>Fatal error (memory allocation failure)</p></li>
+</ol>
+</blockquote>
 <h1>BUGS</h1>
-<p>Report bugs to https://github.com/nbfc-/nbfc-linux</p>
+<p>Report bugs to https://github.com/nbfc-linux/nbfc-linux</p>
 <h1>AUTHOR</h1>
 <p>Benjamin Abendroth (braph93@gmx.de)</p>
 <h1>SEE ALSO</h1>

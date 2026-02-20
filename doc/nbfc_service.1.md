@@ -14,7 +14,7 @@ NoteBook FanControl service
 
 **-h**, **\--help**
 
-> Show this help message and exit.
+> Show help message and exit.
 
 **\--version**
 
@@ -34,26 +34,24 @@ NoteBook FanControl service
 
 **-c**, **\--config-file** *CONFIG*
 
-> Use alternative config file (default /etc/nbfc/nbfc.json).
+> Use an alternative config file (default /etc/nbfc/nbfc.json).
 
-**-e, \--embedded-controller** \[*dummy*, *dev_port*, *ec_sys*,
-*acpi_ec*\]
+**-e**, **\--embedded-controller** {*ec_sys*, *acpi_ec*, *dev_port*,
+*dummy*}
 
-> Specify embedded controller to use.
+> Select the implementation used to access the embedded controller.
 >
-> -   **ec_sys**: Use the ec_sys kernel module for writing to the
->     embedded controller.
+> -   **ec_sys**: Use the ec_sys kernel module.
 >
-> -   **acpi_ec**: Use the acpi_ec kernel module for writing to the
->     embedded controller.
+> -   **acpi_ec**: Use the acpi_ec kernel module.
 >
-> -   **dev_port**: Write to the embedded controller using /dev/port.
+> -   **dev_port**: Access the embedded controller via /dev/port.
 >
-> -   **dummy**: Don\'t write to the embedded controller at all.
+> -   **dummy**: Do not access the embedded controller at all.
 
 # FILES
 
-*/etc/nbfc.json*
+*/etc/nbfc/nbfc.json*
 
 > The main configuration file for nbfc_service. See
 > **nbfc_service.json**(5) for further details.
@@ -93,15 +91,15 @@ NoteBook FanControl service
 
 # EXIT STATUS
 
-> -   0 Everything fine
+> 0.  Everything fine
 >
-> -   1 Generic error
+> 1.  Generic error
 >
-> -   2 Command line error
+> 2.  Command-line error
 >
-> -   3 Initialization error
+> 3.  Initialization error
 >
-> -   5 Fatal error
+> 4.  Fatal error (memory allocation failure)
 
 # BUGS
 

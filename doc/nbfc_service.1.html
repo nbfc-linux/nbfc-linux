@@ -7,7 +7,7 @@
 <h1>OPTIONS</h1>
 <p><strong>-h</strong>, <strong>--help</strong></p>
 <blockquote>
-<p>Show this help message and exit.</p>
+<p>Show help message and exit.</p>
 </blockquote>
 <p><strong>--version</strong></p>
 <blockquote>
@@ -28,25 +28,24 @@
 <p><strong>-c</strong>, <strong>--config-file</strong>
 <em>CONFIG</em></p>
 <blockquote>
-<p>Use alternative config file (default /etc/nbfc/nbfc.json).</p>
+<p>Use an alternative config file (default /etc/nbfc/nbfc.json).</p>
 </blockquote>
-<p><strong>-e, --embedded-controller</strong> [<em>dummy</em>,
-<em>dev_port</em>, <em>ec_sys</em>, <em>acpi_ec</em>]</p>
+<p><strong>-e</strong>, <strong>--embedded-controller</strong>
+{<em>ec_sys</em>, <em>acpi_ec</em>, <em>dev_port</em>,
+<em>dummy</em>}</p>
 <blockquote>
-<p>Specify embedded controller to use.</p>
+<p>Select the implementation used to access the embedded controller.</p>
 <ul>
-<li><p><strong>ec_sys</strong>: Use the ec_sys kernel module for writing
-to the embedded controller.</p></li>
-<li><p><strong>acpi_ec</strong>: Use the acpi_ec kernel module for
-writing to the embedded controller.</p></li>
-<li><p><strong>dev_port</strong>: Write to the embedded controller using
+<li><p><strong>ec_sys</strong>: Use the ec_sys kernel module.</p></li>
+<li><p><strong>acpi_ec</strong>: Use the acpi_ec kernel module.</p></li>
+<li><p><strong>dev_port</strong>: Access the embedded controller via
 /dev/port.</p></li>
-<li><p><strong>dummy</strong>: Don't write to the embedded controller at
+<li><p><strong>dummy</strong>: Do not access the embedded controller at
 all.</p></li>
 </ul>
 </blockquote>
 <h1>FILES</h1>
-<p><em>/etc/nbfc.json</em></p>
+<p><em>/etc/nbfc/nbfc.json</em></p>
 <blockquote>
 <p>The main configuration file for nbfc_service. See
 <strong>nbfc_service.json</strong>(5) for further details.</p>
@@ -87,13 +86,13 @@ directory take precedence over those in
 </blockquote>
 <h1>EXIT STATUS</h1>
 <blockquote>
-<ul>
-<li><p>0 Everything fine</p></li>
-<li><p>1 Generic error</p></li>
-<li><p>2 Command line error</p></li>
-<li><p>3 Initialization error</p></li>
-<li><p>5 Fatal error</p></li>
-</ul>
+<ol start="0" type="1">
+<li><p>Everything fine</p></li>
+<li><p>Generic error</p></li>
+<li><p>Command-line error</p></li>
+<li><p>Initialization error</p></li>
+<li><p>Fatal error (memory allocation failure)</p></li>
+</ol>
 </blockquote>
 <h1>BUGS</h1>
 <p>Report bugs to https://github.com/nbfc-linux/nbfc-linux</p>
