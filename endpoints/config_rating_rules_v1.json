@@ -1,0 +1,45 @@
+{
+	"FanRegisterFullMatch": [
+		{ "Name": "PFAN", "Mode": "rw" },
+		{ "Name": "SFAN", "Mode": "rw" },
+		{ "Name": "CFAN", "Mode": "rw" },
+		{ "Name": "XFAN", "Mode": "rw" },
+		{ "Name": "FAN1", "Mode": "rw" },
+		{ "Name": "FSW1", "Mode": "rw" },
+		{ "Name": "FRDC", "Mode": "r" },
+		{ "Name": "FTGC", "Mode": "w" },
+		{ "Name": "FR2C", "Mode": "r" },
+		{ "Name": "FT2C", "Mode": "w" }
+	],
+
+	"FanRegisterPartialMatch": [
+		"FAN",
+		"RPM",
+		"PWM"
+	],
+
+	"RegisterWriteFullMatch": [
+		"TEMP",
+		"CRZN",
+		"FSH1"
+	],
+
+	"RegisterWritePartialMatch": [
+	],
+
+	"BadRegisterFullMatch": [
+		"FBCM",
+		"FBGI",
+		"FBAE",
+		"FBCB",
+		"FBW1",
+		"FBW2",
+		"FBID",
+		"FUAE",
+		"FRPS"
+	],
+
+	"BadRegisterPartialMatch": [
+		"BAT"
+	]
+}
