@@ -10,21 +10,27 @@
 #include <string.h> // memset
 #include <linux/limits.h>
 
+#include "curl_utils.h"
 #include "config_files.h"
 #include "check_root.h"
 #include "client_global.h"
 
 #define RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE 9.0
 
+#define RATE_CONFIG_RULES_JSON_URL \
+  "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/config_rating_rules_v1.json"
+
 const struct cli99_Option rate_config_options[] = {
   cli99_Options_Include(&main_options),
-  {"-d|--dsdt",      Option_Rate_Config_DSDT_File,   cli99_RequiredArgument},
-  {"-a|--all",       Option_Rate_Config_All,         cli99_NoArgument      },
-  {"-H|--full-help", Option_Rate_Config_Full_Help,   cli99_NoArgument      },
-  {"-j|--json",      Option_Rate_Config_Json,        cli99_NoArgument      },
-  {"-m|--min-score", Option_Rate_Config_Min_Score,   cli99_RequiredArgument},
-  {"--print-rules",  Option_Rate_Config_Print_Rules, cli99_NoArgument      },
-  {"file",           Option_Rate_Config_File,        cli99_NormalPositional},
+  {"-d|--dsdt",        Option_Rate_Config_DSDT_File,   cli99_RequiredArgument},
+  {"-a|--all",         Option_Rate_Config_All,         cli99_NoArgument      },
+  {"-H|--full-help",   Option_Rate_Config_Full_Help,   cli99_NoArgument      },
+  {"-j|--json",        Option_Rate_Config_Json,        cli99_NoArgument      },
+  {"-m|--min-score",   Option_Rate_Config_Min_Score,   cli99_RequiredArgument},
+  {"-n|--no-download", Option_Rate_Config_No_Download, cli99_NoArgument      },
+  {"-r|--rules",       Option_Rate_Config_Rules,       cli99_RequiredArgument},
+  {"--print-rules",    Option_Rate_Config_Print_Rules, cli99_NoArgument      },
+  {"file",             Option_Rate_Config_File,        cli99_NormalPositional},
   cli99_Options_End()
 };
 
@@ -33,11 +39,14 @@ struct {
   bool        full_help;
   bool        json;
   bool        print_rules;
+  bool        no_download;
   bool        min_score_set;
   float       min_score;
   const char* file;
   const char* dsdt_file;
+  const char* rules_file;
 } Rate_Config_Options = {
+  false,
   false,
   false,
   false,
@@ -46,7 +55,74 @@ struct {
   RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE,
   NULL,
   ACPI_ANALYSIS_ACPI_DSDT,
+  NULL,
 };
+
+/*
+ * Download config rating rules from the repository.
+ */
+static Error RateConfig_DownloadRules(char** out) {
+  Error e = err_success();
+  CURL* curl = CurlWithMem_Create(RATE_CONFIG_RULES_JSON_URL, NULL);
+  CURLcode code;
+  long http_code;
+  *out = NULL;
+
+  code = curl_easy_perform(curl);
+  if (code != CURLE_OK) {
+    Log_Download_Failed(RATE_CONFIG_RULES_JSON_URL, code);
+    e = err_string("Download failed");
+    goto end;
+  }
+
+  code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+  if (code != CURLE_OK) {
+    Log_Error("curl_easy_getinfo() failed");
+    e = err_string("Download failed");
+    goto end;
+  }
+
+  if (http_code != 200) {
+    Log_Error("Download failed: %s (server returned HTTP %ld)\n",
+      RATE_CONFIG_RULES_JSON_URL, http_code);
+    e = err_string("Download failed");
+    goto end;
+  }
+
+  // Success
+  *out = CurlWithMem_StealData(curl);
+
+end:
+  CurlWithMem_Destroy(curl);
+  return e;
+}
+
+/*
+ * Return config rating rules.
+ */
+static char* RateConfig_GetRules(const char* rules_file, bool no_download) {
+  Error e;
+  char* out;
+
+  if (rules_file) {
+    if (slurp_file_dynamic(&out, rules_file) == -1) {
+      Log_Error("%s: %s", rules_file, strerror(errno));
+      return NULL;
+    }
+
+    return out;
+  }
+
+  if (! no_download) {
+    e = RateConfig_DownloadRules(&out);
+    if (e)
+      Log_Warn("Falling back on builtin configuration rating rules");
+    else
+      return out;
+  }
+
+  return Mem_Strdup(CONFIG_RATING_DEFAULT_RULES);
+}
 
 struct ConfigWithData {
   char* file;
@@ -419,11 +495,11 @@ static Error RateConfig_RateSingle(ConfigRating* config_rating, bool json, const
 /*
  * Print configuration rules to stdout.
  */
-static int RateConfig_PrintRules(bool json) {
+static int RateConfig_PrintRules(const char* rules_json, bool json) {
   Error e;
   ConfigRatingRules rules = {0};
 
-  e = ConfigRatingRules_FromJson(&rules, CONFIG_RATING_DEFAULT_RULES);
+  e = ConfigRatingRules_FromJson(&rules, rules_json);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -445,6 +521,7 @@ static int RateConfig_PrintRules(bool json) {
 
 int RateConfig() {
   Error e;
+  char* rules;
   ConfigRating config_rating = {0};
 
   if (Rate_Config_Options.full_help) {
@@ -480,8 +557,12 @@ int RateConfig() {
   // Print configuration rules
   // ==========================================================================
 
-  if (Rate_Config_Options.print_rules)
-    return RateConfig_PrintRules(Rate_Config_Options.json);
+  if (Rate_Config_Options.print_rules) {
+    rules = RateConfig_GetRules(Rate_Config_Options.rules_file, Rate_Config_Options.no_download);
+    if (! rules)
+      return NBFC_EXIT_FAILURE;
+    return RateConfig_PrintRules(rules, Rate_Config_Options.json);
+  }
 
   // ==========================================================================
   // Check if DSDT file exists and is readable
@@ -511,7 +592,11 @@ int RateConfig() {
   // Initialize ConfigRating
   // ==========================================================================
 
-  e = ConfigRating_Init(&config_rating, Rate_Config_Options.dsdt_file, CONFIG_RATING_DEFAULT_RULES);
+  rules = RateConfig_GetRules(Rate_Config_Options.rules_file, Rate_Config_Options.no_download);
+  if (! rules)
+    return NBFC_EXIT_FAILURE;
+
+  e = ConfigRating_Init(&config_rating, Rate_Config_Options.dsdt_file, rules);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -527,6 +612,7 @@ int RateConfig() {
     e = RateConfig_RateSingle(&config_rating, Rate_Config_Options.json, Rate_Config_Options.file);
 
   ConfigRating_Free(&config_rating);
+  Mem_Free(rules);
 
   if (e) {
     Log_Error("%s", err_print_all(e));

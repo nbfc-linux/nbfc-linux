@@ -205,8 +205,8 @@ Set quiet mode.
 .RE
 .RE
 
-.B rate-config
-.RI [ OPTIONS ]
+.B rate\-config
+.RI [ FILE "] [" OPTIONS ]
 .RS
 Rates a configuration by analyzing whether it appears safe to execute on the
 current system.
@@ -235,7 +235,18 @@ Use JSON output.
 .BR \-m ", " \-\-min-score
 .I SCORE
 .RS
-Set minimum rating threshold for configurations.
+Set minimum rating threshold for displaying configurations (default: 9.0).
+.RE
+
+.BR \-n ", " \-\-no\-download
+.RS
+Don't download configuration rules from the repository.
+.RE
+
+.BR \-r ", " \-\-rules
+.I FILE
+.RS
+Use an alternative rules file.
 .RE
 
 .B \-\-print\-rules

@@ -79,6 +79,8 @@
  "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
  "  -j, --json            Use JSON output\n"                                   \
  "  -m, --min-score SCORE Set minimum rating threshold for configurations\n"   \
+ "  -n, --no-download     Don't download rules from the repository\n"          \
+ "  -r, --rules FILE      Use an alternative rules file\n"                     \
  "  --print-rules         Print configuration rating rules\n"                  \
  ""
 

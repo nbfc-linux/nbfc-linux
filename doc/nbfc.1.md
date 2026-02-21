@@ -152,7 +152,7 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Set quiet mode.
 
-**rate-config** \[*OPTIONS*\]
+**rate-config** \[*FILE*\] \[*OPTIONS*\]
 
 > Rates a configuration by analyzing whether it appears safe to execute
 > on the current system.
@@ -175,7 +175,16 @@ This program is used to control the NoteBook FanControl service.
 >
 > **-m**, **\--min-score** *SCORE*
 >
-> > Set minimum rating threshold for configurations.
+> > Set minimum rating threshold for displaying configurations (default:
+> > 9.0).
+>
+> **-n**, **\--no-download**
+>
+> > Don\'t download configuration rules from the repository.
+>
+> **-r**, **\--rules** *FILE*
+>
+> > Use an alternative rules file.
 >
 > **\--print-rules**
 >

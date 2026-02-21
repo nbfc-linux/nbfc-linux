@@ -336,6 +336,8 @@ _nbfc_rate_config() {
     '(--min-score -m)'{-m+,--min-score=}'[Set minimum rating threshold for configurations]':SCORE:"_numbers -f 'Set minimum rating threshold for configurations'"
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--print-rules)'--print-rules'[Print configuration rules]'
+    '(--rules -r)'{-r+,--rules=}'[Use an alternative rules file]':FILE:_files
+    '(--no-download -n)'{-n,--no-download}"[Don't download rules file from the repository]"
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command

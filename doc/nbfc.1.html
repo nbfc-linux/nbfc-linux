@@ -148,7 +148,7 @@ speed.</p>
 <p>Set quiet mode.</p>
 </blockquote>
 </blockquote>
-<p><strong>rate-config</strong> [<em>OPTIONS</em>]</p>
+<p><strong>rate-config</strong> [<em>FILE</em>] [<em>OPTIONS</em>]</p>
 <blockquote>
 <p>Rates a configuration by analyzing whether it appears safe to execute
 on the current system.</p>
@@ -170,7 +170,16 @@ on the current system.</p>
 </blockquote>
 <p><strong>-m</strong>, <strong>--min-score</strong> <em>SCORE</em></p>
 <blockquote>
-<p>Set minimum rating threshold for configurations.</p>
+<p>Set minimum rating threshold for displaying configurations (default:
+9.0).</p>
+</blockquote>
+<p><strong>-n</strong>, <strong>--no-download</strong></p>
+<blockquote>
+<p>Don't download configuration rules from the repository.</p>
+</blockquote>
+<p><strong>-r</strong>, <strong>--rules</strong> <em>FILE</em></p>
+<blockquote>
+<p>Use an alternative rules file.</p>
 </blockquote>
 <p><strong>--print-rules</strong></p>
 <blockquote>

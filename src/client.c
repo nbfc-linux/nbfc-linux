@@ -371,6 +371,14 @@ int main(int argc, char *const argv[]) {
       Rate_Config_Options.dsdt_file = p.optarg;
       break;
 
+   case Option_Rate_Config_Rules:
+      Rate_Config_Options.rules_file = p.optarg;
+      break;
+
+   case Option_Rate_Config_No_Download:
+      Rate_Config_Options.no_download = true;
+      break;
+
     case Option_Rate_Config_All:
       Rate_Config_Options.all = true;
       break;
