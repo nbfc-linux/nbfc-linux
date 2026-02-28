@@ -1,0 +1,37 @@
+{
+  "NotebookModel": "Acer Swift Edge 16 SFE16-43",
+  "EcPollInterval": 200,
+  "ReadWriteWords": false,
+  "CriticalTemperature": 95,
+  "FanConfigurations": [
+    {
+      "ReadRegister": 85,
+      "WriteRegister": 85,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 8,
+      "FanDisplayName": "CPU Fan",
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 55,
+          "DownThreshold": 0,
+          "FanSpeed": 0.0
+        },
+        {
+          "UpThreshold": 60,
+          "DownThreshold": 55,
+          "FanSpeed": 12.5
+        },
+        {
+          "UpThreshold": 70,
+          "DownThreshold": 65,
+          "FanSpeed": 50.0
+        },
+        {
+          "UpThreshold": 85,
+          "DownThreshold": 80,
+          "FanSpeed": 100.0
+        }
+      ]
+    }
+  ]
+}
