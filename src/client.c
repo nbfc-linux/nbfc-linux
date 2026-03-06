@@ -3,6 +3,8 @@
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) NXJSON_Memory_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
 
+#define _GNU_SOURCE
+
 #include <float.h>    // FLT_MAX
 #include <limits.h>   // INT_MAX
 #include <locale.h>   // setlocale, LC_NUMERIC

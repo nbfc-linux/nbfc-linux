@@ -4,6 +4,7 @@
 #define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
 
 #define _XOPEN_SOURCE 500 // unistd.h: export pwrite()/pread()
+#define _GNU_SOURCE
 
 #include <string.h>
 #include <locale.h>

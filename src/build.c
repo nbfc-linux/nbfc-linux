@@ -1,5 +1,6 @@
 #define _XOPEN_SOURCE 500 // unistd.h: pwrite()/pread()
 #define _DEFAULT_SOURCE   // endian.h: htole16(), le16toh()
+#define _GNU_SOURCE
 
 // The data structures returned by nxjson are temporary and are loaded into proper C structs.
 // We allocate memory from a pool to avoid malloc() and reduce memory usage.

@@ -5,6 +5,7 @@
 
 #define _XOPEN_SOURCE  500 // unistd.h: export pwrite()/pread()
 #define _DEFAULT_SOURCE    // endian.h:
+#define _GNU_SOURCE
 
 #include "nbfc.h"
 #include "macros.h"
