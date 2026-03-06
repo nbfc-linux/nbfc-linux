@@ -232,7 +232,7 @@ src/nbfc_service: \
 	src/nxjson.c src/nxjson.h \
 	src/nxjson_utils.h \
 	src/pidfile.c src/pidfile.h \
-	src/process.h src/process.c  \
+	src/process.h src/process.c \
 	src/protocol.c src/protocol.h \
 	src/server.c src/server.h \
 	src/service.c src/service.h \

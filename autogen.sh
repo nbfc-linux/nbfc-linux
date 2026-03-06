@@ -6,3 +6,4 @@ type autoreconf >/dev/null || {
 }
 
 autoreconf --force --install
+automake --force-missing --add-missing || true
