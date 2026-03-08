@@ -1,0 +1,39 @@
+all: test_config
+	./test_config ./01-Basic/01-missing-NotebookModel.json
+	./test_config ./01-Basic/02-missing-FanConfigurations.json
+	./test_config ./01-Basic/03-invalid-size-FanConfigurations.json
+	./test_config ./02-FanConfiguration/01-missing-Write-Field.json
+	./test_config ./02-FanConfiguration/02-WriteRegister-and-WriteAcpiMethod.json
+	./test_config ./02-FanConfiguration/03-missing-Read-Field.json
+	./test_config ./02-FanConfiguration/04-ReadRegister-and-ReadAcpiMethod.json
+	./test_config ./02-FanConfiguration/05-missing-MinSpeedValue.json
+	./test_config ./02-FanConfiguration/06-missing-MaxSpeedValue.json
+	./test_config ./02-FanConfiguration/07-MinSpeedValue-same-MaxSpeedValue.json
+	./test_config ./02-FanConfiguration/08-missing-MinSpeedValueRead.json
+	./test_config ./02-FanConfiguration/09-missing-MaxSpeedValueRead.json
+	./test_config ./02-FanConfiguration/10-MinSpeedValueRead-same-MaxSpeedValueRead.json
+	./test_config ./03-RegisterWriteConfiguration/01-WriteMode-Set/01-missing-Register.json
+	./test_config ./03-RegisterWriteConfiguration/01-WriteMode-Set/02-missing-Value.json
+	./test_config ./03-RegisterWriteConfiguration/01-WriteMode-Set/03-extra-AcpiMethod.json
+	./test_config ./03-RegisterWriteConfiguration/02-WriteMode-Call/01-missing-AcpiMethod.json
+	./test_config ./03-RegisterWriteConfiguration/02-WriteMode-Call/02-extra-Register.json
+	./test_config ./03-RegisterWriteConfiguration/02-WriteMode-Call/03-extra-Value.json
+	./test_config ./03-RegisterWriteConfiguration/03-ResetWriteMode-Set/01-missing-Register.json
+	./test_config ./03-RegisterWriteConfiguration/03-ResetWriteMode-Set/02-missing-ResetValue.json
+	./test_config ./03-RegisterWriteConfiguration/03-ResetWriteMode-Set/03-extra-ResetAcpiMethod.json
+	./test_config ./03-RegisterWriteConfiguration/04-ResetWriteMode-Call/01-missing-ResetAcpiMethod.json
+	./test_config ./03-RegisterWriteConfiguration/04-ResetWriteMode-Call/02-extra-Register.json
+	./test_config ./03-RegisterWriteConfiguration/04-ResetWriteMode-Call/03-extra-ResetValue.json
+	./test_config ./04-FanSpeedPercentageOverride/01-missing-FanSpeedPercentage.json
+	./test_config ./04-FanSpeedPercentageOverride/02-missing-FanSpeedValue.json
+	./test_config ./04-FanSpeedPercentageOverride/03-FanSpeedValue-less-0.json
+	./test_config ./04-FanSpeedPercentageOverride/04-FanSpeedValue-greater-65535.json
+	./test_config ./05-TemperatureThreshold/01-missing-DownThreshold.json
+	./test_config ./05-TemperatureThreshold/02-missing-UpThreshold.json
+	./test_config ./05-TemperatureThreshold/03-missing-FanSpeed.json
+	./test_config ./05-TemperatureThreshold/04-FanSpeed-less-zero.json
+	./test_config ./05-TemperatureThreshold/05-FanSpeed-greater-100.json
+	./test_config ./05-TemperatureThreshold/06-UpThreshold-less-DownThreshold.json
+
+test_config: test_config.c
+	$(CC) -O2 test_config.c -o test_config
