@@ -1,0 +1,20 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1,
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 0,
+          "DownThreshold": 1,
+          "FanSpeed": 0
+        }
+      ]
+    }
+  ],
+
+  "Expected": "FanConfigurations[0]: TemperatureThresholds[0]: UpThreshold cannot be less than DownThreshold"
+}

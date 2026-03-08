@@ -1,0 +1,19 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1,
+      "FanSpeedPercentageOverrides": [
+        {
+          "FanSpeedPercentage": 0,
+          "FanSpeedValue": -1
+        }
+      ]
+    }
+  ],
+
+  "Expected": "FanConfigurations: FanSpeedPercentageOverrides: FanSpeedValue: Value not in range (0 - 65535): -1"
+}

@@ -1,0 +1,16 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1,
+      "IndependentReadMinMaxValues": true,
+      "MinSpeedValueRead": 0,
+      "MaxSpeedValueRead": 0
+    }
+  ],
+
+  "Expected": "FanConfigurations[0]: MinSpeedValueRead and MaxSpeedValueRead cannot be the same"
+}

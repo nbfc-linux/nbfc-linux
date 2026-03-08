@@ -1,0 +1,21 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Set",
+      "Register": 0,
+      "Value": 0,
+      "AcpiMethod": "Foo"
+    }
+  ],
+
+  "Expected": "RegisterWriteConfigurations[0]: AcpiMethod: Cannot be used with WriteMode == Set/And/Or"
+}

@@ -1,0 +1,25 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Call",
+      "AcpiMethod": "Foo",
+
+      "ResetRequired": true,
+      "ResetWriteMode": "Set",
+      "Register": 0,
+      "ResetValue": 0,
+      "ResetAcpiMethod": "Foo"
+    }
+  ],
+
+  "Expected": "RegisterWriteConfigurations[0]: ResetAcpiMethod: Cannot be used with ResetWriteMode == Set/And/Or"
+}

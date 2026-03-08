@@ -1,0 +1,15 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1,
+      "IndependentReadMinMaxValues": true,
+      "MaxSpeedValueRead": 0
+    }
+  ],
+
+  "Expected": "FanConfigurations[0]: MinSpeedValueRead: Missing option"
+}

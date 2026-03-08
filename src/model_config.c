@@ -613,7 +613,10 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
   return err_success();
 
 err:
-  return err_chain_string(e, trace->buf);
+  if (trace->stack_size)
+    return err_chain_string(e, trace->buf);
+  else
+    return e;
 }
 
 Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
