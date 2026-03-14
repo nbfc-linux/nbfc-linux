@@ -1,5 +1,30 @@
 # Changelog
 
+## nbfc-linux-0.4.0 (2026-03-14)
+
+- Reduced memory usage of the service from ~280KB to ~230KB.
+
+- Added `nbfc acpi-dump` command
+
+  This command allows to dump information from your ACPI firmware.
+
+  Subcommands:
+    - `nbfc acpi-dump methods`: Dumps the list of ACPI methods
+    - `nbfc acpi-dump registers`: Dumps the list of all ACPI registers
+    - `nbfc acpi-dump ec-registers`: Dumps the list of EC registers
+    - `nbfc acpi-dump dsl`: Dumps the disassembled ACPI firmware
+
+- Added `nbfc rate-config` command
+
+  This command rates configuration files by analyzing whether they appear
+  safe to use on the current system.
+
+- Added `nbfc support` command
+
+  This command shows how to support the project. It also allows to upload
+  the current notebook firmware to the NBFC-Linux server by running
+  `nbfc support --upload-firmware`.
+
 ## nbfc-linux-0.3.20 (2025-06-06)
 - Added support for calling ACPI methods
 
