@@ -286,6 +286,10 @@ int main(int argc, char *const argv[]) {
       Set_Config_Action(Config_Action_Recommend);
       break;
 
+    case Option_Config_Yes:
+      Config_Options.yes = true;
+      break;
+
     // ========================================================================
     // Set options
     // ========================================================================
