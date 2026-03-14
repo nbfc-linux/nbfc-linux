@@ -119,8 +119,61 @@ int Set_Or_Apply() {
       *dot = '\0';
 
     if  (! Contains_Config(&files, config)) {
-      Log_Error("No such configuration available: %s", config);
-      return NBFC_EXIT_FAILURE;
+      // Try case-insensitive match
+      char* match = NULL;
+      char* config_lower = str_to_lower(config);
+
+      for_each_array(ConfigFile*, file, files) {
+        char* name_lower = str_to_lower(file->config_name);
+        if (!strcmp(config_lower, name_lower)) {
+          match = file->config_name;
+          Mem_Free(name_lower);
+          break;
+        }
+        Mem_Free(name_lower);
+      }
+
+      if (match) {
+        Mem_Free(config);
+        config = Mem_Strdup(match);
+      }
+      else {
+        // Show fuzzy suggestions using case-insensitive similarity
+        // and substring matching
+        for_each_array(ConfigFile*, file, files) {
+          char* name_lower = str_to_lower(file->config_name);
+          float similarity = str_similarity(config_lower, name_lower);
+
+          // Boost score if the input is a substring of the config name
+          if (strstr(name_lower, config_lower))
+            similarity = (similarity > 0.5f) ? similarity : 0.5f;
+
+          file->diff = similarity;
+          Mem_Free(name_lower);
+        }
+        qsort(files.data, files.size, sizeof(ConfigFile), ConfigFile_CompareByDiff);
+
+        Log_Error("No such configuration available: %s", config);
+        bool have_suggestion = false;
+        for_each_array(ConfigFile*, file, files) {
+          if (file->diff >= 0.5f) {
+            if (!have_suggestion) {
+              fprintf(stderr, "\nDid you mean one of these?\n");
+              have_suggestion = true;
+            }
+            fprintf(stderr, "  %s\n", file->config_name);
+          }
+        }
+
+        if (!have_suggestion)
+          fprintf(stderr, "\nUse 'nbfc config -l' to list all available configurations.\n");
+
+        Mem_Free(config_lower);
+        Mem_Free(config);
+        return NBFC_EXIT_FAILURE;
+      }
+
+      Mem_Free(config_lower);
     }
   }
 
