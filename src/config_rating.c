@@ -103,7 +103,7 @@ static bool ConfigRating_IsBadRegister(ConfigRating* config_rating, const char* 
 
 static AcpiRegister* ConfigRating_FindEcRegister(
   ConfigRating* config_rating,
-  int offset
+  unsigned offset
 ) {
   for_each_array(AcpiRegister*, acpi_register, config_rating->acpi_info.registers) {
     if ((acpi_register->bit_offset / 8) != offset)
@@ -142,7 +142,7 @@ static bool ConfigRating_RegisterIsByteAligned(ConfigRating_RegisterRating* rati
 static ConfigRating_RegisterRating ConfigRating_RateRegister(
   ConfigRating* config_rating,
   enum RegisterType type,
-  int offset
+  unsigned offset
 ) {
   ConfigRating_RegisterRating rated = {0};
   rated.type = type;
@@ -231,7 +231,7 @@ static ConfigRating_MethodRating ConfigRating_RateMethod(
 }
 
 static void ConfigRating_RegisterRatingPrint(ConfigRating_RegisterRating* rating) {
-  printf("\tEC Register %d (0x%X):\n", rating->offset, rating->offset);
+  printf("\tEC Register %u (0x%X):\n", rating->offset, rating->offset);
 
   switch (rating->type) {
   case RegisterType_FanReadRegister:
@@ -247,7 +247,7 @@ static void ConfigRating_RegisterRatingPrint(ConfigRating_RegisterRating* rating
 
   if (rating->score != RegisterScore_NotFound) {
     printf("\t\tName:   %s\n", rating->info->name);
-    printf("\t\tLength: %d\n", rating->info->bit_length);
+    printf("\t\tLength: %u\n", rating->info->bit_length);
   }
 
   switch (rating->score) {
@@ -406,7 +406,7 @@ void ConfigRating_RateModelConfig(
           register_points = 0;
         }
 
-        const int bit_length = reg_rating->info->bit_length;
+        const unsigned bit_length = reg_rating->info->bit_length;
         if (bit_length != 8 && bit_length != 16) {
           register_points = 0;
         }

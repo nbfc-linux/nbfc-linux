@@ -100,7 +100,7 @@ enum NBFC_PACKED_ENUM MethodScore {
  *   If `score` is `RegisterScore_NotFound` this field is NULL.
  */
 struct ConfigRating_RegisterRating {
-  int offset;
+  unsigned offset;
   enum RegisterType type;
   enum RegisterScore score;
   AcpiRegister* info;

@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 #include <string.h> // strlen
-#include <stdlib.h> // strtoll, system
+#include <stdlib.h> // system
 
 #define ACPI_ANALYSIS_DSDT_TEMP_FILE       "/tmp/nbfc.acpi.dsdt.XXXXXX.dat"
 #define ACPI_ANALYSIS_DSDT_TEMP_SUFFIX_LEN 4 // len of `.dat`
@@ -214,9 +214,9 @@ static Error Acpi_Analysis_Extract_Registers(const char* output, array_of(AcpiRe
 
     acpi_register->name = RegEx_SubStr(&matches[1], text);
     RegEx_SubStr_Fixed(&matches[4], text, acpi_register->region, sizeof(AcpiOperationRegion));
-    acpi_register->bit_offset = RegEx_Strtoll(&matches[5], text, 16);
-    acpi_register->bit_length = RegEx_Strtoll(&matches[6], text, 16);
-    acpi_register->access_byte_width = RegEx_Strtoll(&matches[7], text, 16);
+    acpi_register->bit_offset = RegEx_Strtoull(&matches[5], text, 16);
+    acpi_register->bit_length = RegEx_Strtoull(&matches[6], text, 16);
+    acpi_register->access_byte_width = RegEx_Strtoull(&matches[7], text, 16);
 
     text += matches[0].rm_eo;
   }
@@ -252,7 +252,7 @@ static Error Acpi_Analysis_Extract_Methods(const char* output, array_of(AcpiMeth
     AcpiMethod* acpi_method = &out->data[out->size++];
 
     acpi_method->name = RegEx_SubStr(&matches[1], text);
-    acpi_method->length = RegEx_Strtoll(&matches[4], text, 16);
+    acpi_method->length = RegEx_Strtoull(&matches[4], text, 16);
 
     text += matches[0].rm_eo;
   }

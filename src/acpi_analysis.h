@@ -34,7 +34,7 @@ declare_array_of(AcpiOperationRegionName);
  */
 struct AcpiMethod {
   char* name;
-  int   length;
+  unsigned length;
 };
 typedef struct AcpiMethod AcpiMethod;
 declare_array_of(AcpiMethod);
@@ -60,9 +60,9 @@ declare_array_of(AcpiMethod);
 struct AcpiRegister {
   char* name;
   AcpiOperationRegionName region;
-  int   bit_offset;
-  int   bit_length;
-  int   access_byte_width;
+  unsigned bit_offset;
+  unsigned bit_length;
+  unsigned access_byte_width;
 };
 typedef struct AcpiRegister AcpiRegister;
 declare_array_of(AcpiRegister);
