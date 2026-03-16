@@ -1,0 +1,41 @@
+{
+  "NotebookModel": "Tongfang / AIstone X6RP57TW (i9-14900HX + RTX 5070 Ti)",
+  "Author": "Aineasg (community reverse-engineered)",
+  "EcPollInterval": 3000,
+  "ReadWriteWords": true,
+  "CriticalTemperature": 95,
+  "FanConfigurations": [
+    {
+      "ReadRegister": 96,
+      "WriteRegister": 96,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "IndependentReadMinMaxValues": true,
+      "MinSpeedValueRead": 0,
+      "MaxSpeedValueRead": 100,
+      "ResetRequired": false,
+      "FanSpeedResetValue": 40,
+      "FanDisplayName": "Main Fan (CPU + GPU)",
+      "TemperatureSource": "CPU Package",
+      "TemperatureThresholds": [
+        { "UpThreshold": 40, "DownThreshold": 35, "FanSpeed": 25.0 },
+        { "UpThreshold": 55, "DownThreshold": 50, "FanSpeed": 40.0 },
+        { "UpThreshold": 65, "DownThreshold": 60, "FanSpeed": 55.0 },
+        { "UpThreshold": 75, "DownThreshold": 70, "FanSpeed": 70.0 },
+        { "UpThreshold": 82, "DownThreshold": 77, "FanSpeed": 85.0 },
+        { "UpThreshold": 90, "DownThreshold": 85, "FanSpeed": 100.0 }
+      ],
+      "FanSpeedPercentageOverrides": []
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Set",
+      "WriteOccasion": "OnInitialization",
+      "Register": 96,
+      "Value": 40,
+      "ResetRequired": false,
+      "Description": "Initial fan duty (safe starting point)"
+    }
+  ]
+}
