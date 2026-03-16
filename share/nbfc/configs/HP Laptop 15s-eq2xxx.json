@@ -7,7 +7,7 @@
   "CriticalTemperatureOffset": 7,
   "FanConfigurations": [
     {
-      "ReadRegister": 44,
+      "ReadRegister": 46,
       "WriteRegister": 44,
       "MinSpeedValue": 20,
       "MaxSpeedValue": 100,
