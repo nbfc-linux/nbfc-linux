@@ -205,9 +205,20 @@ int main(int argc, char *const argv[]) {
         }
 
         array_of(int)* fans = &Status_Options.fans;
-        fans->size++;
-        fans->data = Mem_Realloc(fans->data, fans->size * sizeof(int));
-        fans->data[fans->size - 1] = fan;
+        bool have_fan = false;
+
+        for_each_array(int*, fan1, *fans) {
+          if (*fan1 == fan) {
+            have_fan = true;
+            break;
+          }
+        }
+
+        if (! have_fan) {
+          fans->size++;
+          fans->data = Mem_Realloc(fans->data, fans->size * sizeof(int));
+          fans->data[fans->size - 1] = fan;
+        }
       }
       break;
 

@@ -50,41 +50,42 @@ static void Status_Print_Service(const ServiceInfo* service_info) {
     service_info->SelectedConfigId);
 }
 
-int Status() {
+static void Status_Print() {
+  Error e;
   ServiceInfo service_info = {0};
 
+  e = ServiceInfo_TryLoad(&service_info);
+  e_die();
+
+  if (Status_Options.all || Status_Options.service)
+    Status_Print_Service(&service_info);
+
+  if (Status_Options.all) {
+    for_each_array(const FanInfo*, f, service_info.Fans) {
+      printf("\n");
+      Status_Print_Fan(f);
+    }
+  }
+  else if (Status_Options.fans.size) {
+    const int fan_count = service_info.Fans.size;
+    for_each_array(int*, fan_index, Status_Options.fans) {
+      if (*fan_index >= fan_count) {
+        e = err_stringf("Fan number %d not found! (Fan indexes count from zero!)", *fan_index);
+        e_die();
+      }
+
+      printf("\n");
+      Status_Print_Fan(&service_info.Fans.data[*fan_index]);
+    }
+  }
+}
+
+int Status() {
   if (!Status_Options.service && !Status_Options.all && !Status_Options.fans.size)
     Status_Options.all = true;
 
   while (true) {
-    Error e = ServiceInfo_TryLoad(&service_info);
-    e_die();
-
-    if (Status_Options.all || Status_Options.service)
-      Status_Print_Service(&service_info);
-
-    if (Status_Options.all) {
-      for_each_array(const FanInfo*, f, service_info.Fans) {
-        printf("\n");
-        Status_Print_Fan(f);
-      }
-    }
-    else if (Status_Options.fans.size) {
-      const int fan_count = service_info.Fans.size;
-      bool* vis = Mem_Calloc(fan_count, sizeof(bool));
-      for_each_array(int*, fan_index, Status_Options.fans) {
-        if (*fan_index >= fan_count) {
-          Log_Error("Fan number %d not found! (Fan indexes count from zero!)", *fan_index);
-          return NBFC_EXIT_FAILURE;
-        }
-        if (!vis[*fan_index]) {
-          printf("\n");
-          Status_Print_Fan(&service_info.Fans.data[*fan_index]);
-          vis[*fan_index] = true;
-        }
-      }
-      Mem_Free(vis);
-    }
+    Status_Print();
 
     if (! Status_Options.watch)
       break;
