@@ -32,7 +32,6 @@ static void Status_Print_Fan(const FanInfo* fan) {
     "Critical Mode Enabled    : %s\n"
     "Current Fan Speed        : %.2f\n"
     "Target Fan Speed         : %.2f\n"
-    "Requested Fan Speed      : %.2f\n"
     "Fan Speed Steps          : %d\n",
     fan->Name,
     fan->Temperature,
@@ -40,7 +39,6 @@ static void Status_Print_Fan(const FanInfo* fan) {
     str_from_bool(fan->Critical),
     fan->CurrentSpeed,
     fan->TargetSpeed,
-    fan->RequestedSpeed,
     fan->SpeedSteps);
 }
 
