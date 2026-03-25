@@ -171,7 +171,7 @@ void Service_LoadAllConfigFiles(ModelConfig* model_config) {
     exit(NBFC_EXIT_FAILURE);
   }
 
-  Trace_Push(&trace, path);
+  Trace_Push(&trace, "%s", path);
   e = ModelConfig_Validate(&trace, model_config);
   if (e) {
     Log_Error("%s: %s", trace.buf, err_print_all(e));

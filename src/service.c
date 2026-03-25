@@ -89,7 +89,7 @@ Error Service_Init() {
 
   Service_State = Initialized_2_Model_Config;
 
-  Trace_Push(trace, path);
+  Trace_Push(trace, "%s", path);
   e = ModelConfig_Validate(trace, &Service_ModelConfig);
   if (e)
     goto error;

@@ -219,7 +219,7 @@ static array_of(ConfigWithData) RateConfig_RateConfigs(
     }
 
     // Validate the configuration data (and silence warnings)
-    Trace_Push(&trace, path);
+    Trace_Push(&trace, "%s", path);
     LogLevel old = Log_LogLevel;
     Log_LogLevel = LogLevel_Quiet;
     e = ModelConfig_Validate(&trace, &config_with_data->model_config);
