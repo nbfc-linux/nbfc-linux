@@ -17,16 +17,16 @@ Error Protocol_Send_Json(int socket, const nx_json* json) {
 
 Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
   char buffer[PROTOCOL_BUFFER_SIZE] = {0};
-  int nread;
+  ssize_t nread;
   const nx_json* json = NULL;
 
   char* msg = NULL;
-  int msg_size = 0;
+  size_t msg_size = 0;
 
   while ((nread = read(socket, buffer, PROTOCOL_BUFFER_SIZE)) > 0) {
-    msg = Mem_Realloc(msg, msg_size + nread + 1);
-    memcpy(msg + msg_size, buffer, nread);
-    msg_size += nread;
+    msg = Mem_Realloc(msg, msg_size + (size_t) nread + 1);
+    memcpy(msg + msg_size, buffer, (size_t) nread);
+    msg_size += (size_t) nread;
     msg[msg_size] = '\0';
 
     char *end_marker_pos = strstr(msg, PROTOCOL_END_MARKER);

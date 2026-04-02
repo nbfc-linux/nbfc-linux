@@ -145,7 +145,7 @@ int main(int argc, char *const argv[]) {
   Program_Name_Set(argv[0]);
   setlocale(LC_NUMERIC, "C"); // for json floats
 
-  int o;
+  int64_t o;
   const char* err;
   enum Command cmd = Command_Help;
   struct cli99 p;
@@ -198,16 +198,16 @@ int main(int argc, char *const argv[]) {
 
     case Option_Status_Fan:
       {
-        const int fan = parse_number(p.optarg, 0, INT_MAX, &err);
+        const array_size_t fan = (array_size_t) parse_number(p.optarg, 0, INT_MAX, &err);
         if (err) {
           Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
           return NBFC_EXIT_CMDLINE;
         }
 
-        array_of(int)* fans = &Status_Options.fans;
+        array_of(array_size_t)* fans = &Status_Options.fans;
         bool have_fan = false;
 
-        for_each_array(int*, fan1, *fans) {
+        for_each_array(array_size_t*, fan1, *fans) {
           if (*fan1 == fan) {
             have_fan = true;
             break;
@@ -223,7 +223,7 @@ int main(int argc, char *const argv[]) {
       break;
 
     case Option_Status_Watch:
-      Status_Options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
+      Status_Options.watch = (float) parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
@@ -247,7 +247,7 @@ int main(int argc, char *const argv[]) {
       break;
 
     case Option_Sensors_Fan:
-      Sensors_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
+      Sensors_Options.fan = (array_size_t) parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
@@ -306,21 +306,21 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Set_Auto:
-      if (Set_Options.speed != -2.0) {
+      if (Set_Options.speed != -2.0f) {
         Log_Error("Options -a|--auto or -s|--speed may only be specified once");
         return NBFC_EXIT_CMDLINE;
       }
 
-      Set_Options.speed = -1.0;
+      Set_Options.speed = -1.0f;
       break;
 
     case Option_Set_Speed:
-      if (Set_Options.speed != -2.0) {
+      if (Set_Options.speed != -2.0f) {
         Log_Error("Options -a|--auto or -s|--speed may only be specified once");
         return NBFC_EXIT_CMDLINE;
       }
 
-      Set_Options.speed = parse_double(p.optarg, 0, 100, &err);
+      Set_Options.speed = (float) parse_double(p.optarg, 0, 100, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
@@ -333,7 +333,7 @@ int main(int argc, char *const argv[]) {
         return NBFC_EXIT_CMDLINE;
       }
 
-      Set_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
+      Set_Options.fan = (int) parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
@@ -345,7 +345,7 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Update_Parallel:
-      Update_Options.parallel = parse_number(p.optarg, 1, INT_MAX, &err);
+      Update_Options.parallel = (int) parse_number(p.optarg, 1, INT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
@@ -414,7 +414,7 @@ int main(int argc, char *const argv[]) {
 
     case Option_Rate_Config_Min_Score:
       Rate_Config_Options.min_score_set = true;
-      Rate_Config_Options.min_score = parse_double(p.optarg, 0, 10, &err);
+      Rate_Config_Options.min_score = (float) parse_double(p.optarg, 0, 10, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;

@@ -214,9 +214,9 @@ static Error Acpi_Analysis_Extract_Registers(const char* output, array_of(AcpiRe
 
     acpi_register->name = RegEx_SubStr(&matches[1], text);
     RegEx_SubStr_Fixed(&matches[4], text, acpi_register->region, sizeof(AcpiOperationRegion));
-    acpi_register->bit_offset = RegEx_Strtoull(&matches[5], text, 16);
-    acpi_register->bit_length = RegEx_Strtoull(&matches[6], text, 16);
-    acpi_register->access_byte_width = RegEx_Strtoull(&matches[7], text, 16);
+    acpi_register->bit_offset = (uint32_t) RegEx_Strtoull(&matches[5], text, 16);
+    acpi_register->bit_length = (uint32_t) RegEx_Strtoull(&matches[6], text, 16);
+    acpi_register->access_byte_width = (uint32_t) RegEx_Strtoull(&matches[7], text, 16);
 
     text += matches[0].rm_eo;
   }
@@ -252,7 +252,7 @@ static Error Acpi_Analysis_Extract_Methods(const char* output, array_of(AcpiMeth
     AcpiMethod* acpi_method = &out->data[out->size++];
 
     acpi_method->name = RegEx_SubStr(&matches[1], text);
-    acpi_method->length = RegEx_Strtoull(&matches[4], text, 16);
+    acpi_method->length = (uint32_t) RegEx_Strtoull(&matches[4], text, 16);
 
     text += matches[0].rm_eo;
   }
@@ -407,7 +407,7 @@ static Error CopyToTemp(const char* file, char* template_out, int template_suffi
   while ((n = read(infd, buf, sizeof(buf))) > 0) {
     ssize_t w = 0;
     while (w < n) {
-      ssize_t written = write(outfd, buf + w, n - w);
+      ssize_t written = write(outfd, buf + w, (size_t) (n - w));
       if (written < 0) {
         e = err_stdlib(template_out);
         goto end;
@@ -481,8 +481,8 @@ Error Acpi_Analysis_Get_DSL(const char* file, char** out) {
     goto end;
   }
 
-  ssize_t nread = slurp_file_dynamic(out, temp_file);
-  if (nread < 0) {
+  file_op_result res = slurp_file_dynamic(out, temp_file);
+  if (! res.ok) {
     e = err_stdlib(temp_file);
     goto end;
   }

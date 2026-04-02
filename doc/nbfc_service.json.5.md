@@ -5,7 +5,7 @@ nbfc_service.json - Notebook FanControl service configuration
 # CONFIGURATION
 
 **NOTE**: Comments can be added in any JSON object by using the
-**Comment** field.
+**Comment** or the **\#** field.
 
 ## ServiceConfig
 

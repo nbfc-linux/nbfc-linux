@@ -64,7 +64,7 @@ static uint16_t Fan_PercentageToFanSpeed(const Fan* self, float percentage) {
   if (override)
     return override->FanSpeedValue;
 
-  return round(my.minSpeedValueWrite
+  return (uint16_t) round(my.minSpeedValueWrite
       + (((my.maxSpeedValueWrite - my.minSpeedValueWrite) * percentage) / 100.0f));
 }
 
@@ -94,9 +94,10 @@ static Error Fan_ECWriteValue(Fan* self, uint16_t value) {
       return err_success();
   }
 
-  return my.readWriteWords
-    ? ec->WriteWord(my.fanConfig->WriteRegister, value)
-    : ec->WriteByte(my.fanConfig->WriteRegister, value);
+  if (my.readWriteWords)
+    return ec->WriteWord(my.fanConfig->WriteRegister, value);
+  else
+    return ec->WriteByte(my.fanConfig->WriteRegister, (uint8_t) value);
 }
 
 static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {

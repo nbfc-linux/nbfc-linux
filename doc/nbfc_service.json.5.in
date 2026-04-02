@@ -9,6 +9,8 @@ nbfc_service.json \- Notebook FanControl service configuration
 .BR NOTE :
 Comments can be added in any JSON object by using the
 .B Comment
+or the
+.B #
 field.
 .RE
 

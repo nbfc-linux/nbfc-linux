@@ -43,8 +43,8 @@ Error EC_Dummy_ReadWord(uint8_t register_, uint16_t* out) {
 Error EC_Dummy_WriteWord(uint8_t register_, uint16_t value) {
   value = htole16(value);
 
-  uint8_t msb = value >> 8;
-  uint8_t lsb = value;
+  uint8_t msb = (uint8_t) (value >> 8);
+  uint8_t lsb = (uint8_t) value;
 
   if (register_ + 1 < EC_Dummy_FakeRegistersSize) {
     EC_Dummy_FakeRegisters[register_] = lsb;

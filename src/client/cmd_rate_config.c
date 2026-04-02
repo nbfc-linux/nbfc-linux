@@ -105,7 +105,7 @@ static char* RateConfig_GetRules(const char* rules_file, bool no_download) {
   char* out;
 
   if (rules_file) {
-    if (slurp_file_dynamic(&out, rules_file) == -1) {
+    if (! slurp_file_dynamic(&out, rules_file).ok) {
       Log_Error("%s: %s", rules_file, strerror(errno));
       return NULL;
     }
@@ -506,9 +506,9 @@ static int RateConfig_PrintRules(const char* rules_json, bool json) {
   }
 
   if (json) {
-    nx_json* json = ConfigRatingRules_ToJson(&rules);
-    nxjson_write_to_fd(json, STDOUT_FILENO);
-    nx_json_free(json);
+    nx_json* js = ConfigRatingRules_ToJson(&rules);
+    nxjson_write_to_fd(js, STDOUT_FILENO);
+    nx_json_free(js);
   }
   else {
     ConfigRatingRules_Print(&rules);

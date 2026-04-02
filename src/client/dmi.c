@@ -17,7 +17,7 @@
 const char* DMI_Get_System_Product() {
   static char buf[128];
 
-  if (slurp_file(buf, sizeof(buf), DMI_ProductNameFile) == -1)
+  if (! slurp_file(buf, sizeof(buf), DMI_ProductNameFile).ok)
     goto error;
 
   buf[strcspn(buf, "\n")] = '\0';
@@ -37,7 +37,7 @@ error:
 const char* DMI_Get_System_Vendor() {
   static char buf[128];
 
-  if (slurp_file(buf, sizeof(buf), DMI_SysVendorFile) == -1)
+  if (! slurp_file(buf, sizeof(buf), DMI_SysVendorFile).ok)
     goto error;
 
   buf[strcspn(buf, "\n")] = '\0';

@@ -77,15 +77,16 @@ static bool File_Equals_Git_SHA1_Sum(const char* path, const char* sha1sum) {
   char size_plus_content[NBFC_MAX_FILE_SIZE + 64];
   char hash[SHA_DIGEST_LENGTH * 2 + 1] = {0};
 
-  if (slurp_file(buf, sizeof(buf), path) == -1) {
+  file_op_result res = slurp_file(buf, sizeof(buf), path);
+  if (! res.ok) {
     Log_Error("Error reading file: %s: %s", path, strerror(errno));
     return false;
   }
 
   int len = snprintf(size_plus_content, sizeof(size_plus_content), "blob %lu%c%s",
-    strlen(buf), 0, buf);
+    res.len, 0, buf);
 
-  compute_sha1(size_plus_content, len, hash);
+  compute_sha1(size_plus_content, (size_t) len, hash);
 
   return !strcmp(sha1sum, hash);
 }
@@ -143,7 +144,7 @@ static void Print_Summary(array_of(GitHubFile)* files) {
 // Iterates through an array of GitHubFile and returns a CURL instance
 // for the next file that needs to be downloaded or NULL if there
 // are no remaining files.
-static CURL* Get_Next_Download(array_of(GitHubFile)* files, int* iter) {
+static CURL* Get_Next_Download(array_of(GitHubFile)* files, array_size_t* iter) {
 next_file:
   if (*iter >= files->size)
     return NULL;
@@ -163,7 +164,7 @@ next_file:
 
 static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int parallel) {
   int ret = 0;
-  int files_iter = 0;
+  array_size_t files_iter = 0;
   CURLMcode mc;
 
   CURLM* multi = curl_multi_init();
@@ -222,7 +223,7 @@ static int Curl_Parallel_Download_Files(array_of(GitHubFile)* files, int paralle
           if (! Update_Options.quiet)
             Log_Download_Finished(mem->url);
 
-          if (CurlMemory_WriteFile(mem) == -1) {
+          if (! CurlMemory_WriteFile(mem)) {
             Log_Write_Failed(mem->path, errno);
             ret = -1;
           }
@@ -320,8 +321,8 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
 
   out->data = Mem_Calloc(root->val.children.length, sizeof(GitHubFile));
 
-  nx_json_for_each(file, root) {
-    if (file->type != NX_JSON_OBJECT) {
+  nx_json_for_each(object, root) {
+    if (object->type != NX_JSON_OBJECT) {
       Log_Error("Item is not a JSON object");
       continue;
     }
@@ -330,7 +331,7 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
     const char* sha = NULL;
     const char* download_url = NULL;
 
-    nx_json_for_each(member, file) {
+    nx_json_for_each(member, object) {
       if (member->type == NX_JSON_STRING) {
         if (!strcmp(member->key, "name"))
           name = member->val.text;
@@ -385,7 +386,7 @@ static int UpdateModelCompatibilityDatabase() {
   if (! Update_Options.quiet)
     Log_Download_Finished(UpdateAPIModelSupportURL);
 
-  if (CurlWithMem_WriteFile(curl) == -1) {
+  if (! CurlWithMem_WriteFile(curl)) {
     Log_Write_Failed(NBFC_MODEL_SUPPORT_FILE_MUTABLE, errno);
     ret = -1;
     goto end;

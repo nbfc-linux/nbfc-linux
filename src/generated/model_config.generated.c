@@ -1,6 +1,8 @@
 /* Auto generated code ['./tools/config.py', 'source'] */
 
 Error TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
+	(void) self;
+
 	if (! TemperatureThreshold_IsSet_UpThreshold(self))
 		return err_stringf("%s: %s", "UpThreshold", "Missing option");
 
@@ -9,8 +11,8 @@ Error TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
 
 	if (! TemperatureThreshold_IsSet_FanSpeed(self))
 		return err_stringf("%s: %s", "FanSpeed", "Missing option");
-	else if (! (self->FanSpeed >= 0.0 && self->FanSpeed <= 100.0))
-		return err_stringf("%s: %s", "FanSpeed", "requires: parameter >= 0.0 && parameter <= 100.0");
+	else if (! (self->FanSpeed >= 0.0f && self->FanSpeed <= 100.0f))
+		return err_stringf("%s: %s", "FanSpeed", "requires: 0.0 <= parameter <= 100.0");
 	return err_success();
 }
 
@@ -22,7 +24,7 @@ Error TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* js
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "UpThreshold")) {
 			e = int16_t_FromJson(&obj->UpThreshold, c);
@@ -47,10 +49,12 @@ Error TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* js
 }
 
 Error FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* self) {
+	(void) self;
+
 	if (! FanSpeedPercentageOverride_IsSet_FanSpeedPercentage(self))
 		return err_stringf("%s: %s", "FanSpeedPercentage", "Missing option");
-	else if (! (self->FanSpeedPercentage >= 0.0 && self->FanSpeedPercentage <= 100.0))
-		return err_stringf("%s: %s", "FanSpeedPercentage", "requires: parameter >= 0.0 && parameter <= 100.0");
+	else if (! (self->FanSpeedPercentage >= 0.0f && self->FanSpeedPercentage <= 100.0f))
+		return err_stringf("%s: %s", "FanSpeedPercentage", "requires: 0.0 <= parameter <= 100.0");
 
 	if (! FanSpeedPercentageOverride_IsSet_FanSpeedValue(self))
 		return err_stringf("%s: %s", "FanSpeedValue", "Missing option");
@@ -68,7 +72,7 @@ Error FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "FanSpeedPercentage")) {
 			e = float_FromJson(&obj->FanSpeedPercentage, c);
@@ -93,6 +97,8 @@ Error FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const
 }
 
 Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self) {
+	(void) self;
+
 	if (! RegisterWriteConfiguration_IsSet_WriteMode(self))
 		self->WriteMode = RegisterWriteMode_Set;
 
@@ -133,7 +139,7 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "WriteMode")) {
 			e = RegisterWriteMode_FromJson(&obj->WriteMode, c);
@@ -151,7 +157,7 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 				RegisterWriteConfiguration_Set_Register(obj);
 		}
 		else if (!strcmp(c->key, "Value")) {
-			e = uint16_t_FromJson(&obj->Value, c);
+			e = uint8_t_FromJson(&obj->Value, c);
 			if (!e)
 				RegisterWriteConfiguration_Set_Value(obj);
 		}
@@ -166,7 +172,7 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 				RegisterWriteConfiguration_Set_ResetRequired(obj);
 		}
 		else if (!strcmp(c->key, "ResetValue")) {
-			e = uint16_t_FromJson(&obj->ResetValue, c);
+			e = uint8_t_FromJson(&obj->ResetValue, c);
 			if (!e)
 				RegisterWriteConfiguration_Set_ResetValue(obj);
 		}
@@ -193,6 +199,8 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 }
 
 Error FanConfiguration_ValidateFields(FanConfiguration* self) {
+	(void) self;
+
 	if (false)
 		return err_stringf("%s: %s", "FanDisplayName", "Missing option");
 
@@ -254,7 +262,7 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "FanDisplayName")) {
 			e = str_FromJson(&obj->FanDisplayName, c);
@@ -349,6 +357,8 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 }
 
 Error Sponsor_ValidateFields(Sponsor* self) {
+	(void) self;
+
 	if (! Sponsor_IsSet_Name(self))
 		return err_stringf("%s: %s", "Name", "Missing option");
 
@@ -371,7 +381,7 @@ Error Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "Name")) {
 			e = str_FromJson(&obj->Name, c);
@@ -401,6 +411,8 @@ Error Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
 }
 
 Error ModelConfig_ValidateFields(ModelConfig* self) {
+	(void) self;
+
 	if (! ModelConfig_IsSet_NotebookModel(self))
 		return err_stringf("%s: %s", "NotebookModel", "Missing option");
 
@@ -443,7 +455,7 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "NotebookModel")) {
 			e = str_FromJson(&obj->NotebookModel, c);
@@ -503,6 +515,8 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 }
 
 Error FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* self) {
+	(void) self;
+
 	if (! FanTemperatureSourceConfig_IsSet_FanIndex(self))
 		return err_stringf("%s: %s", "FanIndex", "Missing option");
 
@@ -522,7 +536,7 @@ Error FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "FanIndex")) {
 			e = uint8_t_FromJson(&obj->FanIndex, c);
@@ -547,6 +561,8 @@ Error FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const
 }
 
 Error ServiceConfig_ValidateFields(ServiceConfig* self) {
+	(void) self;
+
 	if (! ServiceConfig_IsSet_SelectedConfigId(self))
 		return err_stringf("%s: %s", "SelectedConfigId", "Missing option");
 
@@ -569,7 +585,7 @@ Error ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "SelectedConfigId")) {
 			e = str_FromJson(&obj->SelectedConfigId, c);
@@ -599,6 +615,8 @@ Error ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 }
 
 Error ServiceState_ValidateFields(ServiceState* self) {
+	(void) self;
+
 	if (false)
 		return err_stringf("%s: %s", "TargetFanSpeeds", "Missing option");
 	return err_success();
@@ -612,7 +630,7 @@ Error ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "TargetFanSpeeds")) {
 			e = array_of_float_FromJson(&obj->TargetFanSpeeds, c);
@@ -627,6 +645,8 @@ Error ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
 }
 
 Error FanInfo_ValidateFields(FanInfo* self) {
+	(void) self;
+
 	if (! FanInfo_IsSet_Name(self))
 		return err_stringf("%s: %s", "Name", "Missing option");
 
@@ -661,7 +681,7 @@ Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "Name")) {
 			e = str_FromJson(&obj->Name, c);
@@ -711,6 +731,8 @@ Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 }
 
 Error ServiceInfo_ValidateFields(ServiceInfo* self) {
+	(void) self;
+
 	if (! ServiceInfo_IsSet_PID(self))
 		return err_stringf("%s: %s", "PID", "Missing option");
 
@@ -733,7 +755,7 @@ Error ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
 		return err_string("Not a JSON object");
 
 	nx_json_for_each(c, json) {
-		if (!strcmp(c->key, "Comment"))
+		if (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))
 			continue;
 		else if (!strcmp(c->key, "PID")) {
 			e = int_FromJson(&obj->PID, c);

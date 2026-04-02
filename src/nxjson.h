@@ -50,7 +50,7 @@ typedef struct nx_json {
     double     dbl;      // the value of DOUBLE node
 
     struct {             // children of OBJECT or ARRAY
-      int length;
+      unsigned int length;
       struct nx_json *first;
       struct nx_json *last;
     } children;

@@ -16,7 +16,7 @@ static bool Send(int socket, const char* buffer, size_t length) {
     if (to_send > SEND_BUFFER_SIZE)
       to_send = SEND_BUFFER_SIZE;
 
-    int ret = send(socket, buffer + total_sent, to_send, MSG_NOSIGNAL);
+    ssize_t ret = send(socket, buffer + total_sent, to_send, MSG_NOSIGNAL);
     if (ret < 0) {
       if (errno != EINTR && errno != EAGAIN)
         return false;
@@ -24,7 +24,7 @@ static bool Send(int socket, const char* buffer, size_t length) {
         continue;
     }
 
-    total_sent += ret;
+    total_sent += (size_t) ret;
   }
 
   return true;

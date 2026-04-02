@@ -51,13 +51,13 @@ Sensors_Command Sensors_Command_FromString(const char* s) {
 
 struct {
   Sensors_Command          command;
-  int                      fan;
+  array_size_t             fan;
   array_of(str)            sensors;
   TemperatureAlgorithmType algorithm;
   bool                     force;
 } Sensors_Options = {
   Sensors_Command_None,
-  -1,
+  (array_size_t) -1,
   {NULL, 0},
   TemperatureAlgorithmType_Unset,
   false,
@@ -94,12 +94,12 @@ static Error Sensors_IsValidSensor(const char* sensor) {
   }
 }
 
-static FanTemperatureSourceConfig* Sensors_GetFTSCByFanIndex(int fanIndex) {
+static FanTemperatureSourceConfig* Sensors_GetFTSCByFanIndex(array_size_t fanIndex) {
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config.FanTemperatureSources)
     if (ftsc->FanIndex == fanIndex)
       return ftsc;
 
-  const int idx = service_config.FanTemperatureSources.size;
+  const array_size_t idx = service_config.FanTemperatureSources.size;
   service_config.FanTemperatureSources.data = Mem_Realloc(service_config.FanTemperatureSources.data, (idx + 1) * sizeof(FanTemperatureSourceConfig));
   service_config.FanTemperatureSources.size = (idx + 1);
   return &service_config.FanTemperatureSources.data[idx];
@@ -111,7 +111,7 @@ static int Sensors_Set() {
 
   check_root();
 
-  if (Sensors_Options.fan == -1) {
+  if (Sensors_Options.fan == (array_size_t) -1) {
     Log_Error("Missing option: %s", "-f|--fan");
     return NBFC_EXIT_CMDLINE;
   }
@@ -120,7 +120,7 @@ static int Sensors_Set() {
   Service_LoadAllConfigFiles(&model_config);
 
   if (Sensors_Options.fan >= model_config.FanConfigurations.size) {
-    Log_Error("%s: No such fan: %d", "-f|--fan", Sensors_Options.fan);
+    Log_Error("%s: No such fan: %zu", "-f|--fan", Sensors_Options.fan);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -176,8 +176,7 @@ static int Sensors_Show() {
     const char*              TemperatureAlgorithmType_Source;
   };
 
-#define Sensors_Fan_Max 256
-  struct FanWithTrace fans[Sensors_Fan_Max] = {0};
+  struct FanWithTrace *fans = Mem_Calloc(model_config.FanConfigurations.size, sizeof(struct FanWithTrace));
 
   // ==========================================================================
   // Set the defaults
@@ -185,7 +184,7 @@ static int Sensors_Show() {
 
   const char* default_sources[1] = {"@CPU"};
 
-  for (ssize_t i = 0; i < Sensors_Fan_Max; ++i) {
+  for_enumerate_array(array_size_t, i, model_config.FanConfigurations) {
     fans[i].Sensors.data = default_sources;
     fans[i].Sensors.size = 1;
     fans[i].Sensors_Source = "default";
@@ -197,10 +196,7 @@ static int Sensors_Show() {
   // Override by model configuration
   // ==========================================================================
 
-  for_enumerate_array(ssize_t, i, model_config.FanConfigurations) {
-    if (i >= Sensors_Fan_Max)
-      continue;
-
+  for_enumerate_array(array_size_t, i, model_config.FanConfigurations) {
     FanConfiguration* fc = &model_config.FanConfigurations.data[i];
 
     fans[i].FanName = fc->FanDisplayName;
@@ -221,9 +217,6 @@ static int Sensors_Show() {
   // ==========================================================================
 
   for_each_array(FanTemperatureSourceConfig*, ftsc, service_config.FanTemperatureSources) {
-    if (ftsc->FanIndex >= Sensors_Fan_Max)
-      continue;
-
     if (ftsc->FanIndex >= model_config.FanConfigurations.size)
       continue;
 
@@ -242,11 +235,8 @@ static int Sensors_Show() {
   // Print configuration
   // ==========================================================================
 
-  for_enumerate_array(int, i, model_config.FanConfigurations) {
-    if (i >= Sensors_Fan_Max)
-      continue;
-
-    printf("#%d (%s):\n", i, fans[i].FanName);
+  for_enumerate_array(array_size_t, i, model_config.FanConfigurations) {
+    printf("#%zd (%s):\n", i, fans[i].FanName);
     printf("  Sensors:  ");
     for_each_array(str*, sensor, fans[i].Sensors)
       printf(" %s", *sensor);

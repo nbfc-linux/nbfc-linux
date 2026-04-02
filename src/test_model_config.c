@@ -97,7 +97,7 @@ int test_model_config(const char* file) {
   Log_Info("TemperatureThresholdManager_LegacyBehaviour = %s",
     TemperatureThresholdManager_LegacyBehaviour ? "true" : "false");
 
-  for_enumerate_array(ssize_t, i, model_config.FanConfigurations) {
+  for_enumerate_array(array_size_t, i, model_config.FanConfigurations) {
     Fan fan;
 
     e = Fan_Init(
@@ -121,22 +121,22 @@ int test_model_config(const char* file) {
     seen_0_speed   = false;
     seen_100_speed = false;
     for (int temp = 0; temp <= 100; ++temp) {
-      Fan_SetTemperature(&fan, temp);
+      Fan_SetTemperature(&fan, (float) temp);
       float speed = Fan_GetTargetSpeed(&fan);
       if (options.verbose)
-        Log_Info("[%ld]: temp = %3d, speed = %f", i, temp, speed);
+        Log_Info("[%zd]: temp = %3d, speed = %f", i, temp, speed);
       seen_0_speed   |= (speed == 0.0f);
       seen_100_speed |= (speed == 100.0f);
     }
 
     if (! seen_0_speed && seen_0_threshold) {
-      Log_Error("%s[%ld]: Didn't see 0.0 speed", file, i);
+      Log_Error("%s[%zd]: Didn't see 0.0 speed", file, i);
       ret = 1;
       goto end;
     }
 
     if (! seen_100_speed) {
-      Log_Error("%s[%ld]: Didn't see 100.0 speed", file, i);
+      Log_Error("%s[%zd]: Didn't see 100.0 speed", file, i);
       ret = 1;
       goto end;
     }
@@ -144,22 +144,22 @@ int test_model_config(const char* file) {
     seen_0_speed   = false;
     seen_100_speed = false;
     for (int temp = 100; temp >= 0; --temp) {
-      Fan_SetTemperature(&fan, temp);
+      Fan_SetTemperature(&fan, (float) temp);
       float speed = Fan_GetTargetSpeed(&fan);
       if (options.verbose)
-        Log_Info("[%ld]: temp = %3d, speed = %f", i, temp, speed);
+        Log_Info("[%zd]: temp = %3d, speed = %f", i, temp, speed);
       seen_0_speed   |= (speed == 0.0f);
       seen_100_speed |= (speed == 100.0f);
     }
 
     if (! seen_0_speed && seen_0_threshold) {
-      Log_Error("%s[%ld]: Didn't see 0.0 speed", file, i);
+      Log_Error("%s[%zd]: Didn't see 0.0 speed", file, i);
       ret = 1;
       goto end;
     }
 
     if (! seen_100_speed) {
-      Log_Error("%s[%ld]: Didn't see 100.0 speed", file, i);
+      Log_Error("%s[%zd]: Didn't see 100.0 speed", file, i);
       ret = 1;
       goto end;
     }

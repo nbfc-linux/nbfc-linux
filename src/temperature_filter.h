@@ -15,7 +15,7 @@ struct TemperatureFilter {
   bool            buffer_is_full;
 };
 
-Error TemperatureFilter_Init(TemperatureFilter*, int poll_interval, int timespan);
+Error TemperatureFilter_Init(TemperatureFilter*, unsigned int poll_interval, unsigned int timespan);
 float TemperatureFilter_FilterTemperature(TemperatureFilter*, float temperature);
 void  TemperatureFilter_Close(TemperatureFilter*);
 

@@ -1,8 +1,7 @@
 #ifndef NBFC_ACPI_CALL_H_
 #define NBFC_ACPI_CALL_H_
 
-#include <stdint.h>    // uint64_t
-#include <sys/types.h> // ssize_t
+#include <stdint.h> // uint64_t
 
 #include "error.h"
 

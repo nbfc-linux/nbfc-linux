@@ -110,10 +110,10 @@ void CurlWithMem_Destroy(CURL* curl) {
  * Writes the contents of a CurlMemory buffer to the file specified in the
  * CurlMemory structure.
  */
-static int CurlMemory_WriteFile(const CurlMemory* mem) {
+static bool CurlMemory_WriteFile(const CurlMemory* mem) {
   const int open_flags = O_WRONLY|O_CREAT|O_TRUNC;
   const int mode_flags = S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH;
-  return write_file(mem->path, open_flags, mode_flags, mem->data, mem->size);
+  return write_file(mem->path, open_flags, mode_flags, mem->data, mem->size).ok;
 }
 
 /**
@@ -121,7 +121,7 @@ static int CurlMemory_WriteFile(const CurlMemory* mem) {
  * handle to its configured file path. The CurlMemory object is retrieved
  * from the CURL instance via CURLOPT_PRIVATE.
  */
-int CurlWithMem_WriteFile(CURL* curl) {
+bool CurlWithMem_WriteFile(CURL* curl) {
   CurlMemory* mem;
   curl_easy_getinfo(curl, CURLINFO_PRIVATE, &mem);
   return CurlMemory_WriteFile(mem);

@@ -26,7 +26,7 @@
 pid_t Service_Get_PID() {
   const char* err;
   char buf[32];
-  if (slurp_file(buf, sizeof(buf), NBFC_PID_FILE) == -1) {
+  if (! slurp_file(buf, sizeof(buf), NBFC_PID_FILE).ok) {
     if (errno == ENOENT)
       return -1;
     else {
@@ -38,7 +38,7 @@ pid_t Service_Get_PID() {
   // trim the newline
   buf[strcspn(buf, "\n")] = '\0';
 
-  pid_t pid = parse_number(buf, 0, INT_MAX, &err);
+  pid_t pid = (pid_t) parse_number(buf, 2, INT_MAX, &err);
   if (err) {
 error:
     Log_Error("Failed to read the pid file: " NBFC_PID_FILE ": %s", err);

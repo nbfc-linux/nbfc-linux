@@ -5,6 +5,7 @@
 #include "macros.h"
 #include "nxjson.h"
 
+#include <stdint.h>
 #include <stdbool.h>
 
 #define ACPI_ANALYSIS_IASL      "iasl"
@@ -34,7 +35,7 @@ declare_array_of(AcpiOperationRegionName);
  */
 struct AcpiMethod {
   char* name;
-  unsigned length;
+  uint32_t length;
 };
 typedef struct AcpiMethod AcpiMethod;
 declare_array_of(AcpiMethod);
@@ -60,9 +61,9 @@ declare_array_of(AcpiMethod);
 struct AcpiRegister {
   char* name;
   AcpiOperationRegionName region;
-  unsigned bit_offset;
-  unsigned bit_length;
-  unsigned access_byte_width;
+  uint32_t bit_offset;
+  uint32_t bit_length;
+  uint32_t access_byte_width;
 };
 typedef struct AcpiRegister AcpiRegister;
 declare_array_of(AcpiRegister);

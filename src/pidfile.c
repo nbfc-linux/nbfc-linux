@@ -10,11 +10,12 @@
 
 Error PID_Write(enum PID_LockMode lock_mode) {
   Error e = err_success();
-  int flags = lock_mode;
+  const int flags = ((int) lock_mode)|O_CREAT|O_WRONLY|O_TRUNC;
+  const mode_t mode = S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH;
   char buf[32];
   int len = snprintf(buf, sizeof(buf), "%d", getpid());
 
-  if (write_file(NBFC_PID_FILE, flags|O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH, buf, len) == -1) {
+  if (! write_file(NBFC_PID_FILE, flags, mode, buf, (size_t) len).ok) {
     e = err_stdlib(NBFC_PID_FILE);
 
     if (errno == EEXIST)

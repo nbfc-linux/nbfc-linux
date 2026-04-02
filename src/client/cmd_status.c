@@ -18,10 +18,10 @@ const struct cli99_Option status_options[] = {
 };
 
 struct {
-  array_of(int) fans;
-  bool          all;
-  bool          service;
-  float         watch;
+  array_of(array_size_t) fans;
+  bool                   all;
+  bool                   service;
+  float                  watch;
 } Status_Options = {0};
 
 static void Status_Print_Fan(const FanInfo* fan) {
@@ -34,11 +34,11 @@ static void Status_Print_Fan(const FanInfo* fan) {
     "Target Fan Speed         : %.2f\n"
     "Fan Speed Steps          : %d\n",
     fan->Name,
-    fan->Temperature,
+    (double) fan->Temperature,
     str_from_bool(fan->AutoMode),
     str_from_bool(fan->Critical),
-    fan->CurrentSpeed,
-    fan->TargetSpeed,
+    (double) fan->CurrentSpeed,
+    (double) fan->TargetSpeed,
     fan->SpeedSteps);
 }
 
@@ -67,10 +67,10 @@ static void Status_Print() {
     }
   }
   else if (Status_Options.fans.size) {
-    const int fan_count = service_info.Fans.size;
-    for_each_array(int*, fan_index, Status_Options.fans) {
+    const array_size_t fan_count = service_info.Fans.size;
+    for_each_array(array_size_t*, fan_index, Status_Options.fans) {
       if (*fan_index >= fan_count) {
-        e = err_stringf("Fan number %d not found! (Fan indexes count from zero!)", *fan_index);
+        e = err_stringf("Fan number %zd not found! (Fan indexes count from zero!)", *fan_index);
         e_die();
       }
 
@@ -90,7 +90,7 @@ int Status() {
     if (! Status_Options.watch)
       break;
 
-    sleep_ms(Status_Options.watch * 1000);
+    sleep_ms((unsigned) (Status_Options.watch * 1000));
     printf("%s", STATUS_CLEAR_SCREEN);
   }
 

@@ -285,7 +285,7 @@ int main(int argc, char* const argv[]) {
   struct cli99 p;
   cli99_Init(&p, main_options, argv, argc);
 
-  int o;
+  int64_t o;
   const char* err;
   while ((o = cli99_GetOpt(&p))) {
     if (o == -1) {
@@ -312,14 +312,14 @@ int main(int argc, char* const argv[]) {
       p.options = Options[cmd];
       break;
     case Option_Register:
-      options.register_ = parse_number(p.optarg, 0, 255, &err);
+      options.register_ = (uint8_t) parse_number(p.optarg, 0, 255, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Value:
-      options.value = parse_number(p.optarg, 0, 65535, &err);
+      options.value = (uint16_t) parse_number(p.optarg, 0, 65535, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
@@ -351,14 +351,14 @@ int main(int argc, char* const argv[]) {
       }
       break;
     case Option_Timespan:
-      options.timespan = parse_number(p.optarg, 1, INT_MAX, &err);
+      options.timespan = (int) parse_number(p.optarg, 1, INT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Interval:
-      options.interval = parse_double(p.optarg, 0.1, FLT_MAX, &err);
+      options.interval = (float) parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
@@ -471,7 +471,7 @@ static int Write() {
       Log_Error("write: Value too big: %d", options.value);
       return NBFC_EXIT_CMDLINE;
     }
-    Error e = ec->WriteByte(options.register_, options.value);
+    Error e = ec->WriteByte(options.register_, (uint8_t) options.value);
     e_die();
   }
 
@@ -522,7 +522,7 @@ static int Monitor() {
   int max_loops = INT_MAX;
 
   if (options.timespan)
-    max_loops = options.timespan / options.interval;
+    max_loops = (int) ((float) options.timespan / options.interval);
 
   RegisterBuf* regs = Registers_Log;
   int size = ARRAY_SSIZE(Registers_Log);
@@ -530,7 +530,7 @@ static int Monitor() {
   for (loops = 0; !quit && loops < max_loops && --size; ++loops) {
     Register_FromEC(regs + loops);
     Register_PrintMonitor(regs, loops);
-    sleep_ms(options.interval * 1000);
+    sleep_ms((unsigned) (options.interval * 1000.0f));
   }
 
   if (options.report) {
@@ -550,7 +550,7 @@ static int Watch() {
   int max_loops = INT_MAX;
 
   if (options.timespan)
-    max_loops = options.timespan / options.interval;
+    max_loops = (int) ((float) options.timespan / options.interval);
 
   int size = ARRAY_SSIZE(Registers_Log);
   RegisterBuf* regs = Registers_Log;
@@ -558,7 +558,7 @@ static int Watch() {
   for (int loops = 1; !quit && loops < max_loops && --size; ++loops) {
     Register_FromEC(regs + loops);
     Register_PrintWatch(regs , regs + loops, regs + loops - 1);
-    sleep_ms(options.interval * 1000);
+    sleep_ms((unsigned int) (options.interval * 1000.0f));
   }
 
   return 0;
@@ -574,7 +574,7 @@ static int AcpiCall() {
   char fmt[] = "%s 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX";
   fmt[2 + options.acpi_call_args_size * 6] = '\0';
 
-  ssize_t cmd_len = snprintf(cmd, sizeof(cmd), fmt,
+  int cmd_len = snprintf(cmd, sizeof(cmd), fmt,
     options.acpi_call_method,
     options.acpi_call_args[0],
     options.acpi_call_args[1],
@@ -586,7 +586,7 @@ static int AcpiCall() {
     options.acpi_call_args[7]
   );
 
-  if (cmd_len == -1 || cmd_len >= (sizeof(cmd))) {
+  if (cmd_len == -1 || cmd_len >= (int) sizeof(cmd)) {
     Log_Error("Method (including arguments) is too long");
     return NBFC_EXIT_FAILURE;
   }
@@ -634,12 +634,12 @@ static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
 
 static inline void Register_FromEC(RegisterBuf* self) {
   for (int i = 0; i < RegistersSize; i++)
-    ec->ReadByte(i, &my[i]);
+    ec->ReadByte((uint8_t) i, &my[i]);
 }
 
 static inline void Register_ToEC(RegisterBuf* self) {
   for (int i = 0; i < RegistersSize; ++i)
-    ec->WriteByte(i, my[i]);
+    ec->WriteByte((uint8_t) i, my[i]);
 }
 
 static void Register_PrintWatch(RegisterBuf* all_readings, RegisterBuf* current, RegisterBuf* previous) {
@@ -759,7 +759,7 @@ static int Register_LoadDump(RegisterBuf* self, FILE* fh) {
         goto error;
 
       char* end;
-      const int value = strtoll(hex, &end, 16);
+      const uint8_t value = (uint8_t) strtoll(hex, &end, 16);
       if (*end != '\0')
         goto error;
 
@@ -793,35 +793,47 @@ static void ShellRead(const struct Args* args) {
     if (arg[0] == '-') {
       if (!strcmp(arg, "-w") || !strcmp(arg, "--word"))
         word = 1;
-      else
-        return (void) printf("ERR: Invalid option: %s\n", arg);
+      else {
+        printf("ERR: Invalid option: %s\n", arg);
+        return;
+      }
     }
     else if (! register_arg)
       register_arg = arg;
-    else
-      return (void) printf("ERR: Too much arguments\n");
+    else {
+      printf("ERR: Too much arguments\n");
+      return;
+    }
   }
 
-  if (! register_arg)
-    return (void) printf("ERR: Missing argument (REGISTER)\n");
+  if (! register_arg) {
+    printf("ERR: Missing argument (REGISTER)\n");
+    return;
+  }
 
-  int register_ = parse_number(register_arg, 0, word ? 254 : 255, &err);
-  if (err)
-    return (void) printf("ERR: Argument (REGISTER): %s\n", err);
+  uint8_t register_ = (uint8_t) parse_number(register_arg, 0, word ? 254 : 255, &err);
+  if (err) {
+    printf("ERR: Argument (REGISTER): %s\n", err);
+    return;
+  }
 
   if (word) {
     uint16_t value;
     Error e = ec->ReadWord(register_, &value);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
 
     printf("%d\n", value);
   }
   else {
     uint8_t value;
     Error e = ec->ReadByte(register_, &value);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
 
     printf("%d\n", value);
   }
@@ -839,52 +851,70 @@ static void ShellWrite(const struct Args* args) {
     if (arg[0] == '-') {
       if (!strcmp(arg, "-w") || !strcmp(arg, "--word"))
         word = 1;
-      else
-        return (void) printf("ERR: Invalid option: %s\n", arg);
+      else {
+        printf("ERR: Invalid option: %s\n", arg);
+        return;
+      }
     }
     else if (! register_arg)
       register_arg = arg;
     else if (! value_arg)
       value_arg = arg;
-    else
-      return (void) printf("ERR: Too much arguments\n");
+    else {
+      printf("ERR: Too much arguments\n");
+      return;
+    }
   }
 
-  if (! register_arg)
-    return (void) printf("ERR: Missing argument (REGISTER)\n");
+  if (! register_arg) {
+    printf("ERR: Missing argument (REGISTER)\n");
+    return;
+  }
 
-  if (! value_arg)
-    return (void) printf("ERR: Missing argument (VALUE)\n");
+  if (! value_arg) {
+    printf("ERR: Missing argument (VALUE)\n");
+    return;
+  }
 
-  int register_ = parse_number(register_arg, 0, word ? 254 : 255, &err);
-  if (err)
-    return (void) printf("ERR: Argument (REGISTER): %s\n", err);
+  uint8_t register_ = (uint8_t) parse_number(register_arg, 0, word ? 254 : 255, &err);
+  if (err) {
+    printf("ERR: Argument (REGISTER): %s\n", err);
+    return;
+  }
 
-  int value = parse_number(value_arg, 0, word ? 65535 : 255, &err);
-  if (err)
-    return (void) printf("ERR: Argument (VALUE): %s\n", err);
+  uint16_t value = (uint16_t) parse_number(value_arg, 0, word ? UINT16_MAX : UINT8_MAX, &err);
+  if (err) {
+    printf("ERR: Argument (VALUE): %s\n", err);
+    return;
+  }
 
   if (word) {
     Error e = ec->WriteWord(register_, value);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
   }
   else {
-    Error e = ec->WriteByte(register_, value);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    Error e = ec->WriteByte(register_, (uint8_t) value);
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
   }
 
   printf("OK\n");
 }
 
-static void ShellReadAll(struct Args* args) {
+static void ShellReadAll(struct Args*) {
   uint8_t values[256];
 
   for (int register_ = 0; register_ <= 255; ++register_) {
-    Error e = ec->ReadByte(register_, &values[register_]);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    Error e = ec->ReadByte((uint8_t) register_, &values[register_]);
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
   }
 
   printf("%d", values[0]);

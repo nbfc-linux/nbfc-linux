@@ -24,10 +24,11 @@ array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
 Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
   char buf[32];
-  int nread;
+  file_op_result res;
+  res.ok = true;
 
   if (self->type == FS_TemperatureSource_File) {
-    nread = slurp_file(buf, sizeof(buf), my.file);
+    res = slurp_file(buf, sizeof(buf), my.file);
   }
   else if (self->type == FS_TemperatureSource_Nvidia) {
     return Nvidia_GetTemperature(out);
@@ -36,21 +37,23 @@ Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out
     FILE* fh = popen(my.file, "r");
     if (! fh)
       return err_stdlib(my.file);
-    nread = fread(buf, 1, sizeof(buf), fh);
+    res.len = fread(buf, 1, sizeof(buf), fh);
     int olderr = errno;
     pclose(fh);
     errno = olderr;
   }
 
-  if (nread < 0)
+  if (! res.ok)
     return err_stdlib(my.file);
 
-  if (nread == 0)
-    return (errno = ENODATA), err_stdlib(my.file);
+  if (res.len == 0) {
+    errno = ENODATA;
+    return err_stdlib(my.file);
+  }
 
   char* end;
   errno = 0;
-  *out = strtod(buf, &end);
+  *out = (float) strtod(buf, &end);
   *out *= my.multiplier;
   if (end == buf)
     errno = EINVAL;
@@ -69,7 +72,7 @@ static Error FS_Sensors_Init_HwMon() {
   char* file = Buffer_Get(PATH_MAX);
   char* filename = Buffer_Get(PATH_MAX);
   FS_TemperatureSource* sources = (FS_TemperatureSource*) Buffer_Get(FS_SENSORS_BUFFER_SIZE);
-  int n_sources = 0;
+  array_size_t n_sources = 0;
 
   for (const char* const* hwmonDir = LinuxHwmonDirs; *hwmonDir; ++hwmonDir) {
     for (int i = 0; i < 10; i++) {
@@ -77,8 +80,8 @@ static Error FS_Sensors_Init_HwMon() {
       snprintf(file, PATH_MAX, "%s/name", dir);
 
       char source_name[256];
-      int nread = slurp_file(source_name, sizeof(source_name), file);
-      if (nread < 0) {
+      file_op_result res = slurp_file(source_name, sizeof(source_name), file);
+      if (! res.ok) {
         if (errno != ENOENT) {
           e = err_stdlib(file);
           e_warn();
@@ -86,8 +89,8 @@ static Error FS_Sensors_Init_HwMon() {
         continue;
       }
 
-      while (nread && source_name[nread] < 32)
-        source_name[nread--] = '\0'; /* strip whitespace */
+      while (res.len && source_name[res.len] < 32)
+        source_name[res.len--] = '\0'; /* strip whitespace */
 
       for (int j = 0; j < 10; j++) {
         if (n_sources >= FS_SENSORS_MAX_SOURCES)
@@ -99,7 +102,7 @@ static Error FS_Sensors_Init_HwMon() {
         FS_TemperatureSource* source = &sources[n_sources];
         source->name = source_name;
         source->file = file;
-        source->multiplier = 0.001;
+        source->multiplier = 0.001f;
         source->type = FS_TemperatureSource_File;
 
         float t;

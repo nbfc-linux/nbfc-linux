@@ -444,7 +444,7 @@ void ConfigRating_RateModelConfig(
   }
 
 end:
-  rating->score = (float) points / (registers_size + methods_size);
+  rating->score = (float) points / (float) (registers_size + methods_size);
   rating->priority = priority;
 }
 

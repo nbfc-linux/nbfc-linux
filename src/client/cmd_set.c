@@ -21,11 +21,11 @@ struct {
   float speed;
 } Set_Options = {
   -1,
-  -2.0
+  -2.0f
 };
 
 int Set() {
-  if (Set_Options.speed == -2.0) {
+  if (Set_Options.speed == -2.0f) {
     printf("%s", CLIENT_SET_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
@@ -42,7 +42,7 @@ int Set() {
   if (Set_Options.fan != -1)
     create_json_integer("Fan", in, Set_Options.fan);
 
-  if (Set_Options.speed == -1.0)
+  if (Set_Options.speed == -1.0f)
     create_json_string("Speed", in, "auto");
   else
     create_json_double("Speed", in, Set_Options.speed);
