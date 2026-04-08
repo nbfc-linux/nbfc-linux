@@ -9,7 +9,7 @@
 
 #define MEMORY_TRACE __FILE__ ":" STRINGIFY(__LINE__)
 
-void Memory_FatalError();
+void Memory_FatalError(void);
 
 #if MEMORY_TRACE_ALLOCS
 

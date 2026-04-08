@@ -372,7 +372,7 @@ end:
 }
 
 // Update compatibility database (model_config.json)
-static int UpdateModelCompatibilityDatabase() {
+static int UpdateModelCompatibilityDatabase(void) {
   int ret = 0;
   CURL* curl = CurlWithMem_Create(UpdateAPIModelSupportURL, NBFC_MODEL_SUPPORT_FILE_MUTABLE);
   CURLcode code = curl_easy_perform(curl);
@@ -398,7 +398,7 @@ end:
 }
 
 // Update configuration files
-static int UpdateConfigurationFiles() {
+static int UpdateConfigurationFiles(void) {
   int ret = 0;
   array_of(GitHubFile) files = {0};
 
@@ -431,7 +431,7 @@ end:
   return ret;
 }
 
-int Update() {
+int Update(void) {
   check_root();
   int ret = NBFC_EXIT_SUCCESS;
 

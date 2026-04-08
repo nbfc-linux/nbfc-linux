@@ -18,7 +18,7 @@ struct {
   const char* variable;
 } Show_Variable_Options = {0};
 
-int Show_Variable() {
+int Show_Variable(void) {
   if (! Show_Variable_Options.variable) {
     Log_Error("Missing argument: VARIABLE");
     return NBFC_EXIT_CMDLINE;

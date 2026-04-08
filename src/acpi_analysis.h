@@ -108,8 +108,8 @@ struct AcpiInfo {
 };
 typedef struct AcpiInfo AcpiInfo;
 
-Error Acpi_Analysis_Is_IASL_Installed();
-Error Acpi_Analysis_Is_AcpiExec_Installed();
+Error Acpi_Analysis_Is_IASL_Installed(void);
+Error Acpi_Analysis_Is_AcpiExec_Installed(void);
 
 Error Acpi_Analysis_Get_DSL(const char*, char**);
 Error Acpi_Analysis_Get_Info(const char*, AcpiInfo*);

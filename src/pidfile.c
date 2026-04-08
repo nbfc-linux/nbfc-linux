@@ -25,6 +25,6 @@ Error PID_Write(enum PID_LockMode lock_mode) {
   return e;
 }
 
-void PID_Cleanup() {
+void PID_Cleanup(void) {
   unlink(NBFC_PID_FILE);
 }

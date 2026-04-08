@@ -12,8 +12,8 @@ struct ConfigFile {
 typedef struct ConfigFile ConfigFile;
 declare_array_of(ConfigFile);
 
-array_of(ConfigFile) List_All_Configs();
-array_of(ConfigFile) List_Recommended_Configs();
+array_of(ConfigFile) List_All_Configs(void);
+array_of(ConfigFile) List_Recommended_Configs(void);
 
 char* Get_Supported_Config(array_of(ConfigFile)*, const char*);
 bool  Contains_Config(array_of(ConfigFile)*, const char*);

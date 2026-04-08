@@ -11,6 +11,6 @@ enum PID_LockMode {
 };
 
 Error PID_Write(enum PID_LockMode);
-void  PID_Cleanup();
+void  PID_Cleanup(void);
 
 #endif

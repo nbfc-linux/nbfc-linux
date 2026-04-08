@@ -11,7 +11,7 @@
 #define ACPI_CALL_FILE         "/proc/acpi/call"
 #define ACPI_CALL_MODPROBE_CMD "modprobe acpi_call"
 
-Error AcpiCall_Open() {
+Error AcpiCall_Open(void) {
   if (file_exists(ACPI_CALL_FILE))
     return err_success();
 

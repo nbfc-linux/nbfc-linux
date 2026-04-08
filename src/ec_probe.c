@@ -97,14 +97,14 @@ static void         Handle_Signal(int);
 static const EC_VTable* ec;
 static volatile int quit;
 
-static int Read();
-static int Write();
-static int Dump();
-static int Load();
-static int Monitor();
-static int Watch();
-static int AcpiCall();
-static int Shell();
+static int Read(void);
+static int Write(void);
+static int Dump(void);
+static int Load(void);
+static int Monitor(void);
+static int Watch(void);
+static int AcpiCall(void);
+static int Shell(void);
 
 enum Command {
   Command_Read,
@@ -444,7 +444,7 @@ int main(int argc, char* const argv[]) {
   }
 }
 
-static int Read() {
+static int Read(void) {
   if (options.use_word) {
     uint16_t word;
     Error e = ec->ReadWord(options.register_, &word);
@@ -461,7 +461,7 @@ static int Read() {
   return 0;
 }
 
-static int Write() {
+static int Write(void) {
   if (options.use_word) {
     Error e = ec->WriteWord(options.register_, options.value);
     e_die();
@@ -478,7 +478,7 @@ static int Write() {
   return 0;
 }
 
-static int Dump() {
+static int Dump(void) {
   bool use_color = false;
   RegisterBuf register_buf;
 
@@ -494,7 +494,7 @@ static int Dump() {
   return 0;
 }
 
-static int Load() {
+static int Load(void) {
   FILE* infile;
 
   if (! strcmp(options.file, "-"))
@@ -518,7 +518,7 @@ static int Load() {
   return ret;
 }
 
-static int Monitor() {
+static int Monitor(void) {
   int max_loops = INT_MAX;
 
   if (options.timespan)
@@ -546,7 +546,7 @@ static int Monitor() {
   return 0;
 }
 
-static int Watch() {
+static int Watch(void) {
   int max_loops = INT_MAX;
 
   if (options.timespan)
@@ -564,7 +564,7 @@ static int Watch() {
   return 0;
 }
 
-static int AcpiCall() {
+static int AcpiCall(void) {
   Error e;
   char cmd[1024];
 
@@ -923,7 +923,7 @@ static void ShellReadAll(struct Args*) {
   printf("\n");
 }
 
-static void ShellHelp() {
+static void ShellHelp(void) {
   printf(
     "Available commands: \n"
     "  read [-w|--word] REGISTER\n"
@@ -966,7 +966,7 @@ static void read_args(struct Args* args, char** line) {
   }
 }
 
-static int Shell() {
+static int Shell(void) {
   char buffer[16384];
   char* line;
   struct Args args;

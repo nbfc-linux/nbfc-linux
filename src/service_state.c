@@ -12,7 +12,7 @@
 
 ServiceState service_state = {0};
 
-Error ServiceState_Init() {
+Error ServiceState_Init(void) {
   Error e;
   Trace* trace = (Trace*) Buffer_Get(sizeof(Trace));
   char* file_content = Buffer_Get(NBFC_MAX_FILE_SIZE);
@@ -61,7 +61,7 @@ err:
   return e;
 }
 
-Error ServiceState_Write() {
+Error ServiceState_Write(void) {
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
 
@@ -90,7 +90,7 @@ Error ServiceState_Write() {
     return err_stdlib(NBFC_STATE_FILE);
 }
 
-void ServiceState_Free() {
+void ServiceState_Free(void) {
   Mem_Free(service_state.TargetFanSpeeds.data);
   memset(&service_state, 0, sizeof(service_state));
 }

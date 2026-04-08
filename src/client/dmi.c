@@ -14,7 +14,7 @@
 #define DMI_ProductNameFile DMI_Directory "/product_name"
 #define DMI_SysVendorFile   DMI_Directory "/sys_vendor"
 
-const char* DMI_Get_System_Product() {
+const char* DMI_Get_System_Product(void) {
   static char buf[128];
 
   if (! slurp_file(buf, sizeof(buf), DMI_ProductNameFile).ok)
@@ -34,7 +34,7 @@ error:
   exit(NBFC_EXIT_FAILURE);
 }
 
-const char* DMI_Get_System_Vendor() {
+const char* DMI_Get_System_Vendor(void) {
   static char buf[128];
 
   if (! slurp_file(buf, sizeof(buf), DMI_SysVendorFile).ok)
@@ -54,7 +54,7 @@ error:
   exit(NBFC_EXIT_FAILURE);
 }
 
-const char* DMI_Get_Model_Name() {
+const char* DMI_Get_Model_Name(void) {
   static char model_name[256];
 
   struct vendor_alias { const char* key; const char* value; };

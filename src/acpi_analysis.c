@@ -133,7 +133,7 @@
 /*
  * Checks if the `iasl` program is installed.
  */
-Error Acpi_Analysis_Is_IASL_Installed() {
+Error Acpi_Analysis_Is_IASL_Installed(void) {
   if (system("type " ACPI_ANALYSIS_IASL " >/dev/null 2>/dev/null") == 0)
     return err_success();
 
@@ -144,7 +144,7 @@ Error Acpi_Analysis_Is_IASL_Installed() {
 /*
  * Checks if the `acpiexec` program is installed.
  */
-Error Acpi_Analysis_Is_AcpiExec_Installed() {
+Error Acpi_Analysis_Is_AcpiExec_Installed(void) {
   if (system("type " ACPI_ANALYSIS_ACPIEXEC " >/dev/null 2>/dev/null") == 0)
     return err_success();
 

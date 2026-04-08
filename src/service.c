@@ -42,14 +42,14 @@ static enum Service_Initialization Service_State;
 
 static Error ApplyRegisterWriteConfigurations(bool);
 static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration*);
-static Error ResetRegisterWriteConfigurations();
+static Error ResetRegisterWriteConfigurations(void);
 static Error ResetRegisterWriteConfig(RegisterWriteConfiguration*);
-static void  ResetEC();
-static bool  IsAcpiCallUsed();
+static void  ResetEC(void);
+static bool  IsAcpiCallUsed(void);
 static EmbeddedControllerType EmbeddedControllerType_By_EC(const EC_VTable*);
 static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
 
-Error Service_Init() {
+Error Service_Init(void) {
   Error e;
   Trace* trace = (Trace*) Buffer_Get(sizeof(Trace));
   char* path = Buffer_Get(PATH_MAX);
@@ -198,7 +198,7 @@ error:
   return e;
 }
 
-Error Service_Loop() {
+Error Service_Loop(void) {
   Error e = err_success();
 
   bool re_init_required = false;
@@ -280,7 +280,7 @@ static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
   }
 }
 
-static void ResetEC() {
+static void ResetEC(void) {
   Error e;
   bool failed = false;
   int tries = 10;
@@ -331,7 +331,7 @@ static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
   }
 }
 
-static Error ResetRegisterWriteConfigurations() {
+static Error ResetRegisterWriteConfigurations(void) {
   Error e = err_success();
   for_each_array(RegisterWriteConfiguration*, cfg, Service_ModelConfig.RegisterWriteConfigurations)
     if (cfg->ResetRequired) {
@@ -382,7 +382,7 @@ static Error ApplyRegisterWriteConfigurations(bool initializing) {
   return err_success();
 }
 
-static bool IsAcpiCallUsed() {
+static bool IsAcpiCallUsed(void) {
   for_each_array(FanConfiguration*, fc, Service_ModelConfig.FanConfigurations) {
     if (FanConfiguration_IsSet_WriteAcpiMethod(fc))
       return true;
@@ -405,7 +405,7 @@ static bool IsAcpiCallUsed() {
   return false;
 }
 
-void Service_WriteTargetFanSpeedsToState() {
+void Service_WriteTargetFanSpeedsToState(void) {
   const array_size_t fancount = Service_ModelConfig.FanConfigurations.size;
 
   service_state.TargetFanSpeeds.data = Mem_Realloc(service_state.TargetFanSpeeds.data, sizeof(float) * fancount);
@@ -420,7 +420,7 @@ void Service_WriteTargetFanSpeedsToState() {
   }
 }
 
-void Service_Cleanup() {
+void Service_Cleanup(void) {
   switch (Service_State) {
     case Initialized_6_Temperature_Filter:
       for_each_array(FanTemperatureControl*, ftc, Service_Fans)

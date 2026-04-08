@@ -28,7 +28,7 @@ void Log_Init(bool use_syslog) {
 #endif
 }
 
-void Log_Close() {
+void Log_Close(void) {
 #if ENABLE_SYSLOG
   if (Log_UseSyslog)
     closelog();

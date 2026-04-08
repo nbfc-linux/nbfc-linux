@@ -7,7 +7,7 @@
 #include "../nbfc.h"
 #include "../log.h"
 
-static inline void check_root() {
+static inline void check_root(void) {
   if (geteuid()) {
     Log_Error("This operation must be run as root");
     exit(NBFC_EXIT_FAILURE);

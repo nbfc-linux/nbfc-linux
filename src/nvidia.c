@@ -28,7 +28,7 @@ nvmlReturn_t (*Nvidia_nvmlDeviceGetTemperature_fn)(nvmlDevice_t, unsigned int, u
 // Nvidia_* Functions
 // ============================================================================
 
-Nvidia_Error Nvidia_Init() {
+Nvidia_Error Nvidia_Init(void) {
   if (! Nvidia_DlHandle) {
     Nvidia_DlHandle = dlopen("libnvidia-ml.so.1", RTLD_LAZY);
 
@@ -65,7 +65,7 @@ Nvidia_Error Nvidia_Init() {
   return Nvidia_Error_OK;
 }
 
-void Nvidia_Close() {
+void Nvidia_Close(void) {
   if (Nvidia_nvmlShutdown_fn)
     Nvidia_nvmlShutdown_fn();
 

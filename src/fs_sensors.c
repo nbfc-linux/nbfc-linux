@@ -66,7 +66,7 @@ Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out
 #define FS_SENSORS_MAX_SOURCES 256
 #define FS_SENSORS_BUFFER_SIZE (sizeof(FS_TemperatureSource) * FS_SENSORS_MAX_SOURCES)
 
-static Error FS_Sensors_Init_HwMon() {
+static Error FS_Sensors_Init_HwMon(void) {
   Error e;
   char* dir = Buffer_Get(PATH_MAX);
   char* file = Buffer_Get(PATH_MAX);
@@ -137,12 +137,12 @@ end:
   return err_success();
 }
 
-void FS_Sensors_Log() {
+void FS_Sensors_Log(void) {
   for_each_array(FS_TemperatureSource*, source, FS_Sensors_Sources)
     Log_Info("Available temperature source: \"%s\" (%s)", source->name, source->file);
 }
 
-Error FS_Sensors_Init() {
+Error FS_Sensors_Init(void) {
   Error e;
   int slept;
   const int sleep_time = 30;
@@ -184,7 +184,7 @@ Error FS_Sensors_Init() {
   return err_success();
 }
 
-void FS_Sensors_Cleanup() {
+void FS_Sensors_Cleanup(void) {
   Nvidia_Close();
 
   for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources) {

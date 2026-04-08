@@ -4,11 +4,11 @@
 
 const EC_VTable* EC_Debug_Controller;
 
-Error EC_Debug_Open() {
+Error EC_Debug_Open(void) {
   return EC_Debug_Controller->Open();
 }
 
-void EC_Debug_Close() {
+void EC_Debug_Close(void) {
   EC_Debug_Controller->Close();
 }
 

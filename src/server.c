@@ -153,7 +153,7 @@ static Error Server_Command_Status(int socket, const nx_json* json) {
  *
  * Also change the mode of the socket file to 0666.
  */
-Error Server_Init() {
+Error Server_Init(void) {
   Error e = err_success();
 
   memset(&Server_Address, 0, sizeof(Server_Address));
@@ -188,7 +188,7 @@ error:
 }
 
 // Return an inactive `Client` structure
-static Client* Server_AllocateClient() {
+static Client* Server_AllocateClient(void) {
   for (unsigned i = 0; i < NBFC_MAX_CONNECTIONS; ++i)
     if (! Server_Clients[i].active)
       return &Server_Clients[i];
@@ -229,7 +229,7 @@ static Client* Server_FindClientByFileDescriptor(int fd) {
 }
 
 // Get the number of active clients
-static size_t Server_GetNumberOfActiveClients() {
+static size_t Server_GetNumberOfActiveClients(void) {
   size_t num_clients = 0;
   for (unsigned i = 0; i < NBFC_MAX_CONNECTIONS; ++i)
     num_clients += Server_Clients[i].active;
@@ -237,7 +237,7 @@ static size_t Server_GetNumberOfActiveClients() {
 }
 
 // Accept a new connection and add setup client
-static Error Server_AcceptClient() {
+static Error Server_AcceptClient(void) {
   Error e;
   int addrlen = sizeof(Server_Address);
   int new_socket;
@@ -425,7 +425,7 @@ Error Server_Loop(int timeout) {
   return err_success();
 }
 
-void Server_Close() {
+void Server_Close(void) {
   if (Server_FD != -1) {
     close(Server_FD);
     unlink(NBFC_SOCKET_PATH);

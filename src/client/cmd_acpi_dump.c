@@ -190,7 +190,7 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
   return NBFC_EXIT_SUCCESS;
 }
 
-int AcpiDump() {
+int AcpiDump(void) {
   const char* const dsdt_file = Acpi_Dump_Options.file;
   const bool json = Acpi_Dump_Options.json;
 

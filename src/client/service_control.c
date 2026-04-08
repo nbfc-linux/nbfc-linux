@@ -23,7 +23,7 @@
 #include "../service_config.h"
 #include "../file_utils.h"
 
-pid_t Service_Get_PID() {
+pid_t Service_Get_PID(void) {
   const char* err;
   char buf[32];
   if (! slurp_file(buf, sizeof(buf), NBFC_PID_FILE).ok) {
@@ -80,7 +80,7 @@ error:
   return e;
 }
 
-void ServiceConfig_Load() {
+void ServiceConfig_Load(void) {
   if (! file_exists(NBFC_SERVICE_CONFIG)) {
     memset(&service_config, 0, sizeof(service_config)); // Clear values
     return;
@@ -204,7 +204,7 @@ int Service_Start(bool read_only) {
   return WEXITSTATUS(ret);
 }
 
-int Service_Stop() {
+int Service_Stop(void) {
   pid_t pid = Service_Get_PID();
   if (pid == -1) {
     Log_Error("Service not running");

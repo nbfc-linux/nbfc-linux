@@ -3,7 +3,7 @@
 #include "log.h"
 #include "service.h"
 
-void Sponsor_Print() {
+void Sponsor_Print(void) {
   if (! ModelConfig_IsSet_Sponsor(&Service_ModelConfig))
     return;
 

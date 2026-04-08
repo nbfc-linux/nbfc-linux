@@ -62,7 +62,7 @@ struct {
  * The actual URL is retrieved from the official GitHub repository to
  * ensure compatibility in case the upload endpoint changes.
  */
-static char* Support_Get_Real_Firmware_Upload_Endpoint_URL() {
+static char* Support_Get_Real_Firmware_Upload_Endpoint_URL(void) {
   CURL* curl = CurlWithMem_Create(SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL, NULL);
   CURLcode code;
   long http_code;
@@ -253,7 +253,7 @@ end:
   return ret;
 }
 
-static int Support_Upload_Firmware() {
+static int Support_Upload_Firmware(void) {
   // Accessing `SUPPORT_ACPI_DSDT` requires root
   check_root();
 
@@ -268,7 +268,7 @@ static int Support_Upload_Firmware() {
   return ret;
 }
 
-static int Support_Print_Command() {
+static int Support_Print_Command(void) {
   char* endpoint_url = Support_Get_Real_Firmware_Upload_Endpoint_URL();
 
   printf(
@@ -283,7 +283,7 @@ static int Support_Print_Command() {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Support() {
+int Support(void) {
   int ret = NBFC_EXIT_FAILURE;
 
   if (Support_Options.action == Support_Action_None) {

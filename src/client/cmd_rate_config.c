@@ -140,7 +140,7 @@ void ConfigWithData_Free(ConfigWithData* config_with_data) {
   memset(config_with_data, 0, sizeof(*config_with_data));
 }
 
-static void PrintFullHelp() {
+static void PrintFullHelp(void) {
   puts(
     "nbfc rate-config evaluates one or more NBFC configuration files.\n"
     "\n"
@@ -434,7 +434,7 @@ static Error RateConfig_RateFiles(
   return err_success();
 }
 
-static inline void PrintFullHelpNotice() {
+static inline void PrintFullHelpNotice(void) {
   printf(
     "Please run `nbfc rate-config --full-help` for a full explanation of how "
     "to interpret these results.\n");
@@ -519,7 +519,7 @@ static int RateConfig_PrintRules(const char* rules_json, bool json) {
   return NBFC_EXIT_SUCCESS;
 }
 
-int RateConfig() {
+int RateConfig(void) {
   Error e;
   char* rules;
   ConfigRating config_rating = {0};

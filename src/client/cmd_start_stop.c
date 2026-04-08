@@ -12,17 +12,17 @@ struct {
   bool read_only;
 } Start_Options = {0};
 
-int Start() {
+int Start(void) {
   check_root();
   return Service_Start(Start_Options.read_only);
 }
 
-int Stop() {
+int Stop(void) {
   check_root();
   return Service_Stop();
 }
 
-int Restart() {
+int Restart(void) {
   check_root();
   return Service_Restart(Start_Options.read_only);
 }

@@ -77,7 +77,7 @@ void Set_Config_Action(enum Config_Action action) {
   Config_Options.action = action;
 }
 
-int List() {
+int List(void) {
   array_of(ConfigFile) files = List_All_Configs();
 
   qsort(files.data, files.size, sizeof(ConfigFile), ConfigFile_CompareByName);
@@ -89,7 +89,7 @@ int List() {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Recommend() {
+int Recommend(void) {
   if (isatty(STDOUT_FILENO) && !Config_Options.yes) {
     fprintf(stderr, "%s", RECOMMENDED_WARNING);
     return NBFC_EXIT_FAILURE;
@@ -120,7 +120,7 @@ int Recommend() {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Set_Or_Apply() {
+int Set_Or_Apply(void) {
   check_root();
   char *config;
   array_of(ConfigFile) files = List_All_Configs();
@@ -178,7 +178,7 @@ int Set_Or_Apply() {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Config() {
+int Config(void) {
   switch (Config_Options.action) {
   case Config_Action_List:      return List();
   case Config_Action_Recommend: return Recommend();

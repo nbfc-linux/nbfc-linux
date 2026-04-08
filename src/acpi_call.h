@@ -5,7 +5,7 @@
 
 #include "error.h"
 
-Error AcpiCall_Open();
+Error AcpiCall_Open(void);
 Error AcpiCall_Call(const char*, uint64_t, uint64_t*);
 
 #endif

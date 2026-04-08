@@ -105,7 +105,7 @@ static FanTemperatureSourceConfig* Sensors_GetFTSCByFanIndex(array_size_t fanInd
   return &service_config.FanTemperatureSources.data[idx];
 }
 
-static int Sensors_Set() {
+static int Sensors_Set(void) {
   Error e;
   ModelConfig model_config = {0};
 
@@ -163,7 +163,7 @@ static int Sensors_Set() {
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Sensors_Show() {
+static int Sensors_Show(void) {
   ModelConfig model_config = {0};
 
   Service_LoadAllConfigFiles(&model_config);
@@ -250,7 +250,7 @@ static int Sensors_Show() {
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Sensors_List() {
+static int Sensors_List(void) {
   FS_Sensors_Init();
 
   const char* having[4096];
@@ -282,7 +282,7 @@ static int Sensors_List() {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Sensors() {
+int Sensors(void) {
   switch (Sensors_Options.command) {
     case Sensors_Command_Set:    return Sensors_Set();
     case Sensors_Command_List:   return Sensors_List();

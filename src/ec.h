@@ -9,8 +9,8 @@
 
 typedef struct EC_VTable EC_VTable;
 struct EC_VTable {
-  Error (*Open)();
-  void  (*Close)();
+  Error (*Open)(void);
+  void  (*Close)(void);
   Error (*ReadByte)(uint8_t, uint8_t*);
   Error (*ReadWord)(uint8_t, uint16_t*);
   Error (*WriteByte)(uint8_t, uint8_t);

@@ -20,14 +20,14 @@
 
 static int EC_Linux_FD = -1;
 
-Error EC_Linux_Open() {
+Error EC_Linux_Open(void) {
   EC_Linux_FD = open(EC_Linux_PortFilePath, O_RDWR);
   if (EC_Linux_FD < 0)
     return err_stdlib(EC_Linux_PortFilePath);
   return err_success();
 }
 
-void EC_Linux_Close() {
+void EC_Linux_Close(void) {
   if (EC_Linux_FD >= 0) {
     close(EC_Linux_FD);
     EC_Linux_FD = -1;
@@ -101,12 +101,12 @@ static bool EC_Linux_WaitForEcStatus(enum ECStatus status, bool isSet)
   return false;
 }
 
-static inline bool EC_Linux_WaitWrite()
+static inline bool EC_Linux_WaitWrite(void)
 {
   return EC_Linux_WaitForEcStatus(ECStatus_InputBufferFull, false);
 }
 
-static bool EC_Linux_WaitRead()
+static bool EC_Linux_WaitRead(void)
 {
   if (EC_Linux_WaitReadFailures > EC_Linux_FailuresBeforeSkip) {
     return true;

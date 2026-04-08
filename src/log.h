@@ -19,7 +19,7 @@ typedef enum LogLevel LogLevel;
 extern LogLevel Log_LogLevel;
 
 void Log_Init(bool);
-void Log_Close();
+void Log_Close(void);
 void Log_Log(LogLevel, const char* fmt, ...) PRINTF_LIKE(2, 3);
 
 #define Log_Error(...) Log_Log(LogLevel_Error, __VA_ARGS__)

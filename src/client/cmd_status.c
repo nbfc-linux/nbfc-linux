@@ -50,7 +50,7 @@ static void Status_Print_Service(const ServiceInfo* service_info) {
     service_info->SelectedConfigId);
 }
 
-static void Status_Print() {
+static void Status_Print(void) {
   Error e;
   ServiceInfo service_info = {0};
 
@@ -80,7 +80,7 @@ static void Status_Print() {
   }
 }
 
-int Status() {
+int Status(void) {
   if (!Status_Options.service && !Status_Options.all && !Status_Options.fans.size)
     Status_Options.all = true;
 

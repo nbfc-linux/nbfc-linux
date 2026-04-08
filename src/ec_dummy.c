@@ -11,13 +11,13 @@
 static uint8_t* EC_Dummy_FakeRegisters = NULL;
 #define         EC_Dummy_FakeRegistersSize 256
 
-Error EC_Dummy_Open() {
+Error EC_Dummy_Open(void) {
   if (! EC_Dummy_FakeRegisters)
     EC_Dummy_FakeRegisters = (uint8_t*) Mem_Calloc(EC_Dummy_FakeRegistersSize, sizeof(uint8_t));
   return err_success();
 }
 
-void EC_Dummy_Close() {
+void EC_Dummy_Close(void) {
   Mem_Free(EC_Dummy_FakeRegisters);
   EC_Dummy_FakeRegisters = NULL;
 }

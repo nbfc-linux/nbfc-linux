@@ -21,7 +21,7 @@
 "more information, please refer to the full license text included with\n"      \
 "the source code."
 
-int Warranty() {
+int Warranty(void) {
   puts(WARRANTY_TEXT);
   return NBFC_EXIT_SUCCESS;
 }

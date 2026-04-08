@@ -8,7 +8,7 @@
 #include <string.h> // strlen, strcpy, strerror
 #include <stdio.h>  // fprintf
 
-void Memory_FatalError() {
+void Memory_FatalError(void) {
   WriteToErr("FATAL ERROR: Cannot allocate memory\n");
   exit(NBFC_EXIT_FATAL);
 }
