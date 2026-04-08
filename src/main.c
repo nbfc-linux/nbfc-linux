@@ -13,6 +13,7 @@
 #include "help/nbfc_service.help.h"
 #include "sleep.h"
 #include "mkdir_p.h"
+#include "ec_available.h"
 
 #include <errno.h>  // errno
 #include <string.h> // strerror
@@ -133,25 +134,12 @@ int main(int argc, char* const argv[])
   Log_Info("SYSCONFDIR is \"%s\"", SYSCONFDIR);
   Log_Info("DATADIR is \"%s\"", DATADIR);
   Log_Info("RUNSTATEDIR is \"%s\"", RUNSTATEDIR);
-  Log_Info("Available Embedded Controllers: "
-#if ENABLE_EC_SYS
-    "ec_sys "
-#endif
-#if ENABLE_EC_ACPI
-    "acpi_ec "
-#endif
-#if ENABLE_EC_DEV_PORT
-    "dev_port "
-#endif
-#if ENABLE_EC_DUMMY
-    "dummy "
-#endif
-  );
+  Log_Info("Available Embedded Controllers: " EC_AVAILABLE_STR);
 
   // Sets the OOM (Out-Of-Memory) score adjustment for this process to -1000,
   // which tells the Linux kernel to never kill this process, even under
   // extreme memory pressure.
-  if (write_file("/proc/self/oom_score_adj", O_WRONLY, 0, "-1000\n", 6) < 0) {
+  if (! write_file("/proc/self/oom_score_adj", O_WRONLY, 0, "-1000\n", 6).ok) {
     Log_Error("%s: %s", "/proc/self/oom_score_adj", strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }

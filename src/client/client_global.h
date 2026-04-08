@@ -1,7 +1,7 @@
 #ifndef NBFC_CLIENT_GLOBAL_H_
 #define NBFC_CLIENT_GLOBAL_H_
 
-#include "../optparse/optparse.h"
+#include "../cli99.h"
 
 enum Option {
   Option_None = 0,
@@ -31,6 +31,7 @@ enum Option {
   Option_Config_Recommend,
   Option_Config_Set,
   Option_Config_Apply,
+  Option_Config_Yes,
 
   // Rate-Config options
   Option_Rate_Config_File,
@@ -38,6 +39,8 @@ enum Option {
   Option_Rate_Config_All,
   Option_Rate_Config_Full_Help,
   Option_Rate_Config_Json,
+  Option_Rate_Config_Rules,
+  Option_Rate_Config_No_Download,
   Option_Rate_Config_Print_Rules,
   Option_Rate_Config_Min_Score,
 
@@ -66,6 +69,6 @@ enum Option {
   Option_ShowVariable_Variable,
 };
 
-extern const cli99_option main_options[];
+extern const struct cli99_Option main_options[];
 
 #endif

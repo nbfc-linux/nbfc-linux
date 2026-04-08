@@ -21,7 +21,7 @@ Error AcpiCall_Open() {
 Error AcpiCall_Call(const char* cmd, uint64_t value, uint64_t* out) {
   char buf[1024];
   size_t len = 0;
-  ssize_t ret;
+  file_op_result res;
   char* end;
 
   // Copy `cmd` to `buf`, replacing placeholders ($) with `value` and add
@@ -54,20 +54,20 @@ Error AcpiCall_Call(const char* cmd, uint64_t value, uint64_t* out) {
   buf[len++] = '\n';
 
   // Write command (buf) to ACPI_CALL_FILE
-  ret = write_file(ACPI_CALL_FILE, O_WRONLY, 0, buf, len);
+  res = write_file(ACPI_CALL_FILE, O_WRONLY, 0, buf, len);
 
-  if (ret == -1)
+  if (! res.ok)
     return err_stdlib(ACPI_CALL_FILE);
 
   // Read the contents of ACPI_CALL_FILE into buf
-  ret = slurp_file(buf, sizeof(buf), ACPI_CALL_FILE);
+  res = slurp_file(buf, sizeof(buf), ACPI_CALL_FILE);
 
-  if (ret == -1)
+  if (! res.ok)
     return err_stdlib(ACPI_CALL_FILE);
 
   // Strip whitespace from response
-  while (ret && buf[ret] < 32)
-    buf[ret--] = '\0';
+  while (res.len && buf[res.len] < 32)
+    buf[res.len--] = '\0';
 
   // Check for empty response
   if (! buf[0]) {

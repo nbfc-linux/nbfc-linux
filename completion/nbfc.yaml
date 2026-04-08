@@ -159,6 +159,15 @@ options:
 
   - option_strings: ["--print-rules"]
     help: "Print configuration rules"
+
+  - option_strings: ["-r", "--rules"]
+    help: "Use an alternative rules file"
+    metavar: "FILE"
+    complete: ["file"]
+
+  - option_strings: ["-n", "--no-download"]
+    help: "Don't download rules file from the repository"
+
 positionals:
   - number: 1
     metavar: "FILE"

@@ -1,0 +1,20 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Call",
+      "AcpiMethod": "Foo",
+      "Value": 0
+    }
+  ],
+
+  "Expected": "RegisterWriteConfigurations[0]: Value: Cannot be used with WriteMode == Call"
+}

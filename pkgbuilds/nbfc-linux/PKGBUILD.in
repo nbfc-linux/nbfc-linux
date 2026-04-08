@@ -10,7 +10,7 @@ url="https://github.com/nbfc-linux/nbfc-linux"
 license=('GPL-3.0-only')
 conflicts=('nbfc')
 provides=('nbfc')
-depends=('curl' 'openssl')
+depends=('curl' 'openssl' 'acpica' 'acpi_call')
 makedepends=('curl' 'openssl')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/nbfc-linux/nbfc-linux/archive/refs/tags/${pkgver}.tar.gz")
 sha256sums=('%SHA256%')
@@ -26,4 +26,5 @@ package() {
 
   make DESTDIR="${pkgdir}" install
 }
+
 # vim:set ts=2 sw=2 et:

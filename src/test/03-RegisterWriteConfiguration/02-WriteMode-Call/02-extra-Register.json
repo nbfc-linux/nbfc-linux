@@ -1,0 +1,21 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Call",
+      "AcpiMethod": "Foo",
+      "Register": 0
+    }
+  ],
+
+  "Expected": "OK",
+  "Comment": "Register may be used if ResetRequired is true"
+}

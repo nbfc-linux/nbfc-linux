@@ -3,6 +3,8 @@
 #define NX_JSON_CALLOC(SIZE) ((nx_json*) NXJSON_Memory_Calloc(1, SIZE))
 #define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
 
+#define _GNU_SOURCE
+
 #include <float.h>    // FLT_MAX
 #include <limits.h>   // INT_MAX
 #include <locale.h>   // setlocale, LC_NUMERIC
@@ -33,7 +35,7 @@
 #include "nxjson_write.c"
 #include "service_config.c"
 #include "trace.c"
-#include "optparse/optparse.c"
+#include "cli99.c"
 #include "mkdir_p.c"
 #include "regex_utils.c"
 #include "acpi_analysis.c"
@@ -46,11 +48,11 @@
 #include "client/str_functions.c"
 #include "client/service_control.c"
 
-const cli99_option main_options[] = {
-  {"-h|--help",     Option_Help,       0},
-  {"-v|--version",  Option_Version,    0},
-  {"command",       Option_Command,    1 | cli99_required_option},
-  cli99_options_end()
+const struct cli99_Option main_options[] = {
+  {"-h|--help",     Option_Help,       cli99_NoArgument      },
+  {"-v|--version",  Option_Version,    cli99_NoArgument      },
+  {"command",       Option_Command,    cli99_NormalPositional},
+  cli99_Options_End()
 };
 
 // ============================================================================
@@ -119,7 +121,7 @@ static enum Command Command_FromString(const char* s) {
   return Command_End;
 }
 
-static const cli99_option *Options[] = {
+static const struct cli99_Option *Options[] = {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _options,
   NBFC_CLIENT_COMMANDS
 #undef o
@@ -143,11 +145,11 @@ int main(int argc, char *const argv[]) {
   Program_Name_Set(argv[0]);
   setlocale(LC_NUMERIC, "C"); // for json floats
 
-  int o;
+  int64_t o;
   const char* err;
   enum Command cmd = Command_Help;
-  cli99 p;
-  cli99_Init(&p, argc, argv, main_options, cli99_options_python);
+  struct cli99 p;
+  cli99_Init(&p, main_options, argv, argc);
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
 
@@ -178,7 +180,8 @@ int main(int argc, char *const argv[]) {
         printf("%s", HelpTexts[Command_Help]);
         return NBFC_EXIT_SUCCESS;
       }
-      cli99_SetOptions(&p, Options[cmd], false);
+
+      p.options = Options[cmd];
       break;
 
     // ========================================================================
@@ -195,23 +198,34 @@ int main(int argc, char *const argv[]) {
 
     case Option_Status_Fan:
       {
-        const int fan = parse_number(p.optarg, 0, INT_MAX, &err);
+        const array_size_t fan = (array_size_t) parse_number(p.optarg, 0, INT_MAX, &err);
         if (err) {
-          Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
+          Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
           return NBFC_EXIT_CMDLINE;
         }
 
-        array_of(int)* fans = &Status_Options.fans;
-        fans->size++;
-        fans->data = Mem_Realloc(fans->data, fans->size * sizeof(int));
-        fans->data[fans->size - 1] = fan;
+        array_of(array_size_t)* fans = &Status_Options.fans;
+        bool have_fan = false;
+
+        for_each_array(array_size_t*, fan1, *fans) {
+          if (*fan1 == fan) {
+            have_fan = true;
+            break;
+          }
+        }
+
+        if (! have_fan) {
+          fans->size++;
+          fans->data = Mem_Realloc(fans->data, fans->size * sizeof(int));
+          fans->data[fans->size - 1] = fan;
+        }
       }
       break;
 
     case Option_Status_Watch:
-      Status_Options.watch = parse_double(p.optarg, 0.1, FLT_MAX, &err);
+      Status_Options.watch = (float) parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-w|--watch", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -228,14 +242,14 @@ int main(int argc, char *const argv[]) {
       }
 
       if (Sensors_Options.command == Sensors_Command_Set)
-        cli99_SetOptions(&p, sensors_set_options, false);
+        p.options = sensors_set_options;
 
       break;
 
     case Option_Sensors_Fan:
-      Sensors_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
+      Sensors_Options.fan = (array_size_t) parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -252,7 +266,7 @@ int main(int argc, char *const argv[]) {
     case Option_Sensors_Algorithm:
       Sensors_Options.algorithm = TemperatureAlgorithmType_FromString(p.optarg);
       if (Sensors_Options.algorithm == TemperatureAlgorithmType_Unset) {
-        Log_Error("%s: %s: %s", "-a|--algorithm", "Invalid value", p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, "Invalid value", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -283,41 +297,45 @@ int main(int argc, char *const argv[]) {
       Set_Config_Action(Config_Action_Recommend);
       break;
 
+    case Option_Config_Yes:
+      Config_Options.yes = true;
+      break;
+
     // ========================================================================
     // Set options
     // ========================================================================
 
     case Option_Set_Auto:
-      if (Set_Options.speed != -2.0) {
+      if (Set_Options.speed != -2.0f) {
         Log_Error("Options -a|--auto or -s|--speed may only be specified once");
         return NBFC_EXIT_CMDLINE;
       }
 
-      Set_Options.speed = -1.0;
+      Set_Options.speed = -1.0f;
       break;
 
     case Option_Set_Speed:
-      if (Set_Options.speed != -2.0) {
+      if (Set_Options.speed != -2.0f) {
         Log_Error("Options -a|--auto or -s|--speed may only be specified once");
         return NBFC_EXIT_CMDLINE;
       }
 
-      Set_Options.speed = parse_double(p.optarg, 0, 100, &err);
+      Set_Options.speed = (float) parse_double(p.optarg, 0, 100, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-s|--speed", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
 
     case Option_Set_Fan:
       if (Set_Options.fan != -1) {
-        Log_Error("Option -f|--fan may only be specified once");
+        Log_Error("Option %s may only be specified once", p.option->optstring);
         return NBFC_EXIT_CMDLINE;
       }
 
-      Set_Options.fan = parse_number(p.optarg, 0, INT_MAX, &err);
+      Set_Options.fan = (int) parse_number(p.optarg, 0, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-f|--fan", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -327,9 +345,9 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Update_Parallel:
-      Update_Options.parallel = parse_number(p.optarg, 0, INT_MAX, &err);
+      Update_Options.parallel = (int) parse_number(p.optarg, 1, INT_MAX, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-p|--parallel", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -370,6 +388,14 @@ int main(int argc, char *const argv[]) {
       Rate_Config_Options.dsdt_file = p.optarg;
       break;
 
+   case Option_Rate_Config_Rules:
+      Rate_Config_Options.rules_file = p.optarg;
+      break;
+
+   case Option_Rate_Config_No_Download:
+      Rate_Config_Options.no_download = true;
+      break;
+
     case Option_Rate_Config_All:
       Rate_Config_Options.all = true;
       break;
@@ -388,9 +414,9 @@ int main(int argc, char *const argv[]) {
 
     case Option_Rate_Config_Min_Score:
       Rate_Config_Options.min_score_set = true;
-      Rate_Config_Options.min_score = parse_double(p.optarg, 0, 10, &err);
+      Rate_Config_Options.min_score = (float) parse_double(p.optarg, 0, 10, &err);
       if (err) {
-        Log_Error("%s: %s: %s", "-m|--min-score", err, p.optarg);
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -410,7 +436,7 @@ int main(int argc, char *const argv[]) {
     case Option_Acpi_Dump_Command:
       Acpi_Dump_Options.action = AcpiDump_CommandFromString(p.optarg);
       if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
-        Log_Error("%s: Invalid command", p.optarg);
+        Log_Error("Invalid command: %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -428,7 +454,7 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     default:
-      cli99_ExplainError(&p);
+      Log_Error("%s: %s", cli99_StrError(p.error), p.error_cause);
       return NBFC_EXIT_CMDLINE;
     }
   }

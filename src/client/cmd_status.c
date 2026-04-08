@@ -8,20 +8,20 @@
 
 #define STATUS_CLEAR_SCREEN "\033c"
 
-const cli99_option status_options[] = {
-  cli99_include_options(&main_options),
-  {"-a|--all",     Option_Status_All,     0},
-  {"-s|--service", Option_Status_Service, 0},
-  {"-f|--fan",     Option_Status_Fan,     1},
-  {"-w|--watch",   Option_Status_Watch,   1},
-  cli99_options_end()
+const struct cli99_Option status_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-a|--all",     Option_Status_All,     cli99_NoArgument      },
+  {"-s|--service", Option_Status_Service, cli99_NoArgument      },
+  {"-f|--fan",     Option_Status_Fan,     cli99_RequiredArgument},
+  {"-w|--watch",   Option_Status_Watch,   cli99_RequiredArgument},
+  cli99_Options_End()
 };
 
 struct {
-  array_of(int) fans;
-  bool          all;
-  bool          service;
-  float         watch;
+  array_of(array_size_t) fans;
+  bool                   all;
+  bool                   service;
+  float                  watch;
 } Status_Options = {0};
 
 static void Status_Print_Fan(const FanInfo* fan) {
@@ -32,15 +32,13 @@ static void Status_Print_Fan(const FanInfo* fan) {
     "Critical Mode Enabled    : %s\n"
     "Current Fan Speed        : %.2f\n"
     "Target Fan Speed         : %.2f\n"
-    "Requested Fan Speed      : %.2f\n"
     "Fan Speed Steps          : %d\n",
     fan->Name,
-    fan->Temperature,
+    (double) fan->Temperature,
     str_from_bool(fan->AutoMode),
     str_from_bool(fan->Critical),
-    fan->CurrentSpeed,
-    fan->TargetSpeed,
-    fan->RequestedSpeed,
+    (double) fan->CurrentSpeed,
+    (double) fan->TargetSpeed,
     fan->SpeedSteps);
 }
 
@@ -52,46 +50,47 @@ static void Status_Print_Service(const ServiceInfo* service_info) {
     service_info->SelectedConfigId);
 }
 
-int Status() {
+static void Status_Print() {
+  Error e;
   ServiceInfo service_info = {0};
 
+  e = ServiceInfo_TryLoad(&service_info);
+  e_die();
+
+  if (Status_Options.all || Status_Options.service)
+    Status_Print_Service(&service_info);
+
+  if (Status_Options.all) {
+    for_each_array(const FanInfo*, f, service_info.Fans) {
+      printf("\n");
+      Status_Print_Fan(f);
+    }
+  }
+  else if (Status_Options.fans.size) {
+    const array_size_t fan_count = service_info.Fans.size;
+    for_each_array(array_size_t*, fan_index, Status_Options.fans) {
+      if (*fan_index >= fan_count) {
+        e = err_stringf("Fan number %zd not found! (Fan indexes count from zero!)", *fan_index);
+        e_die();
+      }
+
+      printf("\n");
+      Status_Print_Fan(&service_info.Fans.data[*fan_index]);
+    }
+  }
+}
+
+int Status() {
   if (!Status_Options.service && !Status_Options.all && !Status_Options.fans.size)
     Status_Options.all = true;
 
   while (true) {
-    Error e = ServiceInfo_TryLoad(&service_info);
-    e_die();
-
-    if (Status_Options.all || Status_Options.service)
-      Status_Print_Service(&service_info);
-
-    if (Status_Options.all) {
-      for_each_array(const FanInfo*, f, service_info.Fans) {
-        printf("\n");
-        Status_Print_Fan(f);
-      }
-    }
-    else if (Status_Options.fans.size) {
-      const int fan_count = service_info.Fans.size;
-      bool* vis = Mem_Calloc(fan_count, sizeof(bool));
-      for_each_array(int*, fan_index, Status_Options.fans) {
-        if (*fan_index >= fan_count) {
-          Log_Error("Fan number %d not found! (Fan indexes count from zero!)", *fan_index);
-          return NBFC_EXIT_FAILURE;
-        }
-        if (!vis[*fan_index]) {
-          printf("\n");
-          Status_Print_Fan(&service_info.Fans.data[*fan_index]);
-          vis[*fan_index] = true;
-        }
-      }
-      Mem_Free(vis);
-    }
+    Status_Print();
 
     if (! Status_Options.watch)
       break;
 
-    sleep_ms(Status_Options.watch * 1000);
+    sleep_ms((unsigned) (Status_Options.watch * 1000));
     printf("%s", STATUS_CLEAR_SCREEN);
   }
 

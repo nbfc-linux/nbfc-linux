@@ -8,7 +8,6 @@
 #include <unistd.h> // unlink
 #include <limits.h> // INT_MAX
 
-#include <sys/types.h>
 #include <sys/socket.h> // connect, socket
 #include <sys/un.h>     // sockaddr_un
 
@@ -24,10 +23,10 @@
 #include "../service_config.h"
 #include "../file_utils.h"
 
-int Service_Get_PID() {
+pid_t Service_Get_PID() {
   const char* err;
   char buf[32];
-  if (slurp_file(buf, sizeof(buf), NBFC_PID_FILE) == -1) {
+  if (! slurp_file(buf, sizeof(buf), NBFC_PID_FILE).ok) {
     if (errno == ENOENT)
       return -1;
     else {
@@ -39,7 +38,7 @@ int Service_Get_PID() {
   // trim the newline
   buf[strcspn(buf, "\n")] = '\0';
 
-  int pid = parse_number(buf, 0, INT_MAX, &err);
+  pid_t pid = (pid_t) parse_number(buf, 2, INT_MAX, &err);
   if (err) {
 error:
     Log_Error("Failed to read the pid file: " NBFC_PID_FILE ": %s", err);
@@ -172,7 +171,7 @@ void Service_LoadAllConfigFiles(ModelConfig* model_config) {
     exit(NBFC_EXIT_FAILURE);
   }
 
-  Trace_Push(&trace, path);
+  Trace_Push(&trace, "%s", path);
   e = ModelConfig_Validate(&trace, model_config);
   if (e) {
     Log_Error("%s: %s", trace.buf, err_print_all(e));
@@ -182,15 +181,15 @@ void Service_LoadAllConfigFiles(ModelConfig* model_config) {
 }
 
 int Service_Start(bool read_only) {
-  int pid = Service_Get_PID();
+  pid_t pid = Service_Get_PID();
   if (pid != -1) {
     Log_Info("Service already running (pid: %d)", pid);
     return NBFC_EXIT_SUCCESS;
   }
 
-  char cmd[64] = "nbfc_service -f";
+  const char* cmd = "nbfc_service -f";
   if (read_only)
-    strcat(cmd, " -r");
+    cmd = "nbfc_service -f -r";
 
   int ret = system(cmd);
   if (ret == -1) {
@@ -206,7 +205,7 @@ int Service_Start(bool read_only) {
 }
 
 int Service_Stop() {
-  int pid = Service_Get_PID();
+  pid_t pid = Service_Get_PID();
   if (pid == -1) {
     Log_Error("Service not running");
     return NBFC_EXIT_SUCCESS;

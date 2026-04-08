@@ -1,0 +1,15 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1,
+
+      "WriteRegister": 0,
+      "WriteAcpiMethod": "Foo"
+    }
+  ],
+
+  "Expected": "FanConfigurations[0]: Cannot set both WriteRegister and WriteAcpiMethod"
+}

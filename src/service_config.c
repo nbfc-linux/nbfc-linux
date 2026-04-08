@@ -24,7 +24,7 @@ Error ServiceConfig_Init(const char* file) {
   const nx_json* js = NULL;
 
   Trace_Init(trace);
-  Trace_Push(trace, file);
+  Trace_Push(trace, "%s", file);
 
   e = nx_json_parse_file(&js, file_content, NBFC_MAX_FILE_SIZE, file);
   if (e)

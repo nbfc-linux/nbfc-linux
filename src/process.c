@@ -18,9 +18,9 @@ static char* Process_ReadAllFromFD(int fd)
     if (r <= 0)
       break;
 
-    out = Mem_Realloc(out, size + r + 1);
-    memcpy(out + size, buf, r);
-    size += r;
+    out = Mem_Realloc(out, size + (size_t)r + 1);
+    memcpy(out + size, buf, (size_t)r);
+    size += (size_t)r;
   }
 
   if (out)

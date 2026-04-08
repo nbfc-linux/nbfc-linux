@@ -15,30 +15,27 @@ Probing tool for the embedded controller
 
 **-h**, **\--help**
 
-> Show the help message and exit
+> Show help message and exit.
 
 **\--version**
 
-> Show program\'s version number and exit
+> Show program\'s version number and exit.
 
-**-e**,
-**\--embedded-controller**=\[**dev_port**,**ec_sys**,**acpi_ec**\]
+**-e**, **\--embedded-controller**={**ec_sys**,**acpi_ec**,**dev_port**}
 
-> Specify embedded controller to use
+> Select the implementation used to access the embedded controller.
 >
-> -   **ec_sys**: Use the ec_sys kernel module for writing to the
->     embedded controller.
+> -   **ec_sys**: Use the ec_sys kernel module.
 >
-> -   **acpi_ec**: Use the acpi_ec kernel module for writing to the
->     embedded controller.
+> -   **acpi_ec**: Use the acpi_ec kernel module.
 >
-> -   **dev_port**: Write to the embedded controller using /dev/port.
+> -   **dev_port**: Access the embedded controller via /dev/port.
 
 # COMMANDS
 
 **dump** \[*OPTIONS*\]
 
-> Dump all EC registers
+> Dump all EC registers.
 >
 > **-c**, **\--color**
 >
@@ -122,14 +119,26 @@ Probing tool for the embedded controller
 
 **shell**
 
-> Read commands from STDIN
+> Read commands from STDIN.
 
 All input values are interpreted as decimal numbers by default.
 Hexadecimal values may be entered by prefixing them with \"0x\".
 
+# EXIT STATUS
+
+> 0.  Everything fine
+>
+> 1.  Generic error
+>
+> 2.  Command-line error
+>
+> 3.  Initialization error
+>
+> 4.  Fatal error (memory allocation failure)
+
 # BUGS
 
-Report bugs to https://github.com/nbfc-/nbfc-linux
+Report bugs to https://github.com/nbfc-linux/nbfc-linux
 
 # AUTHOR
 

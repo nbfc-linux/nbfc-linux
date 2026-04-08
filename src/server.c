@@ -47,9 +47,9 @@ static nfds_t             Server_PollFDSize = 0;
  * {"Command": "set-fan-speed", "Fan": <NUMBER>, "Speed": "auto"}
  */
 static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
-  int fan = -1;
-  float speed = -2;
-  const int fancount = Service_ModelConfig.FanConfigurations.size;
+  array_size_t fan = (array_size_t) -1;
+  float speed = -2.0f;
+  const array_size_t fancount = Service_ModelConfig.FanConfigurations.size;
 
   nx_json_for_each(c, json) {
     if (!strcmp(c->key, "Command"))
@@ -58,27 +58,27 @@ static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
       if (c->type != NX_JSON_INTEGER)
         return err_string("Fan: Not an integer");
 
-      fan = c->val.i;
-
-      if (fan < 0)
+      if (c->val.i < 0)
         return err_string("Fan: Cannot be negative");
-      else if (fan >= fancount)
+      else if ((array_size_t) c->val.i >= fancount)
         return err_string("Fan: No such fan available");
+
+      fan = (array_size_t) c->val.i;
     }
     else if (!strcmp(c->key, "Speed")) {
       if (c->type == NX_JSON_STRING && !strcmp(c->val.text, "auto")) {
-        speed = -1;
+        speed = -1.0f;
         continue;
       }
       else if (c->type == NX_JSON_DOUBLE)
-        speed = c->val.dbl;
+        speed = (float) c->val.dbl;
       else if (c->type == NX_JSON_INTEGER)
-        speed = c->val.i;
+        speed = (float) c->val.i;
       else {
         return err_string("Speed: Invalid type. Either float or \"auto\"");
       }
 
-      if (speed < 0.0 || speed > 100.0)
+      if (speed < 0.0f || speed > 100.0f)
         return err_string("Speed: Invalid value");
     }
     else {
@@ -90,8 +90,8 @@ static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
     return err_string("Missing argument: Speed");
 
   for_enumerate_array(array_size_t, i, Service_Fans) {
-    if (fan == -1 || fan == i) {
-      if (speed == -1)
+    if (fan == (array_size_t) -1 || fan == i) {
+      if (speed == -1.0f)
         Fan_SetAutoSpeed(&Service_Fans.data[i].Fan);
       else
         Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, speed);
@@ -266,7 +266,7 @@ static Error Server_AcceptClient() {
 static int Server_ReceiveMessage(Client* client) {
   size_t space_left;
   size_t size_to_read;
-  int    nread;
+  ssize_t nread;
 
   do {
     space_left = sizeof(client->buf) - client->bufsz - 1;
@@ -288,7 +288,7 @@ static int Server_ReceiveMessage(Client* client) {
     if (nread < 0)
       return -1;
 
-    client->bufsz += nread;
+    client->bufsz += (size_t) nread;
     client->buf[client->bufsz] = '\0';
 
     char* end_marker_pos = strstr(client->buf, PROTOCOL_END_MARKER);

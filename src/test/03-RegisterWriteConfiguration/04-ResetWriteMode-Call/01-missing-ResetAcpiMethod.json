@@ -1,0 +1,23 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Set",
+      "Register": 0,
+      "Value": 0,
+
+      "ResetRequired": true,
+      "ResetWriteMode": "Call"
+    }
+  ],
+
+  "Expected": "RegisterWriteConfigurations[0]: ResetAcpiMethod: Missing option"
+}

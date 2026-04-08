@@ -10,12 +10,12 @@
 #include <stdio.h>  // printf
 #include <string.h> // strcmp
 
-const cli99_option acpi_dump_options[] = {
-  cli99_include_options(&main_options),
-  {"command",   Option_Acpi_Dump_Command, 1},
-  {"-f|--file", Option_Acpi_Dump_File,    1},
-  {"-j|--json", Option_Acpi_Dump_Json,    0},
-  cli99_options_end()
+const struct cli99_Option acpi_dump_options[] = {
+  cli99_Options_Include(&main_options),
+  {"command",   Option_Acpi_Dump_Command, cli99_NormalPositional},
+  {"-f|--file", Option_Acpi_Dump_File,    cli99_RequiredArgument},
+  {"-j|--json", Option_Acpi_Dump_Json,    cli99_NoArgument      },
+  cli99_Options_End()
 };
 
 enum NBFC_PACKED_ENUM AcpiDump_Action {
@@ -97,7 +97,7 @@ static int AcpiDump_Methods(const char* dsdt_file, bool json) {
   }
   else {
     for_each_array(AcpiMethod*, method, acpi_info.methods) {
-      printf("%s args=%d\n", method->name, method->length);
+      printf("%s args=%u\n", method->name, method->length);
     }
   }
 
@@ -170,7 +170,7 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
       if (only_ec && !AcpiDump_ContainsRegion(&acpi_info.ec_region_names, register_->region))
         continue;
 
-      printf("%s [%s] byte=%d byte_hex=0x%X bit=%d total_bit=%d len=%d acc=%d\n",
+      printf("%s [%s] byte=%u byte_hex=0x%X bit=%u total_bit=%u len=%u acc=%u\n",
         register_->name,
         register_->region,
         register_->bit_offset / 8,

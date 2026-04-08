@@ -2,6 +2,7 @@
 #define NBFC_CURL_UTILS_H_
 
 #include <string.h> // strerror
+#include <stdbool.h>
 
 #include <curl/curl.h>
 
@@ -22,7 +23,7 @@ typedef struct CurlMemory CurlMemory;
 
 CURL* CurlWithMem_Create(const char* url, const char* path);
 void  CurlWithMem_Destroy(CURL*);
-int   CurlWithMem_WriteFile(CURL*);
+bool  CurlWithMem_WriteFile(CURL*);
 const char* Curl_Get_EasyOpt_Name(CURLoption);
 
 static inline char* CurlWithMem_StealData(CURL* curl) {

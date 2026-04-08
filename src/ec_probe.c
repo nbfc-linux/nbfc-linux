@@ -5,6 +5,7 @@
 
 #define _XOPEN_SOURCE  500 // unistd.h: export pwrite()/pread()
 #define _DEFAULT_SOURCE    // endian.h:
+#define _GNU_SOURCE
 
 #include "nbfc.h"
 #include "macros.h"
@@ -13,7 +14,7 @@
 #include "ec_sys_linux.h"
 #include "acpi_call.h"
 #include "model_config.h"
-#include "optparse/optparse.h"
+#include "cli99.h"
 #include "parse_number.h"
 #include "parse_unumber.h"
 #include "parse_double.h"
@@ -46,7 +47,7 @@
 #include "acpi_call.c"         // src
 #include "buffer.c"            // src
 #include "log.c"               // src
-#include "optparse/optparse.c" // src
+#include "cli99.c"             // src
 #include "memory.c"            // src
 #include "nxjson_memory.c"     // src
 #include "nxjson.c"            // src
@@ -161,74 +162,74 @@ enum Option {
   Option_AcpiCallArgument,
 };
 
-static const cli99_option main_options[] = {
-  {"-e|--embedded-controller", Option_EmbeddedController,  1},
-  {"-h|--help",                Option_Help,                0},
-  {"--version",                Option_Version,             0},
-  {"command",                  Option_Command,             1|cli99_required_option},
-  cli99_options_end()
+static const struct cli99_Option main_options[] = {
+  {"-e|--embedded-controller", Option_EmbeddedController,  cli99_RequiredArgument},
+  {"-h|--help",                Option_Help,                cli99_NoArgument      },
+  {"--version",                Option_Version,             cli99_NoArgument      },
+  {"command",                  Option_Command,             cli99_NormalPositional},
+  cli99_Options_End()
 };
 
-static const cli99_option read_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-w|--word",                Option_Word,                0},
-  {"register",                 Option_Register,            1|cli99_required_option},
-  cli99_options_end()
+static const struct cli99_Option read_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-w|--word",                Option_Word,                cli99_NoArgument      },
+  {"register",                 Option_Register,            cli99_NormalPositional},
+  cli99_Options_End()
 };
 
-static const cli99_option write_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-w|--word",                Option_Word,                0},
-  {"register",                 Option_Register,            1|cli99_required_option},
-  {"value",                    Option_Value,               1|cli99_required_option},
-  cli99_options_end()
+static const struct cli99_Option write_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-w|--word",                Option_Word,                cli99_NoArgument      },
+  {"register",                 Option_Register,            cli99_NormalPositional},
+  {"value",                    Option_Value,               cli99_NormalPositional},
+  cli99_Options_End()
 };
 
-static const cli99_option dump_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-c|--color",               Option_Color,               0},
-  {"-C|--no-color",            Option_NoColor,             0},
-  cli99_options_end()
+static const struct cli99_Option dump_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-c|--color",               Option_Color,               cli99_NoArgument      },
+  {"-C|--no-color",            Option_NoColor,             cli99_NoArgument      },
+  cli99_Options_End()
 };
 
-static const cli99_option load_command_options[] = {
-  cli99_include_options(&main_options),
-  {"file",                     Option_File,                1|cli99_required_option},
-  cli99_options_end()
+static const struct cli99_Option load_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"file",                     Option_File,                cli99_NormalPositional},
+  cli99_Options_End()
 };
 
-static const cli99_option monitor_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-r|--report",              Option_Report,              1},
-  {"-c|--clearly",             Option_Clearly,             0},
-  {"-d|--decimal",             Option_Decimal,             0},
-  {"-t|--timespan",            Option_Timespan,            1},
-  {"-i|--interval",            Option_Interval,            1},
-  cli99_options_end()
+static const struct cli99_Option monitor_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-r|--report",              Option_Report,              cli99_RequiredArgument},
+  {"-c|--clearly",             Option_Clearly,             cli99_NoArgument      },
+  {"-d|--decimal",             Option_Decimal,             cli99_NoArgument      },
+  {"-t|--timespan",            Option_Timespan,            cli99_RequiredArgument},
+  {"-i|--interval",            Option_Interval,            cli99_RequiredArgument},
+  cli99_Options_End()
 };
 
-static const cli99_option watch_command_options[] = {
-  cli99_include_options(&main_options),
-  {"-t|--timespan",            Option_Timespan,            1},
-  {"-i|--interval",            Option_Interval,            1},
-  cli99_options_end()
+static const struct cli99_Option watch_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-t|--timespan",            Option_Timespan,            cli99_RequiredArgument},
+  {"-i|--interval",            Option_Interval,            cli99_RequiredArgument},
+  cli99_Options_End()
 };
 
-static const cli99_option acpi_call_command_options[] = {
-  cli99_include_options(&main_options),
-  {"method",                   Option_AcpiCallMethod,      1|cli99_required_option},
-  {"arg1",                     Option_AcpiCallArgument,    1},
-  {"arg2",                     Option_AcpiCallArgument,    1},
-  {"arg3",                     Option_AcpiCallArgument,    1},
-  {"arg4",                     Option_AcpiCallArgument,    1},
-  {"arg5",                     Option_AcpiCallArgument,    1},
-  {"arg6",                     Option_AcpiCallArgument,    1},
-  {"arg7",                     Option_AcpiCallArgument,    1},
-  {"arg8",                     Option_AcpiCallArgument,    1},
-  cli99_options_end()
+static const struct cli99_Option acpi_call_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"method",                   Option_AcpiCallMethod,      cli99_NormalPositional},
+  {"arg1",                     Option_AcpiCallArgument,    cli99_NormalPositional},
+  {"arg2",                     Option_AcpiCallArgument,    cli99_NormalPositional},
+  {"arg3",                     Option_AcpiCallArgument,    cli99_NormalPositional},
+  {"arg4",                     Option_AcpiCallArgument,    cli99_NormalPositional},
+  {"arg5",                     Option_AcpiCallArgument,    cli99_NormalPositional},
+  {"arg6",                     Option_AcpiCallArgument,    cli99_NormalPositional},
+  {"arg7",                     Option_AcpiCallArgument,    cli99_NormalPositional},
+  {"arg8",                     Option_AcpiCallArgument,    cli99_NormalPositional},
+  cli99_Options_End()
 };
 
-static const cli99_option* Options[] = {
+static const struct cli99_Option* Options[] = {
   read_command_options,
   write_command_options,
   dump_command_options,
@@ -260,6 +261,7 @@ static struct {
   const char*   acpi_call_method;
   uint64_t      acpi_call_args[8];
   int           acpi_call_args_size;
+  uint64_t      _set;
 } options = {0};
 
 const char RegisterHeader[] =
@@ -280,12 +282,19 @@ int main(int argc, char* const argv[]) {
   ec = NULL;
   enum Command cmd = Command_Help;
 
-  cli99 p;
-  cli99_Init(&p, argc, argv, main_options, cli99_options_python);
+  struct cli99 p;
+  cli99_Init(&p, main_options, argv, argc);
 
-  int o;
+  int64_t o;
   const char* err;
   while ((o = cli99_GetOpt(&p))) {
+    if (o == -1) {
+      Log_Error("%s: %s", cli99_StrError(p.error), p.error_cause);
+      return NBFC_EXIT_CMDLINE;
+    }
+
+    options._set |= (1ULL << o);
+
     switch (o) {
     case Option_Command:
       cmd = Command_FromString(p.optarg);
@@ -300,19 +309,19 @@ int main(int argc, char* const argv[]) {
         return 0;
       }
 
-      cli99_SetOptions(&p, Options[cmd], false);
+      p.options = Options[cmd];
       break;
     case Option_Register:
-      options.register_ = parse_number(p.optarg, 0, 255, &err);
+      options.register_ = (uint8_t) parse_number(p.optarg, 0, 255, &err);
       if (err) {
-        Log_Error("Register: %s: %s", p.optarg, err);
+        Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Value:
-      options.value = parse_number(p.optarg, 0, 65535, &err);
+      options.value = (uint16_t) parse_number(p.optarg, 0, 65535, &err);
       if (err) {
-        Log_Error("Value: %s: %s", p.optarg, err);
+        Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -337,21 +346,21 @@ int main(int argc, char* const argv[]) {
         case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable;         break;
 #endif
         default:
-          Log_Error("-e|--embedded-controller: Invalid value: %s", p.optarg);
+          Log_Error("%s: Invalid value: %s", p.option->optstring, p.optarg);
           return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Timespan:
-      options.timespan = parse_number(p.optarg, 1, INT_MAX, &err);
+      options.timespan = (int) parse_number(p.optarg, 1, INT_MAX, &err);
       if (err) {
-        Log_Error("-t|--timespan: %s: %s", p.optarg, err);
+        Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
     case Option_Interval:
-      options.interval = parse_double(p.optarg, 0.1, FLT_MAX, &err);
+      options.interval = (float) parse_double(p.optarg, 0.1, FLT_MAX, &err);
       if (err) {
-        Log_Error("-i|--interval: %s: %s", p.optarg, err);
+        Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -361,24 +370,49 @@ int main(int argc, char* const argv[]) {
     case Option_AcpiCallArgument:
       options.acpi_call_args[options.acpi_call_args_size++] = parse_unumber(p.optarg, 0, UINT64_MAX, &err);
       if (err) {
-        Log_Error("Argument: %s: %s", p.optarg, err);
+        Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
       break;
-    default:
-      cli99_ExplainError(&p);
-      return NBFC_EXIT_CMDLINE;
     }
   }
 
-  if (! cli99_End(&p)) {
-    Log_Error("Too much arguments");
-    return NBFC_EXIT_CMDLINE;
-  }
+  switch (cmd) {
+    case Command_Load:
+      if (! (options._set & (1ULL << Option_File))) {
+        Log_Error("Argument required: %s", "file");
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
 
-  if (! cli99_CheckRequired(&p)) {
-    cli99_ExplainError(&p);
-    return NBFC_EXIT_CMDLINE;
+    case Command_Read:
+      if (! (options._set & (1ULL << Option_Register))) {
+        Log_Error("Argument required: %s", "register");
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Command_Write:
+      if (! (options._set & (1ULL << Option_Register))) {
+        Log_Error("Argument required: %s", "register");
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      if (! (options._set & (1ULL << Option_Value))) {
+        Log_Error("Argument required: %s", "value");
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Command_AcpiCall:
+      if (! (options._set & (1ULL << Option_AcpiCallMethod))) {
+        Log_Error("Argument required: %s", "method");
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    default:
+      break;
   }
 
   if (geteuid()) {
@@ -437,7 +471,7 @@ static int Write() {
       Log_Error("write: Value too big: %d", options.value);
       return NBFC_EXIT_CMDLINE;
     }
-    Error e = ec->WriteByte(options.register_, options.value);
+    Error e = ec->WriteByte(options.register_, (uint8_t) options.value);
     e_die();
   }
 
@@ -488,7 +522,7 @@ static int Monitor() {
   int max_loops = INT_MAX;
 
   if (options.timespan)
-    max_loops = options.timespan / options.interval;
+    max_loops = (int) ((float) options.timespan / options.interval);
 
   RegisterBuf* regs = Registers_Log;
   int size = ARRAY_SSIZE(Registers_Log);
@@ -496,7 +530,7 @@ static int Monitor() {
   for (loops = 0; !quit && loops < max_loops && --size; ++loops) {
     Register_FromEC(regs + loops);
     Register_PrintMonitor(regs, loops);
-    sleep_ms(options.interval * 1000);
+    sleep_ms((unsigned) (options.interval * 1000.0f));
   }
 
   if (options.report) {
@@ -516,7 +550,7 @@ static int Watch() {
   int max_loops = INT_MAX;
 
   if (options.timespan)
-    max_loops = options.timespan / options.interval;
+    max_loops = (int) ((float) options.timespan / options.interval);
 
   int size = ARRAY_SSIZE(Registers_Log);
   RegisterBuf* regs = Registers_Log;
@@ -524,7 +558,7 @@ static int Watch() {
   for (int loops = 1; !quit && loops < max_loops && --size; ++loops) {
     Register_FromEC(regs + loops);
     Register_PrintWatch(regs , regs + loops, regs + loops - 1);
-    sleep_ms(options.interval * 1000);
+    sleep_ms((unsigned int) (options.interval * 1000.0f));
   }
 
   return 0;
@@ -540,7 +574,7 @@ static int AcpiCall() {
   char fmt[] = "%s 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX";
   fmt[2 + options.acpi_call_args_size * 6] = '\0';
 
-  ssize_t cmd_len = snprintf(cmd, sizeof(cmd), fmt,
+  int cmd_len = snprintf(cmd, sizeof(cmd), fmt,
     options.acpi_call_method,
     options.acpi_call_args[0],
     options.acpi_call_args[1],
@@ -552,7 +586,7 @@ static int AcpiCall() {
     options.acpi_call_args[7]
   );
 
-  if (cmd_len == -1 || cmd_len >= (sizeof(cmd))) {
+  if (cmd_len == -1 || cmd_len >= (int) sizeof(cmd)) {
     Log_Error("Method (including arguments) is too long");
     return NBFC_EXIT_FAILURE;
   }
@@ -600,12 +634,12 @@ static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
 
 static inline void Register_FromEC(RegisterBuf* self) {
   for (int i = 0; i < RegistersSize; i++)
-    ec->ReadByte(i, &my[i]);
+    ec->ReadByte((uint8_t) i, &my[i]);
 }
 
 static inline void Register_ToEC(RegisterBuf* self) {
   for (int i = 0; i < RegistersSize; ++i)
-    ec->WriteByte(i, my[i]);
+    ec->WriteByte((uint8_t) i, my[i]);
 }
 
 static void Register_PrintWatch(RegisterBuf* all_readings, RegisterBuf* current, RegisterBuf* previous) {
@@ -725,7 +759,7 @@ static int Register_LoadDump(RegisterBuf* self, FILE* fh) {
         goto error;
 
       char* end;
-      const int value = strtoll(hex, &end, 16);
+      const uint8_t value = (uint8_t) strtoll(hex, &end, 16);
       if (*end != '\0')
         goto error;
 
@@ -759,35 +793,47 @@ static void ShellRead(const struct Args* args) {
     if (arg[0] == '-') {
       if (!strcmp(arg, "-w") || !strcmp(arg, "--word"))
         word = 1;
-      else
-        return (void) printf("ERR: Invalid option: %s\n", arg);
+      else {
+        printf("ERR: Invalid option: %s\n", arg);
+        return;
+      }
     }
     else if (! register_arg)
       register_arg = arg;
-    else
-      return (void) printf("ERR: Too much arguments\n");
+    else {
+      printf("ERR: Too much arguments\n");
+      return;
+    }
   }
 
-  if (! register_arg)
-    return (void) printf("ERR: Missing argument (REGISTER)\n");
+  if (! register_arg) {
+    printf("ERR: Missing argument (REGISTER)\n");
+    return;
+  }
 
-  int register_ = parse_number(register_arg, 0, word ? 254 : 255, &err);
-  if (err)
-    return (void) printf("ERR: Argument (REGISTER): %s\n", err);
+  uint8_t register_ = (uint8_t) parse_number(register_arg, 0, word ? 254 : 255, &err);
+  if (err) {
+    printf("ERR: Argument (REGISTER): %s\n", err);
+    return;
+  }
 
   if (word) {
     uint16_t value;
     Error e = ec->ReadWord(register_, &value);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
 
     printf("%d\n", value);
   }
   else {
     uint8_t value;
     Error e = ec->ReadByte(register_, &value);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
 
     printf("%d\n", value);
   }
@@ -805,52 +851,70 @@ static void ShellWrite(const struct Args* args) {
     if (arg[0] == '-') {
       if (!strcmp(arg, "-w") || !strcmp(arg, "--word"))
         word = 1;
-      else
-        return (void) printf("ERR: Invalid option: %s\n", arg);
+      else {
+        printf("ERR: Invalid option: %s\n", arg);
+        return;
+      }
     }
     else if (! register_arg)
       register_arg = arg;
     else if (! value_arg)
       value_arg = arg;
-    else
-      return (void) printf("ERR: Too much arguments\n");
+    else {
+      printf("ERR: Too much arguments\n");
+      return;
+    }
   }
 
-  if (! register_arg)
-    return (void) printf("ERR: Missing argument (REGISTER)\n");
+  if (! register_arg) {
+    printf("ERR: Missing argument (REGISTER)\n");
+    return;
+  }
 
-  if (! value_arg)
-    return (void) printf("ERR: Missing argument (VALUE)\n");
+  if (! value_arg) {
+    printf("ERR: Missing argument (VALUE)\n");
+    return;
+  }
 
-  int register_ = parse_number(register_arg, 0, word ? 254 : 255, &err);
-  if (err)
-    return (void) printf("ERR: Argument (REGISTER): %s\n", err);
+  uint8_t register_ = (uint8_t) parse_number(register_arg, 0, word ? 254 : 255, &err);
+  if (err) {
+    printf("ERR: Argument (REGISTER): %s\n", err);
+    return;
+  }
 
-  int value = parse_number(value_arg, 0, word ? 65535 : 255, &err);
-  if (err)
-    return (void) printf("ERR: Argument (VALUE): %s\n", err);
+  uint16_t value = (uint16_t) parse_number(value_arg, 0, word ? UINT16_MAX : UINT8_MAX, &err);
+  if (err) {
+    printf("ERR: Argument (VALUE): %s\n", err);
+    return;
+  }
 
   if (word) {
     Error e = ec->WriteWord(register_, value);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
   }
   else {
-    Error e = ec->WriteByte(register_, value);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    Error e = ec->WriteByte(register_, (uint8_t) value);
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
   }
 
   printf("OK\n");
 }
 
-static void ShellReadAll(struct Args* args) {
+static void ShellReadAll(struct Args*) {
   uint8_t values[256];
 
   for (int register_ = 0; register_ <= 255; ++register_) {
-    Error e = ec->ReadByte(register_, &values[register_]);
-    if (e)
-      return (void) printf("ERR: %s\n", err_print_all(e));
+    Error e = ec->ReadByte((uint8_t) register_, &values[register_]);
+    if (e) {
+      printf("ERR: %s\n", err_print_all(e));
+      return;
+    }
   }
 
   printf("%d", values[0]);

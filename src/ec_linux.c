@@ -121,7 +121,7 @@ static bool EC_Linux_WaitRead()
   }
 }
 
-static bool EC_Linux_TryReadByte(int register_, uint8_t* value)
+static bool EC_Linux_TryReadByte(uint8_t register_, uint8_t* value)
 {
   return true
     && EC_Linux_WaitWrite()
@@ -133,7 +133,7 @@ static bool EC_Linux_TryReadByte(int register_, uint8_t* value)
     && EC_Linux_ReadPort(EC_Linux_DataPort, value);
 }
 
-static bool EC_Linux_TryWriteByte(int register_, uint8_t value)
+static bool EC_Linux_TryWriteByte(uint8_t register_, uint8_t value)
 {
   return true
     && EC_Linux_WaitWrite()
@@ -144,7 +144,7 @@ static bool EC_Linux_TryWriteByte(int register_, uint8_t value)
     && EC_Linux_WritePort(EC_Linux_DataPort, value);
 }
 
-static bool EC_Linux_TryReadWord(int register_, uint16_t* value)
+static bool EC_Linux_TryReadWord(uint8_t register_, uint16_t* value)
 {
   // Byte order: little endian
 
@@ -160,14 +160,14 @@ static bool EC_Linux_TryReadWord(int register_, uint16_t* value)
   return false;
 }
 
-static bool EC_Linux_TryWriteWord(int register_, uint16_t value)
+static bool EC_Linux_TryWriteWord(uint8_t register_, uint16_t value)
 {
   // Byte order: little endian
 
   value = htole16(value);
 
-  uint8_t msb = value >> 8;
-  uint8_t lsb = value;
+  uint8_t msb = (uint8_t) (value >> 8);
+  uint8_t lsb = (uint8_t) value;
 
   return EC_Linux_TryWriteByte(register_+0, lsb)
       && EC_Linux_TryWriteByte(register_+1, msb);

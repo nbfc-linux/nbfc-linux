@@ -32,7 +32,7 @@
 #define for_each_array_reverse(TYPE, VAR, ARRAY) \
   for (TYPE VAR = (ARRAY).data + (ARRAY).size; --VAR != (ARRAY).data;)
 
-typedef ssize_t array_size_t;
+typedef size_t array_size_t;
 
 #define declare_array_of(T)                           \
   typedef struct array_of(T) array_of(T);             \
@@ -47,6 +47,7 @@ typedef ssize_t array_size_t;
     array_size_t size;                                \
   }
 
+declare_array_of(array_size_t);
 declare_array_of(float);
 declare_array_of(int);
 

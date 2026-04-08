@@ -11,6 +11,6 @@
 size_t    RegEx_Count(const regex_t*, regmatch_t*, size_t, const char*);
 char*     RegEx_SubStr(const regmatch_t*, const char*);
 void      RegEx_SubStr_Fixed(const regmatch_t*, const char*, char*, size_t);
-long long RegEx_Strtoll(const regmatch_t*, const char*, int);
+unsigned long long RegEx_Strtoull(const regmatch_t*, const char*, int);
 
 #endif

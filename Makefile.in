@@ -239,12 +239,12 @@ src/nbfc_service: \
 	src/service_state.c src/service_state.h \
 	src/sponsor.c src/sponsor.h \
 	src/temperature_filter.c src/temperature_filter.h \
-	src/temperature_threshold_manager.c src/temperature_threshold_manager.h \
-	src/optparse/optparse.h src/optparse/optparse.c
+	src/temperature_threshold_manager.c src/temperature_threshold_manager.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDLIBS_SERVICE) $(LDFLAGS)
 
 src/ec_probe: \
 	src/acpi_call.h src/acpi_call.c \
+	src/cli99.h src/cli99.c \
 	src/config.h \
 	src/ec_probe.c \
 	src/ec_sys_linux.h src/ec_sys_linux.c \
@@ -252,12 +252,12 @@ src/ec_probe: \
 	src/help/ec_probe.help.h \
 	src/nbfc.h \
 	src/memory.h src/memory.c \
-	src/optparse/optparse.h src/optparse/optparse.c \
 	src/process.h src/process.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDLIBS_EC_PROBE) $(LDFLAGS)
 
 src/nbfc: \
 	src/config.h \
+	src/cli99.h src/cli99.c \
 	src/client.c \
 	src/client/check_root.h \
 	src/client/client_global.h \
@@ -288,7 +288,6 @@ src/nbfc: \
 	src/config_rating_rules.h src/config_rating_rules.c \
 	src/error.h src/error.c \
 	src/help/ec_probe.help.h \
-	src/optparse/optparse.h src/optparse/optparse.c \
 	src/protocol.c src/protocol.h \
 	src/model_config_utils.c src/model_config_utils.h \
 	src/nxjson.c src/nxjson.h \

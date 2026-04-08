@@ -37,11 +37,11 @@
   "   Run 'nbfc support -h' for more information on firmware uploads.\n"       \
   ""
 
-const cli99_option support_options[] = {
-  cli99_include_options(&main_options),
-  {"--upload-firmware", Option_Support_Upload_Firmware, 0},
-  {"--print-command",   Option_Support_Print_Command,   0},
-  cli99_options_end()
+const struct cli99_Option support_options[] = {
+  cli99_Options_Include(&main_options),
+  {"--upload-firmware", Option_Support_Upload_Firmware, cli99_NoArgument},
+  {"--print-command",   Option_Support_Print_Command,   cli99_NoArgument},
+  cli99_Options_End()
 };
 
 enum Support_Action {

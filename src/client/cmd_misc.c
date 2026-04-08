@@ -28,7 +28,7 @@ static int Wait_For_Hwmon() {
     for (const char** format = hwmon_file_names; *format; ++format) {
       for (int i = 0; i < 10; i++) {
         snprintf(filename, sizeof(filename), *format, i);
-        if (slurp_file(content, sizeof(content), filename) == -1)
+        if (! slurp_file(content, sizeof(content), filename).ok)
           continue;
 
         // trim the newline

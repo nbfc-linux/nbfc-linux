@@ -1,5 +1,5 @@
-# Maintainer: Francesco Minnocci <ascoli dot minnocci at gmail dot com>
-# Contributor: Benjamin Abendroth <braph93@gmx.de>
+# Maintainer: Benjamin Abendroth <braph93@gmx.de>
+# Contributor: Francesco Minnocci <ascoli dot minnocci at gmail dot com>
 
 pkgname=nbfc-linux-git
 _pkgname=nbfc-linux
@@ -8,7 +8,8 @@ pkgrel=1
 pkgdesc="Lightweight C port of NoteBook FanControl (no Mono required)"
 arch=('i686' 'x86_64')
 url="https://github.com/nbfc-linux/nbfc-linux"
-makedepends=('git')
+depends=('acpica' 'acpi_call')
+makedepends=('git' 'curl' 'openssl')
 license=('GPL3')
 provides=('nbfc')
 conflicts=('nbfc')
@@ -32,4 +33,5 @@ package() {
 
   make DESTDIR="${pkgdir}" install
 }
+
 # vim:set ts=2 sw=2 et:

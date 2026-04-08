@@ -3,7 +3,7 @@
 #include "memory.h"
 
 #include <string.h> // memcpy
-#include <stdlib.h> // strtoll
+#include <stdlib.h> // strtoull
 
 /*
  * Returns the number of matches of a compiled `regex_t` within a string.
@@ -23,17 +23,17 @@ size_t RegEx_Count(const regex_t* regex, regmatch_t* matches, size_t nmatches, c
 }
 
 /*
- * Converts the result of a `regmatch_t` to long long using strtoll().
+ * Converts the result of a `regmatch_t` to unsigned long long using strtoull().
  *
  * NOTE: This function passes a pointer to the start of the match within
- * the original string to strtoll(). Parsing continues beyond the match end
+ * the original string to strtoull(). Parsing continues beyond the match end
  * and stops only when an invalid character is encountered.
  */
-long long RegEx_Strtoll(const regmatch_t* m, const char* s, int base) {
+unsigned long long RegEx_Strtoull(const regmatch_t* m, const char* s, int base) {
   if (m->rm_so < 0 || m->rm_eo < 0)
     return 0;
 
-  return strtoll(s + m->rm_so, NULL, base);
+  return strtoull(s + m->rm_so, NULL, base);
 }
 
 /*

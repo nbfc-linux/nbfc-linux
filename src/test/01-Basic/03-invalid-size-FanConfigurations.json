@@ -1,0 +1,6 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [],
+
+  "Expected": "FanConfigurations: requires: parameter.size > 0"
+}

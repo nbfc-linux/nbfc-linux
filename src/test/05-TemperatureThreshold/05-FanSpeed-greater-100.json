@@ -1,0 +1,20 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1,
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 0,
+          "DownThreshold": 0,
+          "FanSpeed": 101
+        }
+      ]
+    }
+  ],
+
+  "Expected": "FanConfigurations[0]: TemperatureThresholds[0]: FanSpeed: requires: parameter >= 0.0 && parameter <= 100.0"
+}

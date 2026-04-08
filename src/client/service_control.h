@@ -2,12 +2,13 @@
 #define NBFC_SERVICE_CONTROL_H_
 
 #include <stdbool.h>
+#include <sys/types.h> // pid_t
 
 #include "../error.h"
 #include "../nxjson.h"
 #include "../model_config.h"
 
-int   Service_Get_PID();
+pid_t Service_Get_PID();
 int   Service_Start(bool);
 int   Service_Stop();
 int   Service_Restart(bool);

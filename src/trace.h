@@ -6,8 +6,8 @@
 
 struct Trace {
   char buf[4096];
-  unsigned int stack[32];
-  unsigned int stack_size;
+  size_t stack[32];
+  size_t stack_size;
 };
 typedef struct Trace Trace;
 

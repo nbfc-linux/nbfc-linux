@@ -1,0 +1,18 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1,
+      "FanSpeedPercentageOverrides": [
+        {
+          "FanSpeedValue": 0
+        }
+      ]
+    }
+  ],
+
+  "Expected": "FanConfigurations[0]: FanSpeedPercentageOverrides[0]: FanSpeedPercentage: Missing option"
+}

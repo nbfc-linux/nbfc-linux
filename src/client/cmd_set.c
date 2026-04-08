@@ -8,12 +8,12 @@
 #include "../memory.h"
 #include "../nbfc.h"
 
-const cli99_option set_options[] = {
-  cli99_include_options(&main_options),
-  {"-a|--auto",  Option_Set_Auto,  0},
-  {"-s|--speed", Option_Set_Speed, 1},
-  {"-f|--fan",   Option_Set_Fan,   1},
-  cli99_options_end()
+const struct cli99_Option set_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-a|--auto",  Option_Set_Auto,  cli99_NoArgument      },
+  {"-s|--speed", Option_Set_Speed, cli99_RequiredArgument},
+  {"-f|--fan",   Option_Set_Fan,   cli99_RequiredArgument},
+  cli99_Options_End()
 };
 
 struct {
@@ -21,12 +21,12 @@ struct {
   float speed;
 } Set_Options = {
   -1,
-  -2.0
+  -2.0f
 };
 
 int Set() {
-  if (Set_Options.speed == -2.0) {
-    printf(CLIENT_SET_HELP_TEXT);
+  if (Set_Options.speed == -2.0f) {
+    printf("%s", CLIENT_SET_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -42,7 +42,7 @@ int Set() {
   if (Set_Options.fan != -1)
     create_json_integer("Fan", in, Set_Options.fan);
 
-  if (Set_Options.speed == -1.0)
+  if (Set_Options.speed == -1.0f)
     create_json_string("Speed", in, "auto");
   else
     create_json_double("Speed", in, Set_Options.speed);

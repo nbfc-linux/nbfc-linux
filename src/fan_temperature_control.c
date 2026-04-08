@@ -46,7 +46,7 @@ static Error FanTemperatureControl_GetTemperature(FanTemperatureControl* ftc, fl
 
   switch (ftc->TemperatureAlgorithmType) {
     case TemperatureAlgorithmType_Average:
-      *out = sum / total;
+      *out = sum / (float) total;
       return err_success();
     case TemperatureAlgorithmType_Min:
       *out = min;
@@ -158,7 +158,7 @@ static Error FanTemperatureControl_AddTemperatureSources(
     source.name = "anonymous";
     source.file = (char*) sensor;
     source.type = FS_TemperatureSource_File;
-    source.multiplier = 0.001;
+    source.multiplier = 0.001f;
   }
 
   float t; // NOLINT
@@ -281,7 +281,7 @@ static Error FanTemperatureControl_SetByServiceConfig(
 // Initialize temperature filters in `fans`
 static Error FanTemperatureControl_InitializeTemperatureFilters(
   array_of(FanTemperatureControl)* fans,
-  int poll_interval)
+  unsigned int poll_interval)
 {
   Error e;
 

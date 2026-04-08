@@ -2,6 +2,7 @@
 #include <stdio.h>        // printf, fprintf
 #include <stdlib.h>       // exit, realpath, qsort
 #include <string.h>       // strcmp, strrchr, strerror
+#include <unistd.h>       // isatty
 #include <linux/limits.h> // PATH_MAX
 
 #include "../nbfc.h"
@@ -16,6 +17,33 @@
 #include "config_files.h"
 #include "client_global.h"
 
+#define RECOMMENDED_WARNING \
+  "\n"                                                                         \
+  "                   ====================================\n"                  \
+  "                   WARNING: This feature is deprecated!\n"                  \
+  "                   ====================================\n"                  \
+  "\n"                                                                         \
+  "The `nbfc config --recommend` feature is included in NBFC-Linux because\n"  \
+  "it existed in the original NBFC project.\n"                                 \
+  "\n"                                                                         \
+  "However, this feature can be *dangerous*.\n"                                \
+  "\n"                                                                         \
+  "The recommendation mechanism is based solely on loose string matching\n"    \
+  "of laptop model names. A similar model name does not imply that the\n"      \
+  "configuration can be used safely.\n"                                        \
+  "\n"                                                                         \
+  "In the worst case, a misapplied configuration may write to battery\n"       \
+  "control registers, potentially causing permanent battery damage\n"          \
+  "or hardware failure.\n"                                                     \
+  "\n"                                                                         \
+  "If you still want to get a list of similar named model configurations,\n"   \
+  "re-run this command with `-y|--yes`.\n"                                     \
+  "\n"                                                                         \
+  "The recommended way to find configurations that are safe on your system\n"  \
+  "is to run `sudo nbfc rate-config -a`.\n"                                    \
+  "\n"                                                                         \
+  ""
+
 enum Config_Action {
   Config_Action_None = 0,
   Config_Action_Apply,
@@ -24,18 +52,20 @@ enum Config_Action {
   Config_Action_Recommend
 };
 
-const cli99_option config_options[] = {
-  cli99_include_options(&main_options),
-  {"-l|--list",      Option_Config_List,      0},
-  {"-r|--recommend", Option_Config_Recommend, 0},
-  {"-s|--set",       Option_Config_Set,       1},
-  {"-a|--apply",     Option_Config_Apply,     1},
-  cli99_options_end()
+const struct cli99_Option config_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-l|--list",      Option_Config_List,      cli99_NoArgument      },
+  {"-r|--recommend", Option_Config_Recommend, cli99_NoArgument      },
+  {"-s|--set",       Option_Config_Set,       cli99_RequiredArgument},
+  {"-a|--apply",     Option_Config_Apply,     cli99_RequiredArgument},
+  {"-y|--yes",       Option_Config_Yes,       cli99_NoArgument      },
+  cli99_Options_End()
 };
 
 struct {
   enum Config_Action action;
   const char* config;
+  bool yes;
 } Config_Options = {0};
 
 void Set_Config_Action(enum Config_Action action) {
@@ -60,6 +90,11 @@ int List() {
 }
 
 int Recommend() {
+  if (isatty(STDOUT_FILENO) && !Config_Options.yes) {
+    fprintf(stderr, "%s", RECOMMENDED_WARNING);
+    return NBFC_EXIT_FAILURE;
+  }
+
   const char* model_name = DMI_Get_Model_Name();
   array_of(ConfigFile) files = List_Recommended_Configs();
   char* config = Get_Supported_Config(&files, model_name);
@@ -69,16 +104,6 @@ int Recommend() {
     printf("%s\n", config);
     return NBFC_EXIT_SUCCESS;
   }
-
-  fprintf(stderr,
-    "\n"
-    "[!] NOTE:\n"
-    "[!] This output is based solely on comparing your model name\n"
-    "[!] with the configuration file names.\n"
-    "[!] This recommendation does not imply any further validation\n"
-    "[!] or significance beyond the string matching of the model\n"
-    "[!] and configuration names.\n"
-    "\n");
 
   bool have_match = false;
   for_each_array(ConfigFile*, file, files) {
@@ -160,7 +185,7 @@ int Config() {
   case Config_Action_Set:       return Set_Or_Apply();
   case Config_Action_Apply:     return Set_Or_Apply();
   default:
-    printf(CLIENT_CONFIG_HELP_TEXT);
+    printf("%s", CLIENT_CONFIG_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
 }

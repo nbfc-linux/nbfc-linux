@@ -19,7 +19,7 @@ Error ServiceState_Init() {
   const nx_json* js = NULL;
 
   Trace_Init(trace);
-  Trace_Push(trace, NBFC_STATE_FILE);
+  Trace_Push(trace, "%s", NBFC_STATE_FILE);
 
   e = nx_json_parse_file(&js, file_content, NBFC_MAX_FILE_SIZE, NBFC_STATE_FILE);
   if (e)

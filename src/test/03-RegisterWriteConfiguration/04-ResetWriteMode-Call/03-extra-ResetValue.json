@@ -1,0 +1,25 @@
+{
+  "NotebookModel": "Foo",
+  "FanConfigurations": [
+    {
+      "WriteRegister": 0,
+      "ReadRegister": 0,
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 1
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Set",
+      "Register": 0,
+      "Value": 0,
+
+      "ResetRequired": true,
+      "ResetWriteMode": "Call",
+      "ResetAcpiMethod": "Foo",
+      "ResetValue": 0
+    }
+  ],
+
+  "Expected": "RegisterWriteConfigurations[0]: ResetValue: Cannot be used with ResetWriteMode == Call"
+}

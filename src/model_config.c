@@ -25,7 +25,9 @@ static inline Error bool_FromJson(bool* out, const nx_json* node) {
 
 static inline Error int_FromJson(int* out, const nx_json* node) {
   if (node->type == NX_JSON_INTEGER) {
-    *out = node->val.i;
+    if (node->val.i < INT_MIN || node->val.i > INT_MAX)
+      return err_stringf("Value not in range (%d - %d): %ld", INT_MIN, INT_MAX, node->val.i);
+    *out = (int) node->val.i;
     return err_success();
   }
   return err_string("Not an integer");
@@ -37,7 +39,7 @@ static inline Error int8_t_FromJson(int8_t* out, const nx_json* node) {
   e_check();
   if (val < INT8_MIN || val > INT8_MAX)
     return err_stringf("Value not in range (%d - %d): %d", INT8_MIN, INT8_MAX, val);
-  *out = val;
+  *out = (int8_t) val;
   return err_success();
 }
 
@@ -47,7 +49,7 @@ static inline Error uint8_t_FromJson(uint8_t* out, const nx_json* node) {
   e_check();
   if (val < 0 || val > UINT8_MAX)
     return err_stringf("Value not in range (%d - %d): %d", 0, UINT8_MAX, val);
-  *out = val;
+  *out = (uint8_t) val;
   return err_success();
 }
 
@@ -57,7 +59,7 @@ static inline Error int16_t_FromJson(int16_t* out, const nx_json* node) {
   e_check();
   if (val < INT16_MIN || val > INT16_MAX)
     return err_stringf("Value not in range (%d - %d): %d", INT16_MIN, INT16_MAX, val);
-  *out = val;
+  *out = (int16_t) val;
   return err_success();
 }
 
@@ -67,13 +69,13 @@ static inline Error uint16_t_FromJson(uint16_t* out, const nx_json* node) {
   e_check();
   if (val < 0 || val > UINT16_MAX)
     return err_stringf("Value not in range (%d - %d): %d", 0, UINT16_MAX, val);
-  *out = val;
+  *out = (uint16_t) val;
   return err_success();
 }
 
 static inline Error double_FromJson(double* out, const nx_json* node) {
   if (node->type == NX_JSON_INTEGER) {
-    *out = node->val.i;
+    *out = (double) node->val.i;
     return err_success();
   }
   if (node->type == NX_JSON_DOUBLE) {
@@ -84,10 +86,10 @@ static inline Error double_FromJson(double* out, const nx_json* node) {
 }
 
 static inline Error float_FromJson(float* out, const nx_json* json) {
-  double d; // NOLINT
-  Error e = double_FromJson(&d, json);
+  double val; // NOLINT
+  Error e = double_FromJson(&val, json);
   if (! e)
-    *out = d;
+    *out = (float) val;
   return e;
 }
 
@@ -250,7 +252,7 @@ const char* TemperatureAlgorithmType_ToString(TemperatureAlgorithmType t) {
 
 typedef Error (FromJson_Callback)(void*, const nx_json*);
 
-static Error array_of_FromJson(FromJson_Callback callback, void** v_data, array_size_t* v_size, ssize_t size, const nx_json* json) {
+static Error array_of_FromJson(FromJson_Callback callback, void** v_data, array_size_t* v_size, size_t size, const nx_json* json) {
   Error e = nx_json_get_array(json);
   e_check();
 
@@ -613,7 +615,10 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
   return err_success();
 
 err:
-  return err_chain_string(e, trace->buf);
+  if (trace->stack_size)
+    return err_chain_string(e, trace->buf);
+  else
+    return e;
 }
 
 Error ModelConfig_FromFile(ModelConfig* config, const char* file) {

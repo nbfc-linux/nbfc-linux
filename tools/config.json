@@ -16,7 +16,8 @@
       {
         "name": "FanSpeed",
         "type": "float",
-        "valid": "parameter >= 0.0 && parameter <= 100.0",
+        "valid": "parameter >= 0.0f && parameter <= 100.0f",
+        "valid_readable": "0.0 <= parameter <= 100.0",
         "help": "The fan speed in percent"
       }
     ]
@@ -28,7 +29,8 @@
       {
         "name": "FanSpeedPercentage",
         "type": "float",
-        "valid": "parameter >= 0.0 && parameter <= 100.0",
+        "valid": "parameter >= 0.0f && parameter <= 100.0f",
+        "valid_readable": "0.0 <= parameter <= 100.0",
         "help": "The fan speed in percent"
       },
       {
@@ -68,7 +70,7 @@
       },
       {
         "name": "Value",
-        "type": "uint16_t",
+        "type": "uint8_t",
         "help": "The Value which will be written",
         "required": false
       },
@@ -86,7 +88,7 @@
       },
       {
         "name": "ResetValue",
-        "type": "uint16_t",
+        "type": "uint8_t",
         "help": "The value which will be written upon reset.",
         "required": false
       },
@@ -295,6 +297,7 @@
         "name": "FanConfigurations",
         "type": "array_of(FanConfiguration)",
         "valid": "parameter.size > 0",
+        "valid_readable": "parameter.size > 0",
         "help": "Array of at least one FanConfiguration"
       },
       {

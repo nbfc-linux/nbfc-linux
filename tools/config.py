@@ -33,19 +33,20 @@ class StructDefinition:
 
 class FieldDefinition:
     def __init__(self, name_, type_, **optional):
-        type           = type_.replace('const char*', 'str')
-        type           = type.replace('(', '_')
-        type           = type.replace(')', '_')
-        type           = type.replace(' ', '_')
-        type           = type.strip('_')
-        self.name      = name_
-        self.var       = optional.get('var', self.name.replace('-', '_'))
-        self.type      = type_
-        self.help      = optional.get('help', "")
-        self.valid     = optional.get('valid', None)
-        self.required  = optional.get('required', True)
-        self.default   = optional.get('default', None)
-        self.from_json = optional.get('from_json', '%s_FromJson' % type)
+        type                = type_.replace('const char*', 'str')
+        type                = type.replace('(', '_')
+        type                = type.replace(')', '_')
+        type                = type.replace(' ', '_')
+        type                = type.strip('_')
+        self.name           = name_
+        self.var            = optional.get('var', self.name.replace('-', '_'))
+        self.type           = type_
+        self.help           = optional.get('help', "")
+        self.valid          = optional.get('valid', None)
+        self.valid_readable = optional.get('valid_readable', None)
+        self.required       = optional.get('required', True)
+        self.default        = optional.get('default', None)
+        self.from_json      = optional.get('from_json', '%s_FromJson' % type)
 
     def __repr__(self):
         return f'''Field({repr(self.name)}, {self.type}, help = {repr(self.help)})'''
@@ -208,17 +209,17 @@ def write_header(fh):
 
         for i, field in enumerate(struct):
             p(f'static inline void {name}_Set_{field.var}({name}* o) {{')
-            p(f'\to->_set |= (1 << {i});')
+            p(f'\to->_set |= ({_set_field_type}) (1U << {i});')
             p(f'}}')
             p('')
 
             p(f'static inline void {name}_UnSet_{field.var}({name}* o) {{')
-            p(f'\to->_set &= ~(1 << {i});')
+            p(f'\to->_set &= ({_set_field_type}) ~(1U << {i});')
             p(f'}}')
             p('')
 
             p(f'static inline bool {name}_IsSet_{field.var}(const {name}* o) {{')
-            p(f'\treturn o->_set & (1 << {i});')
+            p(f'\treturn o->_set & ({_set_field_type}) (1U << {i});')
             p(f'}}')
             p('')
 
@@ -234,7 +235,8 @@ def write_source(fh):
 def write_validate_fields(struct, fh):
     p = lambda *a,**kw: print(*a, **kw, file=fh)
 
-    p(f'Error {struct.name}_ValidateFields({struct.name}* self) {{', end='')
+    p(f'Error {struct.name}_ValidateFields({struct.name}* self) {{')
+    p(f'\t(void) self;')
     for field in struct:
         if field.required == False:
             is_unset = 'false'
@@ -254,7 +256,7 @@ def write_validate_fields(struct, fh):
         p(f'\t\t{set_or_throw};')
         if field.valid is not None:
             p(f'\telse if (! ({is_valid}))')
-            p(f'\t\treturn err_stringf("%s: %s", "{field.name}", "requires: {field.valid}");')
+            p(f'\t\treturn err_stringf("%s: %s", "{field.name}", "requires: {field.valid_readable}");')
 
     p('\treturn err_success();')
     p('}\n')
@@ -270,7 +272,7 @@ def write_parse_struct(struct, fh):
     p( '\t\treturn err_string("Not a JSON object");')
     p( '')
     p( '\tnx_json_for_each(c, json) {')
-    p( '\t\tif (!strcmp(c->key, "Comment"))')
+    p( '\t\tif (!strcmp(c->key, "#") || !strcmp(c->key, "Comment"))')
     p( '\t\t\tcontinue;')
 
     for field in struct:
