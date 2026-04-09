@@ -13,14 +13,24 @@
 #include "dmi.h"
 #include "str_functions.h"
 
-// Check if `files` contains a config named `name`
-bool Contains_Config(array_of(ConfigFile)* files, const char* name) {
+// Find a ConfigFile by config_name (case-sensitive)
+ConfigFile* ConfigFiles_Find(array_of(ConfigFile)* files, const char* name) {
   for_each_array(ConfigFile*, file, *files) {
     if (! strcmp(file->config_name, name))
-      return true;
+      return file;
   }
 
-  return false;
+  return NULL;
+}
+
+// Find a ConfigFile by config_name (case-insensitive)
+ConfigFile* ConfigFiles_FindIgnoreCase(array_of(ConfigFile)* files, const char* name) {
+  for_each_array(ConfigFile*, file, *files) {
+    if (! str_cmp_ignorecase(file->config_name, name))
+      return file;
+  }
+
+  return NULL;
 }
 
 // Free an array of ConfigFile
@@ -80,17 +90,16 @@ static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
 // Merges two arrays of ConfigFile into a single array,
 // removing duplicates based on `config_name`.
 static array_of(ConfigFile) Merge_Configs(array_of(ConfigFile)* a, array_of(ConfigFile)* b) {
-  array_of(ConfigFile) files = {
-    .data = Mem_Calloc((a->size + b->size), sizeof(ConfigFile)),
-    .size = 0
-  };
+  array_of(ConfigFile) files;
+  files.data = Mem_Calloc((a->size + b->size), sizeof(ConfigFile));
+  files.size = 0;
 
   for_each_array(ConfigFile*, file, *a) {
     files.data[files.size++].config_name = Mem_Strdup(file->config_name);
   }
 
   for_each_array(ConfigFile*, file, *b) {
-    if (! Contains_Config(&files, file->config_name)) {
+    if (! ConfigFiles_Find(&files, file->config_name)) {
       files.data[files.size++].config_name = Mem_Strdup(file->config_name);
     }
   }
@@ -105,7 +114,7 @@ array_of(ConfigFile) List_All_Configs(void) {
 
   a = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR);
 
-  if (file_exists(NBFC_MODEL_SUPPORT_FILE_MUTABLE))
+  if (file_exists(NBFC_MODEL_CONFIGS_DIR_MUTABLE))
     b = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR_MUTABLE);
   else
     return a;
@@ -172,7 +181,7 @@ char* Get_Supported_Config_From_SupportFile(const char* support_file, array_of(C
     if (model->type != NX_JSON_STRING) {
       Log_Warn("%s: Invalid value for model \"%s\": Not a string", support_file, model->key);
     }
-    else if (!strcmp(model->key, model_name)) {
+    else if (!str_cmp_ignorecase(model->key, model_name)) {
       if (config) {
         Log_Warn("%s: Duplicate model key: \"%s\"", support_file, model->key);
       }
@@ -186,7 +195,7 @@ end:
   if (config) {
     // Ensure that the model actually exists
     for_each_array(ConfigFile*, file, *config_files) {
-      if (!strcmp(file->config_name, config)) {
+      if (!str_cmp_ignorecase(file->config_name, config)) {
         return config;
       }
     }
@@ -199,8 +208,8 @@ end:
   else {
     // Not found in support database, try a direct match on `config_files`
     for_each_array(ConfigFile*, file, *config_files) {
-      if (!strcmp(file->config_name, model_name)) {
-        return Mem_Strdup(model_name);
+      if (!str_cmp_ignorecase(file->config_name, model_name)) {
+        return Mem_Strdup(file->config_name);
       }
     }
   }

@@ -126,7 +126,7 @@ int Set_Or_Apply(void) {
   array_of(ConfigFile) files = List_All_Configs();
 
   // "auto" ===================================================================
-  if (! strcmp(Config_Options.config, "auto")) {
+  if (! str_cmp_ignorecase(Config_Options.config, "auto")) {
     config = Get_Supported_Config(&files, DMI_Get_Model_Name());
 
     if (! config) {
@@ -140,13 +140,16 @@ int Set_Or_Apply(void) {
     config = Mem_Strdup(Config_Options.config);
 
     char* dot = strrchr(config, '.');
-    if (dot && !strcmp(dot, ".json"))
+    if (dot && !str_cmp_ignorecase(dot, ".json"))
       *dot = '\0';
 
-    if  (! Contains_Config(&files, config)) {
+    ConfigFile* found = ConfigFiles_FindIgnoreCase(&files, config);
+    if (! found) {
       Log_Error("No such configuration available: %s", config);
       return NBFC_EXIT_FAILURE;
     }
+
+    config = Mem_Strdup(found->config_name);
   }
 
   // Path =====================================================================

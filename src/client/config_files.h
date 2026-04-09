@@ -16,7 +16,8 @@ array_of(ConfigFile) List_All_Configs(void);
 array_of(ConfigFile) List_Recommended_Configs(void);
 
 char* Get_Supported_Config(array_of(ConfigFile)*, const char*);
-bool  Contains_Config(array_of(ConfigFile)*, const char*);
+ConfigFile* ConfigFiles_Find(array_of(ConfigFile)*, const char*);
+ConfigFile* ConfigFiles_FindIgnoreCase(array_of(ConfigFile)*, const char*);
 void  ConfigFiles_Free(array_of(ConfigFile)*);
 
 int ConfigFile_CompareByName(const void*, const void*);

@@ -16,6 +16,21 @@ char *str_to_lower(const char *a) {
   return b;
 }
 
+int str_cmp_ignorecase(const char* a, const char* b) {
+  while (*a && *b) {
+    const int ca = tolower(*a);
+    const int cb = tolower(*b);
+
+    if (ca != cb)
+      return ca - cb;
+
+    ++a;
+    ++b;
+  }
+
+  return (unsigned char)*a - (unsigned char)*b;
+}
+
 bool str_starts_with_ignorecase(const char* string, const char* prefix) {
   for (;*prefix; prefix++, string++)
     if (tolower(*string) != tolower(*prefix))

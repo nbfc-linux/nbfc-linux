@@ -5,6 +5,7 @@
 
 const char* str_from_bool(bool);
 char*       str_to_lower(const char*);
+int         str_cmp_ignorecase(const char*, const char*);
 bool        str_starts_with_ignorecase(const char*, const char*);
 float       str_similarity(const char*, const char*);
 
