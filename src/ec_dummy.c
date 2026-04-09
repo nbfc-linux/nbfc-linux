@@ -34,8 +34,9 @@ Error EC_Dummy_WriteByte(uint8_t register_, uint8_t value) {
 
 Error EC_Dummy_ReadWord(uint8_t register_, uint16_t* out) {
   if (register_ + 1 < EC_Dummy_FakeRegistersSize) {
-    *out = ((uint16_t) EC_Dummy_FakeRegisters[register_]) |
-          (((uint16_t) EC_Dummy_FakeRegisters[register_+1]) << 8);
+    const uint16_t lsb = EC_Dummy_FakeRegisters[register_];
+    const uint16_t msb = EC_Dummy_FakeRegisters[register_ + 1];
+    *out = (uint16_t) ((msb << 8) | lsb);
   }
   return err_success();
 }
@@ -43,8 +44,8 @@ Error EC_Dummy_ReadWord(uint8_t register_, uint16_t* out) {
 Error EC_Dummy_WriteWord(uint8_t register_, uint16_t value) {
   value = htole16(value);
 
-  uint8_t msb = (uint8_t) (value >> 8);
-  uint8_t lsb = (uint8_t) value;
+  const uint8_t msb = (uint8_t) (value >> 8);
+  const uint8_t lsb = (uint8_t) value;
 
   if (register_ + 1 < EC_Dummy_FakeRegistersSize) {
     EC_Dummy_FakeRegisters[register_] = lsb;

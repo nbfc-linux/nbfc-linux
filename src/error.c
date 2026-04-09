@@ -1,7 +1,6 @@
 #include "error.h"
 
 #include "stringbuf.h"
-#include "nxjson.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -24,7 +23,7 @@ static void err_print(Error e, StringBuf* s) {
       break;
 
     case ErrorSystem_NxJson:
-      StringBuf_Printf(s, "%s", NX_JSON_MSGS[e->value.code]);
+      StringBuf_Printf(s, "%s", NX_JSON_MSGS[e->value.nxjson_error]);
       break;
 
     case ErrorSystem_String:
@@ -83,7 +82,7 @@ Error err_chain_stdlib(Error e, const char* message) {
 Error err_chain_nxjson(Error e, const char* message) {
   e = err_allocate(e);
   e->system = ErrorSystem_NxJson;
-  e->value.code = NX_JSON_ERROR;
+  e->value.nxjson_error = NX_JSON_ERROR;
   if (message)
     return err_chain_string(e, message);
   return e;

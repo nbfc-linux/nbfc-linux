@@ -3,6 +3,7 @@
 
 #include "log.h"
 #include "macros.h"
+#include "nxjson.h"
 
 #include <stddef.h>
 
@@ -17,6 +18,7 @@ struct ErrorImpl {
   ErrorSystem system;
   union {
     int code;
+    enum nx_json_error nxjson_error;
     char message[1024];
   } value;
 };

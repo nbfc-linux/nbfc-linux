@@ -91,7 +91,7 @@ static bool EC_Linux_WaitForEcStatus(enum ECStatus status, bool isSet)
       continue;
 
     if (isSet)
-      value = ~value;
+      value = (uint8_t) ~value;
 
     if ((status & value) == 0)
       return true;
@@ -148,12 +148,13 @@ static bool EC_Linux_TryReadWord(uint8_t register_, uint16_t* value)
 {
   // Byte order: little endian
 
-  uint8_t result[2];
+  uint8_t lsb;
+  uint8_t msb;
 
-  if (EC_Linux_TryReadByte(register_+0, &result[0]) &&
-      EC_Linux_TryReadByte(register_+1, &result[1]))
+  if (EC_Linux_TryReadByte(register_+0, &lsb) &&
+      EC_Linux_TryReadByte(register_+1, &msb))
   {
-    *value = ((uint16_t) result[0]) | (((uint16_t) result[1]) << 8);
+    *value = (uint16_t) (((uint16_t) lsb) | (((uint16_t) msb) << 8));
     return true;
   }
 
