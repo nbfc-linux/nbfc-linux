@@ -19,28 +19,27 @@ struct {
 } Show_Variable_Options = {0};
 
 int Show_Variable(void) {
-  if (! Show_Variable_Options.variable) {
+  int ret = NBFC_EXIT_SUCCESS;
+  const char* const variable = Show_Variable_Options.variable;
+
+  if (! variable) {
     Log_Error("Missing argument: VARIABLE");
     return NBFC_EXIT_CMDLINE;
   }
 
-  int ret = NBFC_EXIT_SUCCESS;
-  char* variable = str_to_lower(Show_Variable_Options.variable);
-
-  if (! strcmp(variable, "config_file"))
+  if (! str_cmp_ignorecase(variable, "config_file"))
     printf("%s\n", NBFC_SERVICE_CONFIG);
-  else if (! strcmp(variable, "socket_file"))
+  else if (! str_cmp_ignorecase(variable, "socket_file"))
     printf("%s\n", NBFC_SOCKET_PATH);
-  else if (! strcmp(variable, "pid_file"))
+  else if (! str_cmp_ignorecase(variable, "pid_file"))
     printf("%s\n", NBFC_PID_FILE);
-  else if (! strcmp(variable, "model_configs_dir"))
+  else if (! str_cmp_ignorecase(variable, "model_configs_dir"))
     printf("%s\n", NBFC_MODEL_CONFIGS_DIR);
   else {
     ret = NBFC_EXIT_FAILURE;
     Log_Error("Unknown variable \"%s\". Choose from \"config_file\", \"socket_file\", \"pid_file\", \"model_configs_dir\"",
-      Show_Variable_Options.variable);
+      variable);
   }
 
-  Mem_Free(variable);
   return ret;
 }
