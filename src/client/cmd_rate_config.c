@@ -391,7 +391,9 @@ static void RateConfig_PrintResultsJson(
 
   nxjson_write_to_fd(array, STDOUT_FILENO);
 
+#if STRICT_CLEANUP
   nx_json_free(array);
+#endif
 }
 
 /*
@@ -426,10 +428,12 @@ static Error RateConfig_RateFiles(
     RateConfig_PrintResults(&ratings, num_groups, min_score);
 
   // Free
+#if STRICT_CLEANUP
   for_each_array(ConfigWithData*, rating, ratings) {
     ConfigWithData_Free(rating);
   }
   Mem_Free(ratings.data);
+#endif
 
   return err_success();
 }
@@ -465,7 +469,9 @@ static Error RateConfig_RateAll(ConfigRating* config_rating, bool json, float mi
   }
 
   // Free
+#if STRICT_CLEANUP
   ConfigFiles_Free(&all_configs);
+#endif
 
   return e;
 }
@@ -498,6 +504,7 @@ static Error RateConfig_RateSingle(ConfigRating* config_rating, bool json, const
 static int RateConfig_PrintRules(const char* rules_json, bool json) {
   Error e;
   ConfigRatingRules rules = {0};
+  nx_json* js = NULL;
 
   e = ConfigRatingRules_FromJson(&rules, rules_json);
   if (e) {
@@ -506,15 +513,17 @@ static int RateConfig_PrintRules(const char* rules_json, bool json) {
   }
 
   if (json) {
-    nx_json* js = ConfigRatingRules_ToJson(&rules);
+    js = ConfigRatingRules_ToJson(&rules);
     nxjson_write_to_fd(js, STDOUT_FILENO);
-    nx_json_free(js);
   }
   else {
     ConfigRatingRules_Print(&rules);
   }
 
+#if STRICT_CLEANUP
+  nx_json_free(js);
   ConfigRatingRules_Free(&rules);
+#endif
 
   return NBFC_EXIT_SUCCESS;
 }
@@ -554,6 +563,16 @@ int RateConfig(void) {
   }
 
   // ==========================================================================
+  // Initialize curl (used for retrieving rating rules)
+  // ==========================================================================
+
+  CURLcode code = curl_global_init(CURL_GLOBAL_DEFAULT);
+  if (code != CURLE_OK) {
+    Log_Error("curl_global_init() failed");
+    return NBFC_EXIT_FAILURE;
+  }
+
+  // ==========================================================================
   // Print configuration rules
   // ==========================================================================
 
@@ -561,7 +580,11 @@ int RateConfig(void) {
     rules = RateConfig_GetRules(Rate_Config_Options.rules_file, Rate_Config_Options.no_download);
     if (! rules)
       return NBFC_EXIT_FAILURE;
-    return RateConfig_PrintRules(rules, Rate_Config_Options.json);
+    int ret = RateConfig_PrintRules(rules, Rate_Config_Options.json);
+#if STRICT_CLEANUP
+    Mem_Free(rules);
+#endif
+    return ret;
   }
 
   // ==========================================================================
@@ -611,8 +634,11 @@ int RateConfig(void) {
   else
     e = RateConfig_RateSingle(&config_rating, Rate_Config_Options.json, Rate_Config_Options.file);
 
+#if STRICT_CLEANUP
   ConfigRating_Free(&config_rating);
   Mem_Free(rules);
+  curl_global_cleanup();
+#endif
 
   if (e) {
     Log_Error("%s", err_print_all(e));

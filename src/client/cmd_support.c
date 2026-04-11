@@ -181,8 +181,10 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
   response = CurlWithMem_StealData(curl);
 
 end:
+#if STRICT_CLEANUP
   Mem_Free(endpoint_url);
   CurlWithMem_Destroy(curl);
+#endif
   return response;
 }
 
@@ -249,7 +251,9 @@ static int Support_Handle_Response(char* response) {
   ret = NBFC_EXIT_SUCCESS;
 
 end:
+#if STRICT_CLEANUP
   nx_json_free(root);
+#endif
   return ret;
 }
 
@@ -264,7 +268,9 @@ static int Support_Upload_Firmware(void) {
 
   // Handle response
   int ret = Support_Handle_Response(response);
+#if STRICT_CLEANUP
   Mem_Free(response);
+#endif
   return ret;
 }
 
@@ -279,7 +285,10 @@ static int Support_Print_Command(void) {
     DMI_Get_Model_Name()
   );
 
+#if STRICT_CLEANUP
   Mem_Free(endpoint_url);
+#endif
+
   return NBFC_EXIT_SUCCESS;
 }
 

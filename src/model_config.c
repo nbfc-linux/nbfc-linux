@@ -345,6 +345,10 @@ void ModelConfig_Free(ModelConfig* c) {
     Mem_Free((char*) f->ResetAcpiMethod);
     Mem_Free(f->TemperatureThresholds.data);
     Mem_Free(f->FanSpeedPercentageOverrides.data);
+
+    for_each_array(str*, s, f->Sensors)
+      Mem_Free((char*) *s);
+    Mem_Free(f->Sensors.data);
   }
 
   Mem_Free(c->FanConfigurations.data);

@@ -459,9 +459,11 @@ void ConfigRating_MethodRatingFree(ConfigRating_MethodRating* rating) {
 void ConfigRating_RatingFree(ConfigRating_Rating* rating) {
   for_each_array(ConfigRating_RegisterRating*, reg_rating, rating->register_ratings)
     ConfigRating_RegisterRatingFree(reg_rating);
+  Mem_Free(rating->register_ratings.data);
 
   for_each_array(ConfigRating_MethodRating*, met_rating, rating->method_ratings)
     ConfigRating_MethodRatingFree(met_rating);
+  Mem_Free(rating->method_ratings.data);
 
   memset(rating, 0, sizeof(*rating));
 }

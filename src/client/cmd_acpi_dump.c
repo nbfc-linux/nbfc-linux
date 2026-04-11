@@ -1,5 +1,6 @@
 #include "../log.h"
 #include "../macros.h"
+#include "../memory.h"
 #include "../file_utils.h"
 #include "../acpi_analysis.h"
 #include "../nxjson_write.h"
@@ -64,7 +65,11 @@ static int AcpiDump_DSL(const char* dsdt_file) {
   }
 
   printf("%s", out);
+
+#if STRICT_CLEANUP
   Mem_Free(out);
+#endif
+
   return NBFC_EXIT_SUCCESS;
 }
 
@@ -93,7 +98,9 @@ static int AcpiDump_Methods(const char* dsdt_file, bool json) {
     for_each_array(AcpiMethod*, method, acpi_info.methods)
       AcpiMethod_ToJson(method, NULL, array);
     nxjson_write_to_fd(array, STDOUT_FILENO);
+#if STRICT_CLEANUP
     nx_json_free(array);
+#endif
   }
   else {
     for_each_array(AcpiMethod*, method, acpi_info.methods) {
@@ -101,7 +108,10 @@ static int AcpiDump_Methods(const char* dsdt_file, bool json) {
     }
   }
 
+#if STRICT_CLEANUP
   AcpiInfo_Free(&acpi_info);
+#endif
+
   return NBFC_EXIT_SUCCESS;
 }
 
@@ -163,7 +173,10 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
     }
 
     nxjson_write_to_fd(array, STDOUT_FILENO);
+
+#if STRICT_CLEANUP
     nx_json_free(array);
+#endif
   }
   else {
     for_each_array(AcpiRegister*, register_, acpi_info.registers) {
@@ -186,7 +199,10 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
   // Free data
   // ==========================================================================
 
+#if STRICT_CLEANUP
   AcpiInfo_Free(&acpi_info);
+#endif
+
   return NBFC_EXIT_SUCCESS;
 }
 
