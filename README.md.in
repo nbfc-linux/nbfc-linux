@@ -56,9 +56,29 @@ Installation
   - Or via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
-- Debian / Ubuntu:
-  - [Download Latest Version %TAG%](%DEBIAN_URL%)
-  - Install NBFC-Linux: `apt install ./%DEBIAN_PACKAGE%`
+- Debian Trixie
+  - [Download Latest Version %TAG%](%DEBIAN_TRIXIE_URL%)
+  - Install NBFC-Linux: `apt install ./%DEBIAN_TRIXIE_PACKAGE%`
+
+- Debian Bookworm
+  - [Download Latest Version %TAG%](%DEBIAN_BOOKWORM_URL%)
+  - Install NBFC-Linux: `apt install ./%DEBIAN_BOOKWORM_PACKAGE%`
+
+- Ubuntu Noble
+  - [Download Latest Version %TAG%](%UBUNTU_NOBLE_URL%)
+  - Install NBFC-Linux: `apt install ./%UBUNTU_NOBLE_PACKAGE%`
+
+- Ubuntu Jammy
+  - [Download Latest Version %TAG%](%UBUNTU_JAMMY_URL%)
+  - Install NBFC-Linux: `apt install ./%UBUNTU_JAMMY_PACKAGE%`
+
+- Linux Mint 22
+  - [Download Latest Version %TAG%](%LINUX_MINT_22_URL%)
+  - Install NBFC-Linux: `apt install ./%LINUX_MINT_22_PACKAGE%`
+
+- Linux Mint 21
+  - [Download Latest Version %TAG%](%LINUX_MINT_21_URL%)
+  - Install NBFC-Linux: `apt install ./%LINUX_MINT_21_PACKAGE%`
 
 - Fedora:
   - [Download Latest Version %TAG%](%FEDORA_URL%)

@@ -35,7 +35,7 @@ Comparison of NBFC C# and NBFC Linux
 |Portability                      | Crossplatform                         | Linux                                       |
 |Runtime                          | Mono                                  | Native                                      |
 |Memory Consumption (ps\_mem)     | ~50MB                                 | ~230KB                                      |
-|Model Configuration Files        | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) (210 files) | [JSON](share/nbfc/configs) (311 files) |
+|Model Configuration Files        | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) (210 files) | [JSON](share/nbfc/configs) (312 files) |
 |Model Compatibility Database     | No                                    | [Yes](share/nbfc/model_support.json)        |
 |Fan Control Rights               | Any user                              | Any user                                    |
 |Service Control Rights           | Any user                              | Only root                                   |
@@ -51,22 +51,42 @@ Installation
 ------------
 
 - Arch Linux:
-  - [Download Latest Version 0.4.0](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.0/arch-linux-nbfc-linux-git-0.4.0.pkg.tar.zst)
-  - Install NBFC-Linux: `pacman -U ./arch-linux-nbfc-linux-git-0.4.0.pkg.tar.zst`
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/arch-linux-nbfc-linux-git-0.4.0.r13.g2507403-1-x86_64.pkg.tar.zst)
+  - Install NBFC-Linux: `pacman -U ./arch-linux-nbfc-linux-git-0.4.0.r13.g2507403-1-x86_64.pkg.tar.zst`
   - Or via AUR (`yay -S nbfc-linux`)
   - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
-- Debian / Ubuntu:
-  - [Download Latest Version 0.4.0](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.0/debian-nbfc-linux_0.4.0_amd64.deb)
-  - Install NBFC-Linux: `apt install ./debian-nbfc-linux_0.4.0_amd64.deb`
+- Debian Trixie
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/debian-trixie-nbfc-linux_0.4.1_amd64.deb)
+  - Install NBFC-Linux: `apt install ./debian-trixie-nbfc-linux_0.4.1_amd64.deb`
+
+- Debian Bookworm
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/debian-bookworm-nbfc-linux_0.4.1_amd64.deb)
+  - Install NBFC-Linux: `apt install ./debian-bookworm-nbfc-linux_0.4.1_amd64.deb`
+
+- Ubuntu Noble
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/ubuntu-noble-nbfc-linux_0.4.1_amd64.deb)
+  - Install NBFC-Linux: `apt install ./ubuntu-noble-nbfc-linux_0.4.1_amd64.deb`
+
+- Ubuntu Jammy
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/ubuntu-jammy-nbfc-linux_0.4.1_amd64.deb)
+  - Install NBFC-Linux: `apt install ./ubuntu-jammy-nbfc-linux_0.4.1_amd64.deb`
+
+- Linux Mint 22
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/linux-mint-22-nbfc-linux_0.4.1_amd64.deb)
+  - Install NBFC-Linux: `apt install ./linux-mint-22-nbfc-linux_0.4.1_amd64.deb`
+
+- Linux Mint 21
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/linux-mint-21-nbfc-linux_0.4.1_amd64.deb)
+  - Install NBFC-Linux: `apt install ./linux-mint-21-nbfc-linux_0.4.1_amd64.deb`
 
 - Fedora:
-  - [Download Latest Version 0.4.0](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.0/fedora-nbfc-linux-0.4.0-1.x86_64.rpm)
-  - Install NBFC-Linux: `dnf install ./fedora-nbfc-linux-0.4.0-1.x86_64.rpm`
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/fedora-nbfc-linux-0.4.1-1.x86_64.rpm)
+  - Install NBFC-Linux: `dnf install ./fedora-nbfc-linux-0.4.1-1.x86_64.rpm`
 
 - OpenSuse (Tumbleweed)
-  - [Download Latest Version 0.4.0](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.0/opensuse-nbfc-linux-0.4.0-1.x86_64.rpm)
-  - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.4.0-1.x86_64.rpm`
+  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/opensuse-nbfc-linux-0.4.1-1.x86_64.rpm)
+  - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.4.1-1.x86_64.rpm`
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)
@@ -76,7 +96,7 @@ Installation
   - ensure, that podman is installed
     - docker should work also, but is currently not tested
   - edit [pkgbuilds/rpm/nbfc-linux.spec](./pkgbuilds/rpm/nbfc-linux.spec) and
-    - set wanted Version (e.g. 0.4.0)
+    - set wanted Version (e.g. 0.4.1)
     - set wanted Releasenumber (e.g. 1%{?dist} or 2%{?dist})
   - `./pkgbuilds/rpm/buildNBFC-LINUX`
   - the resulting rpm can be found in [pkgbuilds directory](./pkgbuilds/)
