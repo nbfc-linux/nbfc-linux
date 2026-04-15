@@ -12,25 +12,25 @@
 	 "MaxSpeedValue": 100,
 	 "IndependentReadMinMaxValues": false,
 	 "MinSpeedValueRead": 0,
-	 "MaxSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 5454,
 	 "ResetRequired": true,
-	 "FanSpeedResetValue": 50,
+	 "FanSpeedResetValue": 10,
 	 "FanDisplayName": "11th Gen Intel i5-11400H",
 	 "TemperatureThresholds": [
 	  {
-	   "UpThreshold": 56,
-	   "DownThreshold": 0,
-	   "FanSpeed": 0.0
+	  "UpThreshold": 56,
+	  "DownThreshold": 0,
+	  "FanSpeed": 0.0 
 	  },
 	  {
-	   "UpThreshold": 60,
-	   "DownThreshold": 56,
-	   "FanSpeed": 10.0
+	  "UpThreshold": 60,
+	  "DownThreshold": 56,
+	  "FanSpeed": 10.0
 	  },
 	  {
-	   "UpThreshold": 64,
-	   "DownThreshold": 60,
-	   "FanSpeed": 20.0
+	  "UpThreshold": 64,
+	  "DownThreshold": 60,
+	  "FanSpeed": 20.0
 	  },
 	  {
 	   "UpThreshold": 68,
@@ -82,9 +82,9 @@
 	 "MaxSpeedValue": 100,
 	 "IndependentReadMinMaxValues": false,
 	 "MinSpeedValueRead": 0,
-	 "MaxSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 6382,
 	 "ResetRequired": true,
-	 "FanSpeedResetValue": 50,
+	 "FanSpeedResetValue": 20,
 	 "FanDisplayName": "GeForce RTX 3050",
 	 "TemperatureThresholds": [
 {
@@ -155,7 +155,7 @@
 	 "ResetRequired": true,
 	 "ResetValue": 0,
 	 "ResetWriteMode": "Set",
-	 "Description": "Make manual fan control possible"
+	 "Description": "The 0x03 register must be set to 17/81(for battery mode) Make manual fan control possible"
 	},
 	{
 	 "WriteMode": "Set",
