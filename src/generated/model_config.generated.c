@@ -114,6 +114,9 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self
 	if (false)
 		return err_stringf("%s: %s", "AcpiMethod", "Missing option");
 
+	if (false)
+		self->LuaCode = 0;
+
 	if (! RegisterWriteConfiguration_IsSet_ResetRequired(self))
 		self->ResetRequired = false;
 
@@ -122,6 +125,9 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self
 
 	if (false)
 		return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
+
+	if (false)
+		self->ResetLuaCode = 0;
 
 	if (! RegisterWriteConfiguration_IsSet_ResetWriteMode(self))
 		self->ResetWriteMode = RegisterWriteMode_Set;
@@ -166,6 +172,11 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 			if (!e)
 				RegisterWriteConfiguration_Set_AcpiMethod(obj);
 		}
+		else if (!strcmp(c->key, "LuaCode")) {
+			e = LuaCode_FromJson(&obj->LuaCode, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_LuaCode(obj);
+		}
 		else if (!strcmp(c->key, "ResetRequired")) {
 			e = bool_FromJson(&obj->ResetRequired, c);
 			if (!e)
@@ -180,6 +191,11 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 			e = str_FromJson(&obj->ResetAcpiMethod, c);
 			if (!e)
 				RegisterWriteConfiguration_Set_ResetAcpiMethod(obj);
+		}
+		else if (!strcmp(c->key, "ResetLuaCode")) {
+			e = LuaCode_FromJson(&obj->ResetLuaCode, c);
+			if (!e)
+				RegisterWriteConfiguration_Set_ResetLuaCode(obj);
 		}
 		else if (!strcmp(c->key, "ResetWriteMode")) {
 			e = RegisterWriteMode_FromJson(&obj->ResetWriteMode, c);
@@ -211,10 +227,16 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 		return err_stringf("%s: %s", "ReadAcpiMethod", "Missing option");
 
 	if (false)
+		self->ReadLuaCode = 0;
+
+	if (false)
 		return err_stringf("%s: %s", "WriteRegister", "Missing option");
 
 	if (false)
 		return err_stringf("%s: %s", "WriteAcpiMethod", "Missing option");
+
+	if (false)
+		self->WriteLuaCode = 0;
 
 	if (! FanConfiguration_IsSet_MinSpeedValue(self))
 		return err_stringf("%s: %s", "MinSpeedValue", "Missing option");
@@ -239,6 +261,9 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 
 	if (false)
 		return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
+
+	if (false)
+		self->ResetLuaCode = 0;
 
 	if (false)
 		return err_stringf("%s: %s", "TemperatureAlgorithmType", "Missing option");
@@ -279,6 +304,11 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 			if (!e)
 				FanConfiguration_Set_ReadAcpiMethod(obj);
 		}
+		else if (!strcmp(c->key, "ReadLuaCode")) {
+			e = LuaCode_FromJson(&obj->ReadLuaCode, c);
+			if (!e)
+				FanConfiguration_Set_ReadLuaCode(obj);
+		}
 		else if (!strcmp(c->key, "WriteRegister")) {
 			e = uint8_t_FromJson(&obj->WriteRegister, c);
 			if (!e)
@@ -288,6 +318,11 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 			e = str_FromJson(&obj->WriteAcpiMethod, c);
 			if (!e)
 				FanConfiguration_Set_WriteAcpiMethod(obj);
+		}
+		else if (!strcmp(c->key, "WriteLuaCode")) {
+			e = LuaCode_FromJson(&obj->WriteLuaCode, c);
+			if (!e)
+				FanConfiguration_Set_WriteLuaCode(obj);
 		}
 		else if (!strcmp(c->key, "MinSpeedValue")) {
 			e = uint16_t_FromJson(&obj->MinSpeedValue, c);
@@ -328,6 +363,11 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 			e = str_FromJson(&obj->ResetAcpiMethod, c);
 			if (!e)
 				FanConfiguration_Set_ResetAcpiMethod(obj);
+		}
+		else if (!strcmp(c->key, "ResetLuaCode")) {
+			e = LuaCode_FromJson(&obj->ResetLuaCode, c);
+			if (!e)
+				FanConfiguration_Set_ResetLuaCode(obj);
 		}
 		else if (!strcmp(c->key, "TemperatureAlgorithmType")) {
 			e = TemperatureAlgorithmType_FromJson(&obj->TemperatureAlgorithmType, c);
@@ -422,6 +462,9 @@ Error ModelConfig_ValidateFields(ModelConfig* self) {
 	if (! ModelConfig_IsSet_LegacyTemperatureThresholdsBehaviour(self))
 		self->LegacyTemperatureThresholdsBehaviour = false;
 
+	if (false)
+		return err_stringf("%s: %s", "LuaLibraries", "Missing option");
+
 	if (! ModelConfig_IsSet_EcPollInterval(self))
 		self->EcPollInterval = 3000;
 
@@ -471,6 +514,11 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 			e = bool_FromJson(&obj->LegacyTemperatureThresholdsBehaviour, c);
 			if (!e)
 				ModelConfig_Set_LegacyTemperatureThresholdsBehaviour(obj);
+		}
+		else if (!strcmp(c->key, "LuaLibraries")) {
+			e = LuaLibraries_FromJson(&obj->LuaLibraries, c);
+			if (!e)
+				ModelConfig_Set_LuaLibraries(obj);
 		}
 		else if (!strcmp(c->key, "EcPollInterval")) {
 			e = uint16_t_FromJson(&obj->EcPollInterval, c);

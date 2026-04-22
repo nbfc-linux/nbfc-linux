@@ -326,6 +326,13 @@ static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
       else
         return err_success();
 
+    case RegisterWriteMode_Lua:
+      e = Lua_Call(cfg->ResetLuaCode, 0, &out);
+      if (e)
+        return err_chain_string(e, "ResetLuaCode");
+      else
+        return err_success();
+
     default:
       return err_string("ERR-01");
   }
@@ -364,6 +371,13 @@ static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
       e = AcpiCall_Call(cfg->AcpiMethod, 0, &out);
       if (e)
         return err_chain_string(e, "AcpiMethod");
+      else
+        return err_success();
+
+    case RegisterWriteMode_Lua:
+      e = Lua_Call(cfg->LuaCode, 0, &out);
+      if (e)
+        return err_chain_string(e, "LuaCode");
       else
         return err_success();
 

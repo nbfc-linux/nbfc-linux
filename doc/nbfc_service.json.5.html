@@ -35,8 +35,8 @@ FanTemperatureSourceConfig</em></p>
 </blockquote>
 <h2>FanTemperatureSourceConfig</h2>
 <p>Configures which sensors are attached to a fan.</p>
-<p><strong>FanIndex</strong>: <em>Integer &gt;= 0 &amp;&amp; &lt;=
-255</em></p>
+<p><strong>FanIndex</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 255</p>
 <blockquote>
 <p>Specify which fan should be configured.</p>
 </blockquote>
@@ -84,8 +84,8 @@ milliseconds).</p>
 <blockquote>
 <p>If the temperature exceeds this threshold, NBFC will ignore all
 Temperature threshold elements and set the fan to 100% speed until the
-temperature drops below
-(<strong>CriticalTemperature</strong>-<strong>CriticalTemperatureOffset</strong>).</p>
+temperature drops below (<strong>CriticalTemperature</strong> minus
+<strong>CriticalTemperatureOffset</strong>).</p>
 </blockquote>
 <p><strong>CriticalTemperatureOffset</strong>: <em>Integer</em> &gt;
 0</p>
@@ -112,17 +112,15 @@ RegisterWriteConfiguration</em></p>
 <p>Defines how NBFC controls a fan.</p>
 <p><strong>FanDisplayName</strong>: <em>String</em></p>
 <blockquote>
-<p>Fan display name</p>
+<p>Sets the fan display name.</p>
 </blockquote>
 <p><strong>ReadRegister</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
 <em>Integer</em> &lt;= 255</p>
 <blockquote>
 <p>The register from which NBFC reads the fan speed.</p>
-</blockquote>
-<p><strong>WriteRegister</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
-<em>Integer</em> &lt;= 255</p>
-<blockquote>
-<p>The register which NBFC uses to control the fan.</p>
+<p>This option is mutually exclusive to <strong>ReadAcpiMethod</strong>
+and <strong>ReadLuaCode</strong>. Only one of them can be set at a
+time.</p>
 </blockquote>
 <p><strong>ReadAcpiMethod</strong>: <em>String</em></p>
 <blockquote>
@@ -131,8 +129,30 @@ RegisterWriteConfiguration</em></p>
 <blockquote>
 <p>"ReadAcpiMethod": "\\_SB.PCI0.LPCB.EC0.GFSD"</p>
 </blockquote>
-<p>This option is mutually exclusive to <strong>ReadRegister</strong>.
-Only one of them can be set at a time.</p>
+<p>This option is mutually exclusive to <strong>ReadRegister</strong>
+and <strong>ReadLuaCode</strong>. Only one of them can be set at a
+time.</p>
+</blockquote>
+<p><strong>ReadLuaCode</strong>: <em>String</em> or <em>Array of
+String</em></p>
+<blockquote>
+<p>The Lua code to be executed for reading the fan speed. See<strong>
+LUA CODE</strong>.</p>
+<p>Example:</p>
+<blockquote>
+<p>"ReadLuaCode": "return acpi_call(\"\\\\_SB.PCI0.LPCB.EC0.GFSD\")"</p>
+</blockquote>
+<p>This option is mutually exclusive to <strong>ReadRegister</strong>
+and <strong>ReadAcpiMethod</strong>. Only one of them can be set at a
+time.</p>
+</blockquote>
+<p><strong>WriteRegister</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 255</p>
+<blockquote>
+<p>The register which NBFC uses to control the fan.</p>
+<p>This option is mutually exclusive to <strong>WriteAcpiMethod</strong>
+and <strong>WriteLuaCode</strong>. Only one of them can be set at a
+time.</p>
 </blockquote>
 <p><strong>WriteAcpiMethod</strong>: <em>String</em></p>
 <blockquote>
@@ -142,28 +162,47 @@ placeholder ($) which will be replaced by the fan speed.</p>
 <blockquote>
 <p>"WriteAcpiMethod": "\\_SB.PCI0.LPCB.EC0.SFSD $"</p>
 </blockquote>
-<p>This option is mutually exclusive to <strong>WriteRegister</strong>.
-Only one of them can be set at a time.</p>
+<p>This option is mutually exclusive to <strong>WriteRegister</strong>
+and <strong>WriteLuaCode</strong>. Only one of them can be set at a
+time.</p>
 </blockquote>
-<p><strong>MinSpeedValue</strong>: <em>Integer</em></p>
+<p><strong>WriteLuaCode</strong>: <em>String</em> or <em>Array of
+String</em></p>
+<blockquote>
+<p>The Lua code to execute for writing the fan speed. See<strong> LUA
+CODE</strong>.</p>
+<p>Example:</p>
+<blockquote>
+<p>"WriteLuaCode": "return acpi_call(\"\\\\_SB.PCI0.LPCB.EC0.SFSD \" ..
+get_value())"</p>
+</blockquote>
+<p>This option is mutually exclusive to <strong>WriteRegister</strong>
+and <strong>WriteAcpiMethod</strong>. Only one of them can be set at a
+time.</p>
+</blockquote>
+<p><strong>MinSpeedValue</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 65535</p>
 <blockquote>
 <p>The value which puts the fan to the lowest possible speed (usually
 this stops the fan). Must be an integer between 0 and 255 or 0 and 65535
 if <strong>ReadWriteWords</strong> is <strong>true</strong>. Note:
 <strong>MinSpeedValue</strong> does not necessarily have to be smaller
-than <strong>MaxSpeedValue.</strong></p>
+than <strong>MaxSpeedValue</strong>.</p>
 </blockquote>
-<p><strong>MaxSpeedValue</strong>: <em>Integer</em></p>
+<p><strong>MaxSpeedValue</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 65535</p>
 <blockquote>
 <p>The value which puts the fan to the highest possible fan speed.</p>
 </blockquote>
-<p><strong>MinSpeedValueRead</strong>: <em>Integer</em></p>
+<p><strong>MinSpeedValueRead</strong>: <em>Integer</em> &gt;= 0
+&amp;&amp; <em>Integer</em> &lt;= 65535</p>
 <blockquote>
 <p>The value which corresponds to the lowest possible fan speed. Will be
 ignored if <strong>IndependentReadMinMaxValues</strong> is
 <strong>false</strong>.</p>
 </blockquote>
-<p><strong>MaxSpeedValueRead</strong>: <em>Integer</em></p>
+<p><strong>MaxSpeedValueRead</strong>: <em>Integer</em> &gt;= 0
+&amp;&amp; <em>Integer</em> &lt;= 65535</p>
 <blockquote>
 <p>The value which corresponds to the highest possible fan speed. Will
 be ignored if <strong>IndependentReadMinMaxValues</strong> is
@@ -173,22 +212,38 @@ be ignored if <strong>IndependentReadMinMaxValues</strong> is
 <blockquote>
 <p>Defines if independent minimum/maximum values should be applied for
 read operations.</p>
+<p>This enables <strong>MinSpeedValueRead</strong> and
+<strong>MaxSpeedValueRead</strong>.</p>
 </blockquote>
 <p><strong>ResetRequired</strong>: <em>Boolean</em></p>
 <blockquote>
 <p>Defines if the EC should be reset before the service is shut
 down.</p>
 </blockquote>
-<p><strong>FanSpeedResetValue</strong>: <em>Integer</em></p>
+<p><strong>FanSpeedResetValue</strong>: <em>Integer</em> &gt;= 0
+&amp;&amp; <em>Integer</em> &lt;= 65535</p>
 <blockquote>
 <p>Defines the value which will be written to
 <strong>WriteRegister</strong> to reset the EC.</p>
+<p>This option is mutually exclusive to <strong>ResetAcpiMethod</strong>
+and <strong>ResetLuaCode</strong>. Only one of them can be set at a
+time.</p>
 </blockquote>
 <p><strong>ResetAcpiMethod</strong>: <em>String</em></p>
 <blockquote>
 <p>The ACPI method to call upon fan reset.</p>
 <p>This option is mutually exclusive to
-<strong>FanSpeedResetValue</strong>. Only one of them can be set at a
+<strong>FanSpeedResetValue</strong> and <strong>ResetLuaCode</strong>.
+Only one of them can be set at a time.</p>
+</blockquote>
+<p><strong>ResetLuaCode</strong>: <em>String</em> or <em>Array of
+String</em></p>
+<blockquote>
+<p>The Lua code to be executed upon fan reset. See<strong> LUA
+CODE</strong>.</p>
+<p>This option is mutually exclusive to
+<strong>FanSpeedResetValue</strong> and
+<strong>ResetAcpiMethod</strong>. Only one of them can be set at a
 time.</p>
 </blockquote>
 <p><strong>Sensors</strong>: <em>Array of String</em></p>
@@ -220,8 +275,14 @@ specified sensors</p></li>
 </blockquote>
 <p><strong>TemperatureThresholds</strong>: <em>Array of
 TemperatureThreshold</em></p>
+<blockquote>
+<p>Defines how fast the fan runs at different temperatures.</p>
+</blockquote>
 <p><strong>FanSpeedPercentageOverrides</strong>: <em>Array of
 FanSpeedPercentageOverride</em></p>
+<blockquote>
+<p>Overrides the default algorithm to calculate fan speeds.</p>
+</blockquote>
 <h2>RegisterWriteConfiguration</h2>
 <p>Allows to write to any EC register.</p>
 <p><strong>WriteMode</strong>: <em>String</em></p>
@@ -236,6 +297,8 @@ register &amp; value)</p></li>
 register | value)</p></li>
 <li><p><strong>Call</strong>: calls the ACPI method stored in
 <strong>AcpiMethod</strong> or <strong>ResetAcpiMethod</strong></p></li>
+<li><p><strong>Lua</strong>: executes the Lua code stored in
+<strong>LuaCode</strong> or <strong>ResetLuaCode</strong></p></li>
 </ul>
 </blockquote>
 <p><strong>WriteOccasion</strong>: <em>String</em></p>
@@ -243,9 +306,8 @@ register | value)</p></li>
 <p>Defines when the value should be written:</p>
 <ul>
 <li><p><strong>OnInitialization</strong>: writes the value once upon
-initialization (everytimee the fan control service is enabled or a
-config is applied)</p></li>
-<li><p><strong>OnWriteFanSpeed</strong>: writes the value everytimee the
+initialization (everytime the fan control service starts).</p></li>
+<li><p><strong>OnWriteFanSpeed</strong>: writes the value everytime the
 fan speed is set.</p></li>
 </ul>
 </blockquote>
@@ -254,30 +316,54 @@ fan speed is set.</p></li>
 <blockquote>
 <p>The register which will be manipulated.</p>
 </blockquote>
-<p><strong>Value</strong>: <em>Integer</em></p>
+<p><strong>Value</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 255</p>
 <blockquote>
 <p>The value which will be written.</p>
+<p>This option is mutually exclusive to <strong>AcpiMethod</strong> and
+<strong>LuaCode</strong>. Only one of them can be set at a time.</p>
 </blockquote>
 <p><strong>AcpiMethod</strong>: <em>String</em></p>
 <blockquote>
 <p>The ACPI method to call.</p>
-<p>This option is mutually exclusive to <strong>Value</strong>. Only one
-of them can be set at a time.</p>
+<p>This option is mutually exclusive to <strong>Value</strong> and
+<strong>LuaCode</strong>. Only one of them can be set at a time.</p>
+</blockquote>
+<p><strong>LuaCode</strong>: <em>String</em> or <em>Array of
+String</em></p>
+<blockquote>
+<p>The Lua code to be executed. See<strong> LUA CODE</strong>.</p>
+<p>This option is mutually exclusive to <strong>Value</strong> and
+<strong>AcpiMethod</strong>. Only one of them can be set at a time.</p>
 </blockquote>
 <p><strong>ResetRequired</strong>: <em>Boolean</em></p>
 <blockquote>
 <p>Defines if the register should be reset before the service is shut
 down.</p>
 </blockquote>
-<p><strong>ResetValue</strong>: <em>Integer</em></p>
+<p><strong>ResetValue</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 255</p>
 <blockquote>
 <p>The value which will be written upon reset.</p>
+<p>This option is mutually exclusive to <strong>ResetAcpiMethod</strong>
+and <strong>ResetLuaCode</strong>. Only one of them can be set at a
+time.</p>
 </blockquote>
 <p><strong>ResetAcpiMethod</strong>: <em>String</em></p>
 <blockquote>
 <p>The ACPI method to call upon reset.</p>
-<p>This option is mutually exclusive to <strong>ResetValue</strong>.
-Only one of them can be set at a time.</p>
+<p>This option is mutually exclusive to <strong>ResetValue</strong> and
+<strong>ResetLuaCode</strong>. Only one of them can be set at a
+time.</p>
+</blockquote>
+<p><strong>ResetLuaCode</strong>: <em>String</em> or <em>Array of
+String</em></p>
+<blockquote>
+<p>The Lua code to be executed upon reset. See<strong> LUA
+CODE</strong>.</p>
+<p>This option is mutually exclusive to <strong>ResetValue</strong> and
+<strong>ResetAcpiMethod</strong>. Only one of them can be set at a a
+time.</p>
 </blockquote>
 <p><strong>ResetWriteMode</strong>: <em>String</em></p>
 <blockquote>
@@ -295,7 +381,8 @@ Only one of them can be set at a time.</p>
 <blockquote>
 <p>The fan speed in percent.</p>
 </blockquote>
-<p><strong>FanSpeedValue</strong>: <em>Integer</em></p>
+<p><strong>FanSpeedValue</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
+<em>Integer</em> &lt;= 65535</p>
 <blockquote>
 <p>The fan speed value which will be written to
 <strong>WriteRegister</strong>.</p>
@@ -334,6 +421,48 @@ falls below the <em>DownThreshold</em> (in celsius).</p>
 <em>Float</em> &lt;= 100.0</p>
 <blockquote>
 <p>The fan speed in percent.</p>
+</blockquote>
+<h1>LUA CODE</h1>
+<p>NBFC-Linux allows executing <strong>Lua</strong> code to implement
+more complex read or write operations.</p>
+<p>Lua code can be specified as either a <em>String</em> or an <em>Array
+of String</em>.</p>
+<h2>Return Values</h2>
+<p>Every Lua code must return exactly to values: <strong>Error</strong>,
+<strong>Result.</strong></p>
+<p><strong>Error</strong> is either <strong>nil</strong> (on success) or
+a <strong>string</strong> describing the error (on failure).</p>
+<p><strong>Result</strong> is an <strong>integer</strong> and is used
+for read operations. For write operations this value is ignored
+(returning <strong>0</strong> is recommended).</p>
+<h2>Availabe Lua Functions</h2>
+<p>The following functions are exposed to Lua:</p>
+<p><strong>acpi_call</strong>(<strong>method</strong>):</p>
+<blockquote>
+<p>Executes an ACPI method. Returns <strong>error</strong>,
+<strong>value</strong>.</p>
+</blockquote>
+<p><strong>ec_read</strong>(<strong>register</strong>):</p>
+<blockquote>
+<p>Reads a byte from the embedded controller. Returns
+<strong>error</strong>, <strong>value</strong>.</p>
+</blockquote>
+<p><strong>ec_read_word</strong>(<strong>register</strong>):</p>
+<blockquote>
+<p>Reads two bytes and combines them into a single value. Returns
+<strong>error</strong>, <strong>value</strong>.</p>
+</blockquote>
+<p><strong>ec_write</strong>(<strong>register</strong>,
+<strong>value</strong>):</p>
+<blockquote>
+<p>Writes a byte to the embedded controller. Returns
+<strong>error</strong>, <strong>0</strong>.</p>
+</blockquote>
+<p><strong>ec_write_word</strong>(<strong>register</strong>,
+<strong>value</strong>):</p>
+<blockquote>
+<p>Writes a 16-bit value to a two-byte register. Returns
+<strong>error</strong>, <strong>0</strong>.</p>
 </blockquote>
 <h1>FILES</h1>
 <p><em>/etc/nbfc/nbfc.json</em></p>

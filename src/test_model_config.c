@@ -15,6 +15,7 @@
 #include "nbfc.h"
 #include "buffer.c"
 #include "log.c"
+#include "lua_bindings.c"
 #include "error.c"
 #include "file_utils.c"
 #include "trace.c"

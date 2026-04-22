@@ -39,7 +39,7 @@ Main configuration file of nbfc_service (*/etc/nbfc/nbfc.json*).
 
 Configures which sensors are attached to a fan.
 
-**FanIndex**: *Integer \>= 0 && \<= 255*
+**FanIndex**: *Integer* \>= 0 && *Integer* \<= 255
 
 > Specify which fan should be configured.
 
@@ -85,8 +85,8 @@ State file of the service (*/var/run/nbfc/state.json*).
 
 > If the temperature exceeds this threshold, NBFC will ignore all
 > Temperature threshold elements and set the fan to 100% speed until the
-> temperature drops below
-> (**CriticalTemperature**-**CriticalTemperatureOffset**).
+> temperature drops below (**CriticalTemperature** minus
+> **CriticalTemperatureOffset**).
 
 **CriticalTemperatureOffset**: *Integer* \> 0
 
@@ -111,15 +111,14 @@ Defines how NBFC controls a fan.
 
 **FanDisplayName**: *String*
 
-> Fan display name
+> Sets the fan display name.
 
 **ReadRegister**: *Integer* \>= 0 && *Integer* \<= 255
 
 > The register from which NBFC reads the fan speed.
-
-**WriteRegister**: *Integer* \>= 0 && *Integer* \<= 255
-
-> The register which NBFC uses to control the fan.
+>
+> This option is mutually exclusive to **ReadAcpiMethod** and
+> **ReadLuaCode**. Only one of them can be set at a time.
 
 **ReadAcpiMethod**: *String*
 
@@ -129,8 +128,28 @@ Defines how NBFC controls a fan.
 >
 > > \"ReadAcpiMethod\": \"\\\\\_SB.PCI0.LPCB.EC0.GFSD\"
 >
-> This option is mutually exclusive to **ReadRegister**. Only one of
-> them can be set at a time.
+> This option is mutually exclusive to **ReadRegister** and
+> **ReadLuaCode**. Only one of them can be set at a time.
+
+**ReadLuaCode**: *String* or *Array of String*
+
+> The Lua code to be executed for reading the fan speed. See** LUA
+> CODE**.
+>
+> Example:
+>
+> > \"ReadLuaCode\": \"return
+> > acpi_call(\\\"\\\\\\\\\_SB.PCI0.LPCB.EC0.GFSD\\\")\"
+>
+> This option is mutually exclusive to **ReadRegister** and
+> **ReadAcpiMethod**. Only one of them can be set at a time.
+
+**WriteRegister**: *Integer* \>= 0 && *Integer* \<= 255
+
+> The register which NBFC uses to control the fan.
+>
+> This option is mutually exclusive to **WriteAcpiMethod** and
+> **WriteLuaCode**. Only one of them can be set at a time.
 
 **WriteAcpiMethod**: *String*
 
@@ -141,26 +160,38 @@ Defines how NBFC controls a fan.
 >
 > > \"WriteAcpiMethod\": \"\\\\\_SB.PCI0.LPCB.EC0.SFSD \$\"
 >
-> This option is mutually exclusive to **WriteRegister**. Only one of
-> them can be set at a time.
+> This option is mutually exclusive to **WriteRegister** and
+> **WriteLuaCode**. Only one of them can be set at a time.
 
-**MinSpeedValue**: *Integer*
+**WriteLuaCode**: *String* or *Array of String*
+
+> The Lua code to execute for writing the fan speed. See** LUA CODE**.
+>
+> Example:
+>
+> > \"WriteLuaCode\": \"return
+> > acpi_call(\\\"\\\\\\\\\_SB.PCI0.LPCB.EC0.SFSD \\\" .. get_value())\"
+>
+> This option is mutually exclusive to **WriteRegister** and
+> **WriteAcpiMethod**. Only one of them can be set at a time.
+
+**MinSpeedValue**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The value which puts the fan to the lowest possible speed (usually
 > this stops the fan). Must be an integer between 0 and 255 or 0 and
 > 65535 if **ReadWriteWords** is **true**. Note: **MinSpeedValue** does
-> not necessarily have to be smaller than **MaxSpeedValue.**
+> not necessarily have to be smaller than **MaxSpeedValue**.
 
-**MaxSpeedValue**: *Integer*
+**MaxSpeedValue**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The value which puts the fan to the highest possible fan speed.
 
-**MinSpeedValueRead**: *Integer*
+**MinSpeedValueRead**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The value which corresponds to the lowest possible fan speed. Will be
 > ignored if **IndependentReadMinMaxValues** is **false**.
 
-**MaxSpeedValueRead**: *Integer*
+**MaxSpeedValueRead**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The value which corresponds to the highest possible fan speed. Will be
 > ignored if **IndependentReadMinMaxValues** is **false**.
@@ -169,22 +200,34 @@ Defines how NBFC controls a fan.
 
 > Defines if independent minimum/maximum values should be applied for
 > read operations.
+>
+> This enables **MinSpeedValueRead** and **MaxSpeedValueRead**.
 
 **ResetRequired**: *Boolean*
 
 > Defines if the EC should be reset before the service is shut down.
 
-**FanSpeedResetValue**: *Integer*
+**FanSpeedResetValue**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > Defines the value which will be written to **WriteRegister** to reset
 > the EC.
+>
+> This option is mutually exclusive to **ResetAcpiMethod** and
+> **ResetLuaCode**. Only one of them can be set at a time.
 
 **ResetAcpiMethod**: *String*
 
 > The ACPI method to call upon fan reset.
 >
-> This option is mutually exclusive to **FanSpeedResetValue**. Only one
-> of them can be set at a time.
+> This option is mutually exclusive to **FanSpeedResetValue** and
+> **ResetLuaCode**. Only one of them can be set at a time.
+
+**ResetLuaCode**: *String* or *Array of String*
+
+> The Lua code to be executed upon fan reset. See** LUA CODE**.
+>
+> This option is mutually exclusive to **FanSpeedResetValue** and
+> **ResetAcpiMethod**. Only one of them can be set at a time.
 
 **Sensors**: *Array of String*
 
@@ -214,7 +257,11 @@ Defines how NBFC controls a fan.
 
 **TemperatureThresholds**: *Array of TemperatureThreshold*
 
+> Defines how fast the fan runs at different temperatures.
+
 **FanSpeedPercentageOverrides**: *Array of FanSpeedPercentageOverride*
+
+> Overrides the default algorithm to calculate fan speeds.
 
 ## RegisterWriteConfiguration
 
@@ -235,48 +282,70 @@ Allows to write to any EC register.
 >
 > -   **Call**: calls the ACPI method stored in **AcpiMethod** or
 >     **ResetAcpiMethod**
+>
+> -   **Lua**: executes the Lua code stored in **LuaCode** or
+>     **ResetLuaCode**
 
 **WriteOccasion**: *String*
 
 > Defines when the value should be written:
 >
 > -   **OnInitialization**: writes the value once upon initialization
->     (everytimee the fan control service is enabled or a config is
->     applied)
+>     (everytime the fan control service starts).
 >
-> -   **OnWriteFanSpeed**: writes the value everytimee the fan speed is
+> -   **OnWriteFanSpeed**: writes the value everytime the fan speed is
 >     set.
 
 **Register**: *Integer* \>= 0 && *Integer* \<= 255
 
 > The register which will be manipulated.
 
-**Value**: *Integer*
+**Value**: *Integer* \>= 0 && *Integer* \<= 255
 
 > The value which will be written.
+>
+> This option is mutually exclusive to **AcpiMethod** and **LuaCode**.
+> Only one of them can be set at a time.
 
 **AcpiMethod**: *String*
 
 > The ACPI method to call.
 >
-> This option is mutually exclusive to **Value**. Only one of them can
-> be set at a time.
+> This option is mutually exclusive to **Value** and **LuaCode**. Only
+> one of them can be set at a time.
+
+**LuaCode**: *String* or *Array of String*
+
+> The Lua code to be executed. See** LUA CODE**.
+>
+> This option is mutually exclusive to **Value** and **AcpiMethod**.
+> Only one of them can be set at a time.
 
 **ResetRequired**: *Boolean*
 
 > Defines if the register should be reset before the service is shut
 > down.
 
-**ResetValue**: *Integer*
+**ResetValue**: *Integer* \>= 0 && *Integer* \<= 255
 
 > The value which will be written upon reset.
+>
+> This option is mutually exclusive to **ResetAcpiMethod** and
+> **ResetLuaCode**. Only one of them can be set at a time.
 
 **ResetAcpiMethod**: *String*
 
 > The ACPI method to call upon reset.
 >
-> This option is mutually exclusive to **ResetValue**. Only one of them
-> can be set at a time.
+> This option is mutually exclusive to **ResetValue** and
+> **ResetLuaCode**. Only one of them can be set at a time.
+
+**ResetLuaCode**: *String* or *Array of String*
+
+> The Lua code to be executed upon reset. See** LUA CODE**.
+>
+> This option is mutually exclusive to **ResetValue** and
+> **ResetAcpiMethod**. Only one of them can be set at a a time.
 
 **ResetWriteMode**: *String*
 
@@ -295,7 +364,7 @@ Overrides the default algorithm to calculate fan speeds.
 
 > The fan speed in percent.
 
-**FanSpeedValue**: *Integer*
+**FanSpeedValue**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The fan speed value which will be written to **WriteRegister**.
 
@@ -330,6 +399,50 @@ Defines how fast the fan runs at different temperatures.
 **FanSpeed**: *Float* \>= 0.0 && *Float* \<= 100.0
 
 > The fan speed in percent.
+
+# LUA CODE
+
+NBFC-Linux allows executing **Lua** code to implement more complex read
+or write operations.
+
+Lua code can be specified as either a *String* or an *Array of String*.
+
+## Return Values
+
+Every Lua code must return exactly to values: **Error**, **Result.**
+
+**Error** is either **nil** (on success) or a **string** describing the
+error (on failure).
+
+**Result** is an **integer** and is used for read operations. For write
+operations this value is ignored (returning **0** is recommended).
+
+## Availabe Lua Functions
+
+The following functions are exposed to Lua:
+
+**acpi_call**(**method**):
+
+> Executes an ACPI method. Returns **error**, **value**.
+
+**ec_read**(**register**):
+
+> Reads a byte from the embedded controller. Returns **error**,
+> **value**.
+
+**ec_read_word**(**register**):
+
+> Reads two bytes and combines them into a single value. Returns
+> **error**, **value**.
+
+**ec_write**(**register**, **value**):
+
+> Writes a byte to the embedded controller. Returns **error**, **0**.
+
+**ec_write_word**(**register**, **value**):
+
+> Writes a 16-bit value to a two-byte register. Returns **error**,
+> **0**.
 
 # FILES
 

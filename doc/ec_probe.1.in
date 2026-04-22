@@ -1,5 +1,5 @@
 .nh
-.TH "EC_PROBE" "1" "FEBRUARY 2026" "Notebook FanControl @VERSION@"
+.TH "EC_PROBE" "1" "APRIL 2026" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 ec_probe \- probing tool for the embedded controller
@@ -72,7 +72,7 @@ Load a previously made dump into the embedded controller.
 .RI [ OPTIONS ]
 .I REGISTER
 .RS
-Reads 
+Reads
 .I REGISTER
 from the embedded controller and prints out the value.
 
@@ -102,7 +102,7 @@ of the embedded controller.
 .RS
 If given,
 .I VALUE
-is written into a combined register of 
+is written into a combined register of
 .I REGISTER
 and
 .IR "REGISTER + 1" .
@@ -149,7 +149,7 @@ Output results in decimal format instead of hexadecimal format
 .RE
 
 .PP
-.B watch 
+.B watch
 .RI [ OPTIONS ]
 .RS
 Monitor all embedded controller registers for changes (alternative version).
@@ -214,6 +214,7 @@ Report bugs to https://github.com/nbfc\-linux/nbfc\-linux
 Benjamin Abendroth (braph93@gmx.de)
 
 .SH SEE ALSO
+.PP
 .BR nbfc (1),
 .BR nbfc_service (1),
 .BR nbfc_service.json (5),

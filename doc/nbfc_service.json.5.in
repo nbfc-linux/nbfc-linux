@@ -1,5 +1,5 @@
 .nh
-.TH "NBFC-SERVICE.JSON" 5 "FEBRUARY 2026" "Notebook FanControl @VERSION@"
+.TH "NBFC-SERVICE.JSON" 5 "APRIL 2026" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 nbfc_service.json \- Notebook FanControl service configuration
@@ -61,7 +61,7 @@ Used for configuring which sensors are attached to a fan.
 Configures which sensors are attached to a fan.
 .PP
 .BR FanIndex :
-.I Integer >= 0 && <= 255
+.IR Integer " >= 0 && " Integer " <= 255"
 .RS
 Specify which fan should be configured.
 .RE
@@ -133,7 +133,7 @@ Defines how often NBFC polls the EC for changes (in milliseconds).
 .I Integer
 .RS
 If the temperature exceeds this threshold, NBFC will ignore all Temperature threshold elements and set the fan to 100% speed until the temperature drops below
-.RB ( CriticalTemperature \- CriticalTemperatureOffset ).
+.RB ( CriticalTemperature " minus " CriticalTemperatureOffset ).
 .RE
 
 .PP
@@ -151,6 +151,38 @@ See
 If
 .BR true ,
 NBFC will combine two 8 bit registers to one 16\-bit register when reading from or writing to the EC registers.
+.RE
+
+.PP
+.BR LuaLibraries :
+.I Array of String
+.RS
+Import additional Lua libaries.
+
+Example:
+.RS
+"LuaLibraries": ["math"]
+.RE
+
+Available libraries:
+.IP \(bu 2
+.BR base :
+Provides core global functions.
+.IP \(bu 2
+.BR math :
+Provides standard mathematical functions and constants.
+.IP \(bu 2
+.BR string :
+Provides functions for pattern matching and basic string manipulation.
+.IP \(bu 2
+.BR table :
+Provides utilities for creating and manipulating tables (arrays and dictionaries).
+.IP \(bu 2
+.BR io :
+Provides file input/output facilities and stream-based I/O operations.
+.IP \(bu 2
+.BR os :
+Provides operating system interface functions such as time, environment, and process control.
 .RE
 
 .PP
@@ -175,7 +207,7 @@ Defines how NBFC controls a fan.
 .BR FanDisplayName :
 .I String
 .RS
-Fan display name
+Sets the fan display name.
 .RE
 
 .PP
@@ -183,13 +215,10 @@ Fan display name
 .IR Integer " >= 0 && " Integer " <= 255"
 .RS
 The register from which NBFC reads the fan speed.
-.RE
 
-.PP
-.BR WriteRegister :
-.IR Integer " >= 0 && " Integer " <= 255"
-.RS
-The register which NBFC uses to control the fan.
+This option is mutually exclusive to
+.BR ReadAcpiMethod " and " ReadLuaCode .
+Only one of them can be set at a time.
 .RE
 
 .PP
@@ -204,7 +233,35 @@ Example:
 .RE
 
 This option is mutually exclusive to
-.BR ReadRegister .
+.BR ReadRegister " and " ReadLuaCode .
+Only one of them can be set at a time.
+.RE
+
+.PP
+.BR ReadLuaCode :
+.IR String " or " "Array of String"
+.RS
+The Lua code to be executed for reading the fan speed.
+.RB See " LUA CODE" .
+
+Example:
+.RS
+"ReadLuaCode": "return acpi_call(\\"\\\\\\\\_SB.PCI0.LPCB.EC0.GFSD\\")"
+.RE
+
+This option is mutually exclusive to
+.BR ReadRegister " and " ReadAcpiMethod .
+Only one of them can be set at a time.
+.RE
+
+.PP
+.BR WriteRegister :
+.IR Integer " >= 0 && " Integer " <= 255"
+.RS
+The register which NBFC uses to control the fan.
+
+This option is mutually exclusive to
+.BR WriteAcpiMethod " and " WriteLuaCode .
 Only one of them can be set at a time.
 .RE
 
@@ -220,13 +277,30 @@ Example:
 .RE
 
 This option is mutually exclusive to
-.BR WriteRegister .
+.BR WriteRegister " and " WriteLuaCode .
+Only one of them can be set at a time.
+.RE
+
+.PP
+.BR WriteLuaCode :
+.IR String " or " "Array of String"
+.RS
+The Lua code to execute for writing the fan speed.
+.RB See " LUA CODE" .
+
+Example:
+.RS
+"WriteLuaCode": "return acpi_call(\\"\\\\\\\\_SB.PCI0.LPCB.EC0.SFSD \\" .. get_value())"
+.RE
+
+This option is mutually exclusive to
+.BR WriteRegister " and " WriteAcpiMethod .
 Only one of them can be set at a time.
 .RE
 
 .PP
 .BR MinSpeedValue :
-.I Integer
+.IR Integer " >= 0 && " Integer " <= 65535"
 .RS
 The value which puts the fan to the lowest possible speed (usually this stops the fan). Must be an integer between 0 and 255 or 0 and 65535 if
 .B ReadWriteWords
@@ -235,19 +309,19 @@ is
 Note:
 .B MinSpeedValue
 does not necessarily have to be smaller than
-.B MaxSpeedValue.
+.BR MaxSpeedValue .
 .RE
 
 .PP
 .BR MaxSpeedValue :
-.I Integer
+.IR Integer " >= 0 && " Integer " <= 65535"
 .RS
 The value which puts the fan to the highest possible fan speed.
 .RE
 
 .PP
 .BR MinSpeedValueRead :
-.I Integer
+.IR Integer " >= 0 && " Integer " <= 65535"
 .RS
 The value which corresponds to the lowest possible fan speed. Will be ignored if
 .B IndependentReadMinMaxValues
@@ -257,7 +331,7 @@ is
 
 .PP
 .BR MaxSpeedValueRead :
-.I Integer
+.IR Integer " >= 0 && " Integer " <= 65535"
 .RS
 The value which corresponds to the highest possible fan speed. Will be ignored if
 .B IndependentReadMinMaxValues
@@ -270,6 +344,9 @@ is
 .I Boolean
 .RS
 Defines if independent minimum/maximum values should be applied for read operations.
+
+This enables
+.BR MinSpeedValueRead " and " MaxSpeedValueRead .
 .RE
 
 .PP
@@ -281,11 +358,15 @@ Defines if the EC should be reset before the service is shut down.
 
 .PP
 .BR FanSpeedResetValue :
-.I Integer
+.IR Integer " >= 0 && " Integer " <= 65535"
 .RS
 Defines the value which will be written to
 .B WriteRegister
 to reset the EC.
+
+This option is mutually exclusive to
+.BR ResetAcpiMethod " and " ResetLuaCode .
+Only one of them can be set at a time.
 .RE
 
 .PP
@@ -295,7 +376,19 @@ to reset the EC.
 The ACPI method to call upon fan reset.
 
 This option is mutually exclusive to
-.BR FanSpeedResetValue .
+.BR FanSpeedResetValue " and " ResetLuaCode .
+Only one of them can be set at a time.
+.RE
+
+.PP
+.BR ResetLuaCode :
+.IR String " or " "Array of String"
+.RS
+The Lua code to be executed upon fan reset.
+.RB See " LUA CODE" .
+
+This option is mutually exclusive to
+.BR FanSpeedResetValue " and " ResetAcpiMethod .
 Only one of them can be set at a time.
 .RE
 
@@ -335,10 +428,16 @@ Selects the highest temperature among all specified sensors
 .PP
 .BR TemperatureThresholds :
 .I Array of TemperatureThreshold
+.RS
+Defines how fast the fan runs at different temperatures.
+.RE
 
 .PP
 .BR FanSpeedPercentageOverrides :
 .I Array of FanSpeedPercentageOverride
+.RS
+Overrides the default algorithm to calculate fan speeds.
+.RE
 
 .SS RegisterWriteConfiguration
 .PP
@@ -362,9 +461,11 @@ performs a binary OR operation (register = register | value)
 .IP \(bu 2
 .BR Call :
 calls the ACPI method stored in
-.B AcpiMethod
-or
-.B ResetAcpiMethod
+.BR AcpiMethod " or " ResetAcpiMethod
+.IP \(bu 2
+.BR Lua :
+executes the Lua code stored in
+.BR LuaCode " or " ResetLuaCode
 .RE
 
 .PP
@@ -375,10 +476,10 @@ Defines when the value should be written:
 
 .IP \(bu 2
 .BR OnInitialization :
-writes the value once upon initialization (everytimee the fan control service is enabled or a config is applied)
+writes the value once upon initialization (everytime the fan control service starts).
 .IP \(bu 2
 .BR OnWriteFanSpeed :
-writes the value everytimee the fan speed is set.
+writes the value everytime the fan speed is set.
 .RE
 
 .PP
@@ -390,9 +491,13 @@ The register which will be manipulated.
 
 .PP
 .BR Value :
-.I Integer
+.IR Integer " >= 0 && " Integer " <= 255"
 .RS
 The value which will be written.
+
+This option is mutually exclusive to
+.BR AcpiMethod " and " LuaCode .
+Only one of them can be set at a time.
 .RE
 
 .PP
@@ -402,7 +507,19 @@ The value which will be written.
 The ACPI method to call.
 
 This option is mutually exclusive to
-.BR Value .
+.BR Value " and " LuaCode .
+Only one of them can be set at a time.
+.RE
+
+.PP
+.BR LuaCode :
+.IR String " or " "Array of String"
+.RS
+The Lua code to be executed.
+.RB See " LUA CODE" .
+
+This option is mutually exclusive to
+.BR Value " and " AcpiMethod .
 Only one of them can be set at a time.
 .RE
 
@@ -415,9 +532,13 @@ Defines if the register should be reset before the service is shut down.
 
 .PP
 .BR ResetValue :
-.I Integer
+.IR Integer " >= 0 && " Integer " <= 255"
 .RS
 The value which will be written upon reset.
+
+This option is mutually exclusive to
+.BR ResetAcpiMethod " and " ResetLuaCode .
+Only one of them can be set at a time.
 .RE
 
 .PP
@@ -427,8 +548,20 @@ The value which will be written upon reset.
 The ACPI method to call upon reset.
 
 This option is mutually exclusive to
-.BR ResetValue .
+.BR ResetValue " and " ResetLuaCode .
 Only one of them can be set at a time.
+.RE
+
+.PP
+.BR ResetLuaCode :
+.IR String " or " "Array of String"
+.RS
+The Lua code to be executed upon reset.
+.RB See " LUA CODE" .
+
+This option is mutually exclusive to
+.BR ResetValue " and " ResetAcpiMethod .
+Only one of them can be set at a a time.
 .RE
 
 .PP
@@ -462,7 +595,7 @@ The fan speed in percent.
 
 .PP
 .BR FanSpeedValue :
-.I Integer
+.IR Integer " >= 0 && " Integer " <= 65535"
 .RS
 The fan speed value which will be written to
 .BR WriteRegister .
@@ -520,8 +653,73 @@ NBFC will select the next lower threshold as soon as the temperature falls below
 The fan speed in percent.
 .RE
 
-.SH FILES
+.SH LUA CODE
 .PP
+NBFC-Linux allows executing
+.B Lua
+code to implement more complex read or write operations.
+
+Lua code can be specified as either
+.RI "a " String " or an " "Array of String" .
+
+.SS Return Values
+Every Lua code must return exactly to values:
+.BR Error ", " Result.
+
+.B Error
+is either
+.B nil
+(on success) or a
+.B string
+describing the error (on failure).
+
+.B Result
+is an
+.B integer
+and is used for read operations. For write operations this value is ignored (returning
+.B 0
+is recommended).
+
+.SS Availabe Lua Functions
+The following functions are exposed to Lua:
+
+.BR acpi_call ( method ):
+.RS
+Executes an ACPI method. Returns
+.BR error ", " value .
+.RE
+
+.BR ec_read ( register ):
+.RS
+Reads a byte from the embedded controller. Returns
+.BR error ", " value .
+.RE
+
+.BR ec_read_word ( register ):
+.RS
+Reads two bytes and combines them into a single value. Returns
+.BR error ", " value .
+.RE
+
+.BR ec_write ( register ", " value ):
+.RS
+Writes a byte to the embedded controller. Returns
+.BR error ", " 0 .
+.RE
+
+.BR ec_write_word ( register ", " value ):
+.RS
+Writes a 16-bit value to a two-byte register. Returns
+.BR error ", " 0 .
+.RE
+
+.SS Lua Libraries
+To keep memory usage as low as possible, no Lua libraries are loaded by default.
+They must be explicitly loaded when needed. See
+.BR ModelConfig \-> LuaLibraries
+for details.
+
+.SH FILES
 .PP
 .I @SYSCONFDIR@/nbfc/nbfc.json
 .RS

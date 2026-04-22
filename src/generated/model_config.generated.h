@@ -102,9 +102,11 @@ struct RegisterWriteConfiguration {
 	uint8_t         Register;
 	uint8_t         Value;
 	const char*     AcpiMethod;
+	int             LuaCode;
 	bool            ResetRequired;
 	uint8_t         ResetValue;
 	const char*     ResetAcpiMethod;
+	int             ResetLuaCode;
 	RegisterWriteMode ResetWriteMode;
 	const char*     Description;
 	uint16_t        _set;
@@ -175,72 +177,98 @@ static inline bool RegisterWriteConfiguration_IsSet_AcpiMethod(const RegisterWri
 	return o->_set & (uint16_t) (1U << 4);
 }
 
-static inline void RegisterWriteConfiguration_Set_ResetRequired(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_Set_LuaCode(RegisterWriteConfiguration* o) {
 	o->_set |= (uint16_t) (1U << 5);
 }
 
-static inline void RegisterWriteConfiguration_UnSet_ResetRequired(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_UnSet_LuaCode(RegisterWriteConfiguration* o) {
 	o->_set &= (uint16_t) ~(1U << 5);
 }
 
-static inline bool RegisterWriteConfiguration_IsSet_ResetRequired(const RegisterWriteConfiguration* o) {
+static inline bool RegisterWriteConfiguration_IsSet_LuaCode(const RegisterWriteConfiguration* o) {
 	return o->_set & (uint16_t) (1U << 5);
 }
 
-static inline void RegisterWriteConfiguration_Set_ResetValue(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_Set_ResetRequired(RegisterWriteConfiguration* o) {
 	o->_set |= (uint16_t) (1U << 6);
 }
 
-static inline void RegisterWriteConfiguration_UnSet_ResetValue(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_UnSet_ResetRequired(RegisterWriteConfiguration* o) {
 	o->_set &= (uint16_t) ~(1U << 6);
 }
 
-static inline bool RegisterWriteConfiguration_IsSet_ResetValue(const RegisterWriteConfiguration* o) {
+static inline bool RegisterWriteConfiguration_IsSet_ResetRequired(const RegisterWriteConfiguration* o) {
 	return o->_set & (uint16_t) (1U << 6);
 }
 
-static inline void RegisterWriteConfiguration_Set_ResetAcpiMethod(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_Set_ResetValue(RegisterWriteConfiguration* o) {
 	o->_set |= (uint16_t) (1U << 7);
 }
 
-static inline void RegisterWriteConfiguration_UnSet_ResetAcpiMethod(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_UnSet_ResetValue(RegisterWriteConfiguration* o) {
 	o->_set &= (uint16_t) ~(1U << 7);
 }
 
-static inline bool RegisterWriteConfiguration_IsSet_ResetAcpiMethod(const RegisterWriteConfiguration* o) {
+static inline bool RegisterWriteConfiguration_IsSet_ResetValue(const RegisterWriteConfiguration* o) {
 	return o->_set & (uint16_t) (1U << 7);
 }
 
-static inline void RegisterWriteConfiguration_Set_ResetWriteMode(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_Set_ResetAcpiMethod(RegisterWriteConfiguration* o) {
 	o->_set |= (uint16_t) (1U << 8);
 }
 
-static inline void RegisterWriteConfiguration_UnSet_ResetWriteMode(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_UnSet_ResetAcpiMethod(RegisterWriteConfiguration* o) {
 	o->_set &= (uint16_t) ~(1U << 8);
 }
 
-static inline bool RegisterWriteConfiguration_IsSet_ResetWriteMode(const RegisterWriteConfiguration* o) {
+static inline bool RegisterWriteConfiguration_IsSet_ResetAcpiMethod(const RegisterWriteConfiguration* o) {
 	return o->_set & (uint16_t) (1U << 8);
 }
 
-static inline void RegisterWriteConfiguration_Set_Description(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_Set_ResetLuaCode(RegisterWriteConfiguration* o) {
 	o->_set |= (uint16_t) (1U << 9);
 }
 
-static inline void RegisterWriteConfiguration_UnSet_Description(RegisterWriteConfiguration* o) {
+static inline void RegisterWriteConfiguration_UnSet_ResetLuaCode(RegisterWriteConfiguration* o) {
 	o->_set &= (uint16_t) ~(1U << 9);
 }
 
-static inline bool RegisterWriteConfiguration_IsSet_Description(const RegisterWriteConfiguration* o) {
+static inline bool RegisterWriteConfiguration_IsSet_ResetLuaCode(const RegisterWriteConfiguration* o) {
 	return o->_set & (uint16_t) (1U << 9);
+}
+
+static inline void RegisterWriteConfiguration_Set_ResetWriteMode(RegisterWriteConfiguration* o) {
+	o->_set |= (uint16_t) (1U << 10);
+}
+
+static inline void RegisterWriteConfiguration_UnSet_ResetWriteMode(RegisterWriteConfiguration* o) {
+	o->_set &= (uint16_t) ~(1U << 10);
+}
+
+static inline bool RegisterWriteConfiguration_IsSet_ResetWriteMode(const RegisterWriteConfiguration* o) {
+	return o->_set & (uint16_t) (1U << 10);
+}
+
+static inline void RegisterWriteConfiguration_Set_Description(RegisterWriteConfiguration* o) {
+	o->_set |= (uint16_t) (1U << 11);
+}
+
+static inline void RegisterWriteConfiguration_UnSet_Description(RegisterWriteConfiguration* o) {
+	o->_set &= (uint16_t) ~(1U << 11);
+}
+
+static inline bool RegisterWriteConfiguration_IsSet_Description(const RegisterWriteConfiguration* o) {
+	return o->_set & (uint16_t) (1U << 11);
 }
 
 struct FanConfiguration {
 	const char*     FanDisplayName;
 	uint8_t         ReadRegister;
 	const char*     ReadAcpiMethod;
+	int             ReadLuaCode;
 	uint8_t         WriteRegister;
 	const char*     WriteAcpiMethod;
+	int             WriteLuaCode;
 	uint16_t        MinSpeedValue;
 	uint16_t        MaxSpeedValue;
 	uint16_t        MinSpeedValueRead;
@@ -249,6 +277,7 @@ struct FanConfiguration {
 	bool            ResetRequired;
 	uint16_t        FanSpeedResetValue;
 	const char*     ResetAcpiMethod;
+	int             ResetLuaCode;
 	TemperatureAlgorithmType TemperatureAlgorithmType;
 	array_of(str)   Sensors;
 	array_of(TemperatureThreshold) TemperatureThresholds;
@@ -297,172 +326,208 @@ static inline bool FanConfiguration_IsSet_ReadAcpiMethod(const FanConfiguration*
 	return o->_set & (uint32_t) (1U << 2);
 }
 
-static inline void FanConfiguration_Set_WriteRegister(FanConfiguration* o) {
+static inline void FanConfiguration_Set_ReadLuaCode(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 3);
 }
 
-static inline void FanConfiguration_UnSet_WriteRegister(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_ReadLuaCode(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 3);
 }
 
-static inline bool FanConfiguration_IsSet_WriteRegister(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_ReadLuaCode(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 3);
 }
 
-static inline void FanConfiguration_Set_WriteAcpiMethod(FanConfiguration* o) {
+static inline void FanConfiguration_Set_WriteRegister(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 4);
 }
 
-static inline void FanConfiguration_UnSet_WriteAcpiMethod(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_WriteRegister(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 4);
 }
 
-static inline bool FanConfiguration_IsSet_WriteAcpiMethod(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_WriteRegister(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 4);
 }
 
-static inline void FanConfiguration_Set_MinSpeedValue(FanConfiguration* o) {
+static inline void FanConfiguration_Set_WriteAcpiMethod(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 5);
 }
 
-static inline void FanConfiguration_UnSet_MinSpeedValue(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_WriteAcpiMethod(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 5);
 }
 
-static inline bool FanConfiguration_IsSet_MinSpeedValue(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_WriteAcpiMethod(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 5);
 }
 
-static inline void FanConfiguration_Set_MaxSpeedValue(FanConfiguration* o) {
+static inline void FanConfiguration_Set_WriteLuaCode(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 6);
 }
 
-static inline void FanConfiguration_UnSet_MaxSpeedValue(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_WriteLuaCode(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 6);
 }
 
-static inline bool FanConfiguration_IsSet_MaxSpeedValue(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_WriteLuaCode(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 6);
 }
 
-static inline void FanConfiguration_Set_MinSpeedValueRead(FanConfiguration* o) {
+static inline void FanConfiguration_Set_MinSpeedValue(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 7);
 }
 
-static inline void FanConfiguration_UnSet_MinSpeedValueRead(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_MinSpeedValue(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 7);
 }
 
-static inline bool FanConfiguration_IsSet_MinSpeedValueRead(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_MinSpeedValue(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 7);
 }
 
-static inline void FanConfiguration_Set_MaxSpeedValueRead(FanConfiguration* o) {
+static inline void FanConfiguration_Set_MaxSpeedValue(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 8);
 }
 
-static inline void FanConfiguration_UnSet_MaxSpeedValueRead(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_MaxSpeedValue(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 8);
 }
 
-static inline bool FanConfiguration_IsSet_MaxSpeedValueRead(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_MaxSpeedValue(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 8);
 }
 
-static inline void FanConfiguration_Set_IndependentReadMinMaxValues(FanConfiguration* o) {
+static inline void FanConfiguration_Set_MinSpeedValueRead(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 9);
 }
 
-static inline void FanConfiguration_UnSet_IndependentReadMinMaxValues(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_MinSpeedValueRead(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 9);
 }
 
-static inline bool FanConfiguration_IsSet_IndependentReadMinMaxValues(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_MinSpeedValueRead(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 9);
 }
 
-static inline void FanConfiguration_Set_ResetRequired(FanConfiguration* o) {
+static inline void FanConfiguration_Set_MaxSpeedValueRead(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 10);
 }
 
-static inline void FanConfiguration_UnSet_ResetRequired(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_MaxSpeedValueRead(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 10);
 }
 
-static inline bool FanConfiguration_IsSet_ResetRequired(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_MaxSpeedValueRead(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 10);
 }
 
-static inline void FanConfiguration_Set_FanSpeedResetValue(FanConfiguration* o) {
+static inline void FanConfiguration_Set_IndependentReadMinMaxValues(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 11);
 }
 
-static inline void FanConfiguration_UnSet_FanSpeedResetValue(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_IndependentReadMinMaxValues(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 11);
 }
 
-static inline bool FanConfiguration_IsSet_FanSpeedResetValue(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_IndependentReadMinMaxValues(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 11);
 }
 
-static inline void FanConfiguration_Set_ResetAcpiMethod(FanConfiguration* o) {
+static inline void FanConfiguration_Set_ResetRequired(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 12);
 }
 
-static inline void FanConfiguration_UnSet_ResetAcpiMethod(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_ResetRequired(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 12);
 }
 
-static inline bool FanConfiguration_IsSet_ResetAcpiMethod(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_ResetRequired(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 12);
 }
 
-static inline void FanConfiguration_Set_TemperatureAlgorithmType(FanConfiguration* o) {
+static inline void FanConfiguration_Set_FanSpeedResetValue(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 13);
 }
 
-static inline void FanConfiguration_UnSet_TemperatureAlgorithmType(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_FanSpeedResetValue(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 13);
 }
 
-static inline bool FanConfiguration_IsSet_TemperatureAlgorithmType(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_FanSpeedResetValue(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 13);
 }
 
-static inline void FanConfiguration_Set_Sensors(FanConfiguration* o) {
+static inline void FanConfiguration_Set_ResetAcpiMethod(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 14);
 }
 
-static inline void FanConfiguration_UnSet_Sensors(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_ResetAcpiMethod(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 14);
 }
 
-static inline bool FanConfiguration_IsSet_Sensors(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_ResetAcpiMethod(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 14);
 }
 
-static inline void FanConfiguration_Set_TemperatureThresholds(FanConfiguration* o) {
+static inline void FanConfiguration_Set_ResetLuaCode(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 15);
 }
 
-static inline void FanConfiguration_UnSet_TemperatureThresholds(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_ResetLuaCode(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 15);
 }
 
-static inline bool FanConfiguration_IsSet_TemperatureThresholds(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_ResetLuaCode(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 15);
 }
 
-static inline void FanConfiguration_Set_FanSpeedPercentageOverrides(FanConfiguration* o) {
+static inline void FanConfiguration_Set_TemperatureAlgorithmType(FanConfiguration* o) {
 	o->_set |= (uint32_t) (1U << 16);
 }
 
-static inline void FanConfiguration_UnSet_FanSpeedPercentageOverrides(FanConfiguration* o) {
+static inline void FanConfiguration_UnSet_TemperatureAlgorithmType(FanConfiguration* o) {
 	o->_set &= (uint32_t) ~(1U << 16);
 }
 
-static inline bool FanConfiguration_IsSet_FanSpeedPercentageOverrides(const FanConfiguration* o) {
+static inline bool FanConfiguration_IsSet_TemperatureAlgorithmType(const FanConfiguration* o) {
 	return o->_set & (uint32_t) (1U << 16);
+}
+
+static inline void FanConfiguration_Set_Sensors(FanConfiguration* o) {
+	o->_set |= (uint32_t) (1U << 17);
+}
+
+static inline void FanConfiguration_UnSet_Sensors(FanConfiguration* o) {
+	o->_set &= (uint32_t) ~(1U << 17);
+}
+
+static inline bool FanConfiguration_IsSet_Sensors(const FanConfiguration* o) {
+	return o->_set & (uint32_t) (1U << 17);
+}
+
+static inline void FanConfiguration_Set_TemperatureThresholds(FanConfiguration* o) {
+	o->_set |= (uint32_t) (1U << 18);
+}
+
+static inline void FanConfiguration_UnSet_TemperatureThresholds(FanConfiguration* o) {
+	o->_set &= (uint32_t) ~(1U << 18);
+}
+
+static inline bool FanConfiguration_IsSet_TemperatureThresholds(const FanConfiguration* o) {
+	return o->_set & (uint32_t) (1U << 18);
+}
+
+static inline void FanConfiguration_Set_FanSpeedPercentageOverrides(FanConfiguration* o) {
+	o->_set |= (uint32_t) (1U << 19);
+}
+
+static inline void FanConfiguration_UnSet_FanSpeedPercentageOverrides(FanConfiguration* o) {
+	o->_set &= (uint32_t) ~(1U << 19);
+}
+
+static inline bool FanConfiguration_IsSet_FanSpeedPercentageOverrides(const FanConfiguration* o) {
+	return o->_set & (uint32_t) (1U << 19);
 }
 
 struct Sponsor {
@@ -530,6 +595,7 @@ struct ModelConfig {
 	const char*     NotebookModel;
 	const char*     Author;
 	bool            LegacyTemperatureThresholdsBehaviour;
+	bool            LuaLibraries;
 	uint16_t        EcPollInterval;
 	int16_t         CriticalTemperature;
 	uint16_t        CriticalTemperatureOffset;
@@ -581,88 +647,100 @@ static inline bool ModelConfig_IsSet_LegacyTemperatureThresholdsBehaviour(const 
 	return o->_set & (uint16_t) (1U << 2);
 }
 
-static inline void ModelConfig_Set_EcPollInterval(ModelConfig* o) {
+static inline void ModelConfig_Set_LuaLibraries(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 3);
 }
 
-static inline void ModelConfig_UnSet_EcPollInterval(ModelConfig* o) {
+static inline void ModelConfig_UnSet_LuaLibraries(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 3);
 }
 
-static inline bool ModelConfig_IsSet_EcPollInterval(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_LuaLibraries(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 3);
 }
 
-static inline void ModelConfig_Set_CriticalTemperature(ModelConfig* o) {
+static inline void ModelConfig_Set_EcPollInterval(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 4);
 }
 
-static inline void ModelConfig_UnSet_CriticalTemperature(ModelConfig* o) {
+static inline void ModelConfig_UnSet_EcPollInterval(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 4);
 }
 
-static inline bool ModelConfig_IsSet_CriticalTemperature(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_EcPollInterval(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 4);
 }
 
-static inline void ModelConfig_Set_CriticalTemperatureOffset(ModelConfig* o) {
+static inline void ModelConfig_Set_CriticalTemperature(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 5);
 }
 
-static inline void ModelConfig_UnSet_CriticalTemperatureOffset(ModelConfig* o) {
+static inline void ModelConfig_UnSet_CriticalTemperature(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 5);
 }
 
-static inline bool ModelConfig_IsSet_CriticalTemperatureOffset(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_CriticalTemperature(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 5);
 }
 
-static inline void ModelConfig_Set_ReadWriteWords(ModelConfig* o) {
+static inline void ModelConfig_Set_CriticalTemperatureOffset(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 6);
 }
 
-static inline void ModelConfig_UnSet_ReadWriteWords(ModelConfig* o) {
+static inline void ModelConfig_UnSet_CriticalTemperatureOffset(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 6);
 }
 
-static inline bool ModelConfig_IsSet_ReadWriteWords(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_CriticalTemperatureOffset(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 6);
 }
 
-static inline void ModelConfig_Set_Sponsor(ModelConfig* o) {
+static inline void ModelConfig_Set_ReadWriteWords(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 7);
 }
 
-static inline void ModelConfig_UnSet_Sponsor(ModelConfig* o) {
+static inline void ModelConfig_UnSet_ReadWriteWords(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 7);
 }
 
-static inline bool ModelConfig_IsSet_Sponsor(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_ReadWriteWords(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 7);
 }
 
-static inline void ModelConfig_Set_FanConfigurations(ModelConfig* o) {
+static inline void ModelConfig_Set_Sponsor(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 8);
 }
 
-static inline void ModelConfig_UnSet_FanConfigurations(ModelConfig* o) {
+static inline void ModelConfig_UnSet_Sponsor(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 8);
 }
 
-static inline bool ModelConfig_IsSet_FanConfigurations(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_Sponsor(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 8);
 }
 
-static inline void ModelConfig_Set_RegisterWriteConfigurations(ModelConfig* o) {
+static inline void ModelConfig_Set_FanConfigurations(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 9);
 }
 
-static inline void ModelConfig_UnSet_RegisterWriteConfigurations(ModelConfig* o) {
+static inline void ModelConfig_UnSet_FanConfigurations(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 9);
 }
 
-static inline bool ModelConfig_IsSet_RegisterWriteConfigurations(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_FanConfigurations(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 9);
+}
+
+static inline void ModelConfig_Set_RegisterWriteConfigurations(ModelConfig* o) {
+	o->_set |= (uint16_t) (1U << 10);
+}
+
+static inline void ModelConfig_UnSet_RegisterWriteConfigurations(ModelConfig* o) {
+	o->_set &= (uint16_t) ~(1U << 10);
+}
+
+static inline bool ModelConfig_IsSet_RegisterWriteConfigurations(const ModelConfig* o) {
+	return o->_set & (uint16_t) (1U << 10);
 }
 
 struct FanTemperatureSourceConfig {

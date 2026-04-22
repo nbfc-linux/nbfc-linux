@@ -19,9 +19,12 @@
 #include "parse_double.h"
 #include "client/client_global.h"
 
+#include "acpi_call.c"
 #include "buffer.c"
 #include "log.c"
+#include "lua_bindings.c"
 #include "error.c"
+#include "ec.h"
 #include "file_utils.c"
 #include "model_config.c"
 #include "fs_sensors.c"
@@ -47,6 +50,8 @@
 #include "client/config_files.c"
 #include "client/str_functions.c"
 #include "client/service_control.c"
+
+const EC_VTable* ec = NULL;
 
 const struct cli99_Option main_options[] = {
   {"-h|--help",     Option_Help,       cli99_NoArgument      },

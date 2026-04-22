@@ -29,6 +29,7 @@
 #include "acpi_call.c"
 #include "buffer.c"
 #include "log.c"
+#include "lua_bindings.c"
 #include "error.c"
 #include "trace.c"
 #include "fan.c"

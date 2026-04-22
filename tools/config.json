@@ -81,6 +81,14 @@
         "required": false
       },
       {
+        "name": "LuaCode",
+        "type": "int",
+        "help": "The Lua code to execute",
+        "required": false,
+        "default": "0",
+        "from_json": "LuaCode_FromJson"
+      },
+      {
         "name": "ResetRequired",
         "type": "bool",
         "default": "false",
@@ -97,6 +105,14 @@
         "type": "const char*",
         "help": "The ACPI method to execute",
         "required": false
+      },
+      {
+        "name": "ResetLuaCode",
+        "type": "int",
+        "help": "The Lua code to execute on reset",
+        "required": false,
+        "default": "0",
+        "from_json": "LuaCode_FromJson"
       },
       {
         "name": "ResetWriteMode",
@@ -135,6 +151,14 @@
         "required": false
       },
       {
+        "name": "ReadLuaCode",
+        "type": "int",
+        "help": "The Lua code to execute on read",
+        "required": false,
+        "default": "0",
+        "from_json": "LuaCode_FromJson"
+      },
+      {
         "name": "WriteRegister",
         "type": "uint8_t",
         "help": "The register which NBFC uses to control the fan",
@@ -145,6 +169,14 @@
         "type": "const char*",
         "help": "The ACPI method for setting the fan speed.",
         "required": false
+      },
+      {
+        "name": "WriteLuaCode",
+        "type": "int",
+        "help": "The Lua code to execute on write",
+        "required": false,
+        "default": "0",
+        "from_json": "LuaCode_FromJson"
       },
       {
         "name": "MinSpeedValue",
@@ -191,6 +223,14 @@
         "type": "const char*",
         "help": "The ACPI method for resetting the fan speed.",
         "required": false
+      },
+      {
+        "name": "ResetLuaCode",
+        "type": "int",
+        "help": "The Lua code to be executed on fan reset",
+        "required": false,
+        "default": "0",
+        "from_json": "LuaCode_FromJson"
       },
       {
         "name": "TemperatureAlgorithmType",
@@ -262,6 +302,13 @@
         "name": "LegacyTemperatureThresholdsBehaviour",
         "type": "bool",
         "default": "false"
+      },
+      {
+        "name": "LuaLibraries",
+        "type": "bool",
+        "help": "Included Lua libraries",
+        "required": false,
+        "from_json": "LuaLibraries_FromJson"
       },
       {
         "name": "EcPollInterval",

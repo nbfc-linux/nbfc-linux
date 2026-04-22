@@ -2,6 +2,7 @@
 
 #include "nbfc.h"
 #include "log.h"
+#include "lua_bindings.h"
 #include "macros.h"
 #include "memory.h"
 #include "buffer.h"
@@ -9,10 +10,9 @@
 #include "file_utils.h"
 
 #include <assert.h>  // assert
-#include <string.h>  // strcmp
+#include <string.h>  // strcmp, strlen, memcpy
 #include <stdbool.h> // bool
-#include <limits.h>  // INT_MIN, SHRT_MIN
-#include <math.h>    // NAN
+#include <limits.h>  // INT_MIN, INT_MAX, INT8_MIN, INT8_MAX, ...
 #include <linux/limits.h>
 
 static inline Error bool_FromJson(bool* out, const nx_json* node) {
@@ -108,6 +108,7 @@ static Error RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* j
   else if (!strcmp(s, "And"))  *out = RegisterWriteMode_And;
   else if (!strcmp(s, "Or"))   *out = RegisterWriteMode_Or;
   else if (!strcmp(s, "Call")) *out = RegisterWriteMode_Call;
+  else if (!strcmp(s, "Lua"))  *out = RegisterWriteMode_Lua;
   else return err_stringf("Invalid value for %s: %s", "RegisterWriteMode", s);
   return e;
 }
@@ -160,6 +161,64 @@ static Error EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const 
     return err_stringf("Invalid value for %s: %s", "EmbeddedControllerType", s);
   *out = t;
   return e;
+}
+
+static Error LuaCode_FromJson(int* out, const nx_json* json) {
+  if (json->type == NX_JSON_STRING) {
+    return Lua_LoadCode(json->val.text, out);
+  }
+  else if (json->type == NX_JSON_ARRAY) {
+    size_t total_len = 0;
+    size_t line_len;
+    char* code;
+    Error e;
+
+    nx_json_for_each(line, json) {
+      if (line->type != NX_JSON_STRING)
+        return err_string("Array member not a string");
+
+      total_len += strlen(line->val.text) + 1 /* space for '\n' */;
+    }
+
+    code = Mem_Malloc(total_len + 1 /* space for '\0' */);
+    total_len = 0;
+
+    nx_json_for_each(line, json) {
+      line_len = strlen(line->val.text);
+      memcpy(code + total_len, line->val.text, line_len);
+      total_len += line_len;
+      code[total_len++] = '\n';
+    }
+
+    code[total_len] = '\0';
+
+    e = Lua_LoadCode(code, out);
+
+    Mem_Free(code);
+
+    return e;
+  }
+
+  return err_string("Not a string or array of strings");
+}
+
+static Error LuaLibraries_FromJson(bool* out, const nx_json* json) {
+  Error e;
+  const char* str;
+  (void) *out;
+
+  e = nx_json_get_array(json);
+  e_check();
+
+  nx_json_for_each(item, json) {
+    e = nx_json_get_str(&str, item);
+    e_check();
+
+    e = Lua_UseLibrary(str);
+    e_check();
+  }
+
+  return err_success();
 }
 
 EmbeddedControllerType EmbeddedControllerType_FromString(const char* s) {
@@ -421,6 +480,8 @@ Error TemperatureThresholds_Validate(
 static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguration* r) {
   const bool AcpiMethod                  = RegisterWriteConfiguration_IsSet_AcpiMethod(r);
   const bool ResetAcpiMethod             = RegisterWriteConfiguration_IsSet_ResetAcpiMethod(r);
+  const bool LuaCode                     = RegisterWriteConfiguration_IsSet_LuaCode(r);
+  const bool ResetLuaCode                = RegisterWriteConfiguration_IsSet_ResetLuaCode(r);
   const bool Register                    = RegisterWriteConfiguration_IsSet_Register(r);
   const bool Value                       = RegisterWriteConfiguration_IsSet_Value(r);
   const bool ResetValue                  = RegisterWriteConfiguration_IsSet_ResetValue(r);
@@ -432,8 +493,21 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
     if (! AcpiMethod)
       return err_stringf("%s: %s", "AcpiMethod", "Missing option");
 
+    if (LuaCode)
+      return err_string("LuaCode: Cannot be used with WriteMode == Call");
+
     if (Value)
       return err_string("Value: Cannot be used with WriteMode == Call");
+  }
+  else if (WriteMode == RegisterWriteMode_Lua) {
+    if (! LuaCode)
+      return err_stringf("%s: %s", "LuaCode", "Missing option");
+
+    if (AcpiMethod)
+      return err_string("AcpiMethod: Cannot be used with WriteMode == Lua");
+
+    if (Value)
+      return err_string("Value: Cannot be used with WriteMode == Lua");
   }
   else {
     if (! Register)
@@ -444,6 +518,9 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
 
     if (AcpiMethod)
       return err_string("AcpiMethod: Cannot be used with WriteMode == Set/And/Or");
+
+    if (LuaCode)
+      return err_string("LuaCode: Cannot be used with WriteMode == Set/And/Or");
   }
 
   if (ResetRequired) {
@@ -451,8 +528,21 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
       if (! ResetAcpiMethod)
         return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
+      if (ResetLuaCode)
+        return err_string("ResetLuaCode: Cannot be used with ResetWriteMode == Call");
+
       if (ResetValue)
         return err_string("ResetValue: Cannot be used with ResetWriteMode == Call");
+    }
+    else if (ResetWriteMode == RegisterWriteMode_Lua) {
+      if (! ResetLuaCode)
+        return err_stringf("%s: %s", "ResetLuaCode", "Missing option");
+
+      if (ResetAcpiMethod)
+        return err_string("ResetAcpiMethod: Cannot be used with ResetWriteMode == Lua");
+
+      if (ResetValue)
+        return err_string("ResetValue: Cannot be used with ResetWriteMode == Lua");
     }
     else {
       if (! Register)
@@ -463,6 +553,9 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
 
       if (ResetAcpiMethod)
         return err_string("ResetAcpiMethod: Cannot be used with ResetWriteMode == Set/And/Or");
+
+      if (ResetLuaCode)
+        return err_string("ResetLuaCode: Cannot be used with ResetWriteMode == Set/And/Or");
     }
   }
   else {
@@ -473,13 +566,28 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
       return err_string("ResetValue: Cannot be used with ResetRequired == false");
     */
 
+    if (ResetLuaCode)
+      return err_string("ResetLuaCode: Cannot be used with ResetRequired == false");
+
     if (ResetAcpiMethod)
-      return err_string("ResetAcpiComand: Cannot be used with ResetRequired == false");
+      return err_string("ResetAcpiMethod: Cannot be used with ResetRequired == false");
   }
 
-  if (WriteMode == RegisterWriteMode_Call && ResetWriteMode == RegisterWriteMode_Call) {
+  const bool WriteMode_Needs_Register = (
+    WriteMode == RegisterWriteMode_Set ||
+    WriteMode == RegisterWriteMode_And ||
+    WriteMode == RegisterWriteMode_Or
+  );
+
+  const bool ResetWriteMode_Needs_Register = (
+    ResetWriteMode == RegisterWriteMode_Set ||
+    ResetWriteMode == RegisterWriteMode_And ||
+    ResetWriteMode == RegisterWriteMode_Or
+  );
+
+  if (!WriteMode_Needs_Register && !ResetWriteMode_Needs_Register) {
     if (Register)
-      return err_string("Register: Cannot be used if both WriteMode == Call and ResetWriteMode == Call");
+      return err_string("Register: Cannot be used if both WriteMode == Call/Lua and ResetWriteMode == Call/Lua");
   }
 
   return err_success();
@@ -516,15 +624,21 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
       f->FanDisplayName = Mem_Strdup(fan_name);
     }
 
-    // If ResetRequired is true, ensure that one (and only one) of "FanSpeedResetValue" and "ResetAcpiMethod" is set
+    // If ResetRequired is true, ensure that one (and only one) of "FanSpeedResetValue",
+    // "ResetAcpiMethod" and "ResetLuaCode" is set
     if (f->ResetRequired) {
-      const int reset_group = (FanConfiguration_IsSet_FanSpeedResetValue(f) + FanConfiguration_IsSet_ResetAcpiMethod(f));
+      const int reset_group = (
+        FanConfiguration_IsSet_FanSpeedResetValue(f) +
+        FanConfiguration_IsSet_ResetAcpiMethod(f) +
+        FanConfiguration_IsSet_ResetLuaCode(f)
+      );
+
       if (reset_group == 0) {
-        e = err_stringf("Missing option: %s or %s", "FanSpeedResetValue", "ResetAcpiMethod");
+        e = err_stringf("Missing option: %s or %s or %s", "FanSpeedResetValue", "ResetAcpiMethod", "ResetLuaCode");
         goto err;
       }
       if (reset_group > 1) {
-        e = err_stringf("Cannot set both %s and %s", "FanSpeedResetValue", "ResetAcpiMethod");
+        e = err_stringf("Can only set one of: %s, %s, %s", "FanSpeedResetValue", "ResetAcpiMethod", "ResetLuaCode");
         goto err;
       }
     }
@@ -542,27 +656,42 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
         e = err_string("ResetAcpiMethod: Cannot be used with ResetRequired == false");
         goto err;
       }
+
+      if (FanConfiguration_IsSet_ResetLuaCode(f)) {
+        e = err_string("ResetLuaCode: Cannot be used with ResetRequired == false");
+        goto err;
+      }
     }
 
-    // Ensure that one (and only one) of "WriteRegister" and "WriteAcpiMethod" is set
-    const int write_group = (FanConfiguration_IsSet_WriteRegister(f) + FanConfiguration_IsSet_WriteAcpiMethod(f));
+    // Ensure that one (and only one) of "WriteRegister", "WriteAcpiMethod" and "WriteLuaCode" is set
+    const int write_group = (
+      FanConfiguration_IsSet_WriteRegister(f) +
+      FanConfiguration_IsSet_WriteAcpiMethod(f) +
+      FanConfiguration_IsSet_WriteLuaCode(f)
+    );
+
     if (write_group == 0) {
-      e = err_stringf("Missing option: %s or %s", "WriteRegister", "WriteAcpiMethod");
+      e = err_stringf("Missing option: %s or %s or %s", "WriteRegister", "WriteAcpiMethod", "WriteLuaCode");
       goto err;
     }
     if (write_group > 1) {
-      e = err_stringf("Cannot set both %s and %s", "WriteRegister", "WriteAcpiMethod");
+      e = err_stringf("Can only set one of: %s, %s, %s", "WriteRegister", "WriteAcpiMethod", "WriteLuaCode");
       goto err;
     }
 
-    // Ensure that one (and only one) of "ReadRegister" and "ReadAcpiMethod" is set
-    const int read_group = (FanConfiguration_IsSet_ReadRegister(f) + FanConfiguration_IsSet_ReadAcpiMethod(f));
+    // Ensure that one (and only one) of "ReadRegister", "ReadAcpiMethod" and "ReadLuaCode" is set
+    const int read_group = (
+      FanConfiguration_IsSet_ReadRegister(f) +
+      FanConfiguration_IsSet_ReadAcpiMethod(f) +
+      FanConfiguration_IsSet_ReadLuaCode(f)
+    );
+
     if (read_group == 0) {
-      e = err_stringf("Missing option: %s or %s", "ReadRegister", "ReadAcpiMethod");
+      e = err_stringf("Missing option: %s or %s or %s", "ReadRegister", "ReadAcpiMethod", "ReadLuaCode");
       goto err;
     }
     if (read_group > 1) {
-      e = err_stringf("Cannot set both %s and %s", "ReadRegister", "ReadAcpiMethod");
+      e = err_stringf("Can only set one of: %s, %s, %s", "ReadRegister", "ReadAcpiMethod", "ReadLuaCode");
       goto err;
     }
 
