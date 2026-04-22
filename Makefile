@@ -15,18 +15,21 @@ systemvdir  = $(confdir)/init.d
 
 INIT_SYSTEM = systemd # systemd, systemv, openrc
 
+LUA_CFLAGS = $(shell pkg-config --cflags lua5.4)
+LUA_LDLIBS = $(shell pkg-config --libs lua5.4)
+
 ifeq ($(BUILD), debug)
-	CFLAGS   = -Og -g
+	CFLAGS   = $(LUA_CFLAGS) -Og -g
 else
 	CPPFLAGS = -DNDEBUG
-	CFLAGS   = -Wall -Os -flto -fno-unwind-tables -fno-asynchronous-unwind-tables -fomit-frame-pointer
+	CFLAGS   = $(LUA_CFLAGS) -Wall -Os -flto -fno-unwind-tables -fno-asynchronous-unwind-tables -fomit-frame-pointer
 	LDFLAGS  = -s
 endif
 
-LDLIBS_CLIENT = -lcurl -lcrypto -llua -ldl
-LDLIBS_SERVICE = -lm -llua -ldl
+LDLIBS_CLIENT = -lcurl -lcrypto $(LUA_LDLIBS) -ldl
+LDLIBS_SERVICE = -lm $(LUA_LDLIBS) -ldl
 LDLIBS_EC_PROBE =
-LDLIBS_TEST_MODEL_CONFIG = -lm -llua -ldl
+LDLIBS_TEST_MODEL_CONFIG = -lm $(LUA_LDLIBS) -ldl
 
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(confdir)\"      \
