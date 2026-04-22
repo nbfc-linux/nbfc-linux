@@ -15,8 +15,8 @@ systemvdir  = $(confdir)/init.d
 
 INIT_SYSTEM = systemd # systemd, systemv, openrc
 
-LUA_CFLAGS = $(shell pkg-config --cflags lua5.4)
-LUA_LDLIBS = $(shell pkg-config --libs lua5.4)
+LUA_CFLAGS = $(shell pkg-config --cflags lua5.4 || pkg-config --cflags lua)
+LUA_LDLIBS = $(shell pkg-config --libs lua5.4 || pkg-config --libs lua)
 
 ifeq ($(BUILD), debug)
 	CFLAGS   = $(LUA_CFLAGS) -Og -g
