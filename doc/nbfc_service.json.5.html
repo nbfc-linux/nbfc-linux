@@ -98,6 +98,28 @@ temperature drops below (<strong>CriticalTemperature</strong> minus
 one 16-bit register when reading from or writing to the EC
 registers.</p>
 </blockquote>
+<p><strong>LuaLibraries</strong>: <em>Array of String</em></p>
+<blockquote>
+<p>Import additional Lua libaries.</p>
+<p>Example:</p>
+<blockquote>
+<p>"LuaLibraries": ["math"]</p>
+</blockquote>
+<p>Available libraries:</p>
+<ul>
+<li><p><strong>base</strong>: Provides core global functions.</p></li>
+<li><p><strong>math</strong>: Provides standard mathematical functions
+and constants.</p></li>
+<li><p><strong>string</strong>: Provides functions for pattern matching
+and basic string manipulation.</p></li>
+<li><p><strong>table</strong>: Provides utilities for creating and
+manipulating tables (arrays and dictionaries).</p></li>
+<li><p><strong>io</strong>: Provides file input/output facilities and
+stream-based I/O operations.</p></li>
+<li><p><strong>os</strong>: Provides operating system interface
+functions such as time, environment, and process control.</p></li>
+</ul>
+</blockquote>
 <p><strong>FanConfigurations</strong>: <em>Array of
 FanConfiguration</em></p>
 <blockquote>
@@ -440,7 +462,25 @@ for read operations. For write operations this value is ignored
 <p><strong>acpi_call</strong>(<strong>method</strong>):</p>
 <blockquote>
 <p>Executes an ACPI method. Returns <strong>error</strong>,
-<strong>value</strong>.</p>
+<strong>value</strong> (integer).</p>
+</blockquote>
+<p><strong>acpi_call_raw</strong>(<strong>method</strong>):</p>
+<blockquote>
+<p>Executes an ACPI method and returns the raw result as a string.
+Returns <strong>error</strong>, <strong>value</strong> (string).</p>
+</blockquote>
+<p><strong>acpi_get_int</strong>(<strong>acpi_result</strong>,
+<strong>path</strong>):</p>
+<blockquote>
+<p>Extracts the integer located at <strong>path</strong> from an ACPI
+result. Returns <strong>error</strong>, <strong>value</strong>
+(integer).</p>
+<p>Example:</p>
+<blockquote>
+<p>result = "{[0x0, 0x0], [0xFF, 0x0]}"<br />
+e, v = acpi_get_int(result, "1 0")<br />
+-- v is 0xFF</p>
+</blockquote>
 </blockquote>
 <p><strong>ec_read</strong>(<strong>register</strong>):</p>
 <blockquote>
@@ -464,6 +504,11 @@ for read operations. For write operations this value is ignored
 <p>Writes a 16-bit value to a two-byte register. Returns
 <strong>error</strong>, <strong>0</strong>.</p>
 </blockquote>
+<h2>Lua Libraries</h2>
+<p>To keep memory usage as low as possible, no Lua libraries are loaded
+by default. They must be explicitly loaded when needed. See
+<strong>ModelConfig</strong>-&gt;<strong>LuaLibraries</strong> for
+details.</p>
 <h1>FILES</h1>
 <p><em>/etc/nbfc/nbfc.json</em></p>
 <blockquote>

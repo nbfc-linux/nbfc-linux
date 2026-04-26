@@ -686,7 +686,30 @@ The following functions are exposed to Lua:
 .BR acpi_call ( method ):
 .RS
 Executes an ACPI method. Returns
-.BR error ", " value .
+.BR error ", " value " (integer)."
+.RE
+
+.BR acpi_call_raw ( method ):
+.RS
+Executes an ACPI method and returns the raw result as a string. Returns
+.BR error ", " value " (string)."
+.RE
+
+.BR acpi_get_int ( acpi_result ", " path ):
+.RS
+Extracts the integer located at
+.B path
+from an ACPI result. Returns
+.BR error ", " value " (integer)."
+
+Example:
+.RS
+result = "{[0x0, 0x0], [0xFF, 0x0]}"
+.br
+e, v = acpi_get_int(result, "1 0")
+.br
+-- v is 0xFF
+.RE
 .RE
 
 .BR ec_read ( register ):

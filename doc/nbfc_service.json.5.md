@@ -97,6 +97,32 @@ State file of the service (*/var/run/nbfc/state.json*).
 > If **true**, NBFC will combine two 8 bit registers to one 16-bit
 > register when reading from or writing to the EC registers.
 
+**LuaLibraries**: *Array of String*
+
+> Import additional Lua libaries.
+>
+> Example:
+>
+> > \"LuaLibraries\": \[\"math\"\]
+>
+> Available libraries:
+>
+> -   **base**: Provides core global functions.
+>
+> -   **math**: Provides standard mathematical functions and constants.
+>
+> -   **string**: Provides functions for pattern matching and basic
+>     string manipulation.
+>
+> -   **table**: Provides utilities for creating and manipulating tables
+>     (arrays and dictionaries).
+>
+> -   **io**: Provides file input/output facilities and stream-based I/O
+>     operations.
+>
+> -   **os**: Provides operating system interface functions such as
+>     time, environment, and process control.
+
 **FanConfigurations**: *Array of FanConfiguration*
 
 > Array of at least one FanConfiguration
@@ -423,7 +449,23 @@ The following functions are exposed to Lua:
 
 **acpi_call**(**method**):
 
-> Executes an ACPI method. Returns **error**, **value**.
+> Executes an ACPI method. Returns **error**, **value** (integer).
+
+**acpi_call_raw**(**method**):
+
+> Executes an ACPI method and returns the raw result as a string.
+> Returns **error**, **value** (string).
+
+**acpi_get_int**(**acpi_result**, **path**):
+
+> Extracts the integer located at **path** from an ACPI result. Returns
+> **error**, **value** (integer).
+>
+> Example:
+>
+> > result = \"{\[0x0, 0x0\], \[0xFF, 0x0\]}\"\
+> > e, v = acpi_get_int(result, \"1 0\")\
+> > \-- v is 0xFF
 
 **ec_read**(**register**):
 
@@ -443,6 +485,12 @@ The following functions are exposed to Lua:
 
 > Writes a 16-bit value to a two-byte register. Returns **error**,
 > **0**.
+
+## Lua Libraries
+
+To keep memory usage as low as possible, no Lua libraries are loaded by
+default. They must be explicitly loaded when needed. See
+**ModelConfig**-\>**LuaLibraries** for details.
 
 # FILES
 

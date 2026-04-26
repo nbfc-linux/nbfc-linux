@@ -1,4 +1,7 @@
-all: test_config
+all: test_config test_acpi_call
+
+test_config: test_config.c
+	$(CC) -O2 test_config.c -llua -o test_config
 	./test_config ./01-Basic/01-missing-NotebookModel.json
 	./test_config ./01-Basic/02-missing-FanConfigurations.json
 	./test_config ./01-Basic/03-invalid-size-FanConfigurations.json
@@ -35,5 +38,10 @@ all: test_config
 	./test_config ./05-TemperatureThreshold/05-FanSpeed-greater-100.json
 	./test_config ./05-TemperatureThreshold/06-UpThreshold-less-DownThreshold.json
 
-test_config: test_config.c
-	$(CC) -O2 test_config.c -o test_config
+test_acpi_call: test_acpi_call.c
+	$(CC) -O2 test_acpi_call.c -o test_acpi_call
+	./test_acpi_call
+
+clean:
+	rm -f ./test_acpi_call
+	rm -f ./test_config

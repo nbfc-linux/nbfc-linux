@@ -16,5 +16,5 @@
     }
   ],
 
-  "Expected": "FanConfigurations[0]: TemperatureThresholds[0]: FanSpeed: requires: parameter >= 0.0 && parameter <= 100.0"
+  "Expected": "FanConfigurations[0]: TemperatureThresholds[0]: FanSpeed: requires: 0.0 <= parameter <= 100.0"
 }

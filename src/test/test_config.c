@@ -20,6 +20,10 @@
 #include "../log.c"
 #include "../trace.c"
 #include "../program_name.c"
+#include "../lua_bindings.c"
+#include "../acpi_call.c"
+
+const EC_VTable* ec = NULL;
 
 static bool test(const char* file) {
   Error e;

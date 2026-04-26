@@ -18,9 +18,15 @@ static inline int Lua_Return_Error(lua_State* l, const char* err) {
   return 2;
 }
 
-static inline int Lua_Return_Result(lua_State* l, uint64_t result) {
+static inline int Lua_Return_Integer(lua_State* l, uint64_t result) {
   lua_pushnil(l);
   lua_pushinteger(l, result);
+  return 2;
+}
+
+static inline int Lua_Return_String(lua_State* l, const char* result) {
+  lua_pushnil(l);
+  lua_pushstring(l, result);
   return 2;
 }
 
@@ -44,7 +50,7 @@ static int Lua_EC_Read(lua_State* l) {
   if (e)
     return Lua_Return_Error(l, err_print_all(e));
 
-  return Lua_Return_Result(l, byte);
+  return Lua_Return_Integer(l, byte);
 }
 
 static int Lua_EC_ReadWord(lua_State* l) {
@@ -62,7 +68,7 @@ static int Lua_EC_ReadWord(lua_State* l) {
   if (e)
     return Lua_Return_Error(l, err_print_all(e));
 
-  return Lua_Return_Result(l, word);
+  return Lua_Return_Integer(l, word);
 }
 
 static int Lua_EC_Write(lua_State* l) {
@@ -86,7 +92,7 @@ static int Lua_EC_Write(lua_State* l) {
   if (e)
     return Lua_Return_Error(l, err_print_all(e));
 
-  return Lua_Return_Result(l, 0);
+  return Lua_Return_Integer(l, 0);
 }
 
 static int Lua_EC_WriteWord(lua_State* l) {
@@ -110,7 +116,7 @@ static int Lua_EC_WriteWord(lua_State* l) {
   if (e)
     return Lua_Return_Error(l, err_print_all(e));
 
-  return Lua_Return_Result(l, 0);
+  return Lua_Return_Integer(l, 0);
 }
 
 static int Lua_ACPI_Call(lua_State* l) {
@@ -127,7 +133,38 @@ static int Lua_ACPI_Call(lua_State* l) {
   if (e)
     return Lua_Return_Error(l, err_print_all(e));
 
-  return Lua_Return_Result(l, result);
+  return Lua_Return_Integer(l, result);
+}
+
+static int Lua_ACPI_CallRaw(lua_State* l) {
+  Error e;
+  size_t method_len;
+  const char* method = luaL_checklstring(l, 1, &method_len);
+  char* result;
+
+  e = AcpiCall_Open();
+  if (e)
+    return Lua_Return_Error(l, err_print_all(e));
+
+  e = AcpiCall_CallRaw(method, method_len, &result);
+  if (e)
+    return Lua_Return_Error(l, err_print_all(e));
+
+  return Lua_Return_String(l, result);
+}
+
+static int Lua_ACPI_GetInt(lua_State* l) {
+  Error e;
+  size_t len;
+  const char* acpi_result = luaL_checklstring(l, 1, &len);
+  const char* path = luaL_checklstring(l, 2, &len);
+  uint64_t result;
+
+  e = AcpiCall_GetInt(acpi_result, path, &result);
+  if (e)
+    return Lua_Return_Error(l, err_print_all(e));
+
+  return Lua_Return_Integer(l, result);
 }
 
 static Error Lua_Open(void) {
@@ -144,6 +181,8 @@ static Error Lua_Open(void) {
   lua_register(Lua_State, "ec_write",      Lua_EC_Write);
   lua_register(Lua_State, "ec_write_word", Lua_EC_WriteWord);
   lua_register(Lua_State, "acpi_call",     Lua_ACPI_Call);
+  lua_register(Lua_State, "acpi_call_raw", Lua_ACPI_CallRaw);
+  lua_register(Lua_State, "acpi_get_int",  Lua_ACPI_GetInt);
   return err_success();
 }
 

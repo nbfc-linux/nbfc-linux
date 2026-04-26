@@ -8,5 +8,5 @@
     }
   ],
 
-  "Expected": "FanConfigurations[0]: Missing option: WriteRegister or WriteAcpiMethod"
+  "Expected": "FanConfigurations[0]: Missing option: WriteRegister or WriteAcpiMethod or WriteLuaCode"
 }

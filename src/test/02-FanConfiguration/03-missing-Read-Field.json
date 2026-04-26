@@ -8,5 +8,5 @@
     }
   ],
 
-  "Expected": "FanConfigurations[0]: Missing option: ReadRegister or ReadAcpiMethod"
+  "Expected": "FanConfigurations[0]: Missing option: ReadRegister or ReadAcpiMethod or ReadLuaCode"
 }

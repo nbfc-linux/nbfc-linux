@@ -7,5 +7,7 @@
 
 Error AcpiCall_Open(void);
 Error AcpiCall_Call(const char*, uint64_t, uint64_t*);
+Error AcpiCall_CallRaw(const char*, size_t, char**);
+Error AcpiCall_GetInt(const char*, const char*, uint64_t*);
 
 #endif

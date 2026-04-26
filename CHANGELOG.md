@@ -1,5 +1,13 @@
 # Changelog
 
+## nbfc-linux-0.5.1 (2026-04-26)
+
+- Added Lua helper functions for handling packages and buffers returned
+  from ACPI methods:
+
+  - `acpi_call_raw(method)`: Executes an ACPI method and returns the result as a string
+  - `acpi_get_int(result, path)`: Extracts an integer from `result` located at `path`
+
 ## nbfc-linux-0.5.0 (2026-04-20)
 
 - Added support for executing Lua code.

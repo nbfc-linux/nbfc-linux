@@ -11,5 +11,5 @@
     }
   ],
 
-  "Expected": "FanConfigurations[0]: Cannot set both WriteRegister and WriteAcpiMethod"
+  "Expected": "FanConfigurations[0]: Can only set one of: WriteRegister, WriteAcpiMethod, WriteLuaCode"
 }
