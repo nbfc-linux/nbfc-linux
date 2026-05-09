@@ -2,6 +2,8 @@
 
 #include "acpi_analysis.h"
 
+#include <string.h> // strcmp
+
 /*
  * Checks if two ACPI method calls are equal.
  *
@@ -23,7 +25,10 @@ static bool FanConfiguration_IsSimilar(
     (FanConfiguration_IsSet_WriteRegister(a) == FanConfiguration_IsSet_WriteRegister(b)) &&
     (FanConfiguration_IsSet_ReadAcpiMethod(a) == FanConfiguration_IsSet_ReadAcpiMethod(b)) &&
     (FanConfiguration_IsSet_WriteAcpiMethod(a) == FanConfiguration_IsSet_WriteAcpiMethod(b)) &&
-    (FanConfiguration_IsSet_ResetAcpiMethod(a) == FanConfiguration_IsSet_ResetAcpiMethod(b));
+    (FanConfiguration_IsSet_ResetAcpiMethod(a) == FanConfiguration_IsSet_ResetAcpiMethod(b)) &&
+    (FanConfiguration_IsSet_ReadLuaCode(a) == FanConfiguration_IsSet_ReadLuaCode(b)) &&
+    (FanConfiguration_IsSet_WriteLuaCode(a) == FanConfiguration_IsSet_WriteLuaCode(b)) &&
+    (FanConfiguration_IsSet_ResetLuaCode(a) == FanConfiguration_IsSet_ResetLuaCode(b));
 
   if (! same_fields)
     return false;
@@ -48,6 +53,18 @@ static bool FanConfiguration_IsSimilar(
     if (! AcpiMethodCall_Equal(a->ResetAcpiMethod, b->ResetAcpiMethod))
       return false;
 
+  if (FanConfiguration_IsSet_ReadLuaCode(a))
+    if (strcmp(a->ReadLuaCode.source, b->ReadLuaCode.source))
+      return false;
+
+  if (FanConfiguration_IsSet_WriteLuaCode(a))
+    if (strcmp(a->WriteLuaCode.source, b->WriteLuaCode.source))
+      return false;
+
+  if (FanConfiguration_IsSet_ResetLuaCode(a))
+    if (strcmp(a->ResetLuaCode.source, b->ResetLuaCode.source))
+      return false;
+
   return true;
 }
 
@@ -58,7 +75,7 @@ static bool RegisterWriteConfiguration_IsSimilar(
   const RegisterWriteConfiguration* a,
   const RegisterWriteConfiguration* b
 ) {
-  const bool same_modes = 
+  const bool same_modes =
     (a->WriteMode == b->WriteMode) &&
     (a->ResetWriteMode == b->ResetWriteMode);
 
@@ -69,6 +86,10 @@ static bool RegisterWriteConfiguration_IsSimilar(
     if (! AcpiMethodCall_Equal(a->AcpiMethod, b->AcpiMethod))
       return false;
   }
+  else if(a->WriteMode == RegisterWriteMode_Lua) {
+    if (strcmp(a->LuaCode.source, b->LuaCode.source))
+      return false;
+  }
   else {
     if (a->Register != b->Register)
       return false;
@@ -76,6 +97,10 @@ static bool RegisterWriteConfiguration_IsSimilar(
 
   if (a->ResetWriteMode == RegisterWriteMode_Call) {
     if (! AcpiMethodCall_Equal(a->ResetAcpiMethod, b->ResetAcpiMethod))
+      return false;
+  }
+  else if (a->ResetWriteMode == RegisterWriteMode_Lua) {
+    if (strcmp(a->ResetLuaCode.source, b->ResetLuaCode.source))
       return false;
   }
   else {
@@ -163,7 +188,7 @@ static bool RegisterWriteConfigurations_AreSimilar(
  */
 bool ModelConfig_IsSimilar(
   ModelConfig* a,
-  ModelConfig* b 
+  ModelConfig* b
 ) {
   return
     FanConfigurations_AreSimilar(&a->FanConfigurations, &b->FanConfigurations) &&

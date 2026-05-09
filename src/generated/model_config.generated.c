@@ -115,7 +115,7 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self
 		return err_stringf("%s: %s", "AcpiMethod", "Missing option");
 
 	if (false)
-		self->LuaCode = 0;
+		return err_stringf("%s: %s", "LuaCode", "Missing option");
 
 	if (! RegisterWriteConfiguration_IsSet_ResetRequired(self))
 		self->ResetRequired = false;
@@ -127,7 +127,7 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self
 		return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
 	if (false)
-		self->ResetLuaCode = 0;
+		return err_stringf("%s: %s", "ResetLuaCode", "Missing option");
 
 	if (! RegisterWriteConfiguration_IsSet_ResetWriteMode(self))
 		self->ResetWriteMode = RegisterWriteMode_Set;
@@ -227,7 +227,7 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 		return err_stringf("%s: %s", "ReadAcpiMethod", "Missing option");
 
 	if (false)
-		self->ReadLuaCode = 0;
+		return err_stringf("%s: %s", "ReadLuaCode", "Missing option");
 
 	if (false)
 		return err_stringf("%s: %s", "WriteRegister", "Missing option");
@@ -236,7 +236,7 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 		return err_stringf("%s: %s", "WriteAcpiMethod", "Missing option");
 
 	if (false)
-		self->WriteLuaCode = 0;
+		return err_stringf("%s: %s", "WriteLuaCode", "Missing option");
 
 	if (! FanConfiguration_IsSet_MinSpeedValue(self))
 		return err_stringf("%s: %s", "MinSpeedValue", "Missing option");
@@ -263,7 +263,7 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 		return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
 	if (false)
-		self->ResetLuaCode = 0;
+		return err_stringf("%s: %s", "ResetLuaCode", "Missing option");
 
 	if (false)
 		return err_stringf("%s: %s", "TemperatureAlgorithmType", "Missing option");

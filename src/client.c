@@ -42,6 +42,7 @@
 #include "mkdir_p.c"
 #include "regex_utils.c"
 #include "acpi_analysis.c"
+#include "config_analysis.c"
 #include "config_rating.c"
 #include "config_rating_rules.c"
 #include "model_config_utils.c"

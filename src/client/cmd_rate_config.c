@@ -230,15 +230,20 @@ static array_of(ConfigWithData) RateConfig_RateConfigs(
       continue;
     }
 
-    // Set the filename
-    config_with_data->file = Mem_Strdup(file->config_name);
-
     // Rate the config
-    ConfigRating_RateModelConfig(
+    e = ConfigRating_RateModelConfig(
       config_rating,
       &config_with_data->model_config,
       &config_with_data->rating
     );
+    if (e) {
+      Log_Warn("%s: %s", path, err_print_all(e));
+      ModelConfig_Free(&config_with_data->model_config);
+      continue;
+    }
+
+    // Set the filename
+    config_with_data->file = Mem_Strdup(file->config_name);
 
     result.size++;
   }

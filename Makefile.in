@@ -293,6 +293,7 @@ src/nbfc: \
 	src/client/str_functions.c \
 	src/client/str_functions.h \
 	src/acpi_analysis.h src/acpi_analysis.c \
+	src/config_analysis.h src/config_analysis.c \
 	src/config_rating.h src/config_rating.c \
 	src/config_rating_rules.h src/config_rating_rules.c \
 	src/error.h src/error.c \

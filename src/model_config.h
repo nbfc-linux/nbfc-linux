@@ -65,6 +65,12 @@ typedef char                          TemperatureAlgorithmType;
 typedef const char* str;
 declare_array_of(str);
 
+typedef struct LuaCode LuaCode;
+struct LuaCode {
+  int function;
+  const char* source;
+};
+
 #include "generated/model_config.generated.h"
 
 EmbeddedControllerType   EmbeddedControllerType_FromString(const char*);

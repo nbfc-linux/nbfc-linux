@@ -4,6 +4,7 @@
 #include "macros.h"
 #include "model_config.h"
 #include "acpi_analysis.h"
+#include "config_analysis.h"
 #include "config_rating_rules.h"
 #include "nxjson.h"
 
@@ -24,16 +25,6 @@ struct ConfigRating {
 };
 typedef struct ConfigRating ConfigRating;
 declare_array_of(ConfigRating);
-
-/*
- * Specifies the category of a register, e.g. whether it is a fan register or
- * a miscellaneous register used for register-write configurations.
- */
-enum NBFC_PACKED_ENUM RegisterType {
-  RegisterType_FanReadRegister,
-  RegisterType_FanWriteRegister,
-  RegisterType_RegisterWriteConfigurationRegister
-};
 
 /*
  * Indicates how well an EC register name matches the firmware according to the
@@ -163,7 +154,7 @@ void  ConfigRatingRules_Free(ConfigRatingRules*);
 Error ConfigRating_Init(ConfigRating*, const char*, const char*);
 void  ConfigRating_Free(ConfigRating*);
 
-void  ConfigRating_RateModelConfig(ConfigRating*, ModelConfig*, ConfigRating_Rating*);
+Error ConfigRating_RateModelConfig(ConfigRating*, ModelConfig*, ConfigRating_Rating*);
 void  ConfigRating_RatingPrint(ConfigRating_Rating*);
 
 void  ConfigRating_RatingFree(ConfigRating_Rating*);

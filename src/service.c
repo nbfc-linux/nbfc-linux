@@ -327,7 +327,7 @@ static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
         return err_success();
 
     case RegisterWriteMode_Lua:
-      e = Lua_Call(cfg->ResetLuaCode, 0, &out);
+      e = Lua_Call(cfg->ResetLuaCode.function, 0, &out);
       if (e)
         return err_chain_string(e, "ResetLuaCode");
       else
@@ -375,7 +375,7 @@ static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
         return err_success();
 
     case RegisterWriteMode_Lua:
-      e = Lua_Call(cfg->LuaCode, 0, &out);
+      e = Lua_Call(cfg->LuaCode.function, 0, &out);
       if (e)
         return err_chain_string(e, "LuaCode");
       else

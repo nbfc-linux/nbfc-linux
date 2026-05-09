@@ -82,11 +82,9 @@
       },
       {
         "name": "LuaCode",
-        "type": "int",
+        "type": "LuaCode",
         "help": "The Lua code to execute",
-        "required": false,
-        "default": "0",
-        "from_json": "LuaCode_FromJson"
+        "required": false
       },
       {
         "name": "ResetRequired",
@@ -108,11 +106,9 @@
       },
       {
         "name": "ResetLuaCode",
-        "type": "int",
+        "type": "LuaCode",
         "help": "The Lua code to execute on reset",
-        "required": false,
-        "default": "0",
-        "from_json": "LuaCode_FromJson"
+        "required": false
       },
       {
         "name": "ResetWriteMode",
@@ -152,11 +148,9 @@
       },
       {
         "name": "ReadLuaCode",
-        "type": "int",
+        "type": "LuaCode",
         "help": "The Lua code to execute on read",
-        "required": false,
-        "default": "0",
-        "from_json": "LuaCode_FromJson"
+        "required": false
       },
       {
         "name": "WriteRegister",
@@ -172,11 +166,9 @@
       },
       {
         "name": "WriteLuaCode",
-        "type": "int",
+        "type": "LuaCode",
         "help": "The Lua code to execute on write",
-        "required": false,
-        "default": "0",
-        "from_json": "LuaCode_FromJson"
+        "required": false
       },
       {
         "name": "MinSpeedValue",
@@ -226,11 +218,9 @@
       },
       {
         "name": "ResetLuaCode",
-        "type": "int",
+        "type": "LuaCode",
         "help": "The Lua code to be executed on fan reset",
-        "required": false,
-        "default": "0",
-        "from_json": "LuaCode_FromJson"
+        "required": false
       },
       {
         "name": "TemperatureAlgorithmType",

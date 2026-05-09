@@ -1,3 +1,4 @@
+#include "config_analysis.h"
 #include "config_rating.h"
 #include "nxjson_utils.h"
 #include "memory.h"
@@ -301,41 +302,35 @@ void ConfigRating_RatingPrint(ConfigRating_Rating* rating) {
     ConfigRating_MethodRatingPrint(met_rating);
 }
 
-void ConfigRating_RateModelConfig(
+Error ConfigRating_RateModelConfig(
   ConfigRating* config_rating,
   ModelConfig* model_config,
   ConfigRating_Rating *rating)
 {
+  Error e;
+  ConfigAnalysis* analysis;
+
   // ==========================================================================
-  // Calculate output size of `rating` arrays
+  // Collect information about registers and methods
   // ==========================================================================
 
-  array_size_t registers_size = 0;
-  array_size_t methods_size = 0;
+  e = ConfigAnalysis_AnalyzeModelConfig(model_config, &analysis);
+  if (e)
+    return e;
 
-  for_each_array(FanConfiguration*, fan_config, model_config->FanConfigurations) {
-    registers_size += FanConfiguration_IsSet_ReadRegister(fan_config);
-    registers_size += FanConfiguration_IsSet_WriteRegister(fan_config);
-    methods_size += FanConfiguration_IsSet_ReadAcpiMethod(fan_config);
-    methods_size += FanConfiguration_IsSet_WriteAcpiMethod(fan_config);
-    methods_size += FanConfiguration_IsSet_ResetAcpiMethod(fan_config);
-  }
+  // ==========================================================================
+  // Get size for output arrays
+  // ==========================================================================
 
-  for_each_array(RegisterWriteConfiguration*, rw_config, model_config->RegisterWriteConfigurations) {
-    registers_size += RegisterWriteConfiguration_IsSet_Register(rw_config);
-    methods_size += RegisterWriteConfiguration_IsSet_AcpiMethod(rw_config);
-    methods_size += RegisterWriteConfiguration_IsSet_ResetAcpiMethod(rw_config);
-  }
+  const array_size_t registers_size = analysis->registers_size;
+  const array_size_t methods_size = analysis->methods_size;
 
   // ==========================================================================
   // Defensive programming (should never happen)
   // ==========================================================================
 
-  if ((registers_size + methods_size) == 0) {
-    rating->score = 0.0f;
-    rating->priority = 0;
-    return;
-  }
+  if ((registers_size + methods_size) == 0)
+    return err_string("Configuration has no registers / methods");
 
   // ==========================================================================
   // Allocate memory for arrays
@@ -351,44 +346,18 @@ void ConfigRating_RateModelConfig(
   // Do the actual rating
   // ==========================================================================
 
-  for_each_array(FanConfiguration*, fan_config, model_config->FanConfigurations) {
-    // Registers
-    if (FanConfiguration_IsSet_ReadRegister(fan_config))
-      rating->register_ratings.data[rating->register_ratings.size++] = \
-        ConfigRating_RateRegister(config_rating, RegisterType_FanReadRegister, fan_config->ReadRegister);
-
-    if (FanConfiguration_IsSet_WriteRegister(fan_config))
-      rating->register_ratings.data[rating->register_ratings.size++] = \
-        ConfigRating_RateRegister(config_rating, RegisterType_FanWriteRegister, fan_config->WriteRegister);
-
-    // Methods
-    if (FanConfiguration_IsSet_ReadAcpiMethod(fan_config))
-      rating->method_ratings.data[rating->method_ratings.size++] = \
-        ConfigRating_RateMethod(config_rating, fan_config->ReadAcpiMethod);
-
-    if (FanConfiguration_IsSet_WriteAcpiMethod(fan_config))
-      rating->method_ratings.data[rating->method_ratings.size++] = \
-        ConfigRating_RateMethod(config_rating, fan_config->WriteAcpiMethod);
-
-    if (FanConfiguration_IsSet_ResetAcpiMethod(fan_config))
-      rating->method_ratings.data[rating->method_ratings.size++] = \
-        ConfigRating_RateMethod(config_rating, fan_config->ResetAcpiMethod);
+  // Registers
+  for (size_t i = 0; i < analysis->registers_size; ++i) {
+    rating->register_ratings.data[rating->register_ratings.size++] = \
+      ConfigRating_RateRegister(config_rating,
+          analysis->registers[i].type,
+          analysis->registers[i].register_);
   }
 
-  for_each_array(RegisterWriteConfiguration*, rw_config, model_config->RegisterWriteConfigurations) {
-    // Registers
-    if (RegisterWriteConfiguration_IsSet_Register(rw_config))
-      rating->register_ratings.data[rating->register_ratings.size++] = \
-        ConfigRating_RateRegister(config_rating, RegisterType_RegisterWriteConfigurationRegister, rw_config->Register);
-
-    // Methods
-    if (RegisterWriteConfiguration_IsSet_AcpiMethod(rw_config))
-      rating->method_ratings.data[rating->method_ratings.size++] = \
-        ConfigRating_RateMethod(config_rating, rw_config->AcpiMethod);
-
-    if (RegisterWriteConfiguration_IsSet_ResetAcpiMethod(rw_config))
-      rating->method_ratings.data[rating->method_ratings.size++] = \
-        ConfigRating_RateMethod(config_rating, rw_config->ResetAcpiMethod);
+  // Methods
+  for (size_t i = 0; i < analysis->methods_size; ++i) {
+    rating->method_ratings.data[rating->method_ratings.size++] = \
+      ConfigRating_RateMethod(config_rating, analysis->methods[i]);
   }
 
   // ==========================================================================
@@ -442,7 +411,7 @@ void ConfigRating_RateModelConfig(
     switch (met_rating->score) {
       case MethodScore_Found:
         method_points = 10;
-        priority += 10;
+        priority += 100;
         break;
 
       case MethodScore_NotFound:
@@ -456,6 +425,7 @@ void ConfigRating_RateModelConfig(
 end:
   rating->score = (float) points / (float) (registers_size + methods_size);
   rating->priority = priority;
+  return err_success();
 }
 
 void ConfigRating_RegisterRatingFree(ConfigRating_RegisterRating* rating) {

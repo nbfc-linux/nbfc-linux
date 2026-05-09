@@ -102,11 +102,11 @@ struct RegisterWriteConfiguration {
 	uint8_t         Register;
 	uint8_t         Value;
 	const char*     AcpiMethod;
-	int             LuaCode;
+	LuaCode         LuaCode;
 	bool            ResetRequired;
 	uint8_t         ResetValue;
 	const char*     ResetAcpiMethod;
-	int             ResetLuaCode;
+	LuaCode         ResetLuaCode;
 	RegisterWriteMode ResetWriteMode;
 	const char*     Description;
 	uint16_t        _set;
@@ -265,10 +265,10 @@ struct FanConfiguration {
 	const char*     FanDisplayName;
 	uint8_t         ReadRegister;
 	const char*     ReadAcpiMethod;
-	int             ReadLuaCode;
+	LuaCode         ReadLuaCode;
 	uint8_t         WriteRegister;
 	const char*     WriteAcpiMethod;
-	int             WriteLuaCode;
+	LuaCode         WriteLuaCode;
 	uint16_t        MinSpeedValue;
 	uint16_t        MaxSpeedValue;
 	uint16_t        MinSpeedValueRead;
@@ -277,7 +277,7 @@ struct FanConfiguration {
 	bool            ResetRequired;
 	uint16_t        FanSpeedResetValue;
 	const char*     ResetAcpiMethod;
-	int             ResetLuaCode;
+	LuaCode         ResetLuaCode;
 	TemperatureAlgorithmType TemperatureAlgorithmType;
 	array_of(str)   Sensors;
 	array_of(TemperatureThreshold) TemperatureThresholds;

@@ -94,9 +94,9 @@ static Error Fan_ECWriteValue(Fan* self, uint16_t value) {
       return err_success();
   }
 
-  if (my.fanConfig->WriteLuaCode) {
+  if (my.fanConfig->WriteLuaCode.function) {
     uint64_t out;
-    Error e = Lua_Call(my.fanConfig->WriteLuaCode, value, &out);
+    Error e = Lua_Call(my.fanConfig->WriteLuaCode.function, value, &out);
     if (e)
       return err_chain_string(e, "WriteLuaCode");
     else
@@ -122,9 +122,9 @@ static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {
     return e;
   }
 
-  if (my.fanConfig->ReadLuaCode) {
+  if (my.fanConfig->ReadLuaCode.function) {
     uint64_t val;
-    e = Lua_Call(my.fanConfig->ReadLuaCode, 0, &val);
+    e = Lua_Call(my.fanConfig->ReadLuaCode.function, 0, &val);
     if (e)
       return err_chain_string(e, "ReadLuaCode");
     else
@@ -238,9 +238,9 @@ Error Fan_ECReset(Fan* self) {
       return err_success();
   }
 
-  if (my.fanConfig->ResetLuaCode) {
+  if (my.fanConfig->ResetLuaCode.function) {
     uint64_t out;
-    Error e = Lua_Call(my.fanConfig->ResetLuaCode, 0, &out);
+    Error e = Lua_Call(my.fanConfig->ResetLuaCode.function, 0, &out);
     if (e)
       return err_chain_string(e, "ResetLuaCode");
     else

@@ -163,15 +163,15 @@ static Error EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const 
   return e;
 }
 
-static Error LuaCode_FromJson(int* out, const nx_json* json) {
+static Error LuaCode_FromJson(LuaCode* out, const nx_json* json) {
+  char* code;
+
   if (json->type == NX_JSON_STRING) {
-    return Lua_LoadCode(json->val.text, out);
+    code = Mem_Strdup(json->val.text);
   }
   else if (json->type == NX_JSON_ARRAY) {
     size_t total_len = 0;
     size_t line_len;
-    char* code;
-    Error e;
 
     nx_json_for_each(line, json) {
       if (line->type != NX_JSON_STRING)
@@ -191,15 +191,12 @@ static Error LuaCode_FromJson(int* out, const nx_json* json) {
     }
 
     code[total_len] = '\0';
-
-    e = Lua_LoadCode(code, out);
-
-    Mem_Free(code);
-
-    return e;
   }
+  else
+    return err_string("Not a string or array of strings");
 
-  return err_string("Not a string or array of strings");
+  out->source = code;
+  return Lua_LoadCode(code, &out->function);
 }
 
 static Error LuaLibraries_FromJson(bool* out, const nx_json* json) {
@@ -402,6 +399,9 @@ void ModelConfig_Free(ModelConfig* c) {
     Mem_Free((char*) f->ReadAcpiMethod);
     Mem_Free((char*) f->WriteAcpiMethod);
     Mem_Free((char*) f->ResetAcpiMethod);
+    Mem_Free((char*) f->ReadLuaCode.source);
+    Mem_Free((char*) f->WriteLuaCode.source);
+    Mem_Free((char*) f->ResetLuaCode.source);
     Mem_Free(f->TemperatureThresholds.data);
     Mem_Free(f->FanSpeedPercentageOverrides.data);
 
@@ -415,6 +415,8 @@ void ModelConfig_Free(ModelConfig* c) {
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
     Mem_Free((char*) r->AcpiMethod);
     Mem_Free((char*) r->ResetAcpiMethod);
+    Mem_Free((char*) r->LuaCode.source);
+    Mem_Free((char*) r->ResetLuaCode.source);
     Mem_Free((char*) r->Description);
   }
 

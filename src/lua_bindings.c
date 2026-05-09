@@ -4,7 +4,6 @@
 #include "acpi_call.h"
 
 #include <string.h> // strcmp
-#include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
 
@@ -12,19 +11,19 @@ extern const EC_VTable* ec;
 static uint64_t Lua_CurrentValue;
 static lua_State* Lua_State = NULL;
 
-static inline int Lua_Return_Error(lua_State* l, const char* err) {
+int Lua_Return_Error(lua_State* l, const char* err) {
   lua_pushstring(l, err);
   lua_pushnil(l);
   return 2;
 }
 
-static inline int Lua_Return_Integer(lua_State* l, uint64_t result) {
+int Lua_Return_Integer(lua_State* l, uint64_t result) {
   lua_pushnil(l);
   lua_pushinteger(l, result);
   return 2;
 }
 
-static inline int Lua_Return_String(lua_State* l, const char* result) {
+int Lua_Return_String(lua_State* l, const char* result) {
   lua_pushnil(l);
   lua_pushstring(l, result);
   return 2;
@@ -167,7 +166,7 @@ static int Lua_ACPI_GetInt(lua_State* l) {
   return Lua_Return_Integer(l, result);
 }
 
-static Error Lua_Open(void) {
+Error Lua_Open(void) {
   if (Lua_State)
     return err_success();
 
