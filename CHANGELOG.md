@@ -1,5 +1,10 @@
 # Changelog
 
+## nbfc-linux-0.5.2 (2026-05-10)
+
+- Added `nbfc xml2json` command
+- Support returning non-integer results in `ec_probe acpi_call`
+
 ## nbfc-linux-0.5.1 (2026-04-26)
 
 - Added Lua helper functions for handling packages and buffers returned
