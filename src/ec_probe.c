@@ -591,10 +591,10 @@ static int AcpiCall(void) {
     return NBFC_EXIT_FAILURE;
   }
 
-  uint64_t out;
-  e = AcpiCall_Call(cmd, 0, &out);
+  char* out;
+  e = AcpiCall_CallRaw(cmd, cmd_len, &out);
   e_die();
-  printf("0x%lX\n", out);
+  printf("%s\n", out);
 
   return NBFC_EXIT_SUCCESS;
 }
