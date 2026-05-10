@@ -394,7 +394,7 @@ static void RateConfig_PrintResultsJson(
     RateConfig_AddJsonResult(array, results, group_id);
   }
 
-  nxjson_write_to_fd(array, STDOUT_FILENO);
+  nxjson_write_to_fd(array, STDOUT_FILENO, 2);
 
 #if STRICT_CLEANUP
   nx_json_free(array);
@@ -519,7 +519,7 @@ static int RateConfig_PrintRules(const char* rules_json, bool json) {
 
   if (json) {
     js = ConfigRatingRules_ToJson(&rules);
-    nxjson_write_to_fd(js, STDOUT_FILENO);
+    nxjson_write_to_fd(js, STDOUT_FILENO, 2);
   }
   else {
     ConfigRatingRules_Print(&rules);

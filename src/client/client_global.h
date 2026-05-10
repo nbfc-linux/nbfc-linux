@@ -67,6 +67,9 @@ enum Option {
 
   // Show-Variable options
   Option_ShowVariable_Variable,
+
+  // Xml2Json options
+  Option_Xml2Json_File,
 };
 
 extern const struct cli99_Option main_options[];

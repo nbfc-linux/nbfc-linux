@@ -129,6 +129,7 @@ _nbfc__command() {
     acpi-dump:'Dumps information of your ACPI DSDT'
     wait-for-hwmon:'Wait for /sys/class/hwmon/hwmon* files'
     get-model-name:'Print model name for notebook'
+    xml2json:'Convert an XML configuration to JSON'
     warranty:'Show warranty'
     support:'Show how to support the project'
     help:'Show help'
@@ -183,6 +184,7 @@ _nbfc() {
     acpi-dump) _nbfc_acpi_dump; return $?;;
     wait-for-hwmon) _nbfc_wait_for_hwmon; return $?;;
     get-model-name) _nbfc_get_model_name; return $?;;
+    xml2json) _nbfc_xml2json; return $?;;
     warranty) _nbfc_warranty; return $?;;
     support) _nbfc_support; return $?;;
     help) _nbfc_help; return $?;;
@@ -431,6 +433,16 @@ _nbfc_get_model_name() {
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_xml2json() {
+  local -a args=(
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+    2:'Specify configuration file':_files
   )
   _arguments -S -s -w "${args[@]}"
 }

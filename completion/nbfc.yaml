@@ -207,6 +207,14 @@ help: "Wait for /sys/class/hwmon/hwmon* files"
 prog: "nbfc get-model-name"
 help: "Print model name for notebook"
 ---
+prog: "nbfc xml2json"
+help: "Convert an XML configuration to JSON"
+positionals:
+  - number: 1
+    metavar: "FILE"
+    help: "Specify configuration file"
+    complete: ["file"]
+---
 prog: "nbfc warranty"
 help: "Show warranty"
 ---

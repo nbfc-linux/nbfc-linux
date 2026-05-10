@@ -250,6 +250,7 @@ function _nbfc__command
     acpi-dump 'Dumps information of your ACPI DSDT' \
     wait-for-hwmon 'Wait for /sys/class/hwmon/hwmon* files' \
     get-model-name 'Print model name for notebook' \
+    xml2json 'Convert an XML configuration to JSON' \
     warranty 'Show warranty' \
     support 'Show how to support the project' \
     help 'Show help'
@@ -355,6 +356,11 @@ set -l C002 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positiona
 complete -c $prog -n $C000 -s f -l file -d 'Use an alternative DSDT file' -Fr
 complete -c $prog -n $C001 -s j -l json -d 'Use JSON output' -f
 complete -c $prog -n $C002 -d Commands -f -a '(_nbfc_acpi_dump__command)'
+
+# command nbfc xml2json
+set -l opts "-h --help --version"
+set -l C000 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 xml2json"
+complete -c $prog -n $C000 -d 'Specify configuration file' -Fr
 
 # command nbfc support
 set -l opts "--upload-firmware --print-command -h --help --version"

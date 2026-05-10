@@ -14,16 +14,18 @@ systemvdir  = @sysconfdir@/init.d
 
 LUA_CFLAGS = $(shell pkg-config --cflags lua5.4 || pkg-config --cflags lua)
 LUA_LDLIBS = $(shell pkg-config --libs lua5.4 || pkg-config --libs lua)
+XML_CFLAGS = $(shell pkg-config --cflags libxml-2.0)
+XML_LDLIBS = $(shell pkg-config --libs libxml-2.0)
 
 ifeq ($(BUILD), debug)
-	CFLAGS   = $(LUA_CFLAGS) -Og -g
+	CFLAGS   = $(LUA_CFLAGS) $(XML_CFLAGS) -Og -g
 else
 	CPPFLAGS = -DNDEBUG
-	CFLAGS   = $(LUA_CFLAGS) -Wall -Os -flto -fno-unwind-tables -fno-asynchronous-unwind-tables -fomit-frame-pointer
+	CFLAGS   = $(LUA_CFLAGS) $(XML_CFLAGS) -Wall -Os -flto -fno-unwind-tables -fno-asynchronous-unwind-tables -fomit-frame-pointer
 	LDFLAGS  = -s
 endif
 
-LDLIBS_CLIENT = -lcurl -lcrypto $(LUA_LDLIBS) -ldl
+LDLIBS_CLIENT = -lcurl -lcrypto $(LUA_LDLIBS) $(XML_LDLIBS) -ldl
 LDLIBS_SERVICE = -lm $(LUA_LDLIBS) -ldl
 LDLIBS_EC_PROBE =
 LDLIBS_TEST_MODEL_CONFIG = -lm $(LUA_LDLIBS) -ldl
@@ -282,6 +284,7 @@ src/nbfc: \
 	src/client/cmd_support.c \
 	src/client/cmd_update.c \
 	src/client/cmd_warranty.c \
+	src/client/cmd_xml2json.c \
 	src/client/config_files.c \
 	src/client/config_files.h \
 	src/client/curl_utils.h \
@@ -301,12 +304,14 @@ src/nbfc: \
 	src/log.h src/log.c \
 	src/lua_bindings.h src/lua_bindings.c \
 	src/mkdir_p.c src/mkdir_p.h \
+	src/model_config_to_json.c src/model_config_to_json.h \
 	src/model_config_utils.c src/model_config_utils.h \
 	src/protocol.c src/protocol.h \
 	src/nxjson.c src/nxjson.h \
 	src/nbfc.h \
 	src/process.h src/process.c \
-	src/regex_utils.h src/regex_utils.c
+	src/regex_utils.h src/regex_utils.c \
+	src/xml2json.h src/xml2json.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
 
 src/test_model_config: \

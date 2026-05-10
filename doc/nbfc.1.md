@@ -16,8 +16,8 @@ This program is used to control the NoteBook FanControl service.
 ## MISCELLANEOUS COMMANDS
 
 **nbfc** {**update** \| **rate-config** \| **acpi-dump** \|
-**get-model-name** \| **support** \| **warranty** \| **help**}
-\[*OPTIONS*\]
+**get-model-name** \| **xml2json** \| **support** \| **warranty** \|
+**help**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -234,6 +234,13 @@ This program is used to control the NoteBook FanControl service.
 **get-model-name**
 
 > Print out the notebook\'s model name.
+
+**xml2json** *FILE*
+
+> Convert an XML configuration file to JSON.
+>
+> This command can be used to convert configurations from the original
+> NBFC project into the NBFC-Linux format.
 
 **warranty**
 

@@ -76,7 +76,7 @@ Error ServiceState_Write(void) {
   if (fd == -1)
     return err_stdlib(NBFC_STATE_FILE);
 
-  bool success = nxjson_write_to_fd(o, fd);
+  bool success = nxjson_write_to_fd(o, fd, 2);
 
   int errno_save = errno;
   close(fd);

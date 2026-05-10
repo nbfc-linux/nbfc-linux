@@ -5,7 +5,7 @@
 
 #include <stdbool.h>
 
-bool nxjson_send_to_fd(const nx_json*, int);
-bool nxjson_write_to_fd(const nx_json*, int);
+bool nxjson_send_to_fd(const nx_json*, int, int);
+bool nxjson_write_to_fd(const nx_json*, int, int);
 
 #endif

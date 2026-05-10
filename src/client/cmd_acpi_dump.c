@@ -97,7 +97,7 @@ static int AcpiDump_Methods(const char* dsdt_file, bool json) {
     nx_json* array = create_json_array(NULL, &root);
     for_each_array(AcpiMethod*, method, acpi_info.methods)
       AcpiMethod_ToJson(method, NULL, array);
-    nxjson_write_to_fd(array, STDOUT_FILENO);
+    nxjson_write_to_fd(array, STDOUT_FILENO, 2);
 #if STRICT_CLEANUP
     nx_json_free(array);
 #endif
@@ -172,7 +172,7 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
       AcpiRegister_ToJson(register_, NULL, array);
     }
 
-    nxjson_write_to_fd(array, STDOUT_FILENO);
+    nxjson_write_to_fd(array, STDOUT_FILENO, 2);
 
 #if STRICT_CLEANUP
     nx_json_free(array);

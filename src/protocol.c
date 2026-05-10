@@ -9,7 +9,7 @@
 #include <sys/socket.h>
 
 Error Protocol_Send_Json(int socket, const nx_json* json) {
-  if (! nxjson_send_to_fd(json, socket))
+  if (! nxjson_send_to_fd(json, socket, 2))
     return err_stdlib("send()");
 
   return Protocol_Send_End(socket);

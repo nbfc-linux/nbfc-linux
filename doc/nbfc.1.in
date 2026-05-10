@@ -16,7 +16,7 @@ This program is used to control the NoteBook FanControl service.
 .RI [ OPTIONS ]
 .SS MISCELLANEOUS COMMANDS
 .B nbfc
-.RB { update " | " rate\-config " | " acpi\-dump " | " get\-model\-name " | " support " | " warranty " | " help }
+.RB { update " | " rate\-config " | " acpi\-dump " | " get\-model\-name " | " xml2json " | " support " | " warranty " | " help }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -312,6 +312,15 @@ Print command for manual firmware upload.
 .B get\-model\-name
 .RS
 Print out the notebook's model name.
+.RE
+
+.B xml2json
+.I FILE
+.RS
+Convert an XML configuration file to JSON.
+
+This command can be used to convert configurations from the original NBFC project
+into the NBFC\-Linux format.
 .RE
 
 .B warranty

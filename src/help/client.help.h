@@ -20,6 +20,7 @@
  "    get-model-name      Print out model name\n"                              \
  "    acpi-dump           Dumps information of your ACPI DSDT\n"               \
  "    rate-config         Rate a configuration file\n"                         \
+ "    xml2json            Convert an XML configuration to JSON\n"              \
  "    help                Show help\n"                                         \
  "    support             Show how to support the project\n"                   \
  "    warranty            Show warranty\n"                                     \
@@ -267,3 +268,12 @@
  "  $ nbfc support --print-command\n"                                          \
  "\n"                                                                          \
  ""
+
+#define CLIENT_XML2JSON_HELP_TEXT                                              \
+  "Usage: nbfc xml2json FILE\n"                                                \
+  "\n"                                                                         \
+  "Convert an XML configuration file to JSON.\n"                               \
+  "\n"                                                                         \
+  "This command can be used to convert configurations from the original\n"     \
+  "NBFC project into the NBFC-Linux format.\n"                                 \
+  ""
