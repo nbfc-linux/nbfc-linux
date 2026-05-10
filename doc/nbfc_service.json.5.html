@@ -509,6 +509,16 @@ e, v = acpi_get_int(result, "1 0")<br />
 by default. They must be explicitly loaded when needed. See
 <strong>ModelConfig</strong>-&gt;<strong>LuaLibraries</strong> for
 details.</p>
+<h2>Coding Conventions</h2>
+<p>If possible, use the variables <strong>e</strong> (error) and
+<strong>v</strong> (value) for capturing the result of NBFC
+functions.</p>
+<h2>Testing Configuration</h2>
+<p>If a configuration uses Lua code, ensure that it works correctly with
+<strong>nbfc rate-config</strong>. During rating, <strong>nbfc
+rate-config</strong> replaces all NBFC-specific Lua functions with dummy
+implementations that always return <strong>nil</strong>,
+<strong>1</strong>.</p>
 <h1>FILES</h1>
 <p><em>/etc/nbfc/nbfc.json</em></p>
 <blockquote>

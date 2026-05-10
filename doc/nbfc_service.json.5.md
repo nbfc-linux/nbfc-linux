@@ -492,6 +492,18 @@ To keep memory usage as low as possible, no Lua libraries are loaded by
 default. They must be explicitly loaded when needed. See
 **ModelConfig**-\>**LuaLibraries** for details.
 
+## Coding Conventions
+
+If possible, use the variables **e** (error) and **v** (value) for
+capturing the result of NBFC functions.
+
+## Testing Configuration
+
+If a configuration uses Lua code, ensure that it works correctly with
+**nbfc rate-config**. During rating, **nbfc rate-config** replaces all
+NBFC-specific Lua functions with dummy implementations that always
+return **nil**, **1**.
+
 # FILES
 
 */etc/nbfc/nbfc.json*
