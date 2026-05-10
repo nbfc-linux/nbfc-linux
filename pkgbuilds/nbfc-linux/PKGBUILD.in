@@ -10,8 +10,8 @@ url="https://github.com/nbfc-linux/nbfc-linux"
 license=('GPL-3.0-only')
 conflicts=('nbfc')
 provides=('nbfc')
-depends=('curl' 'openssl' 'acpica' 'acpi_call')
-makedepends=('curl' 'openssl')
+depends=('curl' 'openssl' 'acpica' 'acpi_call' 'libxml2')
+makedepends=('curl' 'openssl' 'libxml2')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/nbfc-linux/nbfc-linux/archive/refs/tags/${pkgver}.tar.gz")
 sha256sums=('%SHA256%')
 
