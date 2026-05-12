@@ -253,8 +253,11 @@
  "  --print-command       Print command for manual firmware upload\n"          \
  "  -h, --help            Shows this message and exit\n"                       \
  "\n"                                                                          \
- "Uploading your notebook firmware helps the developer to create new\n"        \
- "configuration files.\n"\
+ "Uploading your notebook firmware helps the developer to understand existing\n"\
+ "configuration files.\n"                                                      \
+ "\n"                                                                          \
+ "Please create an issue on https://github.com/nbfc-linux/nbfc-linux if you\n" \
+ "need help creating a configuration file for your notebook.\n"                \
  "\n"                                                                          \
  "The following data will be transmitted:\n"                                   \
  "- The laptop manufacturer (/sys/devices/virtual/dmi/id/sys_vendor)\n"        \
