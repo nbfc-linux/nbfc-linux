@@ -102,7 +102,7 @@ List all available configs.
 
 .BR \-r ", " \-\-recommend
 .RS
-List configs which may work for your device.
+List configs with a similar notebook model name.
 .RE
 
 .BR \-s ", " \-\-set
@@ -192,6 +192,9 @@ Force applying a sensor if it could not be found.
 .RI [ OPTIONS ]
 .RS
 Download new configuration files from the internet.
+
+Downloaded files will be stored in
+.IR /var/lib/nbfc/configs .
 
 .BR \-p ", " \-\-parallel
 .I NUM

@@ -81,7 +81,7 @@ This program is used to control the NoteBook FanControl service.
 >
 > **-r**, **\--recommend**
 >
-> > List configs which may work for your device.
+> > List configs with a similar notebook model name.
 >
 > **-s**, **\--set** *CONFIG*
 >
@@ -143,6 +143,8 @@ This program is used to control the NoteBook FanControl service.
 **update** \[*OPTIONS*\]
 
 > Download new configuration files from the internet.
+>
+> Downloaded files will be stored in */var/lib/nbfc/configs*.
 >
 > **-p**, **\--parallel** *NUM*
 >

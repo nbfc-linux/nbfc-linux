@@ -58,7 +58,7 @@
  "                        Set a config\n"                                      \
  "  -a CONFIG, --apply CONFIG\n"                                               \
  "                        Set a config and start the service\n"                \
- "  -r, --recommend       List configs which may work for your device\n"       \
+ "  -r, --recommend       List configs with a similar notebook model name\n"   \
  "\n"                                                                          \
  "If CONFIG is \"auto\", the service will attempt to automatically select\n"   \
  "a matching configuration.\n"                                                 \
@@ -176,6 +176,8 @@
  "Usage: nbfc update [-h] [-p NUM] [-q]\n"                                     \
  "\n"                                                                          \
  "Update the available configuration files and the model support database.\n"  \
+ "\n"                                                                          \
+ "Downloaded files will be stored in /var/lib/nbfc/configs.\n"                 \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
