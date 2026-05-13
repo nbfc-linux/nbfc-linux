@@ -50,43 +50,26 @@ The [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probi
 Installation
 ------------
 
+### Packages
+
+| Operating System      | Download                       | Command                                        |
+|-----------------------|--------------------------------|-------------------------------------------------
+| Arch Linux            | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/arch-linux-nbfc-linux-git-0.4.1-x86_64.pkg.tar.zst)       | `sudo pacman -U ./arch-linux-nbfc-linux-git-0.4.1-x86_64.pkg.tar.zst`         |
+| Debian Trixie         | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/debian-trixie-nbfc-linux_0.5.2_amd64.deb)   | `sudo apt install ./debian-trixie-nbfc-linux_0.5.2_amd64.deb`   |
+| Debian Bookworm       | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/debian-bookworm-nbfc-linux_0.5.2_amd64.deb) | `sudo apt install ./debian-bookworm-nbfc-linux_0.5.2_amd64.deb` |
+| Ubuntu Noble          | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/ubuntu-noble-nbfc-linux_0.5.2_amd64.deb)    | `sudo apt install ./ubuntu-noble-nbfc-linux_0.5.2_amd64.deb`    |
+| Ubuntu Jammy          | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/ubuntu-jammy-nbfc-linux_0.5.2_amd64.deb)    | `sudo apt install ./ubuntu-jammy-nbfc-linux_0.5.2_amd64.deb`    |
+| Linux Mint 22         | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/linux-mint-22-nbfc-linux_0.5.2_amd64.deb)   | `sudo apt install ./linux-mint-22-nbfc-linux_0.5.2_amd64.deb`   |
+| Linux Mint 21         | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/linux-mint-21-nbfc-linux_0.5.2_amd64.deb)   | `sudo apt install ./linux-mint-21-nbfc-linux_0.5.2_amd64.deb`   |
+| Fedora 44             | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/fedora-44-nbfc-linux-0.5.2-1.x86_64.rpm)       | `sudo dnf install ./fedora-44-nbfc-linux-0.5.2-1.x86_64.rpm`       |
+| Fedora 43             | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/fedora-43-nbfc-linux-0.5.2-1.x86_64.rpm)       | `sudo dnf install ./fedora-43-nbfc-linux-0.5.2-1.x86_64.rpm`       |
+| OpenSuse (Tumbleweed) | [0.5.2](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.2/opensuse-nbfc-linux-0.5.2-1.x86_64.rpm)        | `sudo zypper install ./opensuse-nbfc-linux-0.5.2-1.x86_64.rpm`     |
+
+### Alternative Installation Methods
+
 - Arch Linux:
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/arch-linux-nbfc-linux-git-0.4.0.r13.g2507403-1-x86_64.pkg.tar.zst)
-  - Install NBFC-Linux: `pacman -U ./arch-linux-nbfc-linux-git-0.4.0.r13.g2507403-1-x86_64.pkg.tar.zst`
-  - Or via AUR (`yay -S nbfc-linux`)
-  - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
-
-- Debian Trixie
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/debian-trixie-nbfc-linux_0.4.1_amd64.deb)
-  - Install NBFC-Linux: `apt install ./debian-trixie-nbfc-linux_0.4.1_amd64.deb`
-
-- Debian Bookworm
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/debian-bookworm-nbfc-linux_0.4.1_amd64.deb)
-  - Install NBFC-Linux: `apt install ./debian-bookworm-nbfc-linux_0.4.1_amd64.deb`
-
-- Ubuntu Noble
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/ubuntu-noble-nbfc-linux_0.4.1_amd64.deb)
-  - Install NBFC-Linux: `apt install ./ubuntu-noble-nbfc-linux_0.4.1_amd64.deb`
-
-- Ubuntu Jammy
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/ubuntu-jammy-nbfc-linux_0.4.1_amd64.deb)
-  - Install NBFC-Linux: `apt install ./ubuntu-jammy-nbfc-linux_0.4.1_amd64.deb`
-
-- Linux Mint 22
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/linux-mint-22-nbfc-linux_0.4.1_amd64.deb)
-  - Install NBFC-Linux: `apt install ./linux-mint-22-nbfc-linux_0.4.1_amd64.deb`
-
-- Linux Mint 21
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/linux-mint-21-nbfc-linux_0.4.1_amd64.deb)
-  - Install NBFC-Linux: `apt install ./linux-mint-21-nbfc-linux_0.4.1_amd64.deb`
-
-- Fedora:
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/fedora-nbfc-linux-0.4.1-1.x86_64.rpm)
-  - Install NBFC-Linux: `dnf install ./fedora-nbfc-linux-0.4.1-1.x86_64.rpm`
-
-- OpenSuse (Tumbleweed)
-  - [Download Latest Version 0.4.1](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.1/opensuse-nbfc-linux-0.4.1-1.x86_64.rpm)
-  - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.4.1-1.x86_64.rpm`
+  - Via AUR (`yay -S nbfc-linux`)
+  - Via PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)
@@ -96,7 +79,7 @@ Installation
   - ensure, that podman is installed
     - docker should work also, but is currently not tested
   - edit [pkgbuilds/rpm/nbfc-linux.spec](./pkgbuilds/rpm/nbfc-linux.spec) and
-    - set wanted Version (e.g. 0.4.1)
+    - set wanted Version (e.g. 0.5.2)
     - set wanted Releasenumber (e.g. 1%{?dist} or 2%{?dist})
   - `./pkgbuilds/rpm/buildNBFC-LINUX`
   - the resulting rpm can be found in [pkgbuilds directory](./pkgbuilds/)

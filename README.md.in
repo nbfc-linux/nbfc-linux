@@ -50,43 +50,26 @@ The [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probi
 Installation
 ------------
 
+### Packages
+
+| Operating System      | Download                       | Command                                        |
+|-----------------------|--------------------------------|-------------------------------------------------
+| Arch Linux            | [%TAG%](%ARCHLINUX_URL%)       | `sudo pacman -U ./%ARCHLINUX_PACKAGE%`         |
+| Debian Trixie         | [%TAG%](%DEBIAN_TRIXIE_URL%)   | `sudo apt install ./%DEBIAN_TRIXIE_PACKAGE%`   |
+| Debian Bookworm       | [%TAG%](%DEBIAN_BOOKWORM_URL%) | `sudo apt install ./%DEBIAN_BOOKWORM_PACKAGE%` |
+| Ubuntu Noble          | [%TAG%](%UBUNTU_NOBLE_URL%)    | `sudo apt install ./%UBUNTU_NOBLE_PACKAGE%`    |
+| Ubuntu Jammy          | [%TAG%](%UBUNTU_JAMMY_URL%)    | `sudo apt install ./%UBUNTU_JAMMY_PACKAGE%`    |
+| Linux Mint 22         | [%TAG%](%LINUX_MINT_22_URL%)   | `sudo apt install ./%LINUX_MINT_22_PACKAGE%`   |
+| Linux Mint 21         | [%TAG%](%LINUX_MINT_21_URL%)   | `sudo apt install ./%LINUX_MINT_21_PACKAGE%`   |
+| Fedora 44             | [%TAG%](%FEDORA_44_URL%)       | `sudo dnf install ./%FEDORA_44_PACKAGE%`       |
+| Fedora 43             | [%TAG%](%FEDORA_43_URL%)       | `sudo dnf install ./%FEDORA_43_PACKAGE%`       |
+| OpenSuse (Tumbleweed) | [%TAG%](%OPENSUSE_URL%)        | `sudo zypper install ./%OPENSUSE_PACKAGE%`     |
+
+### Alternative Installation Methods
+
 - Arch Linux:
-  - [Download Latest Version %TAG%](%ARCHLINUX_URL%)
-  - Install NBFC-Linux: `pacman -U ./%ARCHLINUX_PACKAGE%`
-  - Or via AUR (`yay -S nbfc-linux`)
-  - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
-
-- Debian Trixie
-  - [Download Latest Version %TAG%](%DEBIAN_TRIXIE_URL%)
-  - Install NBFC-Linux: `apt install ./%DEBIAN_TRIXIE_PACKAGE%`
-
-- Debian Bookworm
-  - [Download Latest Version %TAG%](%DEBIAN_BOOKWORM_URL%)
-  - Install NBFC-Linux: `apt install ./%DEBIAN_BOOKWORM_PACKAGE%`
-
-- Ubuntu Noble
-  - [Download Latest Version %TAG%](%UBUNTU_NOBLE_URL%)
-  - Install NBFC-Linux: `apt install ./%UBUNTU_NOBLE_PACKAGE%`
-
-- Ubuntu Jammy
-  - [Download Latest Version %TAG%](%UBUNTU_JAMMY_URL%)
-  - Install NBFC-Linux: `apt install ./%UBUNTU_JAMMY_PACKAGE%`
-
-- Linux Mint 22
-  - [Download Latest Version %TAG%](%LINUX_MINT_22_URL%)
-  - Install NBFC-Linux: `apt install ./%LINUX_MINT_22_PACKAGE%`
-
-- Linux Mint 21
-  - [Download Latest Version %TAG%](%LINUX_MINT_21_URL%)
-  - Install NBFC-Linux: `apt install ./%LINUX_MINT_21_PACKAGE%`
-
-- Fedora:
-  - [Download Latest Version %TAG%](%FEDORA_URL%)
-  - Install NBFC-Linux: `dnf install ./%FEDORA_PACKAGE%`
-
-- OpenSuse (Tumbleweed)
-  - [Download Latest Version %TAG%](%OPENSUSE_URL%)
-  - Install NBFC-Linux: `zypper install ./%OPENSUSE_PACKAGE%`
+  - Via AUR (`yay -S nbfc-linux`)
+  - Via PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)

@@ -26,7 +26,8 @@ def replace_package_data(content):
         'ubuntu-jammy':     'UBUNTU_JAMMY',
         'linux-mint-22':    'LINUX_MINT_22',
         'linux-mint-21':    'LINUX_MINT_21',
-        'fedora':           'FEDORA',
+        'fedora-44':        'FEDORA_44',
+        'fedora-43':        'FEDORA_43',
         'opensuse':         'OPENSUSE',
         'arch-linux':       'ARCHLINUX',
     }
