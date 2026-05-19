@@ -70,6 +70,8 @@
  "Rates a configuration by analyzing whether it appears safe to execute\n"     \
  "on the current system.\n"                                                    \
  "\n"                                                                          \
+ "By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.\n"\
+ "\n"                                                                          \
  "Please run `nbfc rate-config --full-help` for a full explanation of how\n"   \
  "to interpret these results.\n"                                               \
  "\n"                                                                          \
@@ -88,13 +90,15 @@
 #define CLIENT_ACPI_DUMP_HELP_TEXT                                             \
  "Usage: nbfc acpi-dump [-h] [-j|--json] [-f|--file=FILE] <COMMAND>\n"         \
  "\n"                                                                          \
- "Dumps information of your ACPI DSDT.\n"                                      \
+ "Dumps information of your ACPI tables.\n"                                    \
+ "\n"                                                                          \
+ "By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.\n"\
  "\n"                                                                          \
  "Commands:\n"                                                                 \
  "    registers           List all available registers\n"                      \
  "    ec-registers        List all available EC registers\n"                   \
  "    methods             List all available ACPI methods\n"                   \
- "    dsl                 Disassemble your DSDT\n"                             \
+ "    dsl                 Disassemble your ACPI tables\n"                      \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \

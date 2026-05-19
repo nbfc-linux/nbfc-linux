@@ -160,7 +160,7 @@ _nbfc_acpi_dump__command() {
     registers:'List all available registers'
     ec-registers:'List all available EC registers'
     methods:'List all available ACPI methods'
-    dsl:'Disassemble your DSDT'
+    dsl:'Disassemble your ACPI tables'
   )
 
   _describe -- command items
@@ -334,7 +334,7 @@ _nbfc_rate_config() {
   local -a args=(
     '(--full-help -H)'{-H,--full-help}'[Show full help]'
     '(--all -a)'{-a,--all}'[Rate all available configuration files]'
-    '(--dsdt -d)'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--min-score -m)'{-m+,--min-score=}'[Set minimum rating threshold for configurations]':SCORE:"_numbers -f 'Set minimum rating threshold for configurations'"
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--print-rules)'--print-rules'[Print configuration rules]'
@@ -361,7 +361,7 @@ _nbfc_acpi_dump() {
   esac
 
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -373,7 +373,7 @@ _nbfc_acpi_dump() {
 
 _nbfc_acpi_dump_registers() {
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -385,7 +385,7 @@ _nbfc_acpi_dump_registers() {
 
 _nbfc_acpi_dump_ec_registers() {
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -397,7 +397,7 @@ _nbfc_acpi_dump_ec_registers() {
 
 _nbfc_acpi_dump_methods() {
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -409,7 +409,7 @@ _nbfc_acpi_dump_methods() {
 
 _nbfc_acpi_dump_dsl() {
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"

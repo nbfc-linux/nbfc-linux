@@ -395,7 +395,12 @@ int main(int argc, char *const argv[]) {
       break;
 
     case Option_Rate_Config_DSDT_File:
-      Rate_Config_Options.dsdt_file = p.optarg;
+      if (Rate_Config_Options.dsdt_files_size >= RATE_CONFIG_MAX_AML_FILES) {
+        Log_Error("%s: Too many files given", p.option->optstring);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      Rate_Config_Options.dsdt_files[Rate_Config_Options.dsdt_files_size++] = p.optarg;
       break;
 
    case Option_Rate_Config_Rules:
@@ -436,7 +441,12 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_Acpi_Dump_File:
-      Acpi_Dump_Options.file = p.optarg;
+      if (Acpi_Dump_Options.files_size >= ACPI_DUMP_MAX_AML_FILES) {
+        Log_Error("%s: Too many files given", p.option->optstring);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      Acpi_Dump_Options.files[Acpi_Dump_Options.files_size++] = p.optarg;
       break;
 
     case Option_Acpi_Dump_Json:

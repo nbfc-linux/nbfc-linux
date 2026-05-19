@@ -11,6 +11,8 @@
 #include <stdio.h>  // printf
 #include <string.h> // strcmp
 
+#define ACPI_DUMP_MAX_AML_FILES 64
+
 const struct cli99_Option acpi_dump_options[] = {
   cli99_Options_Include(&main_options),
   {"command",   Option_Acpi_Dump_Command, cli99_NormalPositional},
@@ -30,11 +32,13 @@ enum NBFC_PACKED_ENUM AcpiDump_Action {
 struct {
   enum AcpiDump_Action action;
   bool json;
-  const char* file;
+  const char* files[ACPI_DUMP_MAX_AML_FILES];
+  size_t files_size;
 } Acpi_Dump_Options = {
   AcpiDump_Action_None,
   false,
-  ACPI_ANALYSIS_ACPI_DSDT
+  {0},
+  0,
 };
 
 enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
@@ -46,9 +50,9 @@ enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
 }
 
 /*
- * Dumps the disassembled DSDT to stdout.
+ * Disassembles the AML files and writes them to stdout.
  */
-static int AcpiDump_DSL(const char* dsdt_file) {
+static int AcpiDump_DSL(array_of(str)* aml_files) {
   Error e;
   char* out;
 
@@ -58,25 +62,24 @@ static int AcpiDump_DSL(const char* dsdt_file) {
     return NBFC_EXIT_FAILURE;
   }
 
-  e = Acpi_Analysis_Get_DSL(dsdt_file, &out);
-  if (e) {
-    Log_Error("%s", err_print_all(e));
-    return NBFC_EXIT_FAILURE;
+  for_each_array(str*, file, *aml_files) {
+    e = Acpi_Analysis_Get_DSL(*file, &out);
+    if (e) {
+      Log_Error("%s", err_print_all(e));
+      return NBFC_EXIT_FAILURE;
+    }
+
+    printf("%s", out);
+    Mem_Free(out);
   }
-
-  printf("%s", out);
-
-#if STRICT_CLEANUP
-  Mem_Free(out);
-#endif
 
   return NBFC_EXIT_SUCCESS;
 }
 
 /*
- * Dumps the methods of a DSDT to stdout.
+ * Dumps the methods from the given AML files to stdout.
  */
-static int AcpiDump_Methods(const char* dsdt_file, bool json) {
+static int AcpiDump_Methods(array_of(str)* aml_files, bool json) {
   Error e;
   AcpiInfo acpi_info = {0};
 
@@ -86,7 +89,7 @@ static int AcpiDump_Methods(const char* dsdt_file, bool json) {
     return NBFC_EXIT_FAILURE;
   }
 
-  e = Acpi_Analysis_Get_Info(dsdt_file, &acpi_info);
+  e = Acpi_Analysis_Get_Info(aml_files, &acpi_info);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -128,12 +131,12 @@ static bool AcpiDump_ContainsRegion(array_of(AcpiOperationRegionName)* ec_region
 }
 
 /*
- * Dump all available registers of a DSDT to stdout.
+ * Dump all available registers from the given AML files to stdout.
  *
  * If `only_ec` is true, only output registers that are available
  * through the embedded controller.
  */
-static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
+static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec) {
   Error e;
   AcpiInfo acpi_info = {0};
 
@@ -151,7 +154,7 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
   // Get ACPI info
   // ==========================================================================
 
-  e = Acpi_Analysis_Get_Info(dsdt_file, &acpi_info);
+  e = Acpi_Analysis_Get_Info(aml_files, &acpi_info);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -206,8 +209,20 @@ static int AcpiDump_Registers(const char* dsdt_file, bool json, bool only_ec) {
   return NBFC_EXIT_SUCCESS;
 }
 
+static Error AcpiDump_MakeAMLFilesArray(array_of(str)* out) {
+  if (Acpi_Dump_Options.files_size) {
+    out->data = Acpi_Dump_Options.files;
+    out->size = Acpi_Dump_Options.files_size;
+    return err_success();
+  }
+  else {
+    return Acpi_Analysis_Get_All_AML_Files(out);
+  }
+}
+
 int AcpiDump(void) {
-  const char* const dsdt_file = Acpi_Dump_Options.file;
+  Error e;
+  array_of(str) aml_files = {0};
   const bool json = Acpi_Dump_Options.json;
 
   if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
@@ -215,21 +230,28 @@ int AcpiDump(void) {
     return NBFC_EXIT_CMDLINE;
   }
 
-  if (! file_exists(dsdt_file)) {
-    Log_Error("%s: %s", dsdt_file, strerror(errno));
-    return NBFC_EXIT_FAILURE;
+  if (! Acpi_Dump_Options.files_size) {
+    check_root();
   }
 
-  if (! file_is_readable(dsdt_file)) {
-    Log_Error("%s: %s (do you need root priviledges?)", dsdt_file, strerror(errno));
+  for (size_t i = 0; i < Acpi_Dump_Options.files_size; ++i) {
+    if (! file_is_readable(Acpi_Dump_Options.files[i])) {
+      Log_Error("%s: %s", Acpi_Dump_Options.files[i], strerror(errno));
+      return NBFC_EXIT_FAILURE;
+    }
+  }
+
+  e = AcpiDump_MakeAMLFilesArray(&aml_files);
+  if (e) {
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 
   switch (Acpi_Dump_Options.action) {
-    case AcpiDump_Action_DSL:         return AcpiDump_DSL(dsdt_file);
-    case AcpiDump_Action_Methods:     return AcpiDump_Methods(dsdt_file, json);
-    case AcpiDump_Action_Registers:   return AcpiDump_Registers(dsdt_file, json, false);
-    case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(dsdt_file, json, true);
+    case AcpiDump_Action_DSL:         return AcpiDump_DSL(&aml_files);
+    case AcpiDump_Action_Methods:     return AcpiDump_Methods(&aml_files, json);
+    case AcpiDump_Action_Registers:   return AcpiDump_Registers(&aml_files, json, false);
+    case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(&aml_files, json, true);
     default:                          return NBFC_EXIT_FAILURE;
   }
 }

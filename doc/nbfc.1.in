@@ -214,6 +214,8 @@ Set quiet mode.
 Rates a configuration by analyzing whether it appears safe to execute on the
 current system.
 
+By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.
+
 .BR \-H ", " \-\-full\-help
 .RS
 Show help on how to interpret the results.
@@ -227,7 +229,7 @@ Rate all available configuration files.
 .BR \-d ", " \-\-dsdt
 .I FILE
 .RS
-Use an alternative DSDT file.
+Use an alternative DSDT file. Can be specified multiple times.
 .RE
 
 .BR \-j ", " \-\-json
@@ -262,7 +264,9 @@ Print configuration rating rules.
 .RB { registers " | " ec\-registers " | " methods " | " dsl }
 .RI [ OPTIONS ]
 .RS
-Dumps information of your ACPI DSDT.
+Dumps information of your ACPI tables.
+
+By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.
 
 .B registers
 .RS
@@ -281,13 +285,13 @@ List all available ACPI methods.
 
 .B dsl
 .RS
-Disassemble your DSDT.
+Disassemble your ACPI tables.
 .RE
 
 .BR \-f ", " \-\-file
 .I FILE
 .RS
-Use an alternative DSDT file.
+Use an alternative DSDT file. Can be specified multiple times.
 .RE
 
 .BR \-j ", " \-\-json

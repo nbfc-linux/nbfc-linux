@@ -6,7 +6,7 @@
 #include <stdio.h>  // printf
 #include <string.h> // memset, strcmp, strstr
 
-Error ConfigRating_Init(ConfigRating* config_rating, const char* dsdt_file, const char* rules_json) {
+Error ConfigRating_Init(ConfigRating* config_rating, array_of(str)* aml_files, const char* rules_json) {
   Error e;
   memset(config_rating, 0, sizeof(*config_rating));
 
@@ -16,7 +16,7 @@ Error ConfigRating_Init(ConfigRating* config_rating, const char* dsdt_file, cons
     goto end;
   }
 
-  e = Acpi_Analysis_Get_Info(dsdt_file, &config_rating->acpi_info);
+  e = Acpi_Analysis_Get_Info(aml_files, &config_rating->acpi_info);
   if (e)
     goto end;
 

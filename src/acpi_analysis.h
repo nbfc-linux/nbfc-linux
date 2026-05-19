@@ -10,7 +10,7 @@
 
 #define ACPI_ANALYSIS_IASL      "iasl"
 #define ACPI_ANALYSIS_ACPIEXEC  "acpiexec"
-#define ACPI_ANALYSIS_ACPI_DSDT "/sys/firmware/acpi/tables/DSDT"
+#define ACPI_ANALYSIS_ACPI_DIR  "/sys/firmware/acpi/tables"
 
 /*
  * Stores a register name.
@@ -112,13 +112,15 @@ Error Acpi_Analysis_Is_IASL_Installed(void);
 Error Acpi_Analysis_Is_AcpiExec_Installed(void);
 
 Error Acpi_Analysis_Get_DSL(const char*, char**);
-Error Acpi_Analysis_Get_Info(const char*, AcpiInfo*);
+Error Acpi_Analysis_Get_Info(array_of(str)*, AcpiInfo*);
 
 bool  Acpi_Analysis_Path_Equals(const char*, const char*);
 const char* Acpi_Analysis_Get_Register_Basename(const char*);
 
 nx_json* AcpiMethod_ToJson(AcpiMethod*, const char*, nx_json*);
 nx_json* AcpiRegister_ToJson(AcpiRegister*, const char*, nx_json*);
+
+Error Acpi_Analysis_Get_All_AML_Files(array_of(str)*);
 
 void AcpiInfo_Free(AcpiInfo*);
 void AcpiMethod_Free(AcpiMethod*);

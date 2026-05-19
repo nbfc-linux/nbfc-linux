@@ -10,6 +10,8 @@
 #include <string.h> // strlen
 #include <stdlib.h> // system
 
+#define ACPI_ANALYSIS_MAX_SSDT_FILES       64
+#define ACPI_ANALYSIS_MAX_AML_FILES        65 // SSDTs + DSDT
 #define ACPI_ANALYSIS_DSDT_TEMP_FILE       "/tmp/nbfc.acpi.dsdt.XXXXXX.dat"
 #define ACPI_ANALYSIS_DSDT_TEMP_SUFFIX_LEN 4 // len of `.dat`
 
@@ -298,11 +300,11 @@ static Error Acpi_Analysis_Extract_OperationRegions(const char* output, array_of
 
 /*
  * Extracts a list of registers, methods and operation regions from the
- * DSDT file.
+ * given AML files.
  *
  * This function requires the `acpiexec` program.
  */
-Error Acpi_Analysis_Get_Info(const char* file, AcpiInfo* out) {
+Error Acpi_Analysis_Get_Info(array_of(str)* files, AcpiInfo* out) {
   Error e = err_success();
 
   // Clear output arrays
@@ -310,15 +312,15 @@ Error Acpi_Analysis_Get_Info(const char* file, AcpiInfo* out) {
 
   char* stdout_ = NULL;
   char* stderr_ = NULL;
-  char* argv[] = {
-    Mem_Strdup(ACPI_ANALYSIS_ACPIEXEC),
-    Mem_Strdup("-dt"),
-    Mem_Strdup("-di"),
-    Mem_Strdup("-b"),
-    Mem_Strdup("Objects RegionField; Objects Region; Methods; Exit"),
-    Mem_Strdup(file),
-    NULL
-  };
+  char** argv = Mem_Calloc(6 + files->size, sizeof(char*));
+  argv[0] = Mem_Strdup(ACPI_ANALYSIS_ACPIEXEC);
+  argv[1] = Mem_Strdup("-dt");
+  argv[2] = Mem_Strdup("-di");
+  argv[3] = Mem_Strdup("-b");
+  argv[4] = Mem_Strdup("Objects RegionField; Objects Region; Methods; Exit");
+  for_enumerate_array(array_size_t, i, *files) {
+    argv[5 + i] = Mem_Strdup(files->data[i]);
+  }
 
   int ret = Process_Capture(ACPI_ANALYSIS_ACPIEXEC, argv, &stdout_, &stderr_);
 
@@ -369,12 +371,9 @@ Error Acpi_Analysis_Get_Info(const char* file, AcpiInfo* out) {
   }
 
 end:
-  Mem_Free(argv[0]);
-  Mem_Free(argv[1]);
-  Mem_Free(argv[2]);
-  Mem_Free(argv[3]);
-  Mem_Free(argv[4]);
-  Mem_Free(argv[5]);
+  for (size_t i = 0; i < files->size + 5; ++i)
+    Mem_Free(argv[i]);
+  Mem_Free(argv);
   Mem_Free(stdout_);
   Mem_Free(stderr_);
   return e;
@@ -588,6 +587,35 @@ const char* Acpi_Analysis_Get_Register_Basename(const char* path) {
   }
 
   return p;
+}
+
+/**
+ * Get a list of all relevant AML files.
+ *
+ * The array must not be free'd.
+ */
+Error Acpi_Analysis_Get_All_AML_Files(array_of(str)* out) {
+  static char data[ACPI_ANALYSIS_MAX_AML_FILES][sizeof(ACPI_ANALYSIS_ACPI_DIR "/SSDT??")];
+  static const char* files[ACPI_ANALYSIS_MAX_AML_FILES];
+  array_size_t files_size;
+
+  files[0] = ACPI_ANALYSIS_ACPI_DIR "/DSDT";
+  files_size = 1;
+
+  for (size_t i = 0; i < ACPI_ANALYSIS_MAX_SSDT_FILES; ++i) {
+    snprintf(data[i], sizeof(data[0]), "%s/SSDT%zu", ACPI_ANALYSIS_ACPI_DIR, i);
+    if (file_exists(data[i])) {
+      if (files_size >= ACPI_ANALYSIS_MAX_AML_FILES)
+        return err_stringf("Too many SSDT files found in %s", ACPI_ANALYSIS_ACPI_DIR);
+
+      files[files_size++] = data[i];
+    }
+  }
+
+  out->data = files;
+  out->size = files_size;
+
+  return err_success();
 }
 
 /*

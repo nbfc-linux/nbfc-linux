@@ -159,6 +159,9 @@ This program is used to control the NoteBook FanControl service.
 > Rates a configuration by analyzing whether it appears safe to execute
 > on the current system.
 >
+> By default, the DSDT and all SSDTs are read from
+> /sys/firmware/acpi/tables.
+>
 > **-H**, **\--full-help**
 >
 > > Show help on how to interpret the results.
@@ -169,7 +172,7 @@ This program is used to control the NoteBook FanControl service.
 >
 > **-d**, **\--dsdt** *FILE*
 >
-> > Use an alternative DSDT file.
+> > Use an alternative DSDT file. Can be specified multiple times.
 >
 > **-j**, **\--json**
 >
@@ -195,7 +198,10 @@ This program is used to control the NoteBook FanControl service.
 **acpi-dump** {**registers** \| **ec-registers** \| **methods** \|
 **dsl**} \[*OPTIONS*\]
 
-> Dumps information of your ACPI DSDT.
+> Dumps information of your ACPI tables.
+>
+> By default, the DSDT and all SSDTs are read from
+> /sys/firmware/acpi/tables.
 >
 > **registers**
 >
@@ -211,11 +217,11 @@ This program is used to control the NoteBook FanControl service.
 >
 > **dsl**
 >
-> > Disassemble your DSDT.
+> > Disassemble your ACPI tables.
 >
 > **-f**, **\--file** *FILE*
 >
-> > Use an alternative DSDT file.
+> > Use an alternative DSDT file. Can be specified multiple times.
 >
 > **-j**, **\--json**
 >

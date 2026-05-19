@@ -147,6 +147,7 @@ options:
   - option_strings: ["-d", "--dsdt"]
     help: "Use an alternative DSDT file"
     metavar: "FILE"
+    repeatable: true
     complete: ["file"]
 
   - option_strings: ["-m", "--min-score"]
@@ -184,6 +185,7 @@ options:
   - option_strings: ["-f", "--file"]
     metavar: "FILE"
     help: "Use an alternative DSDT file"
+    repeatable: true
     complete: ["file"]
 
   - option_strings: ["-j", "--json"]
@@ -199,7 +201,7 @@ prog: "nbfc acpi-dump methods"
 help: "List all available ACPI methods"
 ---
 prog: "nbfc acpi-dump dsl"
-help: "Disassemble your DSDT"
+help: "Disassemble your ACPI tables"
 ---
 prog: "nbfc wait-for-hwmon"
 help: "Wait for /sys/class/hwmon/hwmon* files"

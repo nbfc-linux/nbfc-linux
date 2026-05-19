@@ -151,7 +151,7 @@ declare_array_of(ConfigRating_Rating);
 Error ConfigRatingRules_FromJson(ConfigRatingRules*, const char*);
 void  ConfigRatingRules_Free(ConfigRatingRules*);
 
-Error ConfigRating_Init(ConfigRating*, const char*, const char*);
+Error ConfigRating_Init(ConfigRating*, array_of(str)*, const char*);
 void  ConfigRating_Free(ConfigRating*);
 
 Error ConfigRating_RateModelConfig(ConfigRating*, ModelConfig*, ConfigRating_Rating*);

@@ -233,7 +233,7 @@ function _nbfc_acpi_dump__command
     registers 'List all available registers' \
     ec-registers 'List all available EC registers' \
     methods 'List all available ACPI methods' \
-    dsl 'Disassemble your DSDT'
+    dsl 'Disassemble your ACPI tables'
 end
 
 function _nbfc__command
@@ -331,7 +331,7 @@ complete -c $prog -n $C001 -s q -l quiet -d 'Enable quiet mode' -f
 set -l opts "-H --full-help -a --all -d= --dsdt= -m= --min-score= -j --json --print-rules -r= --rules= -n --no-download -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -H --full-help"
 set -l C001 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -a --all"
-set -l C002 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -d --dsdt"
+set -l C002 "$query '$opts' positional_contains 1 rate-config"
 set -l C003 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -m --min-score"
 set -l C004 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -j --json"
 set -l C005 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option --print-rules"
@@ -350,7 +350,7 @@ complete -c $prog -n $C008 -d 'Specify configuration file' -x -a '(_nbfc__filedi
 
 # command nbfc acpi-dump
 set -l opts "-f= --file= -j --json -h --help --version"
-set -l C000 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -f --file"
+set -l C000 "$query '$opts' positional_contains 1 acpi-dump"
 set -l C001 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -j --json"
 set -l C002 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 acpi-dump"
 complete -c $prog -n $C000 -s f -l file -d 'Use an alternative DSDT file' -Fr

@@ -154,6 +154,8 @@ speed.</p>
 <blockquote>
 <p>Rates a configuration by analyzing whether it appears safe to execute
 on the current system.</p>
+<p>By default, the DSDT and all SSDTs are read from
+/sys/firmware/acpi/tables.</p>
 <p><strong>-H</strong>, <strong>--full-help</strong></p>
 <blockquote>
 <p>Show help on how to interpret the results.</p>
@@ -164,7 +166,7 @@ on the current system.</p>
 </blockquote>
 <p><strong>-d</strong>, <strong>--dsdt</strong> <em>FILE</em></p>
 <blockquote>
-<p>Use an alternative DSDT file.</p>
+<p>Use an alternative DSDT file. Can be specified multiple times.</p>
 </blockquote>
 <p><strong>-j</strong>, <strong>--json</strong></p>
 <blockquote>
@@ -192,7 +194,9 @@ on the current system.</p>
 <strong>ec-registers</strong> | <strong>methods</strong> |
 <strong>dsl</strong>} [<em>OPTIONS</em>]</p>
 <blockquote>
-<p>Dumps information of your ACPI DSDT.</p>
+<p>Dumps information of your ACPI tables.</p>
+<p>By default, the DSDT and all SSDTs are read from
+/sys/firmware/acpi/tables.</p>
 <p><strong>registers</strong></p>
 <blockquote>
 <p>List all available registers.</p>
@@ -207,11 +211,11 @@ on the current system.</p>
 </blockquote>
 <p><strong>dsl</strong></p>
 <blockquote>
-<p>Disassemble your DSDT.</p>
+<p>Disassemble your ACPI tables.</p>
 </blockquote>
 <p><strong>-f</strong>, <strong>--file</strong> <em>FILE</em></p>
 <blockquote>
-<p>Use an alternative DSDT file.</p>
+<p>Use an alternative DSDT file. Can be specified multiple times.</p>
 </blockquote>
 <p><strong>-j</strong>, <strong>--json</strong></p>
 <blockquote>

@@ -602,7 +602,7 @@ _nbfc_rate_config() {
     local -a opts
     (( ! ${#OPT_full_help[@]} )) && opts+=(-H --full-help)
     (( ! ${#OPT_all[@]} )) && opts+=(-a --all)
-    (( ! ${#OPT_dsdt[@]} )) && opts+=(-d --dsdt=)
+    opts+=(-d --dsdt=)
     (( ! ${#OPT_min_score[@]} )) && opts+=(-m --min-score=)
     (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
     (( ! ${#OPT_print_rules[@]} )) && opts+=(--print-rules)
@@ -678,7 +678,7 @@ _nbfc_acpi_dump() {
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
-    (( ! ${#OPT_file[@]} )) && opts+=(-f --file=)
+    opts+=(-f --file=)
     (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace

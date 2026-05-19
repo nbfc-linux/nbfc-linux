@@ -7,7 +7,7 @@
 #include "../model_config_utils.h"
 #include "../nxjson_utils.h"
 
-#include <string.h> // memset
+#include <string.h> // memset, strerror
 #include <linux/limits.h>
 
 #include "curl_utils.h"
@@ -16,6 +16,8 @@
 #include "client_global.h"
 
 #define RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE 9.0
+
+#define RATE_CONFIG_MAX_AML_FILES 64
 
 #define RATE_CONFIG_RULES_JSON_URL \
   "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/config_rating_rules_v1.json"
@@ -43,7 +45,8 @@ struct {
   bool        min_score_set;
   float       min_score;
   const char* file;
-  const char* dsdt_file;
+  const char* dsdt_files[RATE_CONFIG_MAX_AML_FILES];
+  size_t      dsdt_files_size;
   const char* rules_file;
 } Rate_Config_Options = {
   false,
@@ -54,7 +57,8 @@ struct {
   false,
   RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE,
   NULL,
-  ACPI_ANALYSIS_ACPI_DSDT,
+  {0},
+  0,
   NULL,
 };
 
@@ -533,10 +537,22 @@ static int RateConfig_PrintRules(const char* rules_json, bool json) {
   return NBFC_EXIT_SUCCESS;
 }
 
+static Error RateConfig_MakeAMLFilesArray(array_of(str)* out) {
+  if (Rate_Config_Options.dsdt_files_size) {
+    out->data = Rate_Config_Options.dsdt_files;
+    out->size = Rate_Config_Options.dsdt_files_size;
+    return err_success();
+  }
+  else {
+    return Acpi_Analysis_Get_All_AML_Files(out);
+  }
+}
+
 int RateConfig(void) {
   Error e;
   char* rules;
   ConfigRating config_rating = {0};
+  array_of(str) dsdt_files = {0};
 
   if (Rate_Config_Options.full_help) {
     PrintFullHelp();
@@ -593,16 +609,24 @@ int RateConfig(void) {
   }
 
   // ==========================================================================
-  // Check if DSDT file exists and is readable
+  // Check if AML files are readable
   // ==========================================================================
 
-  if (! file_exists(Rate_Config_Options.dsdt_file)) {
-    Log_Error("%s: %s", Rate_Config_Options.dsdt_file, strerror(errno));
-    return NBFC_EXIT_FAILURE;
+  if (! Rate_Config_Options.dsdt_files_size) {
+    check_root();
+  }
+  else {
+    for (size_t i = 0; i < Rate_Config_Options.dsdt_files_size; ++i) {
+      if (! file_is_readable(Rate_Config_Options.dsdt_files[i])) {
+        Log_Error("%s: %s", Rate_Config_Options.dsdt_files[i], strerror(errno));
+        return NBFC_EXIT_FAILURE;
+      }
+    }
   }
 
-  if (! file_is_readable(Rate_Config_Options.dsdt_file)) {
-    Log_Error("%s: %s (do you need root priviledges?)", Rate_Config_Options.dsdt_file, strerror(errno));
+  e = RateConfig_MakeAMLFilesArray(&dsdt_files);
+  if (e) {
+    Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 
@@ -624,7 +648,7 @@ int RateConfig(void) {
   if (! rules)
     return NBFC_EXIT_FAILURE;
 
-  e = ConfigRating_Init(&config_rating, Rate_Config_Options.dsdt_file, rules);
+  e = ConfigRating_Init(&config_rating, &dsdt_files, rules);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
