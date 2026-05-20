@@ -269,6 +269,7 @@
  "- The laptop manufacturer (/sys/devices/virtual/dmi/id/sys_vendor)\n"        \
  "- The laptop model (/sys/devices/virtual/dmi/id/product_name)\n"             \
  "- The ACPI DSDT firmware table (/sys/firmware/acpi/tables/DSDT)\n"           \
+ "- The ACPI SSDT firmware tables (/sys/firmware/acpi/tables/SSDT*)\n"         \
  "\n"                                                                          \
  "The preferred method for uploading your notebook firmware is to use:\n"      \
  "  $ sudo nbfc support --upload-firmware\n"                                   \

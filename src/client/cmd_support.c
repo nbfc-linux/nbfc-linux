@@ -6,19 +6,18 @@
 #include "../log.h"
 #include "../memory.h"
 #include "../nxjson_utils.h"
+#include "../acpi_analysis.h"
 
 #include "check_root.h"
 #include "client_global.h"
 #include "curl_utils.h"
 
 #define SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL \
-  "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/firmware_upload_v1"
+  "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/firmware_upload_v2"
 
 #define SUPPORT_PAYPAL_URL "https://paypal.me/BenjaminAbendroth"
 
 #define SUPPORT_GITHUB_URL "https://github.com/nbfc-linux/nbfc-linux"
-
-#define SUPPORT_ACPI_DSDT  "/sys/firmware/acpi/tables/DSDT"
 
 #define SUPPORT_TEXT                                                           \
   "Thank you for using NBFC-Linux!\n"                                          \
@@ -96,7 +95,7 @@ static char* Support_Get_Real_Firmware_Upload_Endpoint_URL(void) {
   return real_endpoint;
 }
 
-static char* Support_Do_Upload(const char* model, const char* firmware_file) {
+static char* Support_Do_Upload(const char* model, array_of(str)* files) {
   char* endpoint_url = NULL;
   char* response = NULL;
   CURL* curl = NULL;
@@ -135,22 +134,28 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
     goto end;
   }
 
-  part = curl_mime_addpart(mime);
-  if (! part) {
-    Log_Error("curl_mime_addpart() failed");
-    goto end;
-  }
+  for_each_array(str*, file, *files) {
+    const char* name = strrchr(*file, '/');
+    if (! name)
+      continue;
 
-  code = curl_mime_name(part, "file");
-  if (code != CURLE_OK) {
-    Log_Error("curl_mime_name() failed");
-    goto end;
-  }
+    part = curl_mime_addpart(mime);
+    if (! part) {
+      Log_Error("curl_mime_addpart() failed");
+      goto end;
+    }
 
-  code = curl_mime_filedata(part, firmware_file);
-  if (code != CURLE_OK) {
-    Log_Error("curl_mime_filedata() failed");
-    goto end;
+    code = curl_mime_name(part, name + 1);
+    if (code != CURLE_OK) {
+      Log_Error("curl_mime_name() failed");
+      goto end;
+    }
+
+    code = curl_mime_filedata(part, *file);
+    if (code != CURLE_OK) {
+      Log_Error("curl_mime_filedata() failed");
+      goto end;
+    }
   }
 
   code = curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
@@ -258,11 +263,20 @@ end:
 }
 
 static int Support_Upload_Firmware(void) {
-  // Accessing `SUPPORT_ACPI_DSDT` requires root
+  Error e;
+  array_of(str) files;
+
+  // Accessing `ACPI_ANALYSIS_ACPI_DIR` requires root
   check_root();
 
+  e = Acpi_Analysis_Get_All_AML_Files(&files);
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
   // Do the upload
-  char* response = Support_Do_Upload(DMI_Get_Model_Name(), SUPPORT_ACPI_DSDT);
+  char* response = Support_Do_Upload(DMI_Get_Model_Name(), &files);
   if (! response)
     return NBFC_EXIT_FAILURE;
 
@@ -275,15 +289,34 @@ static int Support_Upload_Firmware(void) {
 }
 
 static int Support_Print_Command(void) {
+  Error e;
+  array_of(str) files;
   char* endpoint_url = Support_Get_Real_Firmware_Upload_Endpoint_URL();
+
+  e = Acpi_Analysis_Get_All_AML_Files(&files);
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
 
   printf(
     "Run the following command to upload your firmware:\n"
     "\n"
-    "sudo curl -X POST '%s' -F 'file=@" SUPPORT_ACPI_DSDT "' -F 'model=%s'\n",
+    "sudo curl -X POST '%s' \\\n"
+    " -F 'model=%s' \\\n",
     endpoint_url,
     DMI_Get_Model_Name()
   );
+
+  for_enumerate_array(array_size_t, i, files) {
+    const char* end = ((i + 1) == files.size) ? "\n" : " \\\n";
+    const char* file = files.data[i];
+    const char* name = strrchr(file, '/');
+    if (!name)
+      continue;
+
+    printf(" -F '%s=@%s'%s", name + 1, file, end);
+  }
 
 #if STRICT_CLEANUP
   Mem_Free(endpoint_url);
