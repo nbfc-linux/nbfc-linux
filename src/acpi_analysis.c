@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string.h> // strlen
 #include <stdlib.h> // system
+#include <linux/limits.h> // PATH_MAX
 
 #define ACPI_ANALYSIS_MAX_SSDT_FILES       64
 #define ACPI_ANALYSIS_MAX_AML_FILES        65 // SSDTs + DSDT

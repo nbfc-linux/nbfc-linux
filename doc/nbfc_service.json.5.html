@@ -120,6 +120,10 @@ stream-based I/O operations.</p></li>
 functions such as time, environment, and process control.</p></li>
 </ul>
 </blockquote>
+<p><strong>FirmwareFingerprint</strong>: <em>Array of String</em></p>
+<blockquote>
+<p>See <strong>FIRMWARE FINGERPRINTING</strong>.</p>
+</blockquote>
 <p><strong>FanConfigurations</strong>: <em>Array of
 FanConfiguration</em></p>
 <blockquote>
@@ -519,6 +523,100 @@ functions.</p>
 rate-config</strong> replaces all NBFC-specific Lua functions with dummy
 implementations that always return <strong>nil</strong>,
 <strong>1</strong>.</p>
+<h1>FIRMWARE FINGERPRINTING</h1>
+<p>Firmware fingerprinting can be used to ensure that a configuration
+file matches a specific notebook firmware.</p>
+<p>This is especially important for configurations that invoke WMI
+methods. Many notebook vendors reuse the same WMI method names across
+different notebook models while changing the internal implementation and
+method arguments. As a result, matching method names alone is often
+insufficient to determine whether a configuration is compatible with a
+specific firmware.</p>
+<p>Fingerprinting allows AML methods to be analyzed for specific code
+patterns.</p>
+<h2>Fingerprint Syntax</h2>
+<p>Fingerprints are written using AML syntax. A fingerprint always
+begins with a method definition, followed by AML code that is searched
+for within the method body.</p>
+<p>In addition to regular AML syntax, two wildcard operators are
+supported:</p>
+<p><strong>..</strong></p>
+<blockquote>
+<p>Matches any code within the current block scope, but only at the
+current scope level.</p>
+</blockquote>
+<p><strong>...</strong></p>
+<blockquote>
+<p>Matches any code within the current block scope, including code
+contained in nested scopes.</p>
+</blockquote>
+<p>Example:</p>
+<blockquote>
+<p>Given the following method:</p>
+<blockquote>
+<pre><code>Method (\FOO, 2, Serialized) {
+    SMTH()
+
+    Switch (Arg0) {
+        Case (0xDEAD) {
+            If (Arg1 == 0xBEEF) {
+                FMTH()
+                Return (One)
+            }
+        }
+    }
+}</code></pre>
+</blockquote>
+<p>The following patterns would <strong>match</strong>:</p>
+<blockquote>
+<ul>
+<li><p>Method(\FOO)</p></li>
+<li><p>Method(\FOO) { ... 0xDEAD</p></li>
+<li><p>Method(\FOO) { ... 0xBEEF</p></li>
+<li><p>Method(\FOO) { ... Switch (Arg0) { .. Case (0xDEAD)</p></li>
+<li><p>Method(\FOO) { ... Switch (Arg0) { .. Case (0xDEAD) { ... If
+(Arg1 == 0xBEEF)</p></li>
+<li><p>Method(\FOO) { ... Switch (Arg0) { .. Case (0xDEAD) { ... If
+(Arg1 == 0xBEEF) { ... FMTH()</p></li>
+<li><p>Method(\FOO) { ... Switch (Arg0) { .. Case (0xDEAD) { ...
+FMTH()</p></li>
+</ul>
+</blockquote>
+<p>The following patterns would <strong>not match</strong>:</p>
+<blockquote>
+<ul>
+<li><p>Method(\FOO) { .. 0xDEAD</p></li>
+<li><p>Method(\FOO) { Switch (Arg0)</p></li>
+</ul>
+</blockquote>
+</blockquote>
+<h2>Matching Rules</h2>
+<blockquote>
+<ul>
+<li><p>Whitespace is ignored</p></li>
+<li><p>Comments are ignored</p></li>
+<li><p>Only the basename of the identifiers are matched</p></li>
+<li><p>Only scope hierarchy and ordering are considered</p></li>
+<li><p>Intermediate code between matched blocks is ignored</p></li>
+</ul>
+</blockquote>
+<h2>Recommendations</h2>
+<p>When writing fingerprints:</p>
+<blockquote>
+<ul>
+<li><p>Match magic numbers used by WMI method calls whenever
+possible</p></li>
+<li><p>Do not use fully qualified identifiers (use <strong>FOO</strong>
+instead of <strong>\_SB.DEV0.FOO</strong>)</p></li>
+<li><p>Avoid unnecessary parentheses, as they are ignored during
+matching (use <strong>If (FOO == 0x0)</strong> instead of <strong>If
+((Foo == 0x0))</strong>)</p></li>
+<li><p>The <strong>..</strong> operator should only be used when
+matching a direct child block is required. A common example is matching
+<strong>Case()</strong> blocks within a <strong>Switch()</strong>
+statement, where only direct descendants should be considered.</p></li>
+</ul>
+</blockquote>
 <h1>FILES</h1>
 <p><em>/etc/nbfc/nbfc.json</em></p>
 <blockquote>

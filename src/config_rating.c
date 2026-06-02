@@ -20,6 +20,10 @@ Error ConfigRating_Init(ConfigRating* config_rating, array_of(str)* aml_files, c
   if (e)
     goto end;
 
+  e = AML_Analysis_Init(&config_rating->aml_analysis, aml_files);
+  if (e)
+    goto end;
+
 end:
   if (e)
     ConfigRating_Free(config_rating);
@@ -29,6 +33,7 @@ end:
 
 void ConfigRating_Free(ConfigRating* config_rating) {
   AcpiInfo_Free(&config_rating->acpi_info);
+  AML_Analysis_Free(&config_rating->aml_analysis);
   ConfigRatingRules_Free(&config_rating->rules);
   memset(config_rating, 0, sizeof(*config_rating));
 }
@@ -302,6 +307,14 @@ void ConfigRating_RatingPrint(ConfigRating_Rating* rating) {
     ConfigRating_MethodRatingPrint(met_rating);
 }
 
+Error ConfigRating_MatchFirmwareFingerprint(
+  ConfigRating* config_rating,
+  const char* fingerprint,
+  bool* match)
+{
+  return AML_Analysis_MatchFingerprint(&config_rating->aml_analysis, fingerprint, match);
+}
+
 Error ConfigRating_RateModelConfig(
   ConfigRating* config_rating,
   ModelConfig* model_config,
@@ -363,7 +376,7 @@ Error ConfigRating_RateModelConfig(
   // ==========================================================================
   // Calculate the score
   // ==========================================================================
-  
+
   int points = 0;
   int priority = (registers_size + methods_size);
 
@@ -420,6 +433,23 @@ Error ConfigRating_RateModelConfig(
     }
 
     points += method_points;
+  }
+
+  // ==========================================================================
+  // Do firmware fingerprint check
+  // ==========================================================================
+
+  for_each_array(str*, fingerprint, model_config->FirmwareFingerprint) {
+    bool match;
+
+    e = ConfigRating_MatchFirmwareFingerprint(config_rating, *fingerprint, &match);
+    if (e)
+      return e;
+
+    if (! match) {
+      points = 0;
+      break;
+    }
   }
 
 end:

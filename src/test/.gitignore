@@ -1,2 +1,6 @@
 test_acpi_call
+test_aml_analysis
+test_aml_lexer
 test_config
+DSDT.aml
+fingerprint_current_firmware

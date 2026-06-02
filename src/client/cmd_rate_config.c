@@ -279,7 +279,13 @@ static array_size_t RateConfig_GroupRatingsBySimilarConfig(array_of(ConfigWithDa
       if (configs->data[j].group_id != group_unset)
         continue;
 
-      if (ModelConfig_IsSimilar(&configs->data[i].model_config, &configs->data[j].model_config))
+      const bool similar = ModelConfig_IsSimilar(
+          &configs->data[i].model_config,
+          &configs->data[j].model_config);
+
+      const bool same_rating = (configs->data[i].rating.score == configs->data[j].rating.score);
+
+      if (similar && same_rating)
         configs->data[j].group_id = next_group;
     }
 

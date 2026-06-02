@@ -47,6 +47,8 @@ typedef size_t array_size_t;
     array_size_t size;                                \
   }
 
+typedef const char* str;
+declare_array_of(str);
 declare_array_of(array_size_t);
 declare_array_of(float);
 declare_array_of(int);

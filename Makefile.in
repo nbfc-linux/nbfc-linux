@@ -296,6 +296,9 @@ src/nbfc: \
 	src/client/str_functions.c \
 	src/client/str_functions.h \
 	src/acpi_analysis.h src/acpi_analysis.c \
+	src/aml_analysis.h src/aml_analysis.c \
+	src/aml_lexer.h src/aml_lexer.c \
+	src/aml_parser.h src/aml_parser.c \
 	src/config_analysis.h src/config_analysis.c \
 	src/config_rating.h src/config_rating.c \
 	src/config_rating_rules.h src/config_rating_rules.c \

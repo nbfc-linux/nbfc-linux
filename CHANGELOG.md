@@ -1,5 +1,10 @@
 # Changelog
 
+## nbfc-linux-0.5.3 (2026-06-02)
+
+- Added firmware fingerprinting support to improve automatic configuration
+  matching and compatibility verification.
+
 ## nbfc-linux-0.5.2 (2026-05-10)
 
 - Added `nbfc xml2json` command

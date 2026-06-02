@@ -601,6 +601,7 @@ struct ModelConfig {
 	uint16_t        CriticalTemperatureOffset;
 	bool            ReadWriteWords;
 	Sponsor         Sponsor;
+	array_of(str)   FirmwareFingerprint;
 	array_of(FanConfiguration) FanConfigurations;
 	array_of(RegisterWriteConfiguration) RegisterWriteConfigurations;
 	uint16_t        _set;
@@ -719,28 +720,40 @@ static inline bool ModelConfig_IsSet_Sponsor(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 8);
 }
 
-static inline void ModelConfig_Set_FanConfigurations(ModelConfig* o) {
+static inline void ModelConfig_Set_FirmwareFingerprint(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 9);
 }
 
-static inline void ModelConfig_UnSet_FanConfigurations(ModelConfig* o) {
+static inline void ModelConfig_UnSet_FirmwareFingerprint(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 9);
 }
 
-static inline bool ModelConfig_IsSet_FanConfigurations(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_FirmwareFingerprint(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 9);
 }
 
-static inline void ModelConfig_Set_RegisterWriteConfigurations(ModelConfig* o) {
+static inline void ModelConfig_Set_FanConfigurations(ModelConfig* o) {
 	o->_set |= (uint16_t) (1U << 10);
 }
 
-static inline void ModelConfig_UnSet_RegisterWriteConfigurations(ModelConfig* o) {
+static inline void ModelConfig_UnSet_FanConfigurations(ModelConfig* o) {
 	o->_set &= (uint16_t) ~(1U << 10);
 }
 
-static inline bool ModelConfig_IsSet_RegisterWriteConfigurations(const ModelConfig* o) {
+static inline bool ModelConfig_IsSet_FanConfigurations(const ModelConfig* o) {
 	return o->_set & (uint16_t) (1U << 10);
+}
+
+static inline void ModelConfig_Set_RegisterWriteConfigurations(ModelConfig* o) {
+	o->_set |= (uint16_t) (1U << 11);
+}
+
+static inline void ModelConfig_UnSet_RegisterWriteConfigurations(ModelConfig* o) {
+	o->_set &= (uint16_t) ~(1U << 11);
+}
+
+static inline bool ModelConfig_IsSet_RegisterWriteConfigurations(const ModelConfig* o) {
+	return o->_set & (uint16_t) (1U << 11);
 }
 
 struct FanTemperatureSourceConfig {

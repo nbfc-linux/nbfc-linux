@@ -186,6 +186,14 @@ Provides operating system interface functions such as time, environment, and pro
 .RE
 
 .PP
+.BR FirmwareFingerprint :
+.I Array of String
+.RS
+See
+.BR "FIRMWARE FINGERPRINTING" .
+.RE
+
+.PP
 .BR FanConfigurations :
 .I Array of FanConfiguration
 .RS
@@ -754,6 +762,125 @@ During rating,
 .B nbfc rate-config
 replaces all NBFC-specific Lua functions with dummy implementations that always return
 .BR nil ", " 1 .
+
+.SH FIRMWARE FINGERPRINTING
+.PP
+Firmware fingerprinting can be used to ensure that a configuration file matches
+a specific notebook firmware.
+
+This is especially important for configurations that invoke WMI methods.
+Many notebook vendors reuse the same WMI method names across different notebook
+models while changing the internal implementation and method arguments.
+As a result, matching method names alone is often insufficient to determine
+whether a configuration is compatible with a specific firmware.
+
+Fingerprinting allows AML methods to be analyzed for specific code patterns.
+
+.SS
+Fingerprint Syntax
+
+Fingerprints are written using AML syntax.
+A fingerprint always begins with a method definition, followed by AML code that
+is searched for within the method body.
+
+In addition to regular AML syntax, two wildcard operators are supported:
+
+.B ..
+.RS
+Matches any code within the current block scope, but only at the current scope level.
+.RE
+
+.B ...
+.RS
+Matches any code within the current block scope, including code contained in nested scopes.
+.RE
+
+Example:
+.RS
+
+Given the following method:
+
+.RS
+.nf
+Method (\eFOO, 2, Serialized) {
+    SMTH()
+
+    Switch (Arg0) {
+        Case (0xDEAD) {
+            If (Arg1 == 0xBEEF) {
+                FMTH()
+                Return (One)
+            }
+        }
+    }
+}
+.fi
+.RE
+
+The following patterns would
+.BR match :
+.RS
+.IP \(bu 2
+Method(\\FOO)
+.IP \(bu 2
+Method(\\FOO) { ... 0xDEAD
+.IP \(bu 2
+Method(\\FOO) { ... 0xBEEF
+.IP \(bu 2
+Method(\\FOO) { ... Switch (Arg0) { .. Case (0xDEAD)
+.IP \(bu 2
+Method(\\FOO) { ... Switch (Arg0) { .. Case (0xDEAD) { ... If (Arg1 == 0xBEEF)
+.IP \(bu 2
+Method(\\FOO) { ... Switch (Arg0) { .. Case (0xDEAD) { ... If (Arg1 == 0xBEEF) { ... FMTH()
+.IP \(bu 2
+Method(\\FOO) { ... Switch (Arg0) { .. Case (0xDEAD) { ... FMTH()
+.RE
+
+The following patterns would
+.BR "not match" :
+.RS
+.IP \(bu 2
+Method(\\FOO) { .. 0xDEAD
+.IP \(bu 2
+Method(\\FOO) { Switch (Arg0)
+.RE
+.RE
+
+.SS Matching Rules
+.RS
+.IP \(bu 2
+Whitespace is ignored
+.IP \(bu 2
+Comments are ignored
+.IP \(bu 2
+Only the basename of the identifiers are matched
+.IP \(bu 2
+Only scope hierarchy and ordering are considered
+.IP \(bu 2
+Intermediate code between matched blocks is ignored
+.RE
+
+.SS Recommendations
+When writing fingerprints:
+.RS
+.IP \(bu 2
+Match magic numbers used by WMI method calls whenever possible
+.IP \(bu 2
+Do not use fully qualified identifiers
+.RB "(use " "FOO" " instead of " "\\_SB.DEV0.FOO" ")"
+.IP \(bu 2
+Avoid unnecessary parentheses, as they are ignored during matching
+.RB "(use " "If (FOO == 0x0)" " instead of " "If ((Foo == 0x0))" ")"
+.IP \(bu 2
+The
+.B ..
+operator should only be used when matching a direct child block is required.
+A common example is matching
+.B Case()
+blocks within a
+.B Switch()
+statement, where only direct descendants should be considered.
+.RE
 
 .SH FILES
 .PP

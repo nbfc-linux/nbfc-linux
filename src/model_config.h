@@ -62,9 +62,6 @@ typedef char                          TemperatureAlgorithmType;
 
 #endif /* packed enums */
 
-typedef const char* str;
-declare_array_of(str);
-
 typedef struct LuaCode LuaCode;
 struct LuaCode {
   int function;

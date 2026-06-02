@@ -3,6 +3,7 @@
 
 #include "macros.h"
 #include "model_config.h"
+#include "aml_analysis.h"
 #include "acpi_analysis.h"
 #include "config_analysis.h"
 #include "config_rating_rules.h"
@@ -21,6 +22,7 @@
  */
 struct ConfigRating {
   AcpiInfo acpi_info;
+  AML_Analysis aml_analysis;
   ConfigRatingRules rules;
 };
 typedef struct ConfigRating ConfigRating;

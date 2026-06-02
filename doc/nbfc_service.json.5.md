@@ -123,6 +123,10 @@ State file of the service (*/var/run/nbfc/state.json*).
 > -   **os**: Provides operating system interface functions such as
 >     time, environment, and process control.
 
+**FirmwareFingerprint**: *Array of String*
+
+> See **FIRMWARE FINGERPRINTING**.
+
 **FanConfigurations**: *Array of FanConfiguration*
 
 > Array of at least one FanConfiguration
@@ -503,6 +507,110 @@ If a configuration uses Lua code, ensure that it works correctly with
 **nbfc rate-config**. During rating, **nbfc rate-config** replaces all
 NBFC-specific Lua functions with dummy implementations that always
 return **nil**, **1**.
+
+# FIRMWARE FINGERPRINTING
+
+Firmware fingerprinting can be used to ensure that a configuration file
+matches a specific notebook firmware.
+
+This is especially important for configurations that invoke WMI methods.
+Many notebook vendors reuse the same WMI method names across different
+notebook models while changing the internal implementation and method
+arguments. As a result, matching method names alone is often
+insufficient to determine whether a configuration is compatible with a
+specific firmware.
+
+Fingerprinting allows AML methods to be analyzed for specific code
+patterns.
+
+## Fingerprint Syntax
+
+Fingerprints are written using AML syntax. A fingerprint always begins
+with a method definition, followed by AML code that is searched for
+within the method body.
+
+In addition to regular AML syntax, two wildcard operators are supported:
+
+**..**
+
+> Matches any code within the current block scope, but only at the
+> current scope level.
+
+**\...**
+
+> Matches any code within the current block scope, including code
+> contained in nested scopes.
+
+Example:
+
+> Given the following method:
+>
+> > Method (\FOO, 2, Serialized) {
+> >         SMTH()
+> >
+> >         Switch (Arg0) {
+> >             Case (0xDEAD) {
+> >                 If (Arg1 == 0xBEEF) {
+> >                     FMTH()
+> >                     Return (One)
+> >                 }
+> >             }
+> >         }
+> >     }
+>
+> The following patterns would **match**:
+>
+> > -   Method(\\FOO)
+> >
+> > -   Method(\\FOO) { \... 0xDEAD
+> >
+> > -   Method(\\FOO) { \... 0xBEEF
+> >
+> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD)
+> >
+> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \... If
+> >     (Arg1 == 0xBEEF)
+> >
+> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \... If
+> >     (Arg1 == 0xBEEF) { \... FMTH()
+> >
+> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \...
+> >     FMTH()
+>
+> The following patterns would **not match**:
+>
+> > -   Method(\\FOO) { .. 0xDEAD
+> >
+> > -   Method(\\FOO) { Switch (Arg0)
+
+## Matching Rules
+
+> -   Whitespace is ignored
+>
+> -   Comments are ignored
+>
+> -   Only the basename of the identifiers are matched
+>
+> -   Only scope hierarchy and ordering are considered
+>
+> -   Intermediate code between matched blocks is ignored
+
+## Recommendations
+
+When writing fingerprints:
+
+> -   Match magic numbers used by WMI method calls whenever possible
+>
+> -   Do not use fully qualified identifiers (use **FOO** instead of
+>     **\\\_SB.DEV0.FOO**)
+>
+> -   Avoid unnecessary parentheses, as they are ignored during matching
+>     (use **If (FOO == 0x0)** instead of **If ((Foo == 0x0))**)
+>
+> -   The **..** operator should only be used when matching a direct
+>     child block is required. A common example is matching **Case()**
+>     blocks within a **Switch()** statement, where only direct
+>     descendants should be considered.
 
 # FILES
 

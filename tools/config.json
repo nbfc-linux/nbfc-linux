@@ -331,6 +331,11 @@
         "required": false
       },
       {
+        "name": "FirmwareFingerprint",
+        "type": "array_of(str)",
+        "required": false
+      },
+      {
         "name": "FanConfigurations",
         "type": "array_of(FanConfiguration)",
         "valid": "parameter.size > 0",

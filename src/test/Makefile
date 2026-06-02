@@ -1,4 +1,9 @@
-all: test_config test_acpi_call
+all: \
+	test_config \
+	test_acpi_call \
+	test_aml_lexer \
+	test_aml_analysis \
+	fingerprint_current_firmware
 
 test_config: test_config.c
 	$(CC) -O2 test_config.c -llua -o test_config
@@ -42,6 +47,24 @@ test_acpi_call: test_acpi_call.c
 	$(CC) -O2 test_acpi_call.c -o test_acpi_call
 	./test_acpi_call
 
+test_aml_lexer: test_aml_lexer.c
+	$(CC) -O2 test_aml_lexer.c -o test_aml_lexer
+	./test_aml_lexer
+
+DSDT.aml: DSDT.dsl
+	iasl DSDT.dsl
+
+test_aml_analysis: test_aml_analysis.c DSDT.aml
+	$(CC) -O2 test_aml_analysis.c -o test_aml_analysis
+	./test_aml_analysis
+
+fingerprint_current_firmware: fingerprint_current_firmware.c
+	$(CC) -O2 fingerprint_current_firmware.c -o fingerprint_current_firmware
+
 clean:
+	rm -f ./DSDT.aml
+	rm -f ./test_aml_lexer
+	rm -f ./test_aml_analysis
 	rm -f ./test_acpi_call
 	rm -f ./test_config
+	rm -f ./fingerprint_current_firmware

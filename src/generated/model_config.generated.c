@@ -480,6 +480,9 @@ Error ModelConfig_ValidateFields(ModelConfig* self) {
 	if (false)
 		return err_stringf("%s: %s", "Sponsor", "Missing option");
 
+	if (false)
+		return err_stringf("%s: %s", "FirmwareFingerprint", "Missing option");
+
 	if (! ModelConfig_IsSet_FanConfigurations(self))
 		return err_stringf("%s: %s", "FanConfigurations", "Missing option");
 	else if (! (self->FanConfigurations.size > 0))
@@ -544,6 +547,11 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 			e = Sponsor_FromJson(&obj->Sponsor, c);
 			if (!e)
 				ModelConfig_Set_Sponsor(obj);
+		}
+		else if (!strcmp(c->key, "FirmwareFingerprint")) {
+			e = array_of_str_FromJson(&obj->FirmwareFingerprint, c);
+			if (!e)
+				ModelConfig_Set_FirmwareFingerprint(obj);
 		}
 		else if (!strcmp(c->key, "FanConfigurations")) {
 			e = array_of_FanConfiguration_FromJson(&obj->FanConfigurations, c);
