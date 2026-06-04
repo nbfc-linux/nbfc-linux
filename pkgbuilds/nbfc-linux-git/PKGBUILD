@@ -8,8 +8,8 @@ pkgrel=1
 pkgdesc="Lightweight C port of NoteBook FanControl (no Mono required)"
 arch=('i686' 'x86_64')
 url="https://github.com/nbfc-linux/nbfc-linux"
-depends=('acpica' 'acpi_call' 'libxml2')
-makedepends=('git' 'curl' 'openssl' 'libxml2')
+depends=('acpica' 'acpi_call' 'curl' 'openssl' 'libxml2' 'lua54')
+makedepends=('git' 'curl' 'openssl' 'libxml2' 'lua54')
 license=('GPL3')
 provides=('nbfc')
 conflicts=('nbfc')
@@ -17,19 +17,20 @@ source=("${_pkgname}::git+${url}.git")
 sha256sums=('SKIP')
 
 pkgver() {
-	cd "${srcdir}/${_pkgname}"
+  cd "${srcdir}/${_pkgname}"
 
-	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g' | sed 's/.beta//g'
+  #git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g' | sed 's/.beta//g'
+  grep AC_INIT ./configure.ac | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+'
 }
 
 build() {
-	cd "${srcdir}/${_pkgname}"
+  cd "${srcdir}/${_pkgname}"
 
   ./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --bindir=/usr/bin && make
 }
 
 package() {
-	cd "${srcdir}/${_pkgname}"
+  cd "${srcdir}/${_pkgname}"
 
   make DESTDIR="${pkgdir}" install
 }
