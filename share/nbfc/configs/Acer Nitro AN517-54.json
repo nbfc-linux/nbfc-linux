@@ -1,0 +1,181 @@
+{
+ "NotebookModel": "Acer Nitro AN517-54",
+ "Author": "CasualAnimalEnjoyer",
+ "EcPollInterval": 3000,
+ "ReadWriteWords": true,
+ "CriticalTemperature": 95,
+ "FanConfigurations": [
+	{
+	 "ReadRegister": 19,
+	 "WriteRegister": 55,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 5454,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 10,
+	 "FanDisplayName": "11th Gen Intel i5-11400H",
+	 "TemperatureThresholds": [
+	  {
+	  "UpThreshold": 56,
+	  "DownThreshold": 0,
+	  "FanSpeed": 0.0 
+	  },
+	  {
+	  "UpThreshold": 60,
+	  "DownThreshold": 56,
+	  "FanSpeed": 10.0
+	  },
+	  {
+	  "UpThreshold": 64,
+	  "DownThreshold": 60,
+	  "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 64,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 68,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 74,
+	   "DownThreshold": 72,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 78,
+	   "DownThreshold": 74,
+	   "FanSpeed": 60.0
+	  },
+	  {
+	   "UpThreshold": 82,
+	   "DownThreshold": 78,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 84,
+	   "DownThreshold": 82,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 86,
+	   "DownThreshold": 84,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 88,
+	   "DownThreshold": 86,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	},
+	{
+	 "ReadRegister": 21,
+	 "WriteRegister": 58,
+	 "MinSpeedValue": 0,
+	 "MaxSpeedValue": 100,
+	 "IndependentReadMinMaxValues": false,
+	 "MinSpeedValueRead": 0,
+	 "MaxSpeedValueRead": 6382,
+	 "ResetRequired": true,
+	 "FanSpeedResetValue": 20,
+	 "FanDisplayName": "GeForce RTX 3050",
+	 "TemperatureThresholds": [
+{
+	   "UpThreshold": 57,
+	   "DownThreshold": 0,
+	   "FanSpeed": 0.0
+	  },
+	  {
+	   "UpThreshold": 59,
+	   "DownThreshold": 57,
+	   "FanSpeed": 10.0
+	  },
+	  {
+	   "UpThreshold": 60,
+	   "DownThreshold": 59,
+	   "FanSpeed": 20.0
+	  },
+	  {
+	   "UpThreshold": 62,
+	   "DownThreshold": 60,
+	   "FanSpeed": 30.0
+	  },
+	  {
+	   "UpThreshold": 65,
+	   "DownThreshold": 62,
+	   "FanSpeed": 40.0
+	  },
+	  {
+	   "UpThreshold": 66,
+	   "DownThreshold": 64,
+	   "FanSpeed": 50.0
+	  },
+	  {
+	   "UpThreshold": 68,
+	   "DownThreshold": 66,
+	   "FanSpeed": 60.0
+	  },
+	  {
+	   "UpThreshold": 72,
+	   "DownThreshold": 68,
+	   "FanSpeed": 70.0
+	  },
+	  {
+	   "UpThreshold": 76,
+	   "DownThreshold": 72,
+	   "FanSpeed": 80.0
+	  },
+	  {
+	   "UpThreshold": 82,
+	   "DownThreshold": 76,
+	   "FanSpeed": 90.0
+	  },
+	  {
+	   "UpThreshold": 86,
+	   "DownThreshold": 82,
+	   "FanSpeed": 100.0
+	  }
+	 ],
+	 "FanSpeedPercentageOverrides": []
+	}
+ ],
+ "RegisterWriteConfigurations": [
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 3,
+	 "Value": 17,
+	 "ResetRequired": true,
+	 "ResetValue": 0,
+	 "ResetWriteMode": "Set",
+	 "Description": "The 0x03 register must be set to 17/81(for battery mode) Make manual fan control possible"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 34,
+	 "Value": 12,
+	 "ResetRequired": true,
+	 "ResetValue": 4,
+	 "ResetWriteMode": "Set",
+	 "Description": "CPU fan manual mode"
+	},
+	{
+	 "WriteMode": "Set",
+	 "WriteOccasion": "OnInitialization",
+	 "Register": 33,
+	 "Value": 48,
+	 "ResetRequired": true,
+	 "ResetValue": 16,
+	 "ResetWriteMode": "Set",
+	 "Description": "GPU fan manual mode"
+	}
+ ]
+}
