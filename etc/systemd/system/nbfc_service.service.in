@@ -6,6 +6,7 @@ ExecStart=@BINDIR@/nbfc start
 ExecStop=@BINDIR@/nbfc stop
 Type=forking
 PIDFile=@RUNSTATEDIR@/nbfc_service.pid
+TimeoutStartSec=40
 TimeoutStopSec=20
 Restart=on-failure
 
