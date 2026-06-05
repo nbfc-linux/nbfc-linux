@@ -47,18 +47,25 @@
  ""
 
 #define CLIENT_CONFIG_HELP_TEXT                                                \
- "Usage: nbfc config [-h] (-l | -s config | -a config | -r)\n"                 \
+ "Usage: nbfc config [-h] (-l | -s CONFIG | -a CONFIG | -r)\n"                 \
  "\n"                                                                          \
  "Set or list configurations for the NBFC service.\n"                          \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
- "  -l, --list            List all available configs\n"                        \
+ "  -l, --list            List all available configuration file names\n"       \
  "  -s CONFIG, --set CONFIG\n"                                                 \
- "                        Set a config\n"                                      \
+ "                        Set a configuration file as the selected config\n"     \
+ "                        (use --list to see available file names)\n"           \
  "  -a CONFIG, --apply CONFIG\n"                                               \
- "                        Set a config and start the service\n"                \
+ "                        Set a configuration file and start the service\n"      \
+ "                        (use --list to see available file names)\n"           \
  "  -r, --recommend       List configs with a similar notebook model name\n"   \
+ "\n"                                                                          \
+ "CONFIG is the configuration file name (without .json extension),\n"          \
+ "not the notebook model name.\n"                                              \
+ "For example, use \"Lenovo Thinkpad L540\" instead of \"Thinkpad L540\".\n"     \
+ "Use --list to see all available configuration file names.\n"                  \
  "\n"                                                                          \
  "If CONFIG is \"auto\", the service will attempt to automatically select\n"   \
  "a matching configuration.\n"                                                 \

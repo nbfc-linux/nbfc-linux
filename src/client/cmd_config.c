@@ -146,6 +146,7 @@ int Set_Or_Apply(void) {
     ConfigFile* found = ConfigFiles_FindIgnoreCase(&files, config);
     if (! found) {
       Log_Error("No such configuration available: %s", config);
+      Log_Error("Use \"nbfc config --list\" to see available configuration file names");
       return NBFC_EXIT_FAILURE;
     }
 
