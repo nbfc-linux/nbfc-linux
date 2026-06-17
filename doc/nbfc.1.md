@@ -174,6 +174,10 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Use an alternative DSDT file. Can be specified multiple times.
 >
+> **-D**, **\--dsdt-dir** *DIRECTORY*
+>
+> > Use an alternative DSDT directory.
+>
 > **-j**, **\--json**
 >
 > > Use JSON output.
@@ -219,9 +223,13 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Disassemble your ACPI tables.
 >
-> **-f**, **\--file** *FILE*
+> **-d**, **\--dsdt** *FILE*
 >
 > > Use an alternative DSDT file. Can be specified multiple times.
+>
+> **-D**, **\--dsdt-dir** *DIRECTORY*
+>
+> > Use an alternative DSDT directory.
 >
 > **-j**, **\--json**
 >
@@ -238,6 +246,21 @@ This program is used to control the NoteBook FanControl service.
 > **\--print-command**
 >
 > > Print command for manual firmware upload.
+>
+> **\--create-archive** *FILE*
+>
+> > Creates a compressed **tar.gz** archive containing information
+> > required for support and hardware analysis.
+> >
+> > The archive includes:
+> >
+> > -   The output of **nbfc get-model-name**
+> >
+> > -   The output of **nbfc sensors list**
+> >
+> > -   Firmware DSDT (*/sys/firmware/acpi/tables/DSDT*)
+> >
+> > -   Firmware SSDTs (*/sys/firmare/acpi/tables/SSDT\**)
 
 **get-model-name**
 

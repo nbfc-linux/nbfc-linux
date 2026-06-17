@@ -15,9 +15,10 @@
 
 const struct cli99_Option acpi_dump_options[] = {
   cli99_Options_Include(&main_options),
-  {"command",   Option_Acpi_Dump_Command, cli99_NormalPositional},
-  {"-f|--file", Option_Acpi_Dump_File,    cli99_RequiredArgument},
-  {"-j|--json", Option_Acpi_Dump_Json,    cli99_NoArgument      },
+  {"command",       Option_Acpi_Dump_Command,   cli99_NormalPositional},
+  {"-d|--dsdt",     Option_Acpi_Dump_DSDT_File, cli99_RequiredArgument},
+  {"-D|--dsdt-dir", Option_Acpi_Dump_DSDT_Dir,  cli99_RequiredArgument},
+  {"-j|--json",     Option_Acpi_Dump_Json,      cli99_NoArgument      },
   cli99_Options_End()
 };
 
@@ -34,11 +35,13 @@ struct {
   bool json;
   const char* files[ACPI_DUMP_MAX_AML_FILES];
   size_t files_size;
+  const char* dir;
 } Acpi_Dump_Options = {
   AcpiDump_Action_None,
   false,
   {0},
   0,
+  NULL,
 };
 
 enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
@@ -215,8 +218,11 @@ static Error AcpiDump_MakeAMLFilesArray(array_of(str)* out) {
     out->size = Acpi_Dump_Options.files_size;
     return err_success();
   }
+  else if (Acpi_Dump_Options.dir) {
+    return Acpi_Analysis_Get_All_AML_Files(Acpi_Dump_Options.dir, out);
+  }
   else {
-    return Acpi_Analysis_Get_All_AML_Files(out);
+    return Acpi_Analysis_Get_All_AML_Files(NULL, out);
   }
 }
 
@@ -230,7 +236,7 @@ int AcpiDump(void) {
     return NBFC_EXIT_CMDLINE;
   }
 
-  if (! Acpi_Dump_Options.files_size) {
+  if (! Acpi_Dump_Options.files_size && ! Acpi_Dump_Options.dir) {
     check_root();
   }
 

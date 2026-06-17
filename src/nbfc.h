@@ -4,6 +4,8 @@
 #define NBFC_VERSION                     VERSION
 #define NBFC_MAX_FILE_SIZE               32768
 #define NBFC_TEMPERATURE_FILTER_TIMESPAN 6000 /*ms*/
+#define NBFC_MAX_CONNECTIONS             16
+
 #define NBFC_MODEL_CONFIGS_DIR           DATADIR "/nbfc/configs"
 #define NBFC_MODEL_SUPPORT_FILE          DATADIR "/nbfc/model_support.json"
 #define NBFC_MUTABLE_DIR                 "/var/lib/nbfc"
@@ -14,7 +16,9 @@
 #define NBFC_SERVICE_CONFIG              SYSCONFDIR "/nbfc/nbfc.json"
 #define NBFC_PID_FILE                    RUNSTATEDIR "/nbfc_service.pid"
 #define NBFC_SOCKET_PATH                 RUNSTATEDIR "/nbfc_service.socket"
-#define NBFC_MAX_CONNECTIONS             16
+
+#define NBFC_MAKE_ARCHIVE_SCRIPT         "make_archive.sh"
+#define NBFC_MAKE_ARCHIVE_SCRIPT_FILE    LIBDIR "/nbfc/" NBFC_MAKE_ARCHIVE_SCRIPT
 
 #define NBFC_EXIT_SUCCESS 0
 #define NBFC_EXIT_FAILURE 1

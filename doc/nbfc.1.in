@@ -232,6 +232,12 @@ Rate all available configuration files.
 Use an alternative DSDT file. Can be specified multiple times.
 .RE
 
+.BR \-D ", " \-\-dsdt\-dir
+.I DIRECTORY
+.RS
+Use an alternative DSDT directory.
+.RE
+
 .BR \-j ", " \-\-json
 .RS
 Use JSON output.
@@ -288,10 +294,16 @@ List all available ACPI methods.
 Disassemble your ACPI tables.
 .RE
 
-.BR \-f ", " \-\-file
+.BR \-d ", " \-\-dsdt
 .I FILE
 .RS
 Use an alternative DSDT file. Can be specified multiple times.
+.RE
+
+.BR \-D ", " \-\-dsdt\-dir
+.I DIRECTORY
+.RS
+Use an alternative DSDT directory.
 .RE
 
 .BR \-j ", " \-\-json
@@ -313,6 +325,29 @@ Upload your notebook firmware without prompting.
 .B \-\-print\-command
 .RS
 Print command for manual firmware upload.
+.RE
+
+.B \-\-create\-archive
+.I FILE
+.RS
+Creates a compressed
+.B tar.gz
+archive containing information required for support and hardware analysis.
+
+The archive includes:
+
+.IP \(bu 2
+The output of
+.B nbfc get-model-name
+.IP \(bu 2
+The output of
+.B nbfc sensors list
+.IP \(bu 2
+Firmware DSDT
+.RI ( /sys/firmware/acpi/tables/DSDT )
+.IP \(bu 2
+Firmware SSDTs
+.RI ( /sys/firmare/acpi/tables/SSDT* )
 .RE
 .RE
 

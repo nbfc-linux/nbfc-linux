@@ -85,7 +85,7 @@ See
 .SS ServiceState
 .PP
 State file of the service
-.RI ( @RUNSTATEDIR@/nbfc/state.json ).
+.RI ( /var/lib/nbfc/state.json ).
 .PP
 .BR TargetFanSpeeds :
 .I Array of Float

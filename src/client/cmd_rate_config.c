@@ -25,6 +25,7 @@
 const struct cli99_Option rate_config_options[] = {
   cli99_Options_Include(&main_options),
   {"-d|--dsdt",        Option_Rate_Config_DSDT_File,   cli99_RequiredArgument},
+  {"-D|--dsdt-dir",    Option_Rate_Config_DSDT_Dir,    cli99_RequiredArgument},
   {"-a|--all",         Option_Rate_Config_All,         cli99_NoArgument      },
   {"-H|--full-help",   Option_Rate_Config_Full_Help,   cli99_NoArgument      },
   {"-j|--json",        Option_Rate_Config_Json,        cli99_NoArgument      },
@@ -47,6 +48,7 @@ struct {
   const char* file;
   const char* dsdt_files[RATE_CONFIG_MAX_AML_FILES];
   size_t      dsdt_files_size;
+  const char* dsdt_dir;
   const char* rules_file;
 } Rate_Config_Options = {
   false,
@@ -59,6 +61,7 @@ struct {
   NULL,
   {0},
   0,
+  NULL,
   NULL,
 };
 
@@ -87,7 +90,7 @@ static Error RateConfig_DownloadRules(char** out) {
   }
 
   if (http_code != 200) {
-    Log_Error("Download failed: %s (server returned HTTP %ld)\n",
+    Log_Error("Download failed: %s (server returned HTTP %ld)",
       RATE_CONFIG_RULES_JSON_URL, http_code);
     e = err_string("Download failed");
     goto end;
@@ -549,8 +552,11 @@ static Error RateConfig_MakeAMLFilesArray(array_of(str)* out) {
     out->size = Rate_Config_Options.dsdt_files_size;
     return err_success();
   }
+  else if (Rate_Config_Options.dsdt_dir) {
+    return Acpi_Analysis_Get_All_AML_Files(Rate_Config_Options.dsdt_dir, out);
+  }
   else {
-    return Acpi_Analysis_Get_All_AML_Files(out);
+    return Acpi_Analysis_Get_All_AML_Files(NULL, out);
   }
 }
 
@@ -618,15 +624,14 @@ int RateConfig(void) {
   // Check if AML files are readable
   // ==========================================================================
 
-  if (! Rate_Config_Options.dsdt_files_size) {
+  if (! Rate_Config_Options.dsdt_files_size && ! Rate_Config_Options.dsdt_dir) {
     check_root();
   }
-  else {
-    for (size_t i = 0; i < Rate_Config_Options.dsdt_files_size; ++i) {
-      if (! file_is_readable(Rate_Config_Options.dsdt_files[i])) {
-        Log_Error("%s: %s", Rate_Config_Options.dsdt_files[i], strerror(errno));
-        return NBFC_EXIT_FAILURE;
-      }
+
+  for (size_t i = 0; i < Rate_Config_Options.dsdt_files_size; ++i) {
+    if (! file_is_readable(Rate_Config_Options.dsdt_files[i])) {
+      Log_Error("%s: %s", Rate_Config_Options.dsdt_files[i], strerror(errno));
+      return NBFC_EXIT_FAILURE;
     }
   }
 

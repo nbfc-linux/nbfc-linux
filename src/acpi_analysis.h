@@ -120,7 +120,7 @@ const char* Acpi_Analysis_Get_Register_Basename(const char*);
 nx_json* AcpiMethod_ToJson(AcpiMethod*, const char*, nx_json*);
 nx_json* AcpiRegister_ToJson(AcpiRegister*, const char*, nx_json*);
 
-Error Acpi_Analysis_Get_All_AML_Files(array_of(str)*);
+Error Acpi_Analysis_Get_All_AML_Files(const char*, array_of(str)*);
 
 void AcpiInfo_Free(AcpiInfo*);
 void AcpiMethod_Free(AcpiMethod*);

@@ -389,6 +389,11 @@ int main(int argc, char *const argv[]) {
       Support_Options.action = Support_Action_Print_Command;
       break;
 
+    case Option_Support_Create_Archive:
+      Support_Options.action = Support_Action_Create_Archive;
+      Support_Options.archive_file = p.optarg;
+      break;
+
     // ========================================================================
     // Rate-Config options
     // ========================================================================
@@ -404,6 +409,10 @@ int main(int argc, char *const argv[]) {
       }
 
       Rate_Config_Options.dsdt_files[Rate_Config_Options.dsdt_files_size++] = p.optarg;
+      break;
+
+   case Option_Rate_Config_DSDT_Dir:
+      Rate_Config_Options.dsdt_dir = p.optarg;
       break;
 
    case Option_Rate_Config_Rules:
@@ -443,13 +452,17 @@ int main(int argc, char *const argv[]) {
     // Acpi-Dump options
     // ========================================================================
 
-    case Option_Acpi_Dump_File:
+    case Option_Acpi_Dump_DSDT_File:
       if (Acpi_Dump_Options.files_size >= ACPI_DUMP_MAX_AML_FILES) {
         Log_Error("%s: Too many files given", p.option->optstring);
         return NBFC_EXIT_CMDLINE;
       }
 
       Acpi_Dump_Options.files[Acpi_Dump_Options.files_size++] = p.optarg;
+      break;
+
+    case Option_Acpi_Dump_DSDT_Dir:
+      Acpi_Dump_Options.dir = p.optarg;
       break;
 
     case Option_Acpi_Dump_Json:

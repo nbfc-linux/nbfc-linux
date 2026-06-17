@@ -168,6 +168,11 @@ on the current system.</p>
 <blockquote>
 <p>Use an alternative DSDT file. Can be specified multiple times.</p>
 </blockquote>
+<p><strong>-D</strong>, <strong>--dsdt-dir</strong>
+<em>DIRECTORY</em></p>
+<blockquote>
+<p>Use an alternative DSDT directory.</p>
+</blockquote>
 <p><strong>-j</strong>, <strong>--json</strong></p>
 <blockquote>
 <p>Use JSON output.</p>
@@ -213,9 +218,14 @@ on the current system.</p>
 <blockquote>
 <p>Disassemble your ACPI tables.</p>
 </blockquote>
-<p><strong>-f</strong>, <strong>--file</strong> <em>FILE</em></p>
+<p><strong>-d</strong>, <strong>--dsdt</strong> <em>FILE</em></p>
 <blockquote>
 <p>Use an alternative DSDT file. Can be specified multiple times.</p>
+</blockquote>
+<p><strong>-D</strong>, <strong>--dsdt-dir</strong>
+<em>DIRECTORY</em></p>
+<blockquote>
+<p>Use an alternative DSDT directory.</p>
 </blockquote>
 <p><strong>-j</strong>, <strong>--json</strong></p>
 <blockquote>
@@ -232,6 +242,18 @@ on the current system.</p>
 <p><strong>--print-command</strong></p>
 <blockquote>
 <p>Print command for manual firmware upload.</p>
+</blockquote>
+<p><strong>--create-archive</strong> <em>FILE</em></p>
+<blockquote>
+<p>Creates a compressed <strong>tar.gz</strong> archive containing
+information required for support and hardware analysis.</p>
+<p>The archive includes:</p>
+<ul>
+<li><p>The output of <strong>nbfc get-model-name</strong></p></li>
+<li><p>The output of <strong>nbfc sensors list</strong></p></li>
+<li><p>Firmware DSDT (<em>/sys/firmware/acpi/tables/DSDT</em>)</p></li>
+<li><p>Firmware SSDTs (<em>/sys/firmare/acpi/tables/SSDT*</em>)</p></li>
+</ul>
 </blockquote>
 </blockquote>
 <p><strong>get-model-name</strong></p>

@@ -5,6 +5,7 @@ PREFIX      = /usr
 bindir			= $(PREFIX)/bin
 confdir 		= /etc
 datadir			= $(PREFIX)/share
+libdir      = $(PREFIX)/lib
 sysddir 		= $(PREFIX)/lib/systemd/system
 mandir 			= $(PREFIX)/share/man
 man1dir     = $(mandir)/man1
@@ -36,6 +37,7 @@ LDLIBS_TEST_MODEL_CONFIG = -lm $(LUA_LDLIBS) -ldl
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(confdir)\"      \
 	-DDATADIR=\"$(datadir)\"         \
+	-DLIBDIR=\"$(libdir)\"         	 \
 	-DRUNSTATEDIR=\"$(runstatedir)\" \
 	-DVERSION=\"$(version)\"
 
@@ -51,6 +53,7 @@ ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_n
 all: deprecation_warning $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(SYSTEMV) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
+	install -Dm 755 src/make_archive.sh $(DESTDIR)$(libdir)/nbfc/make_archive.sh
 	install -Dm 755 src/nbfc_service    $(DESTDIR)$(bindir)/nbfc_service
 	install -Dm 755 src/ec_probe        $(DESTDIR)$(bindir)/ec_probe
 	install -Dm 755 src/nbfc            $(DESTDIR)$(bindir)/nbfc
@@ -58,6 +61,7 @@ install-core: $(CORE)
 REPLACE_VARS = sed \
 	-e 's|@BINDIR@|$(bindir)|g'           \
 	-e 's|@DATADIR@|$(datadir)|g'         \
+	-e 's|@LIBDIR@|$(libdir)|g'           \
 	-e 's|@SYSCONFDIR@|$(confdir)|g'      \
 	-e 's|@RUNSTATEDIR@|$(runstatedir)|g' \
 	-e 's|@VERSION@|$(version)|g'

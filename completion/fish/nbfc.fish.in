@@ -328,34 +328,38 @@ complete -c $prog -n $C000 -s p -l parallel -d 'Set number of parallel downloads
 complete -c $prog -n $C001 -s q -l quiet -d 'Enable quiet mode' -f
 
 # command nbfc rate-config
-set -l opts "-H --full-help -a --all -d= --dsdt= -m= --min-score= -j --json --print-rules -r= --rules= -n --no-download -h --help --version"
+set -l opts "-H --full-help -a --all -d= --dsdt= -D= --dsdt-dir= -m= --min-score= -j --json --print-rules -r= --rules= -n --no-download -h --help --version"
 set -l C000 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -H --full-help"
 set -l C001 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -a --all"
-set -l C002 "$query '$opts' positional_contains 1 rate-config"
-set -l C003 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -m --min-score"
-set -l C004 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -j --json"
-set -l C005 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option --print-rules"
-set -l C006 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -r --rules"
-set -l C007 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -n --no-download"
-set -l C008 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 rate-config"
+set -l C002 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -D --dsdt-dir"
+set -l C003 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -d --dsdt -D --dsdt-dir"
+set -l C004 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -m --min-score"
+set -l C005 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -j --json"
+set -l C006 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option --print-rules"
+set -l C007 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -r --rules"
+set -l C008 "$query '$opts' positional_contains 1 rate-config && not $query '$opts' has_option -n --no-download"
+set -l C009 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 rate-config"
 complete -c $prog -n $C000 -s H -l full-help -d 'Show full help' -f
 complete -c $prog -n $C001 -s a -l all -d 'Rate all available configuration files' -f
 complete -c $prog -n $C002 -s d -l dsdt -d 'Use an alternative DSDT file' -Fr
-complete -c $prog -n $C003 -s m -l min-score -d 'Set minimum rating threshold for configurations' -x
-complete -c $prog -n $C004 -s j -l json -d 'Use JSON output' -f
-complete -c $prog -n $C005 -l print-rules -d 'Print configuration rules' -f
-complete -c $prog -n $C006 -s r -l rules -d 'Use an alternative rules file' -Fr
-complete -c $prog -n $C007 -s n -l no-download -d "Don't download rules file from the repository" -f
-complete -c $prog -n $C008 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
+complete -c $prog -n $C003 -s D -l dsdt-dir -d 'Use an alternative DSDT dir' -x -a '(__fish_complete_directories)'
+complete -c $prog -n $C004 -s m -l min-score -d 'Set minimum rating threshold for configurations' -x
+complete -c $prog -n $C005 -s j -l json -d 'Use JSON output' -f
+complete -c $prog -n $C006 -l print-rules -d 'Print configuration rules' -f
+complete -c $prog -n $C007 -s r -l rules -d 'Use an alternative rules file' -Fr
+complete -c $prog -n $C008 -s n -l no-download -d "Don't download rules file from the repository" -f
+complete -c $prog -n $C009 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
 
 # command nbfc acpi-dump
-set -l opts "-f= --file= -j --json -h --help --version"
-set -l C000 "$query '$opts' positional_contains 1 acpi-dump"
-set -l C001 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -j --json"
-set -l C002 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 acpi-dump"
-complete -c $prog -n $C000 -s f -l file -d 'Use an alternative DSDT file' -Fr
-complete -c $prog -n $C001 -s j -l json -d 'Use JSON output' -f
-complete -c $prog -n $C002 -d Commands -f -a '(_nbfc_acpi_dump__command)'
+set -l opts "-d= --dsdt= -D= --dsdt-dir= -j --json -h --help --version"
+set -l C000 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -D --dsdt-dir"
+set -l C001 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -d --dsdt -D --dsdt-dir"
+set -l C002 "$query '$opts' positional_contains 1 acpi-dump && not $query '$opts' has_option -j --json"
+set -l C003 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 acpi-dump"
+complete -c $prog -n $C000 -s d -l dsdt -d 'Use an alternative DSDT file' -Fr
+complete -c $prog -n $C001 -s D -l dsdt-dir -d 'Use an alternative DSDT directory' -x -a '(__fish_complete_directories)'
+complete -c $prog -n $C002 -s j -l json -d 'Use JSON output' -f
+complete -c $prog -n $C003 -d Commands -f -a '(_nbfc_acpi_dump__command)'
 
 # command nbfc xml2json
 set -l opts "-h --help --version"
@@ -363,10 +367,12 @@ set -l C000 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positiona
 complete -c $prog -n $C000 -d 'Specify configuration file' -Fr
 
 # command nbfc support
-set -l opts "--upload-firmware --print-command -h --help --version"
-set -l C000 "$query '$opts' positional_contains 1 support && not $query '$opts' has_option --upload-firmware"
-set -l C001 "$query '$opts' positional_contains 1 support && not $query '$opts' has_option --print-command"
+set -l opts "--upload-firmware --print-command --create-archive= -h --help --version"
+set -l C000 "$query '$opts' positional_contains 1 support && not $query '$opts' has_option --print-command --create-archive --upload-firmware"
+set -l C001 "$query '$opts' positional_contains 1 support && not $query '$opts' has_option --upload-firmware --create-archive --print-command"
+set -l C002 "$query '$opts' positional_contains 1 support && not $query '$opts' has_option --upload-firmware --print-command --create-archive"
 complete -c $prog -n $C000 -l upload-firmware -d 'Upload your notebook firmware without prompting' -f
 complete -c $prog -n $C001 -l print-command -d 'Print command for manual firmware upload' -f
+complete -c $prog -n $C002 -l create-archive -d 'Create a support archive' -Fr
 
 # vim: ft=fish ts=2 sts=2 sw=2 et

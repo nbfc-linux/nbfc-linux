@@ -80,6 +80,7 @@
  "  -H, --full-help       Show full help\n"                                    \
  "  -a, --all             Rate all available configuration files\n"            \
  "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
+ "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
  "  -j, --json            Use JSON output\n"                                   \
  "  -m, --min-score SCORE Set minimum rating threshold for configurations\n"   \
  "  -n, --no-download     Don't download rules from the repository\n"          \
@@ -88,7 +89,7 @@
  ""
 
 #define CLIENT_ACPI_DUMP_HELP_TEXT                                             \
- "Usage: nbfc acpi-dump [-h] [-j|--json] [-f|--file=FILE] <COMMAND>\n"         \
+ "Usage: nbfc acpi-dump [-h] [-j|--json] [-d|--dsdt=FILE] <COMMAND>\n"         \
  "\n"                                                                          \
  "Dumps information of your ACPI tables.\n"                                    \
  "\n"                                                                          \
@@ -102,7 +103,8 @@
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
- "  -f, --file FILE       Use an alternative DSDT file\n"                      \
+ "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
+ "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
  "  -j, --json            Use JSON output\n"                                   \
  ""
 
@@ -251,12 +253,14 @@
 
 #define CLIENT_SUPPORT_HELP_TEXT                                               \
  "Usage: nbfc support [-h] [--upload-firmware] [--print-command]\n"            \
+ "                         [--create-archive=FILE]\n"                          \
  "\n"                                                                          \
  "Displays information on how to support the project.\n"                       \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  --upload-firmware     Upload your notebook firmware without prompting\n"   \
  "  --print-command       Print command for manual firmware upload\n"          \
+ "  --create-archive      Create a tar.gz archive containing your firmware\n"  \
  "  -h, --help            Shows this message and exit\n"                       \
  "\n"                                                                          \
  "Uploading your notebook firmware helps the developer to understand existing\n"\

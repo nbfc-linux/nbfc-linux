@@ -30,6 +30,8 @@ AC_CHECK_FUNCS([atexit memset mkdir realpath setlocale socket strchr strrchr str
 AC_CHECK_LIB([curl], [curl_easy_init], [], [AC_MSG_ERROR([libcurl not found])])
 AC_CHECK_LIB([crypto], [SHA1], [], [AC_MSG_ERROR([libcrypto (OpenSSL) not found])])
 
+libdir='${prefix}/lib'
+
 # =============================================================================
 # Init-System
 # =============================================================================

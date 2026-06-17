@@ -591,20 +591,26 @@ const char* Acpi_Analysis_Get_Register_Basename(const char* path) {
 }
 
 /**
- * Get a list of all relevant AML files.
+ * Get a list of all relevant AML files inside a directroy.
  *
  * The array must not be free'd.
  */
-Error Acpi_Analysis_Get_All_AML_Files(array_of(str)* out) {
-  static char data[ACPI_ANALYSIS_MAX_AML_FILES][sizeof(ACPI_ANALYSIS_ACPI_DIR "/SSDT??")];
+Error Acpi_Analysis_Get_All_AML_Files(const char* dir, array_of(str)* out) {
+  static char data[ACPI_ANALYSIS_MAX_AML_FILES][PATH_MAX];
   static const char* files[ACPI_ANALYSIS_MAX_AML_FILES];
-  array_size_t files_size;
+  array_size_t files_size = 0;
 
-  files[0] = ACPI_ANALYSIS_ACPI_DIR "/DSDT";
-  files_size = 1;
+  if (! dir)
+    dir = ACPI_ANALYSIS_ACPI_DIR;
 
-  for (size_t i = 0; i < ACPI_ANALYSIS_MAX_SSDT_FILES; ++i) {
-    snprintf(data[i], sizeof(data[0]), "%s/SSDT%zu", ACPI_ANALYSIS_ACPI_DIR, i);
+  snprintf(data[0], PATH_MAX, "%s/%s", dir, "DSDT");
+  if (file_exists(data[0])) {
+    files[0] = data[0];
+    files_size = 1;
+  }
+
+  for (size_t i = 1; i < ACPI_ANALYSIS_MAX_SSDT_FILES; ++i) {
+    snprintf(data[i], PATH_MAX, "%s/SSDT%zu", dir, i);
     if (file_exists(data[i])) {
       if (files_size >= ACPI_ANALYSIS_MAX_AML_FILES)
         return err_stringf("Too many SSDT files found in %s", ACPI_ANALYSIS_ACPI_DIR);
@@ -612,6 +618,9 @@ Error Acpi_Analysis_Get_All_AML_Files(array_of(str)* out) {
       files[files_size++] = data[i];
     }
   }
+
+  if (! files_size)
+    return err_stringf("%s: No AML files found", dir);
 
   out->data = files;
   out->size = files_size;

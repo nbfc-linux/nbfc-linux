@@ -4,6 +4,7 @@ prefix      = @prefix@
 bindir      = @bindir@
 sysconfdir  = @sysconfdir@
 datadir     = @datadir@
+libdir      = @libdir@
 mandir      = @mandir@
 man1dir     = @mandir@/man1
 man5dir     = @mandir@/man5
@@ -33,6 +34,7 @@ LDLIBS_TEST_MODEL_CONFIG = -lm $(LUA_LDLIBS) -ldl
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(sysconfdir)\"    \
 	-DDATADIR=\"$(datadir)\"          \
+	-DLIBDIR=\"$(libdir)\"            \
 	-DRUNSTATEDIR=\"$(runstatedir)\"  \
 	-DVERSION=\"$(version)\"
 
@@ -48,6 +50,7 @@ ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_n
 all: $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(SYSTEMV) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
+	install -Dm 755 src/make_archive.sh $(DESTDIR)$(libdir)/nbfc/make_archive.sh
 	install -Dm 755 src/nbfc_service    $(DESTDIR)$(bindir)/nbfc_service
 	install -Dm 755 src/ec_probe        $(DESTDIR)$(bindir)/ec_probe
 	install -Dm 755 src/nbfc            $(DESTDIR)$(bindir)/nbfc
@@ -55,6 +58,7 @@ install-core: $(CORE)
 REPLACE_VARS = sed \
 	-e 's|@BINDIR@|$(bindir)|g'           \
 	-e 's|@DATADIR@|$(datadir)|g'         \
+	-e 's|@LIBDIR@|$(libdir)|g'           \
 	-e 's|@SYSCONFDIR@|$(sysconfdir)|g'   \
 	-e 's|@RUNSTATEDIR@|$(runstatedir)|g' \
 	-e 's|@VERSION@|$(version)|g'

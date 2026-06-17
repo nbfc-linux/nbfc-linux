@@ -148,7 +148,14 @@ options:
     help: "Use an alternative DSDT file"
     metavar: "FILE"
     repeatable: true
+    groups: ["group1"]
     complete: ["file"]
+
+  - option_strings: ["-D", "--dsdt-dir"]
+    help: "Use an alternative DSDT dir"
+    metavar: "DIRECTORY"
+    groups: ["group1"]
+    complete: ["directory"]
 
   - option_strings: ["-m", "--min-score"]
     help: "Set minimum rating threshold for configurations"
@@ -182,11 +189,18 @@ positionals:
 prog: "nbfc acpi-dump"
 help: "Dumps information of your ACPI DSDT"
 options:
-  - option_strings: ["-f", "--file"]
+  - option_strings: ["-d", "--dsdt"]
     metavar: "FILE"
     help: "Use an alternative DSDT file"
     repeatable: true
+    groups: ["group1"]
     complete: ["file"]
+
+  - option_strings: ["-D", "--dsdt-dir"]
+    metavar: "DIRECTORY"
+    help: "Use an alternative DSDT directory"
+    groups: ["group1"]
+    complete: ["directory"]
 
   - option_strings: ["-j", "--json"]
     help: "Use JSON output"
@@ -224,10 +238,18 @@ prog: "nbfc support"
 help: "Show how to support the project"
 options:
   - option_strings: ["--upload-firmware"]
+    groups: ["group1"]
     help: "Upload your notebook firmware without prompting"
 
   - option_strings: ["--print-command"]
+    groups: ["group1"]
     help: "Print command for manual firmware upload"
+
+  - option_strings: ["--create-archive"]
+    groups: ["group1"]
+    help: "Create a support archive"
+    metavar: "FILE"
+    complete: ["file"]
 ---
 prog: "nbfc help"
 help: "Show help"

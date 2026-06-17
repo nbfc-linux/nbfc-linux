@@ -53,7 +53,7 @@ Configures which sensors are attached to a fan.
 
 ## ServiceState
 
-State file of the service (*/var/run/nbfc/state.json*).
+State file of the service (*/var/lib/nbfc/state.json*).
 
 **TargetFanSpeeds**: *Array of Float*
 

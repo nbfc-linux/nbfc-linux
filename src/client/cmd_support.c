@@ -40,19 +40,23 @@ const struct cli99_Option support_options[] = {
   cli99_Options_Include(&main_options),
   {"--upload-firmware", Option_Support_Upload_Firmware, cli99_NoArgument},
   {"--print-command",   Option_Support_Print_Command,   cli99_NoArgument},
+  {"--create-archive",  Option_Support_Create_Archive,  cli99_RequiredArgument},
   cli99_Options_End()
 };
 
 enum Support_Action {
   Support_Action_None = 0,
   Support_Action_Upload_Firmware,
-  Support_Action_Print_Command
+  Support_Action_Print_Command,
+  Support_Action_Create_Archive,
 };
 
 struct {
   enum Support_Action action;
+  const char* archive_file;
 } Support_Options = {
-  Support_Action_None
+  Support_Action_None,
+  NULL
 };
 
 /**
@@ -79,7 +83,7 @@ static char* Support_Get_Real_Firmware_Upload_Endpoint_URL(void) {
   }
 
   if (http_code != 200) {
-    Log_Error("Download failed: %s (server returned HTTP %ld)\n",
+    Log_Error("Download failed: %s (server returned HTTP %ld)",
       SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL, http_code);
     exit(NBFC_EXIT_FAILURE);
   }
@@ -177,7 +181,7 @@ static char* Support_Do_Upload(const char* model, array_of(str)* files) {
   }
 
   if (http_code != 200) {
-    Log_Error("Upload failed: %s (server returned HTTP %ld)\n",
+    Log_Error("Upload failed: %s (server returned HTTP %ld)",
       endpoint_url, http_code);
     goto end;
   }
@@ -269,7 +273,7 @@ static int Support_Upload_Firmware(void) {
   // Accessing `ACPI_ANALYSIS_ACPI_DIR` requires root
   check_root();
 
-  e = Acpi_Analysis_Get_All_AML_Files(&files);
+  e = Acpi_Analysis_Get_All_AML_Files(NULL, &files);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -293,7 +297,7 @@ static int Support_Print_Command(void) {
   array_of(str) files;
   char* endpoint_url = Support_Get_Real_Firmware_Upload_Endpoint_URL();
 
-  e = Acpi_Analysis_Get_All_AML_Files(&files);
+  e = Acpi_Analysis_Get_All_AML_Files(NULL, &files);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -325,12 +329,27 @@ static int Support_Print_Command(void) {
   return NBFC_EXIT_SUCCESS;
 }
 
+int Support_Create_Archive(const char* archive_file) {
+  check_root();
+
+  return execl(
+    NBFC_MAKE_ARCHIVE_SCRIPT_FILE,
+    NBFC_MAKE_ARCHIVE_SCRIPT,
+    Mem_Strdup(archive_file),
+    NULL
+  );
+}
+
 int Support(void) {
   int ret = NBFC_EXIT_FAILURE;
 
   if (Support_Options.action == Support_Action_None) {
     puts(SUPPORT_TEXT);
     return NBFC_EXIT_SUCCESS;
+  }
+
+  if (Support_Options.action == Support_Action_Create_Archive) {
+    return Support_Create_Archive(Support_Options.archive_file);
   }
 
   if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {

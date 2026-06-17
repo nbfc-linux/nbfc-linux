@@ -36,6 +36,7 @@ enum Option {
   // Rate-Config options
   Option_Rate_Config_File,
   Option_Rate_Config_DSDT_File,
+  Option_Rate_Config_DSDT_Dir,
   Option_Rate_Config_All,
   Option_Rate_Config_Full_Help,
   Option_Rate_Config_Json,
@@ -46,7 +47,8 @@ enum Option {
 
   // Acpi-Dump options
   Option_Acpi_Dump_Command,
-  Option_Acpi_Dump_File,
+  Option_Acpi_Dump_DSDT_File,
+  Option_Acpi_Dump_DSDT_Dir,
   Option_Acpi_Dump_Json,
 
   // Set options
@@ -64,6 +66,7 @@ enum Option {
   // Support options
   Option_Support_Upload_Firmware,
   Option_Support_Print_Command,
+  Option_Support_Create_Archive,
 
   // Show-Variable options
   Option_ShowVariable_Variable,

@@ -334,7 +334,8 @@ _nbfc_rate_config() {
   local -a args=(
     '(--full-help -H)'{-H,--full-help}'[Show full help]'
     '(--all -a)'{-a,--all}'[Rate all available configuration files]'
-    '*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT dir]':DIRECTORY:_directories
     '(--min-score -m)'{-m+,--min-score=}'[Set minimum rating threshold for configurations]':SCORE:"_numbers -f 'Set minimum rating threshold for configurations'"
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--print-rules)'--print-rules'[Print configuration rules]'
@@ -349,7 +350,7 @@ _nbfc_rate_config() {
 }
 
 _nbfc_acpi_dump() {
-  local opts='-f= --file= -j --json -h --help --version'
+  local opts='-d= --dsdt= -D= --dsdt-dir= -j --json -h --help --version'
   local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
   _nbfc__query init "$opts" "${words[@]}"
 
@@ -361,7 +362,8 @@ _nbfc_acpi_dump() {
   esac
 
   local -a args=(
-    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -373,7 +375,8 @@ _nbfc_acpi_dump() {
 
 _nbfc_acpi_dump_registers() {
   local -a args=(
-    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -385,7 +388,8 @@ _nbfc_acpi_dump_registers() {
 
 _nbfc_acpi_dump_ec_registers() {
   local -a args=(
-    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -397,7 +401,8 @@ _nbfc_acpi_dump_ec_registers() {
 
 _nbfc_acpi_dump_methods() {
   local -a args=(
-    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -409,7 +414,8 @@ _nbfc_acpi_dump_methods() {
 
 _nbfc_acpi_dump_dsl() {
   local -a args=(
-    '*'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -458,8 +464,9 @@ _nbfc_warranty() {
 
 _nbfc_support() {
   local -a args=(
-    '(--upload-firmware)'--upload-firmware'[Upload your notebook firmware without prompting]'
-    '(--print-command)'--print-command'[Print command for manual firmware upload]'
+    '(--create-archive --print-command --upload-firmware)'--upload-firmware'[Upload your notebook firmware without prompting]'
+    '(--create-archive --upload-firmware --print-command)'--print-command'[Print command for manual firmware upload]'
+    '(--print-command --upload-firmware --create-archive)'--create-archive='[Create a support archive]':FILE:_files
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
