@@ -423,14 +423,6 @@ int main(int argc, char* const argv[]) {
   signal(SIGINT,  Handle_Signal);
   signal(SIGTERM, Handle_Signal);
 
-  if (ec == NULL) {
-    Error e = EC_FindWorking(&ec);
-    e_die();
-  }
-
-  Error e = ec->Open();
-  e_die();
-
   switch (cmd) {
   case Command_Dump:     return Dump();
   case Command_Load:     return Load();
@@ -444,7 +436,25 @@ int main(int argc, char* const argv[]) {
   }
 }
 
+static void Initialize_EC(void) {
+  static bool initialized = false;
+
+  if (! initialized) {
+    initialized = true;
+
+    if (ec == NULL) {
+      Error e = EC_FindWorking(&ec);
+      e_die();
+    }
+
+    Error e = ec->Open();
+    e_die();
+  }
+}
+
 static int Read(void) {
+  Initialize_EC();
+
   if (options.use_word) {
     uint16_t word;
     Error e = ec->ReadWord(options.register_, &word);
@@ -462,6 +472,8 @@ static int Read(void) {
 }
 
 static int Write(void) {
+  Initialize_EC();
+
   if (options.use_word) {
     Error e = ec->WriteWord(options.register_, options.value);
     e_die();
@@ -479,6 +491,8 @@ static int Write(void) {
 }
 
 static int Dump(void) {
+  Initialize_EC();
+
   bool use_color = false;
   RegisterBuf register_buf;
 
@@ -495,6 +509,8 @@ static int Dump(void) {
 }
 
 static int Load(void) {
+  Initialize_EC();
+
   FILE* infile;
 
   if (! strcmp(options.file, "-"))
@@ -519,6 +535,8 @@ static int Load(void) {
 }
 
 static int Monitor(void) {
+  Initialize_EC();
+
   int max_loops = INT_MAX;
 
   if (options.timespan)
@@ -547,6 +565,8 @@ static int Monitor(void) {
 }
 
 static int Watch(void) {
+  Initialize_EC();
+
   int max_loops = INT_MAX;
 
   if (options.timespan)
@@ -783,6 +803,8 @@ struct Args {
 };
 
 static void ShellRead(const struct Args* args) {
+  Initialize_EC();
+
   int word = 0;
   const char* register_arg = NULL;
   const char* err;
@@ -840,6 +862,8 @@ static void ShellRead(const struct Args* args) {
 }
 
 static void ShellWrite(const struct Args* args) {
+  Initialize_EC();
+
   int word = 0;
   const char* register_arg = NULL;
   const char* value_arg = NULL;
@@ -907,6 +931,8 @@ static void ShellWrite(const struct Args* args) {
 }
 
 static void ShellReadAll(struct Args*) {
+  Initialize_EC();
+
   uint8_t values[256];
 
   for (int register_ = 0; register_ <= 255; ++register_) {
