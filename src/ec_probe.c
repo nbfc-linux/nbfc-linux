@@ -21,6 +21,7 @@
 #include "help/ec_probe.help.h"
 #include "program_name.c"
 #include "log.h"
+#include "client/check_root.h"
 
 #include <float.h>   // FLT_MAX
 #include <stdbool.h> // bool
@@ -105,6 +106,7 @@ static int Monitor(void);
 static int Watch(void);
 static int AcpiCall(void);
 static int Shell(void);
+static int Graph(void);
 
 enum Command {
   Command_Read,
@@ -115,12 +117,24 @@ enum Command {
   Command_Watch,
   Command_AcpiCall,
   Command_Shell,
+  Command_Graph,
   Command_Help,
   Command_End
 };
 
 static enum Command Command_FromString(const char* s) {
-  const char* cmds[] = { "read", "write", "dump", "load", "monitor", "watch", "acpi_call", "shell", "help" };
+  const char* cmds[] = {
+    "read",
+    "write",
+    "dump",
+    "load",
+    "monitor",
+    "watch",
+    "acpi_call",
+    "shell",
+    "graph",
+    "help"
+  };
 
   for (int i = 0; i < ARRAY_SSIZE(cmds); ++i)
     if (!strcmp(cmds[i], s))
@@ -138,6 +152,7 @@ static const char* HelpTexts[] = {
   EC_PROBE_WATCH_HELP_TEXT,
   EC_PROBE_ACPI_CALL_HELP_TEXT,
   EC_PROBE_SHELL_HELP_TEXT,
+  EC_PROBE_GRAPH_HELP_TEXT,
   EC_PROBE_HELP_TEXT,
 };
 
@@ -229,6 +244,13 @@ static const struct cli99_Option acpi_call_command_options[] = {
   cli99_Options_End()
 };
 
+static const struct cli99_Option graph_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-d|--decimal",             Option_Decimal,             cli99_NoArgument      },
+  {"file",                     Option_File,                cli99_NormalPositional},
+  cli99_Options_End()
+};
+
 static const struct cli99_Option* Options[] = {
   read_command_options,
   write_command_options,
@@ -238,6 +260,7 @@ static const struct cli99_Option* Options[] = {
   watch_command_options,
   acpi_call_command_options,
   main_options, // shell
+  graph_command_options,
   main_options, // help
 };
 
@@ -411,13 +434,15 @@ int main(int argc, char* const argv[]) {
       }
       break;
 
+    case Command_Graph:
+      if (! (options._set & (1ULL << Option_File))) {
+        Log_Error("Argument required: %s", "file");
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
     default:
       break;
-  }
-
-  if (geteuid()) {
-    Log_Error("This program must be run as root");
-    return NBFC_EXIT_FAILURE;
   }
 
   signal(SIGINT,  Handle_Signal);
@@ -432,6 +457,7 @@ int main(int argc, char* const argv[]) {
   case Command_Watch:    return Watch();
   case Command_AcpiCall: return AcpiCall();
   case Command_Shell:    return Shell();
+  case Command_Graph:    return Graph();
   default:               return NBFC_EXIT_FAILURE;
   }
 }
@@ -453,6 +479,7 @@ static void Initialize_EC(void) {
 }
 
 static int Read(void) {
+  check_root();
   Initialize_EC();
 
   if (options.use_word) {
@@ -472,6 +499,7 @@ static int Read(void) {
 }
 
 static int Write(void) {
+  check_root();
   Initialize_EC();
 
   if (options.use_word) {
@@ -491,6 +519,7 @@ static int Write(void) {
 }
 
 static int Dump(void) {
+  check_root();
   Initialize_EC();
 
   bool use_color = false;
@@ -509,6 +538,7 @@ static int Dump(void) {
 }
 
 static int Load(void) {
+  check_root();
   Initialize_EC();
 
   FILE* infile;
@@ -535,6 +565,7 @@ static int Load(void) {
 }
 
 static int Monitor(void) {
+  check_root();
   Initialize_EC();
 
   int max_loops = INT_MAX;
@@ -565,6 +596,7 @@ static int Monitor(void) {
 }
 
 static int Watch(void) {
+  check_root();
   Initialize_EC();
 
   int max_loops = INT_MAX;
@@ -585,6 +617,8 @@ static int Watch(void) {
 }
 
 static int AcpiCall(void) {
+  check_root();
+
   Error e;
   char cmd[1024];
 
@@ -617,6 +651,17 @@ static int AcpiCall(void) {
   printf("%s\n", out);
 
   return NBFC_EXIT_SUCCESS;
+}
+
+static int Graph() {
+  char* argv[8] = {0};
+  argv[0] = Mem_Strdup(NBFC_MAKE_GRAPH_SCRIPT);
+  argv[1] = Mem_Strdup(options.file);
+
+  if (options.decimal)
+    argv[2] = Mem_Strdup("-d");
+
+  return execv(NBFC_MAKE_GRAPH_SCRIPT_FILE, argv);
 }
 
 static void Handle_Signal(int sig) {
@@ -993,6 +1038,8 @@ static void read_args(struct Args* args, char** line) {
 }
 
 static int Shell(void) {
+  check_root();
+
   char buffer[16384];
   char* line;
   struct Args args;

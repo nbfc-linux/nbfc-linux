@@ -11,7 +11,7 @@ Probing tool for the embedded controller
 .SH SYNOPSIS
 .PP
 .B ec_probe
-.RB { read " | " write " | " dump " | " load " | " monitor " | " watch " | " acpi_call " | " shell }
+.RB { read " | " write " | " dump " | " load " | " monitor " | " watch " | " acpi_call " | " graph " | " shell }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -179,6 +179,19 @@ The maximum number of arguments is 8.
 Example:
 .RS
 ec_probe acpi_call '\\_SB.PCI0.LPCB.EC0.SFSD' 0xFF
+.RE
+.RE
+
+.PP
+.B graph
+.RI [ OPTIONS "] " FILE
+.RS
+Visualize recordings made by
+.BR "ec_probe monitor -r" .
+
+.BR \-d ", " \-\-decimal
+.RS
+ Read register values as decimal numbers.
 .RE
 .RE
 

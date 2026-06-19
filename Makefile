@@ -54,6 +54,7 @@ all: deprecation_warning $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(SYSTEMV) $(BASH_
 
 install-core: $(CORE)
 	install -Dm 755 src/make_archive.sh $(DESTDIR)$(libdir)/nbfc/make_archive.sh
+	install -Dm 755 src/make_graph.py   $(DESTDIR)$(libdir)/nbfc/make_graph.py
 	install -Dm 755 src/nbfc_service    $(DESTDIR)$(bindir)/nbfc_service
 	install -Dm 755 src/ec_probe        $(DESTDIR)$(bindir)/ec_probe
 	install -Dm 755 src/nbfc            $(DESTDIR)$(bindir)/nbfc

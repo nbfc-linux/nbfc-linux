@@ -113,6 +113,7 @@ _ec_probe__command() {
     monitor:'Monitor all EC registers for changes'
     watch:'Monitor all EC registers for changes (alternative version)'
     acpi_call:'Call an ACPI method'
+    graph:'Visualize recordings made by `ec_probe monitor -r`'
     shell:'Read commands from STDIN'
   )
 
@@ -132,6 +133,7 @@ _ec_probe() {
     monitor) _ec_probe_monitor; return $?;;
     watch) _ec_probe_watch; return $?;;
     acpi_call) _ec_probe_acpi_call; return $?;;
+    graph) _ec_probe_graph; return $?;;
     shell) _ec_probe_shell; return $?;;
   esac
 
@@ -226,6 +228,17 @@ _ec_probe_acpi_call() {
     8:'Sixth argument':"_numbers 'Sixth argument'"
     9:'Seventh argument':"_numbers 'Seventh argument'"
     10:'Eighth argument':"_numbers 'Eighth argument'"
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_ec_probe_graph() {
+  local -a args=(
+    '(--decimal -d)'{-d,--decimal}'[Read register values as decimal numbers]'
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
+    1:command1:_ec_probe__command
+    2:'CSV file containing the recordings':_files
   )
   _arguments -S -s -w "${args[@]}"
 }

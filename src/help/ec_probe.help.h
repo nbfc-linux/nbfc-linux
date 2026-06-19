@@ -17,6 +17,7 @@
  "  monitor               Monitor all EC registers for changes\n"              \
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
  "  acpi_call             Call an ACPI method\n"                               \
+ "  graph                 Visualize recordings made by `ec_probe monitor -r`\n"\
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
@@ -126,4 +127,14 @@
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
+ ""
+
+#define EC_PROBE_GRAPH_HELP_TEXT                                               \
+ "Usage: %s graph [-d] FILE\n"                                                 \
+ "\n"                                                                          \
+ "Visualize recordings made by `ec_probe monitor -r`.\n"                       \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
+ "  -d, --decimal         Read register values as decimal numbers\n"           \
  ""

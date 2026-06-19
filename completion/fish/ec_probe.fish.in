@@ -156,6 +156,7 @@ function _ec_probe__command
     monitor 'Monitor all EC registers for changes' \
     watch 'Monitor all EC registers for changes (alternative version)' \
     acpi_call 'Call an ACPI method' \
+    graph 'Visualize recordings made by `ec_probe monitor -r`' \
     shell 'Read commands from STDIN'
 end
 
@@ -245,5 +246,12 @@ complete -c $prog -n $C005 -d 'Fifth argument' -x
 complete -c $prog -n $C006 -d 'Sixth argument' -x
 complete -c $prog -n $C007 -d 'Seventh argument' -x
 complete -c $prog -n $C008 -d 'Eighth argument' -x
+
+# command ec_probe graph
+set -l opts "-d --decimal -h --help -e= --embedded-controller="
+set -l C000 "$query '$opts' positional_contains 1 graph && not $query '$opts' has_option -d --decimal"
+set -l C001 "$query '$opts' num_of_positionals -eq 1 && $query '$opts' positional_contains 1 graph"
+complete -c $prog -n $C000 -s d -l decimal -d 'Read register values as decimal numbers' -f
+complete -c $prog -n $C001 -d 'CSV file containing the recordings' -Fr
 
 # vim: ft=fish ts=2 sts=2 sw=2 et

@@ -9,7 +9,8 @@ Probing tool for the embedded controller
 # SYNOPSIS
 
 **ec_probe** {**read** \| **write** \| **dump** \| **load** \|
-**monitor** \| **watch** \| **acpi_call** \| **shell**} \[*OPTIONS*\]
+**monitor** \| **watch** \| **acpi_call** \| **graph** \| **shell**}
+\[*OPTIONS*\]
 
 # OPTIONS
 
@@ -116,6 +117,14 @@ Probing tool for the embedded controller
 > Example:
 >
 > > ec_probe acpi_call \'\\\_SB.PCI0.LPCB.EC0.SFSD\' 0xFF
+
+**graph** \[*OPTIONS*\] *FILE*
+
+> Visualize recordings made by **ec_probe monitor -r**.
+>
+> **-d**, **\--decimal**
+>
+> > Read register values as decimal numbers.
 
 **shell**
 

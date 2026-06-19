@@ -20,6 +20,9 @@
 #define NBFC_MAKE_ARCHIVE_SCRIPT         "make_archive.sh"
 #define NBFC_MAKE_ARCHIVE_SCRIPT_FILE    LIBDIR "/nbfc/" NBFC_MAKE_ARCHIVE_SCRIPT
 
+#define NBFC_MAKE_GRAPH_SCRIPT           "make_graph.py"
+#define NBFC_MAKE_GRAPH_SCRIPT_FILE      LIBDIR "/nbfc/" NBFC_MAKE_GRAPH_SCRIPT
+
 #define NBFC_EXIT_SUCCESS 0
 #define NBFC_EXIT_FAILURE 1
 #define NBFC_EXIT_CMDLINE 2

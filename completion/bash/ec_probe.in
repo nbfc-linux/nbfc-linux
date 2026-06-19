@@ -69,6 +69,11 @@ _ec_probe__parse_commandline() {
   local cmd="root" argi arg i char trailing_chars VAR ARGS
 
   __find_option() {
+    case "$1" in root:graph*)
+      case "$2" in
+        -d|--decimal) VAR=OPT_decimal; ARGS=0; return;;
+      esac
+    esac
     case "$1" in root:watch*)
       case "$2" in
         -i|--interval) VAR=OPT_interval; ARGS=1; return;;
@@ -188,6 +193,7 @@ _ec_probe() {
       monitor) _ec_probe_monitor && return 0;;
       watch) _ec_probe_watch && return 0;;
       acpi_call);;
+      graph) _ec_probe_graph && return 0;;
       shell);;
     esac
   fi
@@ -235,7 +241,7 @@ _ec_probe() {
   fi
 
   (( ${#POSITIONALS[@]} == 1 )) && {
-    COMPREPLY=($(compgen -W 'dump load read write monitor watch acpi_call shell' -- "$cur"))
+    COMPREPLY=($(compgen -W 'dump load read write monitor watch acpi_call graph shell' -- "$cur"))
     return 0;
   }
 
@@ -393,6 +399,23 @@ _ec_probe_watch() {
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
+
+  return 1
+}
+
+_ec_probe_graph() {
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_decimal[@]} )) && opts+=(-d --decimal)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  (( ${#POSITIONALS[@]} == 2 )) && {
+    _filedir
+    return 0;
+  }
 
   return 1
 }

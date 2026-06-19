@@ -139,5 +139,17 @@ positionals:
     help: "Eighth argument"
     complete: ["integer"]
 ---
+prog: "ec_probe graph"
+help: "Visualize recordings made by `ec_probe monitor -r`"
+options:
+  - option_strings: ["-d", "--decimal"]
+    help: "Read register values as decimal numbers"
+
+positionals:
+  - number: 1
+    metavar: "FILE"
+    help: "CSV file containing the recordings"
+    complete: ["file"]
+---
 prog: "ec_probe shell"
 help: "Read commands from STDIN"
