@@ -47,7 +47,7 @@
  ""
 
 #define CLIENT_CONFIG_HELP_TEXT                                                \
- "Usage: nbfc config [-h] (-l | -s config | -a config | -r)\n"                 \
+ "Usage: nbfc config [-h] (-l | -s CONFIG | -a CONFIG | -r)\n"                 \
  "\n"                                                                          \
  "Set or list configurations for the NBFC service.\n"                          \
  "\n"                                                                          \
@@ -62,6 +62,9 @@
  "\n"                                                                          \
  "If CONFIG is \"auto\", the service will attempt to automatically select\n"   \
  "a matching configuration.\n"                                                 \
+ "\n"                                                                          \
+ "CONFIG is the configuration filename without the \".json\" extension,\n"     \
+ "not the value of the \"NotebookModel\" field inside the configuration file.\n"\
  ""
 
 #define CLIENT_RATE_CONFIG_HELP_TEXT                                           \

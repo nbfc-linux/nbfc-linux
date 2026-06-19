@@ -90,6 +90,13 @@ This program is used to control the NoteBook FanControl service.
 > **-a**, **\--apply** *CONFIG*
 >
 > > Set a config and start the service.
+>
+> If *CONFIG* is **auto**, the service will attempt to automatically
+> select a matching configuration.
+>
+> *CONFIG* is the configuration filename without the **.json**
+> extension, not the value of the **NotebookModel** field inside the
+> configuration file.
 
 **set** \[*OPTIONS*\]
 
