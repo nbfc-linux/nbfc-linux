@@ -12,7 +12,7 @@ Add this flake to inputs in your configuration:
   inputs = {
     # ...
     nbfc-linux = {
-      url = "github:nbfc-linux/nbfc-linux";
+      url = "github:nbfc-linux/nbfc-linux?dir=pkgbuilds/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # ...
