@@ -256,6 +256,7 @@ _nbfc() {
       xml2json) _nbfc_xml2json && return 0;;
       warranty);;
       support) _nbfc_support && return 0;;
+      faq);;
       help);;
     esac
   fi
@@ -270,7 +271,7 @@ _nbfc() {
   fi
 
   (( ${#POSITIONALS[@]} == 1 )) && {
-    COMPREPLY=($(compgen -W 'start stop restart status config set sensors update rate-config acpi-dump wait-for-hwmon get-model-name xml2json warranty support help' -- "$cur"))
+    COMPREPLY=($(compgen -W 'start stop restart status config set sensors update rate-config acpi-dump wait-for-hwmon get-model-name xml2json warranty support faq help' -- "$cur"))
     return 0;
   }
 

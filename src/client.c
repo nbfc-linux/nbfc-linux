@@ -104,7 +104,8 @@ const struct cli99_Option main_options[] = {
   o("warranty",         Warranty,         WARRANTY,         main)          \
   o("donate",           Donate,           SUPPORT,          main)          \
   o("support",          Support,          SUPPORT,          support)       \
-  o("help",             Help,             HELP,             main)
+  o("help",             Help,             HELP,             main)          \
+  o("faq",              FAQ,              FAQ,              main)
 //  COMMAND             ENUM              HELP TEXT         OPTIONS
 
 enum Command {
@@ -523,6 +524,7 @@ int main(int argc, char *const argv[]) {
   case Command_Donate:            return Support();
   case Command_Support:           return Support();
   case Command_Xml2Json:          return Xml2Json();
+  case Command_FAQ:               return FAQ();
   default:                        return NBFC_EXIT_FAILURE;
   }
 }

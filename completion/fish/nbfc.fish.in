@@ -253,6 +253,7 @@ function _nbfc__command
     xml2json 'Convert an XML configuration to JSON' \
     warranty 'Show warranty' \
     support 'Show how to support the project' \
+    faq 'Show NBFC FAQ manual' \
     help 'Show help'
 end
 

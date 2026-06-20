@@ -1,0 +1,589 @@
+.nh
+.TH NBFC-LINUX 7 "June 2026" "NBFC-Linux Manual" "Miscellaneous Information Manual"
+
+.SH GENERAL
+
+.SS "What is NBFC-Linux?"
+
+NBFC-Linux is a C port of the original but unmaintained C# software NBFC (NoteBook FanControl).
+It allows to control the notebook's fans by accessing the embedded controller (EC) or invoking ACPI methods.
+It shares the same utilities and interfaces as the original NBFC.
+
+.SS "What is the difference between NBFC and NBFC-Linux?"
+
+NBFC-Linux is specifically designed and optimized for the Linux ecosystem.
+
+It also comes with features that the original NBFC does not have, such as:
+.RS
+.IP \(bu 2
+Configuration rating
+.RB ( "nbfc rate-config" )
+.IP \(bu 2
+Support for calling ACPI methods
+.IP \(bu 2
+Lua scripting
+.IP \(bu 2
+Online configuration fetching
+.IP \(bu 2
+Firmware fingerprinting
+.IP \(bu 2
+Shell autocompletion for Bash, Fish and Zsh.
+.RE
+
+.SH INSTALLATION
+
+.SS "Where to get NBFC-Linux from?"
+
+NBFC-Linux can be downloaded from
+.IR https://github.com/nbfc-linux/nbfc-linux .
+
+Packages are available for
+.BR Ubuntu ", " "Linux Mint" ", " Debian ", " Fedora ", " OpenSuse " and " "Arch Linux" .
+
+.SS "Which kernel modules are required?"
+
+For accessing the embedded controller:
+.RS
+.IP \(bu 2
+.B ec_sys
+(most preferred)
+.IP \(bu 2
+.B acpi_ec
+(needs to be manually installed, see
+.IR "https://github.com/saidsay-so/acpi_ec" ")."
+
+.PP
+The embedded controller can also be accessed through
+.IR /dev/port " (without any kernel module)."
+.RE
+
+For invoking ACPI methods:
+.RS
+.IP \(bu 2
+.B acpi_call
+(manual compilation may be required for some distributions)
+.RE
+
+.SH CONFIGURATION
+
+.SS "Updating configurations"
+
+To fetch the latest configuration files from the project repository, run:
+.RS
+.B sudo nbfc update
+.RE
+
+.SS "Setting a configuration"
+
+To set a configuration, run:
+.RS
+.B sudo nbfc config --set
+.I CONFIG
+.RE
+
+Where
+.I CONFIG
+is the base filename of a configuration (without
+.BR .json " file extension)."
+
+.SS "Testing a configuration"
+
+When trying out configuration files, it is recommended to follow these steps:
+
+.RS
+.IP \(bu 2
+Set the configuration using
+.B sudo nbfc config --set
+.I CONFIG
+.IP \(bu 2
+Start the service in read-only mode using
+.B sudo nbfc restart --read-only
+.IP \(bu 2
+Let the fan spin up and down by stressing the CPU (using
+.BR "stress -c 8" )
+.IP \(bu 2
+Check if the reported fan speed matches the real (physical) fan speed using
+.B nbfc status
+.IP \(bu 2
+If this is the case, restart the service in write-mode using
+.B sudo nbfc restart
+.IP \(bu 2
+Now you can change the fan speed. See
+.B USAGE
+.RE
+
+.SS "Finding a suitable configuration"
+
+.B Automatic detection
+.RS
+To automatically select a configuration that matches your notebook model name, run:
+.RS
+.B sudo nbfc config --set auto
+.RE
+
+If this command does not print out an error message, the service has been configured successfully.
+.RE
+
+.B Configuration rating
+.RS
+To get a list of configurations that are safe to execute on the current system and may work on the device, run:
+.RS
+.B sudo nbfc rate-config --all
+.RE
+.RE
+
+.B Configurations with similar names
+.RS
+To get a list of configuration files with a name similar to the current notebook model, run:
+.RS
+.B nbfc config --recommend
+.RE
+
+.B WARNING:
+A similar model name does not mean that the configuration can be safely used on the device.
+.B It can actually be dangerous.
+Please only use configurations from this output if you are absolutely sure it is appropriate for your device.
+.RE
+
+.SS "Converting an XML model configuration from the original NBFC"
+
+If you found a configuration that was made for the original NBFC project, you can convert it using:
+.RS
+.B nbfc xml2json
+.I INFILE.xml
+.B >
+.I OUTFILE.json
+.RE
+
+In order to use the configuration, it has to be copied to
+.IR @DATADIR@/nbfc/configs/ .
+
+Such configurations may be available in the
+.B NBFC-Revive
+project, see
+.IR "https://github.com/UraniumDonut/nbfc-revive" .
+
+.SH ADVANCED CONFIGURATION
+
+.SS "Changing temperature sensors attached to a fan"
+
+If a model configuration does not configure sensors for a fan, then the default will be used, which is
+.BR @CPU ,
+meaning all CPU-associated sensors.
+
+You may have to change the sensors attached to a fan, e.g. setting a fan to the
+.B @GPU
+sensor group.
+
+To override the default sensors, use this command:
+.RS
+.B sudo nbfc sensors set -f
+.I FAN
+.RB [ "-s"
+.IR SENSOR... ]
+.RB [ "-a"
+.IR ALGORITHM ]
+.RE
+
+.I ALGORITHM
+is one of:
+.RS
+.IP \(bu 2
+.B Min
+(take the minimum temperature among all specified sensors)
+.IP \(bu 2
+.B Max
+(take the maximum temperature among all specified sensors)
+.IP \(bu
+.B Average
+(calculate the average temperature among all specified sensors; default)
+.RE
+
+.I SENSOR
+may either be a:
+.RS
+.IP \(bu 2
+.B "temperature file"
+.IP \(bu 2
+.BR "sensor name" " (which will result in one or more temperature files)"
+.IP \(bu 2
+.BR "sensor group " ( "@CPU" ", " "@GPU" ")"
+.RE
+
+.B NOTE:
+If you are writing model configuration files, use the
+.B Sensors
+field. It is recommended to use sensor groups, so that the configuration works on many systems regardless of the hardware.
+
+.SS "Showing sensors attached to a fan"
+
+To show all fans with their configured sensors, run:
+.RS
+.B nbfc sensors show
+.RE
+
+.SS "Finding all available sensors"
+
+To get a list of all available sensors, run:
+.RS
+.B nbfc sensors list
+.RE
+
+.SH USAGE
+
+.SS "Getting the service status"
+
+To get information about the service, including the notebook's fans, run:
+.RS
+.B nbfc status
+.RE
+
+.SS "Setting the fan speed"
+
+To set the speed of all available fans, run:
+.RS
+.B nbfc set -s
+.I PERCENT
+.RE
+
+To set all available fans to profile based automatic control, run:
+.RS
+.B nbfc set -a
+.RE
+
+To apply the fan speed to only a specific fan, run:
+.RS
+.B nbfc set -s
+.I PERCENT
+.B -f
+.I FAN
+.RE
+
+.B NOTE:
+.I FAN
+is a number starting from zero.
+
+.SH MISCELLANEOUS
+
+.SS "Starting NBFC-Linux automatically at boot time"
+
+NBFC-Linux comes with a
+.B systemd
+service file.
+
+To enable NBFC-Linux to start on boot, run:
+.RS
+.B sudo systemctl enable nbfc_service.service
+.RE
+
+.SS "Resetting the notebook's fans to the default behaviour"
+
+If the model configuration file for the notebook has been written properly, then
+.RS
+.B sudo nbfc stop
+.br
+\- or \-
+.br
+.B sudo systemctl stop nbfc_service
+.RE
+should reset the notebook's fans to their default behaviour.
+
+In 99% of cases, a reboot will also reset the embedded controller.
+
+.SH TROUBLESHOOTING
+
+.SS "Error: No such configuration available"
+
+The selected config file (as referenced by
+.B SelectedConfigId
+in
+.I /etc/nbfc/nbfc.json)
+does not exist.
+
+.SS "Error: No working implementation found for accessing the embedded controller"
+
+Neither
+.B ec_sys
+nor
+.B acpi_ec
+kernel modules are available.
+Access through
+.I /dev/port
+is also not possible.
+
+.SS "Error: /sys/kernel/debug/ec/ec0/io: Invalid argument"
+
+The
+.B ec_sys
+kernel module is loaded, but
+.B write_support
+is disabled.
+
+Edit
+.I /etc/default/grub
+and find the line
+.B GRUB_CMDLINE_LINUX_DEFAULT 
+then append
+.B ec_sys.write_support=1
+to it.
+
+For example, the line should look like this:
+.B GRUB_CMDLINE_LINUX_DEFAULT=\[dq]quiet kvm.enable_virt_at_load=0 ec_sys.write_support=1\[dq]
+
+Then run
+.B sudo update-grub
+and reboot your system.
+
+.SS "Error: Could not load kernel module \[dq]acpi_call\[dq]"
+
+The
+.B acpi_call
+kernel module is missing. Install or build it as needed.
+
+.SS "Error: /proc/acpi/call: AE_NOT_FOUND"
+
+An unknown ACPI method was invoked. It usually indicates an incorrect or incompatible configuration.
+
+.SH "NOTEBOOK FIRMWARE BACKGROUND"
+
+.SS "What is an embedded controller (EC)?"
+
+The embedded controller is a microcontroller within modern notebook computers. It manages system hardware functions such as fan speed, battery charging, keyboard control, LCD backlight and many more.
+
+.SS "What is ACPI?"
+
+The Advanced Configuration and Power Interface (ACPI) is an open industry standard for device configuration and power management. ACPI methods allow the operating system to control various hardware components.
+
+.SH CONFIGURATION DEVELOPMENT
+
+.SS "Safety Considerations"
+
+Only interact with EC registers or ACPI methods you fully understand. Misuse can damage hardware.
+If possible, remove the battery while creating a configuration, as accidental modification to battery registers may brick the battery permanently.
+
+.SS "Naming configuration files"
+
+Use the output of
+.B nbfc get-model-name
+as the configuration's filename.
+
+.SS "How to analyze the firmware?"
+
+To get a list of all registers that are accessible through the embedded controller, run:
+.RS
+.B sudo nbfc acpi-dump ec-registers
+.RE
+
+To get a list of all embedded controller registers, run:
+.RS
+.B sudo nbfc acpi-dump registers
+.RE
+
+.B WARNING:
+Do not try to access those registers through
+.BR ec_probe ,
+as they are not exposed through the embedded controller.
+Only write to registers that are listed by
+.BR "sudo nbfc acpi-dump ec-registers" .
+
+To get a list of all ACPI methods, run:
+.RS
+.B sudo nbfc acpi-dump methods
+.RE
+
+To disassemble all the ACPI firmware tables, run:
+.RS
+.B sudo nbfc acpi-dump dsl
+.RE
+
+.SS "How to identify fan registers?"
+
+Search for registers named like
+.BR FAN ", " RPM ", " PWM ", etc."
+
+Examples:
+.B SFAN CFAN PFAN FAN1 FSW1 FRDC FTGC RPM1 RPM2
+
+.SS "How to identify ACPI methods?"
+
+Search for methods named like
+.BR FAN ", " RPM ", " PWM ", etc."
+
+Examples:
+.B FANG FANW GFSD SFSD SFNV FRSP STMM GFRM
+
+.SS "Accessing the embedded controller"
+
+For reading a register:
+.RS
+.B sudo ec_probe read
+.I REGISTER
+.RE
+
+For reading a 16-bit register:
+.RS
+.B sudo ec_probe read --word
+.I REGISTER
+.RE
+
+For writing to a register:
+.RS
+.B sudo ec_probe write
+.I REGISTER
+.I VALUE
+.RE
+
+For writing to a 16-bit register:
+.RS
+.B sudo ec_probe write --word
+.I REGISTER
+.I VALUE
+.RE
+
+.SS "Invoking ACPI methods"
+
+To call an ACPI method, run:
+.RS
+.B sudo ec_probe acpi_call '\eMETHOD ARGS...'
+.RE
+
+.SS "Tracing embedded controller changes"
+
+It may be useful to trace the registers of the embedded controller as the fan spins up and down.
+
+To do so, make sure the fan is at its lowest speed, then run:
+
+.RS
+.B sudo ec_probe monitor -r
+.I OUTFILE.csv
+.RE
+
+While recording, stress the CPU, run:
+
+.RS
+.B stress -c 8
+.RE
+
+When the fan reached its maximum speed, stop the
+.B stress
+command and wait until the fan is at its lowest speed.
+
+You now can kill the
+.B ec_probe monitor
+command and inspect the
+.I OUTFILE.csv
+for register changes.
+
+You can also visualize the
+.I OUTFILE.csv
+by running:
+
+.RS
+.B ec_probe graph
+.I OUTFILE.csv
+.RE
+
+.SS "Writing complex configurations with Lua"
+
+Sometimes a firmware must be accessed in a more complex way than the NBFC software supports.
+For example, ACPI commands have to be constructed or the readings of the embedded controller have to be modified.
+
+See
+.BR nbfc_service.json (5)
+for details.
+
+.SS "Firmware Fingerprinting"
+
+Firmware fingerprinting is especially useful if a model configuration file uses
+.B ACPI WMI
+methods.
+Since these methods often have the same names but not the same implementation it is necessary to look for characteristics in the firmware that confirm it is the intended firmware.
+
+See
+.BR nbfc_service.json (5)
+for details.
+
+.SS "Getting Help"
+
+See
+.BR nbfc_service.json (5)
+for details.
+
+For more information, see the
+.BR "Creating Model Configuration HowTo" :
+.IR "https://nbfc-linux.github.io/creating-config/" .
+
+For further assistance, visit the project at GitHub:
+.IR https://github.com/nbfc-linux/nbfc-linux .
+
+.SH CONTRIBUTING
+
+.SS "Contributing a configuration file"
+
+When contributing a configuration file, please also attach your firmware.
+You can create an archive containing your firmware by running:
+
+.RS
+.B sudo nbfc support --create-archive
+.I ARCHIVE.tar.gz
+.RE
+
+This helps the developer validate your configuration and keep the register-name database up to date.
+
+.SS "Contributing code"
+
+Before contributing code, please open an issue and ask if the contribution is wanted. This helps avoid frustration and prevents unnecessary work.
+
+.SS "Uploading your firmware"
+
+Uploading your notebook firmware helps the developer to understand existing
+configuration files.
+
+The following data will be transmitted:
+
+.RS
+.IP \(bu 2
+The
+.B laptop manufacturer
+.RI ( /sys/devices/virtual/dmi/id/sys_vendor )
+.IP \(bu 2
+The
+.B laptop model
+.RI ( /sys/devices/virtual/dmi/id/product_name )
+.IP \(bu 2
+The
+.B ACPI DSDT
+firmware table
+.RI ( /sys/firmware/acpi/tables/DSDT )
+.IP \(bu 2
+The
+.B ACPI SSDT
+firmware tables
+.RI ( /sys/firmware/acpi/tables/SSDT* )
+.RE
+
+.PP
+
+The preferred method for uploading your notebook firmware is to use:
+
+.RS
+.B sudo nbfc support --upload-firmware
+.RE
+
+However, if you're paranoid, you can upload it manually using
+.BR curl :
+
+.RS
+.B nbfc support --print-command
+.RE
+
+.SH AUTHOR
+.PP
+Benjamin Abendroth (braph93@gmx.de)
+
+.SH SEE ALSO
+.PP
+.BR nbfc (1),
+.BR nbfc_service (1),
+.BR nbfc_service.json (5),
+.BR ec_probe (1)

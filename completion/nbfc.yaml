@@ -251,5 +251,8 @@ options:
     metavar: "FILE"
     complete: ["file"]
 ---
+prog: "nbfc faq"
+help: "Show NBFC FAQ manual"
+---
 prog: "nbfc help"
 help: "Show help"

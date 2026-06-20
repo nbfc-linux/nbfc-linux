@@ -8,6 +8,7 @@ doc/ec_probe.1
 doc/nbfc.1
 doc/nbfc_service.1
 doc/nbfc_service.json.5
+doc/nbfc.faq.7
 completion/bash/ec_probe
 completion/bash/nbfc
 completion/bash/nbfc_service

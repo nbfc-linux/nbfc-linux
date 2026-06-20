@@ -16,7 +16,7 @@ This program is used to control the NoteBook FanControl service.
 .RI [ OPTIONS ]
 .SS MISCELLANEOUS COMMANDS
 .B nbfc
-.RB { update " | " rate\-config " | " acpi\-dump " | " get\-model\-name " | " xml2json " | " support " | " warranty " | " help }
+.RB { update " | " rate\-config " | " acpi\-dump " | " get\-model\-name " | " xml2json " | " support " | " warranty " | " faq " | " help }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -381,6 +381,11 @@ into the NBFC\-Linux format.
 .B warranty
 .RS
 Show warranty.
+.RE
+
+.B faq
+.RS
+Show NBFC FAQ manual page.
 .RE
 
 .B help

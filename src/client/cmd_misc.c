@@ -103,3 +103,7 @@ static int Complete_Sensors(void) {
 
   return NBFC_EXIT_SUCCESS;
 }
+
+static int FAQ() {
+  return execlp("man", "man", "nbfc.faq", NULL);
+}

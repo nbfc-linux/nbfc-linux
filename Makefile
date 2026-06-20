@@ -10,6 +10,7 @@ sysddir 		= $(PREFIX)/lib/systemd/system
 mandir 			= $(PREFIX)/share/man
 man1dir     = $(mandir)/man1
 man5dir     = $(mandir)/man5
+man7dir     = $(mandir)/man7
 runstatedir	= /var/run
 orcdir   		= $(confdir)/init.d
 systemvdir  = $(confdir)/init.d
@@ -42,7 +43,7 @@ override CPPFLAGS += \
 	-DVERSION=\"$(version)\"
 
 CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
-DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
+DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5 doc/nbfc.faq.7
 SYSTEMD = etc/systemd/system/nbfc_service.service
 OPEN_RC = etc/init.d/nbfc_service.openrc
 SYSTEMV = etc/init.d/nbfc_service.systemv
@@ -78,6 +79,9 @@ doc/nbfc_service.1: doc/nbfc_service.1.in
 	$(REPLACE_VARS) < $< > $@
 
 doc/nbfc_service.json.5: doc/nbfc_service.json.5.in
+	$(REPLACE_VARS) < $< > $@
+
+doc/nbfc.faq.7: doc/nbfc.faq.7.in
 	$(REPLACE_VARS) < $< > $@
 
 # BASH completion files #######################################################
@@ -148,6 +152,7 @@ install-docs: $(DOC)
 	install -Dm 644 doc/nbfc.1               $(DESTDIR)$(man1dir)/nbfc.1
 	install -Dm 644 doc/nbfc_service.1       $(DESTDIR)$(man1dir)/nbfc_service.1
 	install -Dm 644 doc/nbfc_service.json.5  $(DESTDIR)$(man5dir)/nbfc_service.json.5
+	install -Dm 644 doc/nbfc.faq.7           $(DESTDIR)$(man7dir)/nbfc.faq.7
 
 install-completion: $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 	# ZSH
@@ -343,16 +348,18 @@ src/generated/: .force
 # Documentation ===============================================================
 # =============================================================================
 
-doc: doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
+doc: doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5 doc/nbfc.faq.7
 	pandoc -f man -t markdown doc/ec_probe.1 					> doc/ec_probe.1.md
 	pandoc -f man -t markdown doc/nbfc.1 							> doc/nbfc.1.md
 	pandoc -f man -t markdown doc/nbfc_service.1 			> doc/nbfc_service.1.md
 	pandoc -f man -t markdown doc/nbfc_service.json.5 > doc/nbfc_service.json.5.md
+	pandoc -f man -t markdown doc/nbfc.faq.7          > doc/nbfc.faq.7.md
 	
 	pandoc -f man -t html doc/ec_probe.1 					> doc/ec_probe.1.html
 	pandoc -f man -t html doc/nbfc.1 							> doc/nbfc.1.html
 	pandoc -f man -t html doc/nbfc_service.1 			> doc/nbfc_service.1.html
 	pandoc -f man -t html doc/nbfc_service.json.5 > doc/nbfc_service.json.5.html
+	pandoc -f man -t html doc/nbfc.faq.7          > doc/nbfc.faq.7.html
 
 deprecation_warning:
 	@echo

@@ -24,6 +24,7 @@
  "    help                Show help\n"                                         \
  "    support             Show how to support the project\n"                   \
  "    warranty            Show warranty\n"                                     \
+ "    faq                 Show frequently asked questions\n"                   \
  ""
 
 #define CLIENT_START_HELP_TEXT                                                 \
@@ -294,3 +295,13 @@
   "This command can be used to convert configurations from the original\n"     \
   "NBFC project into the NBFC-Linux format.\n"                                 \
   ""
+
+#define CLIENT_FAQ_HELP_TEXT                                                   \
+ "Usage: nbfc faq [-h]\n"                                                      \
+ "\n"                                                                          \
+ "Show the NBFC FAQ man page.\n"                                               \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ "\n"                                                                          \
+ ""

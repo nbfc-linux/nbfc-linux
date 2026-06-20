@@ -132,6 +132,7 @@ _nbfc__command() {
     xml2json:'Convert an XML configuration to JSON'
     warranty:'Show warranty'
     support:'Show how to support the project'
+    faq:'Show NBFC FAQ manual'
     help:'Show help'
   )
 
@@ -187,6 +188,7 @@ _nbfc() {
     xml2json) _nbfc_xml2json; return $?;;
     warranty) _nbfc_warranty; return $?;;
     support) _nbfc_support; return $?;;
+    faq) _nbfc_faq; return $?;;
     help) _nbfc_help; return $?;;
   esac
 
@@ -467,6 +469,15 @@ _nbfc_support() {
     '(--create-archive --print-command --upload-firmware)'--upload-firmware'[Upload your notebook firmware without prompting]'
     '(--create-archive --upload-firmware --print-command)'--print-command'[Print command for manual firmware upload]'
     '(--print-command --upload-firmware --create-archive)'--create-archive='[Create a support archive]':FILE:_files
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_faq() {
+  local -a args=(
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command

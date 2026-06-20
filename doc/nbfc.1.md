@@ -17,7 +17,7 @@ This program is used to control the NoteBook FanControl service.
 
 **nbfc** {**update** \| **rate-config** \| **acpi-dump** \|
 **get-model-name** \| **xml2json** \| **support** \| **warranty** \|
-**help**} \[*OPTIONS*\]
+**faq** \| **help**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -283,6 +283,10 @@ This program is used to control the NoteBook FanControl service.
 **warranty**
 
 > Show warranty.
+
+**faq**
+
+> Show NBFC FAQ manual page.
 
 **help**
 
