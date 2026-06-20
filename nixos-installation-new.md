@@ -82,7 +82,7 @@ in {
   ];
 ```
 
-### Chose configuration file
+### Choose configuration file
 
 Now if you try to set config the normal way you will encounter the following issue
 ```bash
