@@ -15,6 +15,7 @@
 #include "check_root.h"
 #include "service_control.h"
 #include "config_files.h"
+#include "str_functions.h"
 #include "client_global.h"
 
 #define RECOMMENDED_WARNING \
@@ -146,6 +147,26 @@ int Set_Or_Apply(void) {
     ConfigFile* found = ConfigFiles_FindIgnoreCase(&files, config);
     if (! found) {
       Log_Error("No such configuration available: %s", config);
+
+      // Compute similarity scores and suggest close matches
+      for_each_array(ConfigFile*, file, files)
+        file->diff = str_similarity(config, file->config_name);
+      qsort(files.data, files.size, sizeof(ConfigFile), ConfigFile_CompareByDiff);
+
+      bool have_suggestion = false;
+      for_each_array(ConfigFile*, file, files) {
+        if (file->diff >= RecommendedConfigMatchThreshold) {
+          if (!have_suggestion) {
+            fprintf(stderr, "Did you mean one of these?\n");
+            have_suggestion = true;
+          }
+          fprintf(stderr, "  %s\n", file->config_name);
+        }
+      }
+
+      if (!have_suggestion)
+        fprintf(stderr, "Use 'nbfc config --list' to see all available configurations.\n");
+
       return NBFC_EXIT_FAILURE;
     }
 
