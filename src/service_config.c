@@ -10,10 +10,9 @@
 #include "nxjson_utils.h"
 #include "nxjson_write.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
+#include <unistd.h> // close
+#include <string.h> // memset
+#include <sys/stat.h> // open, O_WRONLY, O_CREAT, O_TRUNC, S_IRUSR, ...
 
 ServiceConfig service_config = {0};
 
@@ -93,12 +92,14 @@ Error ServiceConfig_Write(const char* file) {
   if (ServiceConfig_IsSet_EmbeddedControllerType(&service_config))
     create_json_string("EmbeddedControllerType", o, EmbeddedControllerType_ToString(service_config.EmbeddedControllerType));
 
+#if 0
   if (service_config.TargetFanSpeeds.size) {
     nx_json* fanspeeds = create_json_array("TargetFanSpeeds", o);
 
     for_each_array(float*, f, service_config.TargetFanSpeeds)
       create_json_double(NULL, fanspeeds, *f);
   }
+#endif
 
   if (service_config.FanTemperatureSources.size) {
     nx_json* fan_temperature_sources = create_json_array("FanTemperatureSources", o);

@@ -448,7 +448,7 @@ int Update(void) {
   Log_Info("Updating configuration files ...");
   if (UpdateConfigurationFiles() == -1)
     ret = NBFC_EXIT_FAILURE;
-  
+
 #if STRICT_CLEANUP
   curl_global_cleanup();
 #endif

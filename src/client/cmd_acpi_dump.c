@@ -11,8 +11,6 @@
 #include <stdio.h>  // printf
 #include <string.h> // strcmp
 
-#define ACPI_DUMP_MAX_AML_FILES 64
-
 const struct cli99_Option acpi_dump_options[] = {
   cli99_Options_Include(&main_options),
   {"command",       Option_Acpi_Dump_Command,   cli99_NormalPositional},
@@ -33,7 +31,7 @@ enum NBFC_PACKED_ENUM AcpiDump_Action {
 struct {
   enum AcpiDump_Action action;
   bool json;
-  const char* files[ACPI_DUMP_MAX_AML_FILES];
+  const char* files[ACPI_ANALYSIS_MAX_AML_FILES];
   size_t files_size;
   const char* dir;
 } Acpi_Dump_Options = {

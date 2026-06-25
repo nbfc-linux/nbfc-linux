@@ -17,8 +17,6 @@
 
 #define RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE 9.0
 
-#define RATE_CONFIG_MAX_AML_FILES 64
-
 #define RATE_CONFIG_RULES_JSON_URL \
   "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/config_rating_rules_v1.json"
 
@@ -46,7 +44,7 @@ struct {
   bool        min_score_set;
   float       min_score;
   const char* file;
-  const char* dsdt_files[RATE_CONFIG_MAX_AML_FILES];
+  const char* dsdt_files[ACPI_ANALYSIS_MAX_AML_FILES];
   size_t      dsdt_files_size;
   const char* dsdt_dir;
   const char* rules_file;

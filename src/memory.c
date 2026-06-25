@@ -5,7 +5,7 @@
 #include "log.h"    // WriteToErr
 
 #include <stdlib.h> // malloc, calloc, realloc, free, exit
-#include <string.h> // strlen, strcpy, strerror
+#include <string.h> // strlen, memcpy, strerror
 #include <stdio.h>  // fprintf
 
 void Memory_FatalError(void) {
@@ -78,7 +78,7 @@ char* Memory_Strdup(const char* s)
   char* p = Memory_Malloc(len + 1);
 #endif
 
-  strcpy(p, s);
+  memcpy(p, s, len + 1);
   return p;
 }
 

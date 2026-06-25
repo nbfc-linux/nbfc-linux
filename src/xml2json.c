@@ -65,7 +65,7 @@ static Error Xml2Json_ParseBool(xmlNode* node, const char* key, nx_json* parent)
   if (! content)
     return err_string("xmlNodeGetContent() returned NULL");
 
-  int val = 2;
+  int val = -1;
   if (! strcmp((const char*) content, "true")) {
     val = 1;
   }
@@ -74,7 +74,7 @@ static Error Xml2Json_ParseBool(xmlNode* node, const char* key, nx_json* parent)
   }
 
   xmlFree(content);
-  if (val == 2)
+  if (val == -1)
     return err_string("Not a bool");
 
   create_json_bool(key, parent, !!val);
@@ -89,7 +89,7 @@ static Error Xml2Json_ParseBool(xmlNode* node, const char* key, nx_json* parent)
 
 #define XML2JSON_PARSE_END()                                                  \
       else {                                                                  \
-        e = err_string("Unkown field");                                       \
+        e = err_string("Unknown field");                                      \
       }                                                                       \
                                                                               \
       if (e)                                                                  \

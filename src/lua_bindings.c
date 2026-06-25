@@ -203,7 +203,7 @@ Error Lua_UseLibrary(const char* libname) {
   else if (! strcmp(libname, LUA_OSLIBNAME))
     luaL_requiref(Lua_State, LUA_OSLIBNAME, luaopen_os, 1);
   else
-    return err_stringf("%s: Unkown Lua library", libname);
+    return err_stringf("%s: Unknown Lua library", libname);
 
   lua_pop(Lua_State, 1);
   return err_success();
@@ -255,11 +255,11 @@ Error Lua_Call(int function_ref, uint64_t value, uint64_t* result) {
   // stack:
   // -2 = error
   // -1 = result
-  
+
   // check error
   if (! lua_isnil(Lua_State, -2)) {
     const char* err = lua_tostring(Lua_State, -2);
-    e = err_string(err ? err : "Unkown Lua error");
+    e = err_string(err ? err : "Unknown Lua error");
     lua_pop(Lua_State, 2);
     return e;
   }

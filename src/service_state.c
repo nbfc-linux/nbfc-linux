@@ -8,7 +8,9 @@
 #include "nxjson_utils.h"
 #include "nxjson_write.h"
 
-#include <sys/stat.h>
+#include <string.h> // memset
+#include <unistd.h> // close
+#include <sys/stat.h> // open, O_WRONLY, O_CREAT, O_TRUNC, S_IRUSR, ...
 
 ServiceState service_state = {0};
 

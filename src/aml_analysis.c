@@ -147,7 +147,7 @@ static bool AML_Analysis_IdentifierBasenameEquals(const AML_Token* a, const AML_
  * Returns true if both tokens are equal.
  */
 static bool AML_Analysis_TokenEquals(const AML_Token* a, const AML_Token* b) {
-  if (a->type == b->type)
+  if (a->type == b->type) {
     switch (a->type) {
     case AML_TOK_Integer:
       return a->number == b->number;
@@ -161,6 +161,7 @@ static bool AML_Analysis_TokenEquals(const AML_Token* a, const AML_Token* b) {
     default:
       return true;
     }
+  }
 
   return false;
 }

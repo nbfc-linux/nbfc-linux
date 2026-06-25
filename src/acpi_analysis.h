@@ -8,20 +8,23 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ACPI_ANALYSIS_IASL      "iasl"
-#define ACPI_ANALYSIS_ACPIEXEC  "acpiexec"
-#define ACPI_ANALYSIS_ACPI_DIR  "/sys/firmware/acpi/tables"
+#define ACPI_ANALYSIS_IASL_BIN        "iasl"
+#define ACPI_ANALYSIS_ACPIEXEC_BIN    "acpiexec"
+#define ACPI_ANALYSIS_ACPI_DIR        "/sys/firmware/acpi/tables"
+#define ACPI_ANALYSIS_MAX_SEGMENT_LEN 4
+#define ACPI_ANALYSIS_MAX_SSDT_FILES  64
+#define ACPI_ANALYSIS_MAX_AML_FILES   65 /* SSDTs + DSDT */
 
 /*
  * Stores a register name.
  */
-typedef char AcpiRegisterName[5];
+typedef char AcpiRegisterName[ACPI_ANALYSIS_MAX_SEGMENT_LEN + 1];
 declare_array_of(AcpiRegisterName);
 
 /*
  * Stores a operation region name.
  */
-typedef char AcpiOperationRegionName[5];
+typedef char AcpiOperationRegionName[ACPI_ANALYSIS_MAX_SEGMENT_LEN + 1];
 declare_array_of(AcpiOperationRegionName);
 
 /*

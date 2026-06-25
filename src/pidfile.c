@@ -6,7 +6,7 @@
 #include <errno.h>  // errno, EEXIST
 #include <stdio.h>  // snprintf
 #include <unistd.h> // getpid
-#include <sys/stat.h>
+#include <sys/stat.h> // O_WRONLY, O_CREAT, O_TRUNC, S_IRUSR, ...
 
 Error PID_Write(enum PID_LockMode lock_mode) {
   Error e = err_success();

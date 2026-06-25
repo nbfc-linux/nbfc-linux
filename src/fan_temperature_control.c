@@ -248,7 +248,7 @@ static Error FanTemperatureControl_SetByModelConfig(
 // Initialize `fans` by `service_config`
 static Error FanTemperatureControl_SetByServiceConfig(
   array_of(FanTemperatureControl)* fans,
-  ServiceConfig* service_config) 
+  ServiceConfig* service_config)
 {
   Error e;
 
@@ -312,7 +312,7 @@ Error FanTemperatureControl_Init(
   if (e)
     return e;
 
-  // Set the temperature sources as specified in service_config 
+  // Set the temperature sources as specified in service_config
   e = FanTemperatureControl_SetByServiceConfig(fans, service_config);
   if (e)
     return e;

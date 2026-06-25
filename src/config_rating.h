@@ -17,6 +17,9 @@
  * acpi_info:
  *   Contains ACPI information (registers, methods, operation regions).
  *
+ * aml_analysis:
+ *   Contains disassembled and tokenized ACPI tables.
+ *
  * rules:
  *   Contains the rules for rating configurations.
  */

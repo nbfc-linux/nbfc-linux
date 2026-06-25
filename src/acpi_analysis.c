@@ -6,13 +6,10 @@
 #include "regex_utils.h"
 #include "nxjson_utils.h"
 
-#include <stdint.h>
 #include <string.h> // strlen
 #include <stdlib.h> // system
 #include <linux/limits.h> // PATH_MAX
 
-#define ACPI_ANALYSIS_MAX_SSDT_FILES       64
-#define ACPI_ANALYSIS_MAX_AML_FILES        65 // SSDTs + DSDT
 #define ACPI_ANALYSIS_DSDT_TEMP_FILE       "/tmp/nbfc.acpi.dsdt.XXXXXX.dat"
 #define ACPI_ANALYSIS_DSDT_TEMP_SUFFIX_LEN 4 // len of `.dat`
 
@@ -137,22 +134,22 @@
  * Checks if the `iasl` program is installed.
  */
 Error Acpi_Analysis_Is_IASL_Installed(void) {
-  if (system("type " ACPI_ANALYSIS_IASL " >/dev/null 2>/dev/null") == 0)
+  if (system("type " ACPI_ANALYSIS_IASL_BIN " >/dev/null 2>/dev/null") == 0)
     return err_success();
 
   errno = ENOENT;
-  return err_stdlib(ACPI_ANALYSIS_IASL);
+  return err_stdlib(ACPI_ANALYSIS_IASL_BIN);
 }
 
 /*
  * Checks if the `acpiexec` program is installed.
  */
 Error Acpi_Analysis_Is_AcpiExec_Installed(void) {
-  if (system("type " ACPI_ANALYSIS_ACPIEXEC " >/dev/null 2>/dev/null") == 0)
+  if (system("type " ACPI_ANALYSIS_ACPIEXEC_BIN " >/dev/null 2>/dev/null") == 0)
     return err_success();
 
   errno = ENOENT;
-  return err_stdlib(ACPI_ANALYSIS_ACPIEXEC);
+  return err_stdlib(ACPI_ANALYSIS_ACPIEXEC_BIN);
 }
 
 void AcpiRegister_Free(AcpiRegister* acpi_register) {
@@ -314,7 +311,7 @@ Error Acpi_Analysis_Get_Info(array_of(str)* files, AcpiInfo* out) {
   char* stdout_ = NULL;
   char* stderr_ = NULL;
   char** argv = Mem_Calloc(6 + files->size, sizeof(char*));
-  argv[0] = Mem_Strdup(ACPI_ANALYSIS_ACPIEXEC);
+  argv[0] = Mem_Strdup(ACPI_ANALYSIS_ACPIEXEC_BIN);
   argv[1] = Mem_Strdup("-dt");
   argv[2] = Mem_Strdup("-di");
   argv[3] = Mem_Strdup("-b");
@@ -323,20 +320,20 @@ Error Acpi_Analysis_Get_Info(array_of(str)* files, AcpiInfo* out) {
     argv[5 + i] = Mem_Strdup(files->data[i]);
   }
 
-  int ret = Process_Capture(ACPI_ANALYSIS_ACPIEXEC, argv, &stdout_, &stderr_);
+  int ret = Process_Capture(ACPI_ANALYSIS_ACPIEXEC_BIN, argv, &stdout_, &stderr_);
 
   if (ret == -1) {
-    e = err_stdlib(ACPI_ANALYSIS_ACPIEXEC);
+    e = err_stdlib(ACPI_ANALYSIS_ACPIEXEC_BIN);
     goto end;
   }
 
   if (ret != 0) {
-    e = err_stringf(ACPI_ANALYSIS_ACPIEXEC " returned %d", ret);
+    e = err_stringf(ACPI_ANALYSIS_ACPIEXEC_BIN " returned %d", ret);
     goto end;
   }
 
   if (! stdout_) {
-    e = err_string(ACPI_ANALYSIS_ACPIEXEC " returned no output");
+    e = err_string(ACPI_ANALYSIS_ACPIEXEC_BIN " returned no output");
     goto end;
   }
 
@@ -453,14 +450,14 @@ Error Acpi_Analysis_Get_DSL(const char* file, char** out) {
   char* stdout_ = NULL;
   char* stderr_ = NULL;
   char* argv[] = {
-    Mem_Strdup(ACPI_ANALYSIS_IASL),
+    Mem_Strdup(ACPI_ANALYSIS_IASL_BIN),
     Mem_Strdup("-d"),
     Mem_Strdup(temp_file),
     NULL
   };
 
   // Run `iasl -d temp_file` and immediately remove `temp_file`
-  int ret = Process_Capture(ACPI_ANALYSIS_IASL, argv, &stdout_, &stderr_);
+  int ret = Process_Capture(ACPI_ANALYSIS_IASL_BIN, argv, &stdout_, &stderr_);
   int errno_save = errno;
   unlink(temp_file);
   errno = errno_save;
@@ -472,12 +469,12 @@ Error Acpi_Analysis_Get_DSL(const char* file, char** out) {
   temp_file[len - 1] = 'l';
 
   if (ret == -1) {
-    e = err_stdlib(ACPI_ANALYSIS_IASL);
+    e = err_stdlib(ACPI_ANALYSIS_IASL_BIN);
     goto end;
   }
 
   if (ret != 0) {
-    e = err_stringf(ACPI_ANALYSIS_IASL " returned %d", ret);
+    e = err_stringf(ACPI_ANALYSIS_IASL_BIN " returned %d", ret);
     goto end;
   }
 
