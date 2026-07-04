@@ -37,6 +37,7 @@ options:
     metavar: "FAN INDEX"
     help: "Show status of fan (zero based)"
     groups: ["group1"]
+    repeatable: true
     complete: ["exec", "nbfc complete-fans"]
 
   - option_strings: ["-w", "--watch"]

@@ -233,7 +233,7 @@ _nbfc_status() {
   local -a args=(
     '(--fan --service -f -s --all -a)'{-a,--all}'[Show service and fan status (default)]'
     '(--all --fan -a -f --service -s)'{-s,--service}'[Show service status]'
-    '(--all --service -a -s --fan -f)'{-f+,--fan=}'[Show status of fan (zero based)]':'FAN INDEX':"{_nbfc__exec 'nbfc complete-fans'}"
+    '(--all --service -a -s)''*'{-f+,--fan=}'[Show status of fan (zero based)]':'FAN INDEX':"{_nbfc__exec 'nbfc complete-fans'}"
     '(--watch -w)'{-w+,--watch=}'[Show status periodically]':SECONDS:"_numbers -f 'Show status periodically'"
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"

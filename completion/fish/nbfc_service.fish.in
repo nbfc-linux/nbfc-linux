@@ -2,140 +2,123 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-function _nbfc_service__query
+function _nbfc_service__has_option
+  set -l option
+  for option in $__QUERY_CACHE_HAVING_OPTIONS
+    contains -- $option $argv && return 0
+  end
 
+  return 1
+end
+
+function _nbfc_service__query_init
+  set -l definitions $argv
   set -l positionals
   set -l having_options
   set -l option_values
 
-  set -l options $argv[1]
-  set -e argv[1]
+  function _nbfc_service_get_option -S
+    set -l option $argv[1]
+    set -l i (count $definitions)
 
-  set -l cmd $argv[1]
-  set -e argv[1]
-
-  set -l my_cache_key "$(commandline -b) $options"
-
-  if test "$__QUERY_CACHE_KEY" = "$my_cache_key"
-    set positionals    $__QUERY_CACHE_POSITIONALS
-    set having_options $__QUERY_CACHE_HAVING_OPTIONS
-    set option_values  $__QUERY_CACHE_OPTION_VALUES
-  else
-
-    set -l short_opts_with_arg
-    set -l short_opts_without_arg
-    set -l short_opts_with_optional_arg
-    set -l long_opts_with_arg
-    set -l long_opts_without_arg
-    set -l long_opts_with_optional_arg
-
-    set -l option
-
-    if test -n "$options"
-      for option in (string split -- ' ' $options)
-        if false
-          true
-        else if string match -qr -- '^--.+=$' $option
-          set -a long_opts_with_arg (string replace -- '=' '' $option)
-        else if string match -qr -- '^--.+=\?$' $option
-          set -a long_opts_with_optional_arg (string replace -- '=?' '' $option)
-        else if string match -qr -- '^--.+$' $option
-          set -a long_opts_without_arg $option
-        else if string match -qr -- '^-.=$' $option
-          set -a short_opts_with_arg (string replace -- '=' '' $option)
-        else if string match -qr -- '^-.=\?$' $option
-          set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
-        else if string match -qr -- '^-.$' $option
-          set -a short_opts_without_arg $option
+    while test $i -ge 1
+      set -l split (string split -m 1 -- '=>' $definitions[$i])
+      if true
+        set -l opt
+        for opt in (string split -- ' ' $split[2])
+          test "$opt" = "$option"   && begin echo '0'; return; end
+          test "$opt" = "$option="  && begin echo '1'; return; end
+          test "$opt" = "$option=?" && begin echo '?'; return; end
         end
       end
+
+      set i (math $i - 1)
     end
+  end
 
-    set -l cmdline (commandline -poc)
-    set -l cmdline_count (count $cmdline)
+  set -l cmdline (commandline -poc)
+  set -l cmdline_count (count $cmdline)
 
-    set -l argi 2 # cmdline[1] is command name
-    while test $argi -le $cmdline_count
-      set -l arg "$cmdline[$argi]"
-      set -l have_trailing_arg (test $argi -lt $cmdline_count && echo true || echo false)
+  set -l argi 2 # cmdline[1] is command name
+  while test $argi -le $cmdline_count
+    set -l arg "$cmdline[$argi]"
+    set -l have_trailing_arg (test $argi -lt $cmdline_count && echo true || echo false)
 
-      switch $arg
-        case '-'
-          set -a positionals -
-        case '--'
-          set -a positionals $cmdline[$(math $argi + 1)..]
-          break
-        case '--*=*'
-          set -l split (string split -m 1 -- '=' $arg)
-          set -a having_options $split[1]
-          set -a option_values "$split[2]"
-        case '--*'
-          if contains -- $arg $long_opts_with_arg
-            if $have_trailing_arg
-              set -a having_options $arg
+    switch $arg
+      case '-'
+        set -a positionals -
+      case '--'
+        set -a positionals $cmdline[$(math $argi + 1)..]
+        break
+      case '--*=*'
+        set -l split (string split -m 1 -- '=' $arg)
+        set -a having_options $split[1]
+        set -a option_values "$split[2]"
+      case '--*'
+        set -l option_type (_nbfc_service_get_option $arg)
+        if test "$option_type" = '1'
+          if $have_trailing_arg
+            set -a having_options $arg
+            set -a option_values $cmdline[(math $argi + 1)]
+            set argi (math $argi + 1)
+          end
+        else
+          set -a having_options $arg
+          set -a option_values ''
+        end
+      case '-*'
+        set -l end_of_parsing false
+
+        set -l arg_length (string length -- $arg)
+        set -l i 2
+        while not $end_of_parsing; and test $i -le $arg_length
+          set -l option "-$(string sub -s $i -l 1 -- $arg)"
+          set -l trailing_chars "$(string sub -s (math $i + 1) -- $arg)"
+          set -l option_type (_nbfc_service_get_option $option)
+
+          if test "$option_type" = '0'
+            set -a having_options $option
+            set -a option_values ''
+          else if test "$option_type" = '1'
+            set end_of_parsing true
+
+            if test -n "$trailing_chars"
+              set -a having_options $option
+              set -a option_values $trailing_chars
+            else if $have_trailing_arg
+              set -a having_options $option
               set -a option_values $cmdline[(math $argi + 1)]
               set argi (math $argi + 1)
             end
-          else
-            set -a having_options $arg
-            set -a option_values ''
+          else if test "$option_type" = '?'
+            set end_of_parsing true
+            set -a having_options $option
+            set -a option_values "$trailing_chars" # may be empty
           end
-        case '-*'
-          set -l end_of_parsing false
 
-          set -l arg_length (string length -- $arg)
-          set -l i 2
-          while not $end_of_parsing; and test $i -le $arg_length
-            set -l option "-$(string sub -s $i -l 1 -- $arg)"
-            set -l trailing_chars "$(string sub -s (math $i + 1) -- $arg)"
-
-            if contains -- $option $short_opts_without_arg
-              set -a having_options $option
-              set -a option_values ''
-            else if contains -- $option $short_opts_with_arg
-              set end_of_parsing true
-
-              if test -n "$trailing_chars"
-                set -a having_options $option
-                set -a option_values $trailing_chars
-              else if $have_trailing_arg
-                set -a having_options $option
-                set -a option_values $cmdline[(math $argi + 1)]
-                set argi (math $argi + 1)
-              end
-            else if contains -- $option $short_opts_with_optional_arg
-              set end_of_parsing true
-              set -a having_options $option
-              set -a option_values "$trailing_chars" # may be empty
-            end
-
-            set i (math $i + 1)
-          end
-        case '*'
-          set -a positionals $arg
-      end
-
-      set argi (math $argi + 1)
+          set i (math $i + 1)
+        end
+      case '*'
+        set -a positionals $arg
     end
 
-    set -g __QUERY_CACHE_POSITIONALS    $positionals
-    set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
-    set -g __QUERY_CACHE_OPTION_VALUES  $option_values
-    set -g __QUERY_CACHE_KEY            $my_cache_key
+    set argi (math $argi + 1)
   end
 
-  switch $cmd
-    case 'has_option'
-      for option in $having_options
-        contains -- $option $argv && return 0
-      end
+  set -g __QUERY_CACHE_POSITIONALS    $positionals
+  set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
+  set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+end
 
-      return 1
-  end
+function _nbfc_service__prepare
+  _nbfc_service__query_init \
+    '=>-h --help -r --read-only -f --fork -d --debug -c= --config-file= -e= --embedded-controller='
+  return 0
 end
 
 set -l prog 'nbfc_service'
-set -l query '_nbfc_service__query'
+set -l P '_nbfc_service__prepare'
+set -l has_option '_nbfc_service__has_option'
 
 # Delete existing completions
 complete -c $prog -e
@@ -144,18 +127,17 @@ complete -c $prog -e
 complete -c $prog -x
 
 # command nbfc_service
-set -l opts "-h --help -r --read-only -f --fork -d --debug -c= --config-file= -e= --embedded-controller="
-set -l C000 "not $query '$opts' has_option -h --help"
-set -l C001 "not $query '$opts' has_option -r --read-only"
-set -l C002 "not $query '$opts' has_option -f --fork"
-set -l C003 "not $query '$opts' has_option -d --debug"
-set -l C004 "not $query '$opts' has_option -c --config-file"
-set -l C005 "not $query '$opts' has_option -e --embedded-controller"
-complete -c $prog -n $C000 -s h -l help -d 'show this help message and exit' -f
-complete -c $prog -n $C001 -s r -l read-only -d 'Start in read-only mode' -f
-complete -c $prog -n $C002 -s f -l fork -d 'Switch process to background after sucessfully started' -f
-complete -c $prog -n $C003 -s d -l debug -d 'Enable tracing of reads and writes of the embedded controller' -f
-complete -c $prog -n $C004 -s c -l config-file -d 'Use alternative config file (default @SYSCONFDIR@/nbfc/nbfc.json)' -Fr
-complete -c $prog -n $C005 -s e -l embedded-controller -d 'Specify embedded controller to use' -x -a 'dummy dev_port ec_sys acpi_ec'
+set -l C000 "not $has_option -h --help"
+set -l C001 "not $has_option -r --read-only"
+set -l C002 "not $has_option -f --fork"
+set -l C003 "not $has_option -d --debug"
+set -l C004 "not $has_option -c --config-file"
+set -l C005 "not $has_option -e --embedded-controller"
+complete -c $prog -n $P -n $C000 -s h -l help -d 'show this help message and exit' -f
+complete -c $prog -n $P -n $C001 -s r -l read-only -d 'Start in read-only mode' -f
+complete -c $prog -n $P -n $C002 -s f -l fork -d 'Switch process to background after sucessfully started' -f
+complete -c $prog -n $P -n $C003 -s d -l debug -d 'Enable tracing of reads and writes of the embedded controller' -f
+complete -c $prog -n $P -n $C004 -s c -l config-file -d 'Use alternative config file (default @SYSCONFDIR@/nbfc/nbfc.json)' -Fr
+complete -c $prog -n $P -n $C005 -s e -l embedded-controller -d 'Specify embedded controller to use' -x -a 'dummy dev_port ec_sys acpi_ec'
 
 # vim: ft=fish ts=2 sts=2 sw=2 et

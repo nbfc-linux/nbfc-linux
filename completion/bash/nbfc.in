@@ -339,7 +339,8 @@ _nbfc_status() {
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
-    (( ! ${#OPT_all[@]} && ! ${#OPT_fan[@]} && ! ${#OPT_service[@]} )) && opts+=(-a --all -s --service -f --fan=)
+    (( ! ${#OPT_all[@]} && ! ${#OPT_fan[@]} && ! ${#OPT_service[@]} )) && opts+=(-a --all -s --service)
+    (( ! ${#OPT_all[@]} && ! ${#OPT_service[@]} )) && opts+=(-f --fan=)
     (( ! ${#OPT_watch[@]} )) && opts+=(-w --watch=)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
