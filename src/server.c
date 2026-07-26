@@ -158,7 +158,7 @@ Error Server_Init(void) {
 
   memset(&Server_Address, 0, sizeof(Server_Address));
   Server_Address.sun_family = AF_UNIX;
-  snprintf(Server_Address.sun_path, sizeof(Server_Address.sun_path), NBFC_SOCKET_PATH);
+  snprintf(Server_Address.sun_path, sizeof(Server_Address.sun_path), "%s", NBFC_SOCKET_PATH);
 
   if ((Server_FD = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
     e = err_stdlib("socket()");

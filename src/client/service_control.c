@@ -59,7 +59,7 @@ Error Client_Communicate(const nx_json* in, char** buf, const nx_json** out) {
 
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sun_family = AF_UNIX;
-  snprintf(serv_addr.sun_path, sizeof(serv_addr.sun_path), NBFC_SOCKET_PATH);
+  snprintf(serv_addr.sun_path, sizeof(serv_addr.sun_path), "%s", NBFC_SOCKET_PATH);
 
   if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
     e = err_string(NBFC_SOCKET_PATH);
