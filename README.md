@@ -98,7 +98,7 @@ Getting started with the GUI
 
 Graphical User Interfaces are available as separate projects.
 
-Currently there are two GUI implementations:
+Currently there are three GUI implementations:
 
 - [NBFC-Qt](https://github.com/nbfc-linux/nbfc-qt)
   - Simple GUI written in Python based on Qt5/Qt6
@@ -106,6 +106,9 @@ Currently there are two GUI implementations:
 
 - [NBFC-Gtk](https://github.com/nbfc-linux/nbfc-gtk)
   - Simple GUI written in Python based on Gtk4
+
+- [NBFC-XFCE4-Tray](https://github.com/nbfc-linux/nbfc-xfce4-tray)
+  - Simple XFCE4 Panel Plugin (only for controlling the fans)
 
 Getting started without the GUI
 -------------------------------
