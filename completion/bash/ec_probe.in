@@ -89,6 +89,11 @@ _ec_probe__parse_commandline() {
         -d|--decimal) VAR=OPT_decimal; ARGS=0; return;;
       esac
     esac
+    case "$1" in root:write_bit*)
+      case "$2" in
+        -d|--dry) VAR=OPT_dry; ARGS=0; return;;
+      esac
+    esac
     case "$1" in root:write*)
       case "$2" in
         -w|--word) VAR=OPT_word; ARGS=0; return;;
@@ -181,7 +186,7 @@ _ec_probe() {
 
   local END_OF_OPTIONS POSITIONALS
   local -a OPT_help OPT_embedded_controller OPT_color OPT_no_color OPT_word
-  local -a OPT_interval OPT_timespan OPT_report OPT_clearly OPT_decimal
+  local -a OPT_dry OPT_interval OPT_timespan OPT_report OPT_clearly OPT_decimal
   _ec_probe__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -190,6 +195,8 @@ _ec_probe() {
       load) _ec_probe_load && return 0;;
       read) _ec_probe_read && return 0;;
       write) _ec_probe_write && return 0;;
+      read_bit) _ec_probe_read_bit && return 0;;
+      write_bit) _ec_probe_write_bit && return 0;;
       monitor) _ec_probe_monitor && return 0;;
       watch) _ec_probe_watch && return 0;;
       acpi_call);;
@@ -241,7 +248,7 @@ _ec_probe() {
   fi
 
   (( ${#POSITIONALS[@]} == 1 )) && {
-    COMPREPLY=($(compgen -W 'dump load read write monitor watch acpi_call graph shell' -- "$cur"))
+    COMPREPLY=($(compgen -W 'dump load read write read_bit write_bit monitor watch acpi_call graph shell' -- "$cur"))
     return 0;
   }
 
@@ -302,6 +309,47 @@ _ec_probe_write() {
   }
 
   (( ${#POSITIONALS[@]} == 3 )) && {
+    return 0;
+  }
+
+  return 1
+}
+
+_ec_probe_read_bit() {
+  (( ${#POSITIONALS[@]} == 2 )) && {
+    COMPREPLY=($(compgen -W '{0..255}' -- "$cur"))
+    return 0;
+  }
+
+  (( ${#POSITIONALS[@]} == 3 )) && {
+    COMPREPLY=($(compgen -W '{0..7}' -- "$cur"))
+    return 0;
+  }
+
+  return 1
+}
+
+_ec_probe_write_bit() {
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_dry[@]} )) && opts+=(-d --dry)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  (( ${#POSITIONALS[@]} == 2 )) && {
+    COMPREPLY=($(compgen -W '{0..255}' -- "$cur"))
+    return 0;
+  }
+
+  (( ${#POSITIONALS[@]} == 3 )) && {
+    COMPREPLY=($(compgen -W '{0..7}' -- "$cur"))
+    return 0;
+  }
+
+  (( ${#POSITIONALS[@]} == 4 )) && {
+    COMPREPLY=($(compgen -W '0 1' -- "$cur"))
     return 0;
   }
 

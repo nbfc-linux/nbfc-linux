@@ -11,7 +11,7 @@ Probing tool for the embedded controller
 .SH SYNOPSIS
 .PP
 .B ec_probe
-.RB { read " | " write " | " dump " | " load " | " monitor " | " watch " | " acpi_call " | " graph " | " shell }
+.RB { read " | " write " | " read_bit " | " write_bit " | " dump " | " load " | " monitor " | " watch " | " acpi_call " | " graph " | " shell }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -106,6 +106,44 @@ is written into a combined register of
 .I REGISTER
 and
 .IR "REGISTER + 1" .
+.RE
+.RE
+
+.PP
+.B read_bit
+.I REGISTER
+.I BIT\-OFFSET
+.RS
+Reads the bit at
+.I BIT\-OFFSET
+from
+.I REGISTER
+and prints its value.
+
+.I BIT\-OFFSET
+is the zero-based bit offset (0–7).
+.RE
+
+.PP
+.B write_bit
+.RI [ OPTIONS ]
+.I REGISTER
+.I BIT\-OFFSET
+.I VALUE
+.RS
+Writes
+.I VALUE
+to the bit at
+.I BIT\-OFFSET
+of
+.IR REGISTER .
+
+.I BIT\-OFFSET
+is the zero-based bit offset (0–7).
+
+.BR \-d ", " \-\-dry
+.RS
+If given, shows what would be written without modifying the register.
 .RE
 .RE
 

@@ -16,6 +16,7 @@ function _nbfc_service__query_init
   set -l positionals
   set -l having_options
   set -l option_values
+  set -l last_arg_is_option_argument false
 
   function _nbfc_service_get_option -S
     set -l option $argv[1]
@@ -61,6 +62,8 @@ function _nbfc_service__query_init
             set -a having_options $arg
             set -a option_values $cmdline[(math $argi + 1)]
             set argi (math $argi + 1)
+          else
+            set last_arg_is_option_argument true
           end
         else
           set -a having_options $arg
@@ -89,6 +92,8 @@ function _nbfc_service__query_init
               set -a having_options $option
               set -a option_values $cmdline[(math $argi + 1)]
               set argi (math $argi + 1)
+            else
+              set last_arg_is_option_argument true
             end
           else if test "$option_type" = '?'
             set end_of_parsing true
@@ -108,6 +113,29 @@ function _nbfc_service__query_init
   set -g __QUERY_CACHE_POSITIONALS    $positionals
   set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
   set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+
+  set -l cmdline_last_arg (commandline -ct | string unescape)
+  set -g __QUERY_CACHE_CURRENT_ARG $cmdline_last_arg
+
+  $last_arg_is_option_argument && return
+
+  set -l split (string split -m1 -- '=' $cmdline_last_arg)
+  if test $status -eq 0 && contains -- (_nbfc_service_get_option $split[1]) '1' '?'
+    set -g __QUERY_CACHE_CURRENT_ARG $split[2]
+    return
+  end
+
+  set -l arg_length (string length -- $cmdline_last_arg)
+  set -l i 2
+  while test $i -le $arg_length
+    set -l option "-$(string sub -s $i -l 1 -- $cmdline_last_arg)"
+    if contains -- (_nbfc_service_get_option $option) '1' '?'
+      set -g __QUERY_CACHE_CURRENT_ARG (string sub -s (math $i + 1) -- $cmdline_last_arg)
+      return
+    end
+
+    set i (math $i + 1)
+  end
 end
 
 function _nbfc_service__prepare

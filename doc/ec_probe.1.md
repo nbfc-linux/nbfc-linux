@@ -8,9 +8,9 @@ Probing tool for the embedded controller
 
 # SYNOPSIS
 
-**ec_probe** {**read** \| **write** \| **dump** \| **load** \|
-**monitor** \| **watch** \| **acpi_call** \| **graph** \| **shell**}
-\[*OPTIONS*\]
+**ec_probe** {**read** \| **write** \| **read_bit** \| **write_bit** \|
+**dump** \| **load** \| **monitor** \| **watch** \| **acpi_call** \|
+**graph** \| **shell**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -68,6 +68,23 @@ Probing tool for the embedded controller
 >
 > > If given, *VALUE* is written into a combined register of *REGISTER*
 > > and *REGISTER + 1*.
+
+**read_bit** *REGISTER* *BIT-OFFSET*
+
+> Reads the bit at *BIT-OFFSET* from *REGISTER* and prints its value.
+>
+> *BIT-OFFSET* is the zero-based bit offset (0--7).
+
+**write_bit** \[*OPTIONS*\] *REGISTER* *BIT-OFFSET* *VALUE*
+
+> Writes *VALUE* to the bit at *BIT-OFFSET* of *REGISTER*.
+>
+> *BIT-OFFSET* is the zero-based bit offset (0--7).
+>
+> **-d**, **\--dry**
+>
+> > If given, shows what would be written without modifying the
+> > register.
 
 **monitor** \[*OPTIONS*\]
 

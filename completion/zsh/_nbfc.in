@@ -6,12 +6,6 @@
 
 _nbfc__query() {
 
-  __zsh_query_contains() {
-    local arg='' key="$1"; shift
-    for arg; do [[ "$key" == "$arg" ]] && return 0; done
-    return 1
-  }
-
   local cmd="$1"; shift
 
   case "$cmd" in
@@ -61,7 +55,7 @@ _nbfc__query() {
         HAVING_OPTIONS+=("${arg%%=*}")
         OPTION_VALUES+=("${arg#*=}");;
       --*)
-        if __zsh_query_contains "$arg" "${long_opts_with_arg[@]}"; then
+        if _nbfc__array_contains "$arg" "${long_opts_with_arg[@]}"; then
           if $have_trailing_arg; then
             HAVING_OPTIONS+=("$arg")
             OPTION_VALUES+=("${args[$((++argi))]}")
@@ -78,10 +72,10 @@ _nbfc__query() {
           local option="-${arg:$i:1}"
           local trailing_chars="${arg:$((i+1))}"
 
-          if __zsh_query_contains "$option" "${short_opts_without_arg[@]}"; then
+          if _nbfc__array_contains "$option" "${short_opts_without_arg[@]}"; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("")
-          elif __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
+          elif _nbfc__array_contains "$option" "${short_opts_with_arg[@]}"; then
             if [[ -n "$trailing_chars" ]]; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("$trailing_chars")
@@ -91,7 +85,7 @@ _nbfc__query() {
             fi
 
             continue 2
-          elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
+          elif _nbfc__array_contains "$option" "${short_opts_with_optional_arg[@]}"; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("$trailing_chars") # may be empty
             continue 2
@@ -104,11 +98,19 @@ _nbfc__query() {
   done
 }
 
+_nbfc__array_contains() {
+  local arg='' key="$1"; shift
+  for arg; do [[ "$key" == "$arg" ]] && return 0; done
+  return 1
+}
+
 _nbfc__exec() {
   local item='' desc='' describe=()
 
   while IFS=$'\t' read -r item desc; do
+    item="${item//\\/\\\\}"
     item="${item//:/\\:}"
+    desc="${desc//\\/\\\\}"
     [[ -n "$desc" ]] && describe+=("$item:$desc") || describe+=("$item")
   done < <(eval "$1")
 

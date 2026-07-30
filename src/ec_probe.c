@@ -18,6 +18,7 @@
 #include "parse_number.h"
 #include "parse_unumber.h"
 #include "parse_double.h"
+#include "to_binary.h"
 #include "help/ec_probe.help.h"
 #include "program_name.c"
 #include "log.h"
@@ -100,6 +101,8 @@ static volatile int quit;
 
 static int Read(void);
 static int Write(void);
+static int Read_Bit(void);
+static int Write_Bit(void);
 static int Dump(void);
 static int Load(void);
 static int Monitor(void);
@@ -111,6 +114,8 @@ static int Graph(void);
 enum Command {
   Command_Read,
   Command_Write,
+  Command_Read_Bit,
+  Command_Write_Bit,
   Command_Dump,
   Command_Load,
   Command_Monitor,
@@ -126,6 +131,8 @@ static enum Command Command_FromString(const char* s) {
   const char* cmds[] = {
     "read",
     "write",
+    "read_bit",
+    "write_bit",
     "dump",
     "load",
     "monitor",
@@ -146,6 +153,8 @@ static enum Command Command_FromString(const char* s) {
 static const char* HelpTexts[] = {
   EC_PROBE_READ_HELP_TEXT,
   EC_PROBE_WRITE_HELP_TEXT,
+  EC_PROBE_READ_BIT_HELP_TEXT,
+  EC_PROBE_WRITE_BIT_HELP_TEXT,
   EC_PROBE_DUMP_HELP_TEXT,
   EC_PROBE_LOAD_HELP_TEXT,
   EC_PROBE_MONITOR_HELP_TEXT,
@@ -163,8 +172,11 @@ enum Option {
   Option_EmbeddedController,
   Option_Command,
   Option_Word,
+  Option_Dry,
   Option_Register,
   Option_Value,
+  Option_BitOffset,
+  Option_BitValue,
   Option_Color,
   Option_NoColor,
   Option_File,
@@ -197,6 +209,22 @@ static const struct cli99_Option write_command_options[] = {
   {"-w|--word",                Option_Word,                cli99_NoArgument      },
   {"register",                 Option_Register,            cli99_NormalPositional},
   {"value",                    Option_Value,               cli99_NormalPositional},
+  cli99_Options_End()
+};
+
+static const struct cli99_Option read_bit_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"register",                 Option_Register,            cli99_NormalPositional},
+  {"bit_offset",               Option_BitOffset,           cli99_NormalPositional},
+  cli99_Options_End()
+};
+
+static const struct cli99_Option write_bit_command_options[] = {
+  cli99_Options_Include(&main_options),
+  {"-d|--dry",                 Option_Dry,                 cli99_NoArgument      },
+  {"register",                 Option_Register,            cli99_NormalPositional},
+  {"bit_offset",               Option_BitOffset,           cli99_NormalPositional},
+  {"value",                    Option_BitValue,            cli99_NormalPositional},
   cli99_Options_End()
 };
 
@@ -254,6 +282,8 @@ static const struct cli99_Option graph_command_options[] = {
 static const struct cli99_Option* Options[] = {
   read_command_options,
   write_command_options,
+  read_bit_command_options,
+  write_bit_command_options,
   dump_command_options,
   load_command_options,
   monitor_command_options,
@@ -277,8 +307,11 @@ static struct {
   const char*   file;
   bool          clearly;
   bool          decimal;
+  bool          dry;
   uint8_t       register_;
   uint16_t      value;
+  uint8_t       bit_offset;
+  uint8_t       bit_value;
   bool          use_word;
   enum UseColor use_color;
   const char*   acpi_call_method;
@@ -353,6 +386,7 @@ int main(int argc, char* const argv[]) {
     case Option_Clearly:  options.clearly  = 1;                    break;
     case Option_Decimal:  options.decimal  = 1;                    break;
     case Option_Word:     options.use_word = 1;                    break;
+    case Option_Dry:      options.dry = 1;                         break;
     case Option_Report:   options.report   = p.optarg;             break;
     case Option_Color:    options.use_color = ColorEnable;         break;
     case Option_NoColor:  options.use_color = ColorDisable;        break;
@@ -397,6 +431,20 @@ int main(int argc, char* const argv[]) {
         return NBFC_EXIT_CMDLINE;
       }
       break;
+    case Option_BitOffset:
+      options.bit_offset = (uint8_t) parse_unumber(p.optarg, 0, 7, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+    case Option_BitValue:
+      options.bit_value = (uint8_t) parse_unumber(p.optarg, 0, 1, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
     }
   }
 
@@ -427,6 +475,35 @@ int main(int argc, char* const argv[]) {
       }
       break;
 
+    case Command_Read_Bit:
+      if (! (options._set & (1ULL << Option_Register))) {
+        Log_Error("Argument required: %s", "register");
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      if (! (options._set & (1ULL << Option_BitOffset))) {
+        Log_Error("Argument required: %s", "bit_offset");
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Command_Write_Bit:
+      if (! (options._set & (1ULL << Option_Register))) {
+        Log_Error("Argument required: %s", "register");
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      if (! (options._set & (1ULL << Option_BitOffset))) {
+        Log_Error("Argument required: %s", "bit_offset");
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      if (! (options._set & (1ULL << Option_BitValue))) {
+        Log_Error("Argument required: %s", "bit_value");
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
     case Command_AcpiCall:
       if (! (options._set & (1ULL << Option_AcpiCallMethod))) {
         Log_Error("Argument required: %s", "method");
@@ -449,16 +526,18 @@ int main(int argc, char* const argv[]) {
   signal(SIGTERM, Handle_Signal);
 
   switch (cmd) {
-  case Command_Dump:     return Dump();
-  case Command_Load:     return Load();
-  case Command_Read:     return Read();
-  case Command_Write:    return Write();
-  case Command_Monitor:  return Monitor();
-  case Command_Watch:    return Watch();
-  case Command_AcpiCall: return AcpiCall();
-  case Command_Shell:    return Shell();
-  case Command_Graph:    return Graph();
-  default:               return NBFC_EXIT_FAILURE;
+  case Command_Dump:      return Dump();
+  case Command_Load:      return Load();
+  case Command_Read:      return Read();
+  case Command_Write:     return Write();
+  case Command_Read_Bit:  return Read_Bit();
+  case Command_Write_Bit: return Write_Bit();
+  case Command_Monitor:   return Monitor();
+  case Command_Watch:     return Watch();
+  case Command_AcpiCall:  return AcpiCall();
+  case Command_Shell:     return Shell();
+  case Command_Graph:     return Graph();
+  default:                return NBFC_EXIT_FAILURE;
   }
 }
 
@@ -486,13 +565,13 @@ static int Read(void) {
     uint16_t word;
     Error e = ec->ReadWord(options.register_, &word);
     e_die();
-    printf("%d (0x%.2X)\n", word, word);
+    printf("%d (0x%.4X 0b%s)\n", word, word, to_binary(word, 16U));
   }
   else {
     uint8_t byte;
     Error e = ec->ReadByte(options.register_, &byte);
     e_die();
-    printf("%d (0x%.2X)\n", byte, byte);
+    printf("%d (0x%.2X 0b%s)\n", byte, byte, to_binary(byte, 8U));
   }
 
   return 0;
@@ -512,6 +591,42 @@ static int Write(void) {
       return NBFC_EXIT_CMDLINE;
     }
     Error e = ec->WriteByte(options.register_, (uint8_t) options.value);
+    e_die();
+  }
+
+  return 0;
+}
+
+static int Read_Bit(void) {
+  check_root();
+  Initialize_EC();
+
+  uint8_t byte;
+  Error e = ec->ReadByte(options.register_, &byte);
+  e_die();
+
+  uint8_t bit = (byte >> (options.bit_offset)) & 1;
+  printf("%d\n", bit);
+  return 0;
+}
+
+static int Write_Bit(void) {
+  Error e;
+  check_root();
+  Initialize_EC();
+
+  uint8_t byte;
+  e = ec->ReadByte(options.register_, &byte);
+  e_die();
+
+  uint8_t mask = 1U << (options.bit_offset);
+  uint8_t new_byte = options.bit_value ? (byte | mask) : (byte & ~mask);
+
+  if (options.dry) {
+    Log_Info("Dry run: Write %d (0x%.2X 0b%s)", new_byte, new_byte, to_binary(new_byte, 8U));
+  }
+  else {
+    e = ec->WriteByte(options.register_, new_byte);
     e_die();
   }
 

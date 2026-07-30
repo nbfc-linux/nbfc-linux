@@ -13,6 +13,7 @@ function _ec_probe__query_init
   set -l positionals
   set -l having_options
   set -l option_values
+  set -l last_arg_is_option_argument false
 
   function _ec_probe_match_positionals -S
     set -l patterns (string split -- '>' "$argv[1]")
@@ -68,6 +69,8 @@ function _ec_probe__query_init
             set -a having_options $arg
             set -a option_values $cmdline[(math $argi + 1)]
             set argi (math $argi + 1)
+          else
+            set last_arg_is_option_argument true
           end
         else
           set -a having_options $arg
@@ -96,6 +99,8 @@ function _ec_probe__query_init
               set -a having_options $option
               set -a option_values $cmdline[(math $argi + 1)]
               set argi (math $argi + 1)
+            else
+              set last_arg_is_option_argument true
             end
           else if test "$option_type" = '?'
             set end_of_parsing true
@@ -115,6 +120,29 @@ function _ec_probe__query_init
   set -g __QUERY_CACHE_POSITIONALS    $positionals
   set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
   set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+
+  set -l cmdline_last_arg (commandline -ct | string unescape)
+  set -g __QUERY_CACHE_CURRENT_ARG $cmdline_last_arg
+
+  $last_arg_is_option_argument && return
+
+  set -l split (string split -m1 -- '=' $cmdline_last_arg)
+  if test $status -eq 0 && contains -- (_ec_probe_get_option $split[1]) '1' '?'
+    set -g __QUERY_CACHE_CURRENT_ARG $split[2]
+    return
+  end
+
+  set -l arg_length (string length -- $cmdline_last_arg)
+  set -l i 2
+  while test $i -le $arg_length
+    set -l option "-$(string sub -s $i -l 1 -- $cmdline_last_arg)"
+    if contains -- (_ec_probe_get_option $option) '1' '?'
+      set -g __QUERY_CACHE_CURRENT_ARG (string sub -s (math $i + 1) -- $cmdline_last_arg)
+      return
+    end
+
+    set i (math $i + 1)
+  end
 end
 
 function _ec_probe__has_option
@@ -141,6 +169,7 @@ function _ec_probe__prepare
     '(dump)=>-c --color -C --no-color' \
     '(read)=>-w --word' \
     '(write)=>-w --word' \
+    '(write_bit)=>-d --dry' \
     '(monitor)=>-i= --interval= -t= --timespan= -r= --report= -c --clearly -d --decimal' \
     '(watch)=>-i= --interval= -t= --timespan=' \
     '(graph)=>-d --decimal'
@@ -153,6 +182,8 @@ function _ec_probe__command
     load 'Load a previously made dump into the embedded controller' \
     read 'Read a byte from a EC register' \
     write 'Write a byte to a EC register' \
+    read_bit 'Read a bit from a EC register' \
+    write_bit 'Write a bit to a EC register' \
     monitor 'Monitor all EC registers for changes' \
     watch 'Monitor all EC registers for changes (alternative version)' \
     acpi_call 'Call an ACPI method' \
@@ -207,6 +238,24 @@ set -l C003 "$num_of_positionals -eq 2"
 complete -c $prog -n $P -n $C000 -n $C001 -s w -l word -d 'Combine two registers into one' -f
 complete -c $prog -n $P -n $C002 -n $C000 -d 'Register destination' -x -a '(seq 0 255)'
 complete -c $prog -n $P -n $C003 -n $C000 -d 'Value to write' -x
+
+# command ec_probe read_bit
+set -l C000 "$num_of_positionals -eq 1"
+set -l C001 "$positional_contains 1 read_bit"
+set -l C002 "$num_of_positionals -eq 2"
+complete -c $prog -n $P -n $C000 -n $C001 -d 'Register source' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C002 -n $C001 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
+
+# command ec_probe write_bit
+set -l C000 "$positional_contains 1 write_bit"
+set -l C001 "not $has_option -d --dry"
+set -l C002 "$num_of_positionals -eq 1"
+set -l C003 "$num_of_positionals -eq 2"
+set -l C004 "$num_of_positionals -eq 3"
+complete -c $prog -n $P -n $C000 -n $C001 -s d -l dry -d 'Print the resulting value without writing it' -f
+complete -c $prog -n $P -n $C002 -n $C000 -d 'Register destination' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
+complete -c $prog -n $P -n $C004 -n $C000 -d 'Value to write' -x -a '0 1'
 
 # command ec_probe monitor
 set -l C000 "$positional_contains 1 monitor"

@@ -6,12 +6,6 @@
 
 _ec_probe__query() {
 
-  __zsh_query_contains() {
-    local arg='' key="$1"; shift
-    for arg; do [[ "$key" == "$arg" ]] && return 0; done
-    return 1
-  }
-
   local cmd="$1"; shift
 
   case "$cmd" in
@@ -61,7 +55,7 @@ _ec_probe__query() {
         HAVING_OPTIONS+=("${arg%%=*}")
         OPTION_VALUES+=("${arg#*=}");;
       --*)
-        if __zsh_query_contains "$arg" "${long_opts_with_arg[@]}"; then
+        if _ec_probe__array_contains "$arg" "${long_opts_with_arg[@]}"; then
           if $have_trailing_arg; then
             HAVING_OPTIONS+=("$arg")
             OPTION_VALUES+=("${args[$((++argi))]}")
@@ -78,10 +72,10 @@ _ec_probe__query() {
           local option="-${arg:$i:1}"
           local trailing_chars="${arg:$((i+1))}"
 
-          if __zsh_query_contains "$option" "${short_opts_without_arg[@]}"; then
+          if _ec_probe__array_contains "$option" "${short_opts_without_arg[@]}"; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("")
-          elif __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
+          elif _ec_probe__array_contains "$option" "${short_opts_with_arg[@]}"; then
             if [[ -n "$trailing_chars" ]]; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("$trailing_chars")
@@ -91,7 +85,7 @@ _ec_probe__query() {
             fi
 
             continue 2
-          elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
+          elif _ec_probe__array_contains "$option" "${short_opts_with_optional_arg[@]}"; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("$trailing_chars") # may be empty
             continue 2
@@ -104,12 +98,20 @@ _ec_probe__query() {
   done
 }
 
+_ec_probe__array_contains() {
+  local arg='' key="$1"; shift
+  for arg; do [[ "$key" == "$arg" ]] && return 0; done
+  return 1
+}
+
 _ec_probe__command() {
   local items=(
     dump:'Dump all EC registers'
     load:'Load a previously made dump into the embedded controller'
     read:'Read a byte from a EC register'
     write:'Write a byte to a EC register'
+    read_bit:'Read a bit from a EC register'
+    write_bit:'Write a bit to a EC register'
     monitor:'Monitor all EC registers for changes'
     watch:'Monitor all EC registers for changes (alternative version)'
     acpi_call:'Call an ACPI method'
@@ -130,6 +132,8 @@ _ec_probe() {
     load) _ec_probe_load; return $?;;
     read) _ec_probe_read; return $?;;
     write) _ec_probe_write; return $?;;
+    read_bit) _ec_probe_read_bit; return $?;;
+    write_bit) _ec_probe_write_bit; return $?;;
     monitor) _ec_probe_monitor; return $?;;
     watch) _ec_probe_watch; return $?;;
     acpi_call) _ec_probe_acpi_call; return $?;;
@@ -185,6 +189,30 @@ _ec_probe_write() {
     1:command1:_ec_probe__command
     2:'Register destination':'({0..255})'
     3:'Value to write':"_numbers 'Value to write'"
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_ec_probe_read_bit() {
+  local -a args=(
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
+    1:command1:_ec_probe__command
+    2:'Register source':'({0..255})'
+    3:'Bit offset (0-7)':'({0..7})'
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_ec_probe_write_bit() {
+  local -a args=(
+    '(--dry -d)'{-d,--dry}'[Print the resulting value without writing it]'
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
+    1:command1:_ec_probe__command
+    2:'Register destination':'({0..255})'
+    3:'Bit offset (0-7)':'({0..7})'
+    4:'Value to write':'(0 1)'
   )
   _arguments -S -s -w "${args[@]}"
 }

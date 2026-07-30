@@ -13,6 +13,7 @@ function _nbfc__query_init
   set -l positionals
   set -l having_options
   set -l option_values
+  set -l last_arg_is_option_argument false
 
   function _nbfc_match_positionals -S
     set -l patterns (string split -- '>' "$argv[1]")
@@ -68,6 +69,8 @@ function _nbfc__query_init
             set -a having_options $arg
             set -a option_values $cmdline[(math $argi + 1)]
             set argi (math $argi + 1)
+          else
+            set last_arg_is_option_argument true
           end
         else
           set -a having_options $arg
@@ -96,6 +99,8 @@ function _nbfc__query_init
               set -a having_options $option
               set -a option_values $cmdline[(math $argi + 1)]
               set argi (math $argi + 1)
+            else
+              set last_arg_is_option_argument true
             end
           else if test "$option_type" = '?'
             set end_of_parsing true
@@ -115,6 +120,29 @@ function _nbfc__query_init
   set -g __QUERY_CACHE_POSITIONALS    $positionals
   set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
   set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+
+  set -l cmdline_last_arg (commandline -ct | string unescape)
+  set -g __QUERY_CACHE_CURRENT_ARG $cmdline_last_arg
+
+  $last_arg_is_option_argument && return
+
+  set -l split (string split -m1 -- '=' $cmdline_last_arg)
+  if test $status -eq 0 && contains -- (_nbfc_get_option $split[1]) '1' '?'
+    set -g __QUERY_CACHE_CURRENT_ARG $split[2]
+    return
+  end
+
+  set -l arg_length (string length -- $cmdline_last_arg)
+  set -l i 2
+  while test $i -le $arg_length
+    set -l option "-$(string sub -s $i -l 1 -- $cmdline_last_arg)"
+    if contains -- (_nbfc_get_option $option) '1' '?'
+      set -g __QUERY_CACHE_CURRENT_ARG (string sub -s (math $i + 1) -- $cmdline_last_arg)
+      return
+    end
+
+    set i (math $i + 1)
+  end
 end
 
 function _nbfc__has_option
@@ -159,44 +187,10 @@ function _nbfc__filedir
 end
 
 function _nbfc__get_completing_arg
-  set -l arg (commandline -ct | string unescape)
-
-  switch $arg
-    case '--*=' '--*=*'
-      set arg (string replace -r -- '^-[^=]*=' '' $arg)
-    case '-*'
-      set -l prog (commandline -po)[1]
-      set -l progdef (complete -c $prog)
-
-      set -l full_opt (string match -r -- '^-[a-zA-Z0-9]+=' $arg)
-      set -l opt (string sub -s 2 -e -1 -- $full_opt)
-      set -l optdefs (string match -re -- " -(o|-old-option) $opt( |\$)" $progdef)
-      set -l optdefs (string match -re -- " -(x|r|a|-(exclusive|require-parameter|arguments))( |\$)" $optdefs)
-
-      if test (count $optdefs) -gt 0
-        set arg (string replace -m 1 -- $full_opt '' $arg)
-      else
-        set -l i 2
-
-        while test $i -lt (string length -- $arg)
-          set -l opt (string sub -s $i -l 1 -- $arg)
-          set -l optdefs (string match -re -- " -(s|-short-option) $opt( |\$)" $progdef)
-          set -l optdefs (string match -re -- " -(x|r|a|-(exclusive|require-parameter|arguments))( |\$)" $optdefs)
-
-          if test (count $optdefs) -gt 0
-            set arg (string sub -s (math $i + 1) -- "$arg")
-            break
-          end
-
-          set i (math $i + 1)
-        end
-      end
-  end
-
   if test -n "$__fish_stripprefix"
-    string replace -r -- $__fish_stripprefix '' "$arg"
+    string replace -r -- $__fish_stripprefix '' "$__QUERY_CACHE_CURRENT_ARG"
   else
-    printf '%s\n' "$arg"
+    printf '%s\n' "$__QUERY_CACHE_CURRENT_ARG"
   end
 end
 

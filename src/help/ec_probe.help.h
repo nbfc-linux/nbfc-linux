@@ -14,6 +14,8 @@
  "  load                  Load a previously made dump\n"                       \
  "  read                  Read a byte from a EC register\n"                    \
  "  write                 Write a byte to a EC register\n"                     \
+ "  read_bit              Read a bit from a EC register\n"                     \
+ "  write_bit             Write a bit to a EC register\n"                      \
  "  monitor               Monitor all EC registers for changes\n"              \
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
  "  acpi_call             Call an ACPI method\n"                               \
@@ -74,6 +76,40 @@
  "Optional arguments:\n"                                                       \
  "  -h, --help  Show this help message and exit\n"                             \
  "  -w, --word  Write VALUE to two registers\n"                                \
+ "\n"                                                                          \
+ "All input values are interpreted as decimal numbers by default.\n"           \
+ "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
+ ""
+
+#define EC_PROBE_READ_BIT_HELP_TEXT                                            \
+ "Usage: %s read_bit [-h] REGISTER BIT-OFFSET\n"                               \
+ "\n"                                                                          \
+ "Read a bit from a EC register.\n"                                            \
+ "\n"                                                                          \
+ "Positional arguments:\n"                                                     \
+ "  REGISTER    Register source\n"                                             \
+ "  BIT-OFFSET  Bit offset (0 - 7)\n"                                          \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help  Show this help message and exit\n"                             \
+ "\n"                                                                          \
+ "All input values are interpreted as decimal numbers by default.\n"           \
+ "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
+ ""
+
+#define EC_PROBE_WRITE_BIT_HELP_TEXT                                           \
+ "Usage: %s write_bit [-h] REGISTER BIT-OFFSET VALUE\n"                        \
+ "\n"                                                                          \
+ "Write a bit to a EC register.\n"                                             \
+ "\n"                                                                          \
+ "Positional arguments:\n"                                                     \
+ "  REGISTER    Register destination\n"                                        \
+ "  BIT-OFFSET  Bit offset (0 - 7)\n"                                          \
+ "  VALUE       Value (0, 1)\n"                                                \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help  Show this help message and exit\n"                             \
+ "  -d, --dry   Print the resulting value without writing it\n"                \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \

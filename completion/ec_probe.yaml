@@ -54,6 +54,41 @@ positionals:
     help: "Value to write"
     complete: ["integer"]
 ---
+prog: "ec_probe read_bit"
+help: "Read a bit from a EC register"
+positionals:
+  - number: 1
+    metavar: "REGISTER"
+    help: "Register source"
+    complete: ["range", 0, 255]
+
+  - number: 2
+    metavar: "BIT-OFFSET"
+    help: "Bit offset (0-7)"
+    complete: ["range", 0, 7]
+---
+prog: "ec_probe write_bit"
+help: "Write a bit to a EC register"
+options:
+  - option_strings: ["-d", "--dry"]
+    help: "Print the resulting value without writing it"
+
+positionals:
+  - number: 1
+    metavar: "REGISTER"
+    help: "Register destination"
+    complete: ["range", 0, 255]
+
+  - number: 2
+    metavar: "BIT-OFFSET"
+    help: "Bit offset (0-7)"
+    complete: ["range", 0, 7]
+
+  - number: 3
+    metavar: "VALUE"
+    help: "Value to write"
+    complete: ["choices", ["0", "1"]]
+---
 prog: "ec_probe monitor"
 help: "Monitor all EC registers for changes"
 options:
