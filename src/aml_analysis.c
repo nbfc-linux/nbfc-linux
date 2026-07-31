@@ -1,5 +1,6 @@
 #include "aml_analysis.h"
 
+#include "log.h"
 #include "memory.h"
 #include "acpi_analysis.h"
 
@@ -17,6 +18,7 @@ static void AML_Analysis_RemoveDoubleParentheses(array_of(AML_Token)*);
  */
 Error AML_Analysis_Init(AML_Analysis* analysis, array_of(str)* aml_files) {
   Error e = err_success();
+  size_t num_failures = 0;
   AML_Lexer l;
   AML_Parser p;
 
@@ -29,16 +31,20 @@ Error AML_Analysis_Init(AML_Analysis* analysis, array_of(str)* aml_files) {
     AML_LexedSource* source = &analysis->sources.data[i];
 
     e = Acpi_Analysis_Get_DSL(file, &source->source);
-    if (e)
-      goto end;
+    if (e) {
+      Log_Error("%s", err_print_all(e));
+      ++num_failures;
+      continue;
+    }
 
     analysis->sources.size++;
 
     AML_Lexer_Init(&l, source->source);
     e = AML_Lexer_GetTokens(&l, &source->tokens);
     if (e) {
-      e = err_chain_string(e, file);
-      goto end;
+      ++num_failures;
+      Log_Error("%s: %s", file, err_print_all(e));
+      continue;
     }
 
     AML_Analysis_RemoveDoubleParentheses(&source->tokens);
@@ -46,16 +52,18 @@ Error AML_Analysis_Init(AML_Analysis* analysis, array_of(str)* aml_files) {
     AML_Parser_Init(&p, source->tokens);
     e = AML_Parser_ExtractMethods(&p, &analysis->methods);
     if (e) {
-      e = err_chain_string(e, file);
-      goto end;
+      ++num_failures;
+      Log_Error("%s: %s", file, err_print_all(e));
+      continue;
     }
   }
 
-end:
-  if (e)
+  if (num_failures == aml_files->size) {
     AML_Analysis_Free(analysis);
+    return err_string("No AML files could be parsed");
+  }
 
-  return e;
+  return err_success();
 }
 
 void AML_Analysis_Free(AML_Analysis* analysis) {
