@@ -293,15 +293,11 @@ static bool AML_Parser_ExtractMethod(AML_Parser* p, AML_Token* name, AML_Method*
     }
 
     switch (t.type) {
-    case AML_TOK_OP_ParenOpen: /* fall-through */
-    case AML_TOK_OP_BraceOpen: /* fall-through */
-    case AML_TOK_OP_BracketOpen:
+    case AML_TOK_OP_BraceOpen:
       ++paren_count;
       break;
 
-    case AML_TOK_OP_ParenClose: /* fall-through */
-    case AML_TOK_OP_BraceClose: /* fall-through */
-    case AML_TOK_OP_BracketClose:
+    case AML_TOK_OP_BraceClose:
       --paren_count;
       break;
 
