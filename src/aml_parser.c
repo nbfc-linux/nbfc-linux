@@ -286,8 +286,11 @@ static bool AML_Parser_ExtractMethod(AML_Parser* p, AML_Token* name, AML_Method*
 
   while (paren_count) {
     AML_Token t;
-    if (! AML_Parser_GetRealToken(p, &t))
+    if (! AML_Parser_GetRealToken(p, &t)) {
+      p->error = "Unexpected end of input";
+      p->error2 = NULL;
       return false;
+    }
 
     switch (t.type) {
     case AML_TOK_OP_ParenOpen: /* fall-through */
