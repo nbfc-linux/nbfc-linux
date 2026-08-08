@@ -22,6 +22,7 @@ def replace_package_data(content):
     mapping = {
         'debian-trixie':    'DEBIAN_TRIXIE',
         'debian-bookworm':  'DEBIAN_BOOKWORM',
+        'ubuntu-resolute':  'UBUNTU_RESOLUTE',
         'ubuntu-noble':     'UBUNTU_NOBLE',
         'ubuntu-jammy':     'UBUNTU_JAMMY',
         'linux-mint-22':    'LINUX_MINT_22',

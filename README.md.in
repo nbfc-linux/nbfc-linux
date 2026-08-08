@@ -57,6 +57,7 @@ Installation
 | Arch Linux            | [%TAG%](%ARCHLINUX_URL%)       | `sudo pacman -U ./%ARCHLINUX_PACKAGE%`         |
 | Debian Trixie         | [%TAG%](%DEBIAN_TRIXIE_URL%)   | `sudo apt install ./%DEBIAN_TRIXIE_PACKAGE%`   |
 | Debian Bookworm       | [%TAG%](%DEBIAN_BOOKWORM_URL%) | `sudo apt install ./%DEBIAN_BOOKWORM_PACKAGE%` |
+| Ubuntu Resolute       | [%TAG%](%UBUNTU_RESOLUTE_URL%) | `sudo apt install ./%UBUNTU_RESOLUTE_PACKAGE%` |
 | Ubuntu Noble          | [%TAG%](%UBUNTU_NOBLE_URL%)    | `sudo apt install ./%UBUNTU_NOBLE_PACKAGE%`    |
 | Ubuntu Jammy          | [%TAG%](%UBUNTU_JAMMY_URL%)    | `sudo apt install ./%UBUNTU_JAMMY_PACKAGE%`    |
 | Linux Mint 22         | [%TAG%](%LINUX_MINT_22_URL%)   | `sudo apt install ./%LINUX_MINT_22_PACKAGE%`   |
