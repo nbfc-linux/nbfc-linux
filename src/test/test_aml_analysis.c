@@ -297,6 +297,8 @@ int main() {
 #undef T
 }
 
+#include "../log.c"
+#include "../program_name.c"
 #include "../error.c"
 #include "../memory.c"
 #include "../file_utils.c"
