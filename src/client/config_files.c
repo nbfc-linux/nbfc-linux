@@ -23,10 +23,10 @@ ConfigFile* ConfigFiles_Find(array_of(ConfigFile)* files, const char* name) {
   return NULL;
 }
 
-// Find a ConfigFile by config_name (case-insensitive)
-ConfigFile* ConfigFiles_FindIgnoreCase(array_of(ConfigFile)* files, const char* name) {
+// Find a ConfigFile by config_name (loose matching)
+ConfigFile* ConfigFiles_FindLoose(array_of(ConfigFile)* files, const char* name) {
   for_each_array(ConfigFile*, file, *files) {
-    if (! str_cmp_ignorecase(file->config_name, name))
+    if (DMI_Model_Name_Equals(file->config_name, name))
       return file;
   }
 
@@ -131,14 +131,16 @@ array_of(ConfigFile) List_Recommended_Configs(void) {
   const char* model_name = DMI_Get_Model_Name();
   array_of(ConfigFile) files = List_All_Configs();
   for_each_array(ConfigFile*, file, files) {
-    file->diff = str_similarity(model_name, file->config_name);
+    char* config_name = DMI_Replace_Vendor_Alias(file->config_name);
+    file->diff = str_similarity(model_name, config_name);
+    Mem_Free(config_name);
   }
   qsort(files.data, files.size, sizeof(struct ConfigFile), ConfigFile_CompareByDiff);
   return files;
 }
 
 /*
- * Retrive the supported config for `model_name`.
+ * Retrieve the supported config for `model_name`.
  *
  * This function searches a model support database (a JSON file) for the
  * given `model_name` and returns the compatible output config for it.
@@ -181,7 +183,7 @@ char* Get_Supported_Config_From_SupportFile(const char* support_file, array_of(C
     if (model->type != NX_JSON_STRING) {
       Log_Warn("%s: Invalid value for model \"%s\": Not a string", support_file, model->key);
     }
-    else if (!str_cmp_ignorecase(model->key, model_name)) {
+    else if (DMI_Model_Name_Equals(model->key, model_name)) {
       if (config) {
         Log_Warn("%s: Duplicate model key: \"%s\"", support_file, model->key);
       }
@@ -195,8 +197,9 @@ end:
   if (config) {
     // Ensure that the model actually exists
     for_each_array(ConfigFile*, file, *config_files) {
-      if (!str_cmp_ignorecase(file->config_name, config)) {
-        return config;
+      if (DMI_Model_Name_Equals(file->config_name, config)) {
+        Mem_Free(config);
+        return Mem_Strdup(file->config_name);
       }
     }
 
@@ -208,7 +211,7 @@ end:
   else {
     // Not found in support database, try a direct match on `config_files`
     for_each_array(ConfigFile*, file, *config_files) {
-      if (!str_cmp_ignorecase(file->config_name, model_name)) {
+      if (DMI_Model_Name_Equals(file->config_name, model_name)) {
         return Mem_Strdup(file->config_name);
       }
     }

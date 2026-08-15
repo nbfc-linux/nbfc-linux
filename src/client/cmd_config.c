@@ -1,7 +1,7 @@
 #include <errno.h>        // errno
 #include <stdio.h>        // printf, fprintf
 #include <stdlib.h>       // exit, realpath, qsort
-#include <string.h>       // strcmp, strrchr, strerror
+#include <string.h>       // strrchr, strerror
 #include <unistd.h>       // isatty
 #include <linux/limits.h> // PATH_MAX
 
@@ -143,7 +143,7 @@ int Set_Or_Apply(void) {
     if (dot && !str_cmp_ignorecase(dot, ".json"))
       *dot = '\0';
 
-    ConfigFile* found = ConfigFiles_FindIgnoreCase(&files, config);
+    ConfigFile* found = ConfigFiles_FindLoose(&files, config);
     if (! found) {
       Log_Error("No such configuration available: %s", config);
       return NBFC_EXIT_FAILURE;

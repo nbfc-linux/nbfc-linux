@@ -1,7 +1,7 @@
 #include "str_functions.h"
 
 #include <ctype.h>  // tolower
-#include <string.h> // strlen
+#include <string.h> // strlen, strncmp, memcpy
 
 #include "../memory.h"
 
@@ -14,6 +14,24 @@ char *str_to_lower(const char *a) {
   for (char* c = b; *c; ++c)
     *c = (char) tolower(*c);
   return b;
+}
+
+char* str_replace_prefix(const char* s, const char* search, const char* replace)
+{
+  size_t search_len = strlen(search);
+
+  if (strncmp(s, search, search_len) != 0)
+    return Mem_Strdup(s);
+
+  size_t replace_len = strlen(replace);
+  size_t suffix_len = strlen(s + search_len);
+
+  char* result = Mem_Malloc(suffix_len + replace_len + 1);
+
+  memcpy(result, replace, replace_len);
+  memcpy(result + replace_len, s + search_len, suffix_len + 1);
+
+  return result;
 }
 
 int str_cmp_ignorecase(const char* a, const char* b) {
