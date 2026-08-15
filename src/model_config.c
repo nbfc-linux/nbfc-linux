@@ -393,6 +393,16 @@ static array_of(FanSpeedPercentageOverride) Config_DefaultFanSpeedPercentageOver
 void ModelConfig_Free(ModelConfig* c) {
   Mem_Free((char*) c->NotebookModel);
   Mem_Free((char*) c->Author);
+  Mem_Free((char*) c->Sponsor.Name);
+  Mem_Free((char*) c->Sponsor.Description);
+  Mem_Free((char*) c->Sponsor.URL);
+  Mem_Free((char*) c->Sponsor.BannerURL);
+
+  for_each_array(str*, s, c->FirmwareFingerprint) {
+    Mem_Free((char*) *s);
+  }
+
+  Mem_Free(c->FirmwareFingerprint.data);
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
     Mem_Free((char*) f->FanDisplayName);
