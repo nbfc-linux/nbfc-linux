@@ -132,8 +132,8 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self
 	if (! RegisterWriteConfiguration_IsSet_ResetWriteMode(self))
 		self->ResetWriteMode = RegisterWriteMode_Set;
 
-	if (! RegisterWriteConfiguration_IsSet_Description(self))
-		self->Description = Mem_Strdup("");
+	if (false)
+		return err_stringf("%s: %s", "Description", "Missing option");
 	return err_success();
 }
 
@@ -456,8 +456,8 @@ Error ModelConfig_ValidateFields(ModelConfig* self) {
 	if (! ModelConfig_IsSet_NotebookModel(self))
 		return err_stringf("%s: %s", "NotebookModel", "Missing option");
 
-	if (! ModelConfig_IsSet_Author(self))
-		self->Author = Mem_Strdup("");
+	if (false)
+		return err_stringf("%s: %s", "Author", "Missing option");
 
 	if (! ModelConfig_IsSet_LegacyTemperatureThresholdsBehaviour(self))
 		self->LegacyTemperatureThresholdsBehaviour = false;

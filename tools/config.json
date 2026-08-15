@@ -119,8 +119,8 @@
       {
         "name": "Description",
         "type": "const char*",
-        "default": "Mem_Strdup(\"\")",
-        "help": "A short description of what effect the RegisterWriteConfiguration will have"
+        "help": "A short description of what effect the RegisterWriteConfiguration will have",
+        "required": false
       }
     ]
   },
@@ -285,8 +285,8 @@
       {
         "name": "Author",
         "type": "const char*",
-        "default": "Mem_Strdup(\"\")",
-        "help": "The Author of the config file. Enter whatever you want."
+        "help": "The Author of the config file. Enter whatever you want.",
+        "required": false
       },
       {
         "name": "LegacyTemperatureThresholdsBehaviour",
