@@ -83,7 +83,7 @@ static Error Xml2Json_ParseBool(xmlNode* node, const char* key, nx_json* parent)
 
 #define XML2JSON_PARSE_BEGIN()                                                \
   Error e = err_success();                                                    \
-  for (xmlNode *node = root->children; node; node = node->next) {             \
+  for (xmlNode* node = root->children; node; node = node->next) {             \
     if (node->type == XML_ELEMENT_NODE) {                                     \
       if (false);                                                             \
 
@@ -125,7 +125,7 @@ static Error Xml2Json_ParseTemperatureThreshold(xmlNode* root, nx_json* parent) 
 static Error Xml2Json_ParseTemperatureThresholds(xmlNode* root, nx_json* parent) {
   nx_json* array = create_json_array("TemperatureThresholds", parent);
 
-  for (xmlNode *node = root->children; node; node = node->next)
+  for (xmlNode* node = root->children; node; node = node->next)
     if (node->type == XML_ELEMENT_NODE) {
       Error e = Xml2Json_ParseTemperatureThreshold(node, array);
       if (e)
@@ -148,7 +148,7 @@ static Error Xml2Json_ParseFanSpeedPercentageOverride(xmlNode* root, nx_json* pa
 static Error Xml2Json_ParseFanSpeedPercentageOverrides(xmlNode* root, nx_json* parent) {
   nx_json* array = create_json_array("FanSpeedPercentageOverrides", parent);
 
-  for (xmlNode *node = root->children; node; node = node->next)
+  for (xmlNode* node = root->children; node; node = node->next)
     if (node->type == XML_ELEMENT_NODE) {
       Error e = Xml2Json_ParseFanSpeedPercentageOverride(node, array);
       if (e)
@@ -176,7 +176,7 @@ static Error Xml2Json_ParseRegisterWriteConfiguration(xmlNode* root, nx_json* pa
 static Error Xml2Json_ParseRegisterWriteConfigurations(xmlNode* root, nx_json* parent) {
   nx_json* array = create_json_array("RegisterWriteConfigurations", parent);
 
-  for (xmlNode *node = root->children; node; node = node->next)
+  for (xmlNode* node = root->children; node; node = node->next)
     if (node->type == XML_ELEMENT_NODE) {
       Error e = Xml2Json_ParseRegisterWriteConfiguration(node, array);
       if (e)
@@ -208,7 +208,7 @@ static Error Xml2Json_ParseFanConfiguration(xmlNode* root, nx_json* parent) {
 static Error Xml2Json_ParseFanConfigurations(xmlNode* root, nx_json* parent) {
   nx_json* array = create_json_array("FanConfigurations", parent);
 
-  for (xmlNode *node = root->children; node; node = node->next)
+  for (xmlNode* node = root->children; node; node = node->next)
     if (node->type == XML_ELEMENT_NODE) {
       Error e = Xml2Json_ParseFanConfiguration(node, array);
       if (e)

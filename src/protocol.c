@@ -29,7 +29,7 @@ Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
     msg_size += (size_t) nread;
     msg[msg_size] = '\0';
 
-    char *end_marker_pos = strstr(msg, PROTOCOL_END_MARKER);
+    char* end_marker_pos = strstr(msg, PROTOCOL_END_MARKER);
     if (end_marker_pos != NULL) {
       *end_marker_pos = '\0';
       break;

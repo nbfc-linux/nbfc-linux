@@ -46,7 +46,7 @@ char* RegEx_SubStr(const regmatch_t* m, const char* s) {
     return NULL;
 
   size_t len = (size_t) (m->rm_eo - m->rm_so);
-  char *out = Mem_Malloc(len + 1);
+  char* out = Mem_Malloc(len + 1);
   memcpy(out, s + m->rm_so, len);
   out[len] = '\0';
   return out;

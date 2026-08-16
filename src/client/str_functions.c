@@ -9,7 +9,7 @@ const char* str_from_bool(bool val) {
   return val ? "true" : "false";
 }
 
-char *str_to_lower(const char *a) {
+char* str_to_lower(const char* a) {
   char* b = Mem_Strdup(a);
   for (char* c = b; *c; ++c)
     *c = (char) tolower(*c);
@@ -68,10 +68,10 @@ static size_t levenshtein_min(size_t a, size_t b, size_t c) {
   }
 }
 
-static size_t levenshtein(const char *s1, size_t s1len, const char *s2, size_t s2len) {
+static size_t levenshtein(const char* s1, size_t s1len, const char* s2, size_t s2len) {
   const size_t rows = s2len + 1;
   const size_t cols = s1len + 1;
-  size_t *matrix = Mem_Calloc(rows * cols, sizeof(size_t));
+  size_t* matrix = Mem_Calloc(rows * cols, sizeof(size_t));
   size_t x, y;
 
 #define M(i, j) matrix[(i) * cols + (j)]

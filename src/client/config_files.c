@@ -41,14 +41,14 @@ void ConfigFiles_Free(array_of(ConfigFile)* files) {
 }
 
 // Compare function for qsort
-int ConfigFile_CompareByName(const void *a, const void *b) {
-  return strcmp(((struct ConfigFile *)a)->config_name, ((struct ConfigFile *)b)->config_name);
+int ConfigFile_CompareByName(const void* a, const void* b) {
+  return strcmp(((struct ConfigFile*) a)->config_name, ((struct ConfigFile*) b)->config_name);
 }
 
 // Compare function for qsort
-int ConfigFile_CompareByDiff(const void *a, const void *b) {
-  return (((struct ConfigFile *)b)->diff > ((struct ConfigFile *)a)->diff)
-       - (((struct ConfigFile *)b)->diff < ((struct ConfigFile *)a)->diff);
+int ConfigFile_CompareByDiff(const void* a, const void* b) {
+  return (((struct ConfigFile*) b)->diff > ((struct ConfigFile*) a)->diff)
+       - (((struct ConfigFile*) b)->diff < ((struct ConfigFile*) a)->diff);
 }
 
 // Return an array of ConfigFile for each file in `path`

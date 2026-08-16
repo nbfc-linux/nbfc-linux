@@ -122,7 +122,7 @@ int Recommend(void) {
 
 int Set_Or_Apply(void) {
   check_root();
-  char *config;
+  char* config;
   array_of(ConfigFile) files = List_All_Configs();
 
   // "auto" ===================================================================

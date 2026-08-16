@@ -12,12 +12,12 @@
 #include "service_control.h"
 
 static int Wait_For_Hwmon(void) {
-  const char *hwmon_file_names[] = {
+  const char* hwmon_file_names[] = {
     "/sys/class/hwmon/hwmon%d/name",
     "/sys/class/hwmon/hwmon%d/device/name",
     NULL
   };
-  const char *linux_temp_sensor_names[] = {
+  const char* linux_temp_sensor_names[] = {
     "coretemp", "k10temp", "zenpower", NULL
   };
 

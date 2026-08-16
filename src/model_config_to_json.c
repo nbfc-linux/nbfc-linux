@@ -61,7 +61,7 @@ static void FanSpeedPercentageOverride_ToJson(const FanSpeedPercentageOverride* 
   }
 
   if (FanSpeedPercentageOverride_IsSet_TargetOperation(cfg)) {
-    const char *str = "?";
+    const char* str = "?";
     switch (cfg->TargetOperation) {
     case OverrideTargetOperation_Read:      str = "Read";      break;
     case OverrideTargetOperation_Write:     str = "Write";     break;
@@ -76,7 +76,7 @@ static void RegisterWriteConfiguration_ToJson(const RegisterWriteConfiguration* 
   nx_json* obj = create_json_object(key, parent);
 
   if (RegisterWriteConfiguration_IsSet_WriteOccasion(cfg)) {
-    const char *str = "?";
+    const char* str = "?";
     switch (cfg->WriteOccasion) {
     case RegisterWriteOccasion_OnInitialization: str = "OnInitialization"; break;
     case RegisterWriteOccasion_OnWriteFanSpeed:  str = "OnWriteFanSpeed";  break;

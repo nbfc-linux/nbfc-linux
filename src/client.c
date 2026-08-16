@@ -115,7 +115,7 @@ enum Command {
 #undef o
 };
 
-static const char *HelpTexts[] = {
+static const char* HelpTexts[] = {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  CLIENT_ ## HELP ## _HELP_TEXT,
   NBFC_CLIENT_COMMANDS
 #undef o
@@ -145,7 +145,7 @@ static const struct cli99_Option *Options[] = {
 // Main
 // ============================================================================
 
-int main(int argc, char *const argv[]) {
+int main(int argc, char* const argv[]) {
   if (geteuid() == 0) {
     mkdir_p(NBFC_CONFIG_DIR, 0755);
     mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755);

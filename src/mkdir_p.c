@@ -5,9 +5,9 @@
 
 #include "memory.h"
 
-int mkdir_p(const char *path, mode_t mode) {
-  char *tmp = Mem_Strdup(path);
-  char *p = tmp;
+int mkdir_p(const char* path, mode_t mode) {
+  char* tmp = Mem_Strdup(path);
+  char* p = tmp;
   int ret = 0;
 
   if (tmp[0] == '/')
