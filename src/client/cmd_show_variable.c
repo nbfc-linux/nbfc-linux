@@ -1,12 +1,12 @@
 #include <stdio.h>  // printf
 #include <string.h> // strcmp
 
-#include "str_functions.h"
 #include "client_global.h"
 
 #include "../nbfc.h"
 #include "../memory.h"
 #include "../log.h"
+#include "../str_functions.h"
 
 const struct cli99_Option ShowVariable_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),

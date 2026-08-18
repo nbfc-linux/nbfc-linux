@@ -9,7 +9,7 @@
 #include "../log.h"
 #include "../memory.h"
 #include "../file_utils.h"
-#include "str_functions.h"
+#include "../str_functions.h"
 
 #define DMI_Directory       "/sys/devices/virtual/dmi/id"
 #define DMI_ProductNameFile DMI_Directory "/product_name"

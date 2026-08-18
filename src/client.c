@@ -50,11 +50,11 @@
 #include "config_rating_rules.c"
 #include "model_config_utils.c"
 #include "model_config_to_json.c"
+#include "str_functions.c"
 #include "xml2json.c"
 #include "client/dmi.c"
 #include "client/curl_utils.c"
 #include "client/config_files.c"
-#include "client/str_functions.c"
 #include "client/service_control.c"
 
 const EC_VTable* ec = NULL;

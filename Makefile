@@ -303,8 +303,6 @@ src/nbfc: \
 	src/client/dmi.h \
 	src/client/service_control.c \
 	src/client/service_control.h \
-	src/client/str_functions.c \
-	src/client/str_functions.h \
 	src/acpi_analysis.h src/acpi_analysis.c \
 	src/aml_analysis.h src/aml_analysis.c \
 	src/aml_lexer.h src/aml_lexer.c \
@@ -324,6 +322,8 @@ src/nbfc: \
 	src/nbfc.h \
 	src/process.h src/process.c \
 	src/regex_utils.h src/regex_utils.c \
+	src/str_functions.c \
+	src/str_functions.h \
 	src/xml2json.h src/xml2json.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
 

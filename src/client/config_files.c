@@ -10,8 +10,8 @@
 #include "../memory.h"
 #include "../nxjson_utils.h"
 #include "../file_utils.h"
+#include "../str_functions.h"
 #include "dmi.h"
-#include "str_functions.h"
 
 // Find a ConfigFile by config_name (case-sensitive)
 ConfigFile* ConfigFiles_Find(array_of(ConfigFile)* files, const char* name) {

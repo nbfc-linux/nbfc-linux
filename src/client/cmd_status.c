@@ -1,8 +1,8 @@
 #include "../nbfc.h"
 #include "../sleep.h"
 #include "../memory.h"
+#include "../str_functions.h"
 
-#include "str_functions.h"
 #include "service_control.h"
 #include "client_global.h"
 
