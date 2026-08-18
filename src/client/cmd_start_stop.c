@@ -2,8 +2,8 @@
 #include "service_control.h"
 #include "client_global.h"
 
-const struct cli99_Option start_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Start_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"-r|--read-only", Option_Start_ReadOnly, cli99_NoArgument},
   cli99_Options_End()
 };

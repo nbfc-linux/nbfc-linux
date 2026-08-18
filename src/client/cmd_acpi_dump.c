@@ -11,8 +11,8 @@
 #include <stdio.h>  // printf
 #include <string.h> // strcmp
 
-const struct cli99_Option acpi_dump_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option AcpiDump_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"command",       Option_Acpi_Dump_Command,   cli99_NormalPositional},
   {"-d|--dsdt",     Option_Acpi_Dump_DSDT_File, cli99_RequiredArgument},
   {"-D|--dsdt-dir", Option_Acpi_Dump_DSDT_Dir,  cli99_RequiredArgument},

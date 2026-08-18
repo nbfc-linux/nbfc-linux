@@ -8,8 +8,8 @@
 #include "../memory.h"
 #include "../log.h"
 
-const struct cli99_Option show_variable_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option ShowVariable_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"variable", Option_ShowVariable_Variable, cli99_RequiredArgument},
   cli99_Options_End()
 };

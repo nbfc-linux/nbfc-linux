@@ -20,8 +20,8 @@
 #define RATE_CONFIG_RULES_JSON_URL \
   "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/config_rating_rules_v1.json"
 
-const struct cli99_Option rate_config_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option RateConfig_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"-d|--dsdt",        Option_Rate_Config_DSDT_File,   cli99_RequiredArgument},
   {"-D|--dsdt-dir",    Option_Rate_Config_DSDT_Dir,    cli99_RequiredArgument},
   {"-a|--all",         Option_Rate_Config_All,         cli99_NoArgument      },

@@ -8,8 +8,8 @@
 #include "../memory.h"
 #include "../nbfc.h"
 
-const struct cli99_Option set_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Set_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"-a|--auto",  Option_Set_Auto,  cli99_NoArgument      },
   {"-s|--speed", Option_Set_Speed, cli99_RequiredArgument},
   {"-f|--fan",   Option_Set_Fan,   cli99_RequiredArgument},

@@ -75,6 +75,6 @@ enum Option {
   Option_Xml2Json_File,
 };
 
-extern const struct cli99_Option main_options[];
+extern const struct cli99_Option Main_CommandLine[];
 
 #endif

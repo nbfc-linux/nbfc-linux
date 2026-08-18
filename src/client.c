@@ -59,7 +59,7 @@
 
 const EC_VTable* ec = NULL;
 
-const struct cli99_Option main_options[] = {
+const struct cli99_Option Main_CommandLine[] = {
   {"-h|--help",     Option_Help,       cli99_NoArgument      },
   {"-v|--version",  Option_Version,    cli99_NoArgument      },
   {"command",       Option_Command,    cli99_NormalPositional},
@@ -85,28 +85,28 @@ const struct cli99_Option main_options[] = {
 #include "client/cmd_xml2json.c"
 
 #define NBFC_CLIENT_COMMANDS \
-  o("set",              Set,              SET,              set)           \
-  o("status",           Status,           STATUS,           status)        \
-  o("start",            Start,            START,            start)         \
-  o("stop",             Stop,             STOP,             main)          \
-  o("restart",          Restart,          RESTART,          start)         \
-  o("sensors",          Sensors,          SENSORS,          sensors)       \
-  o("config",           Config,           CONFIG,           config)        \
-  o("rate-config",      Rate_Config,      RATE_CONFIG,      rate_config)   \
-  o("acpi-dump",        Acpi_Dump,        ACPI_DUMP,        acpi_dump)     \
-  o("update",           Update,           UPDATE,           update)        \
-  o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   main)          \
-  o("get-model-name",   Get_Model_Name,   GET_MODEL,        main)          \
-  o("complete-fans",    Complete_Fans,    COMPLETE_FANS,    main)          \
-  o("complete-sensors", Complete_Sensors, COMPLETE_SENSORS, main)          \
-  o("show-variable",    Show_Variable,    SHOW_VARIABLE,    show_variable) \
-  o("xml2json",         Xml2Json,         XML2JSON,         xml2json)      \
-  o("warranty",         Warranty,         WARRANTY,         main)          \
-  o("donate",           Donate,           SUPPORT,          main)          \
-  o("support",          Support,          SUPPORT,          support)       \
-  o("help",             Help,             HELP,             main)          \
-  o("faq",              FAQ,              FAQ,              main)
-//  COMMAND             ENUM              HELP TEXT         OPTIONS
+  o("set",              Set,              SET,              Set)           \
+  o("status",           Status,           STATUS,           Status)        \
+  o("start",            Start,            START,            Start)         \
+  o("stop",             Stop,             STOP,             Main)          \
+  o("restart",          Restart,          RESTART,          Start)         \
+  o("sensors",          Sensors,          SENSORS,          Sensors)       \
+  o("config",           Config,           CONFIG,           Config)        \
+  o("rate-config",      Rate_Config,      RATE_CONFIG,      RateConfig)    \
+  o("acpi-dump",        Acpi_Dump,        ACPI_DUMP,        AcpiDump)      \
+  o("update",           Update,           UPDATE,           Update)        \
+  o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   Main)          \
+  o("get-model-name",   Get_Model_Name,   GET_MODEL,        Main)          \
+  o("complete-fans",    Complete_Fans,    COMPLETE_FANS,    Main)          \
+  o("complete-sensors", Complete_Sensors, COMPLETE_SENSORS, Main)          \
+  o("show-variable",    Show_Variable,    SHOW_VARIABLE,    ShowVariable)  \
+  o("xml2json",         Xml2Json,         XML2JSON,         Xml2Json)      \
+  o("warranty",         Warranty,         WARRANTY,         Main)          \
+  o("donate",           Donate,           SUPPORT,          Main)          \
+  o("support",          Support,          SUPPORT,          Support)       \
+  o("help",             Help,             HELP,             Main)          \
+  o("faq",              FAQ,              FAQ,              Main)
+//  COMMAND             ENUM              HELP TEXT         COMMANDLINE
 
 enum Command {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
@@ -136,7 +136,7 @@ static enum Command Command_FromString(const char* s) {
 }
 
 static const struct cli99_Option *Options[] = {
-#define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _options,
+#define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _CommandLine,
   NBFC_CLIENT_COMMANDS
 #undef o
 };
@@ -163,7 +163,7 @@ int main(int argc, char* const argv[]) {
   const char* err;
   enum Command cmd = Command_Help;
   struct cli99 p;
-  cli99_Init(&p, main_options, argv, argc);
+  cli99_Init(&p, Main_CommandLine, argv, argc);
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
 
@@ -256,7 +256,7 @@ int main(int argc, char* const argv[]) {
       }
 
       if (Sensors_Options.command == Sensors_Command_Set)
-        p.options = sensors_set_options;
+        p.options = Sensors_Set_CommandLine;
 
       break;
 

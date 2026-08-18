@@ -4,8 +4,8 @@
 
 #include "client_global.h"
 
-const struct cli99_Option xml2json_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Xml2Json_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"file", Option_Xml2Json_File, cli99_NormalPositional},
   cli99_Options_End()
 };

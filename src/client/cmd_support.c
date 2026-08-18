@@ -36,8 +36,8 @@
   "   Run 'nbfc support -h' for more information on firmware uploads.\n"       \
   ""
 
-const struct cli99_Option support_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Support_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"--upload-firmware", Option_Support_Upload_Firmware, cli99_NoArgument},
   {"--print-command",   Option_Support_Print_Command,   cli99_NoArgument},
   {"--create-archive",  Option_Support_Create_Archive,  cli99_RequiredArgument},

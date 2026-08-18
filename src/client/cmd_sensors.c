@@ -19,14 +19,14 @@
  * nbfc sensors set -f <FAN_INDEX> [-s sensor...] [-a algorithm]
  */
 
-const struct cli99_Option sensors_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Sensors_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"sensors_command", Option_Sensors_Command,   cli99_NormalPositional},
   cli99_Options_End()
 };
 
-const struct cli99_Option sensors_set_options[] = {
-  cli99_Options_Include(&sensors_options),
+const struct cli99_Option Sensors_Set_CommandLine[] = {
+  cli99_Options_Include(&Sensors_CommandLine),
   {"-f|--fan",        Option_Sensors_Fan,       cli99_RequiredArgument},
   {"-s|--sensor",     Option_Sensors_Sensor,    cli99_RequiredArgument},
   {"-a|--algorithm",  Option_Sensors_Algorithm, cli99_RequiredArgument},

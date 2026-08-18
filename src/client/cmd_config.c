@@ -52,8 +52,8 @@ enum Config_Action {
   Config_Action_Recommend
 };
 
-const struct cli99_Option config_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Config_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"-l|--list",      Option_Config_List,      cli99_NoArgument      },
   {"-r|--recommend", Option_Config_Recommend, cli99_NoArgument      },
   {"-s|--set",       Option_Config_Set,       cli99_RequiredArgument},
