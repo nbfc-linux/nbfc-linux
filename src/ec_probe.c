@@ -57,6 +57,7 @@
 #include "trace.c"             // src
 #include "file_utils.c"        // src
 #include "process.c"           // src
+#include "str_functions.c"     // src
 
 #define Console_Black       "\033[0;30m"
 #define Console_Red         "\033[0;31m"

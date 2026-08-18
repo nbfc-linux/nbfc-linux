@@ -9,6 +9,7 @@
 #include "macros.h"
 #include "process.h"
 #include "file_utils.h"
+#include "str_functions.h"
 
 #define ACPI_CALL_FILE         "/proc/acpi/call"
 #define ACPI_CALL_MODPROBE_CMD "modprobe acpi_call"
@@ -62,9 +63,7 @@ Error AcpiCall_CallRaw(const char* cmd, size_t cmdlen, char** out) {
   if (! res.ok)
     return err_stdlib(ACPI_CALL_FILE);
 
-  // Strip whitespace from response
-  while (res.len && result[res.len] < 32)
-    result[res.len--] = '\0';
+  str_rstrip_whitespace(result, res.len);
 
   // Check for empty response
   if (! result[0]) {

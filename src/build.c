@@ -51,6 +51,7 @@
 #include "service_state.c"
 #include "server.c"
 #include "sponsor.c"
+#include "str_functions.c"
 #include "temperature_filter.c"
 #include "temperature_threshold_manager.c"
 #include "mkdir_p.c"

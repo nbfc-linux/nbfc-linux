@@ -56,6 +56,17 @@ bool str_starts_with_ignorecase(const char* string, const char* prefix) {
   return true;
 }
 
+size_t str_rstrip_whitespace(char* s, size_t len) {
+  if (! len)
+    return 0;
+
+  while (len > 0 && ((unsigned char) s[len - 1]) <= 32)
+    --len;
+
+  s[len] = '\0';
+  return len;
+}
+
 static size_t levenshtein_min(size_t a, size_t b, size_t c) {
   if (a <= b && a <= c) {
     return a;

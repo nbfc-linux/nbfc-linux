@@ -6,6 +6,7 @@
 #include "log.h"
 #include "sleep.h"
 #include "nvidia.h"
+#include "str_functions.h"
 
 #include <dirent.h>  // DIR, opendir, readdir, closedir
 #include <errno.h>   // ENODATA, EINVAL
@@ -91,8 +92,7 @@ static Error FS_Sensors_Init_HwMon(void) {
         continue;
       }
 
-      while (res.len && source_name[res.len] < 32)
-        source_name[res.len--] = '\0'; /* strip whitespace */
+      str_rstrip_whitespace(source_name, res.len);
 
       for (int j = 0; j < 10; j++) {
         if (n_sources >= FS_SENSORS_MAX_SOURCES)
@@ -184,9 +184,7 @@ static bool FS_Sensors_VFIO_CheckSysBusPciDevices(void) {
     if (!res.ok)
       continue;
 
-    // Strip trailing whitespace using res.len
-    while (res.len > 0 && vendor[res.len - 1] <= 32)
-      vendor[--res.len] = '\0';
+    str_rstrip_whitespace(vendor, res.len);
 
     // NVIDIA PCI vendor ID is 0x10de / 10de
     if (!strstr(vendor, "10de"))

@@ -7,6 +7,7 @@
 #include "../memory.h"
 #include "../nxjson_utils.h"
 #include "../acpi_analysis.h"
+#include "../str_functions.h"
 
 #include "check_root.h"
 #include "client_global.h"
@@ -89,12 +90,7 @@ static char* Support_Get_Real_Firmware_Upload_Endpoint_URL(void) {
   }
 
   char* real_endpoint = CurlWithMem_StealData(curl);
-
-  // Strip trailing whitespace
-  size_t len = strlen(real_endpoint);
-  while (len && real_endpoint[len] < 32)
-    real_endpoint[len--] = '\0';
-
+  str_rstrip_whitespace(real_endpoint, strlen(real_endpoint));
   CurlWithMem_Destroy(curl);
   return real_endpoint;
 }

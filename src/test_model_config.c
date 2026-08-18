@@ -27,6 +27,7 @@
 #include "fan.c"
 #include "acpi_call.c"
 #include "process.c"
+#include "str_functions.c"
 #include "temperature_threshold_manager.c"
 
 const EC_VTable* ec;
