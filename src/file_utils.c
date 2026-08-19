@@ -62,7 +62,7 @@ file_op_result slurp_file_dynamic(char** out, const char* file) {
   }
 
   char buf[4096];
-  *out = NULL;
+  *out = Mem_Calloc(1, 1);
 
   while (1) {
     ssize_t nread = read(fd, buf, sizeof(buf));
