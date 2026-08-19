@@ -10,11 +10,12 @@
  * Parses a signed integer value from a string with strict and predictable
  * semantics.
  *
- * The function accepty only:
+ * The function accepts only:
  *  - Decimal numbers (base 10)
  *  - Hexadecimal numbers (base 16) with an explicit "0x" or "0X" prefix.
+ *  - Binary numbers (base 2) with an explicit "0b" or "0B" prefix.
  *
- * Hexadecimal parsing is performed explicitly instead of relying on
+ * Hexadecimal/binary parsing is performed explicitly instead of relying on
  * base-0 conversion. This is intentional to avoid accepting octal values
  * such as "0777".
  *
@@ -37,6 +38,8 @@ static int64_t parse_number(const char* s, int64_t min, int64_t max, const char*
 
     if (s[start+1] == 'x' || s[start+1] == 'X')
       base = 16;
+    else if (s[start+1] == 'b' || s[start+1] == 'B')
+      base = 2;
   }
 
   errno = 0;
