@@ -59,6 +59,16 @@ Probing tool for the embedded controller
 >
 > > If given, the value of *REGISTER* and the value of *REGISTER + 1* is
 > > read and combined into a single value.
+>
+> **-f**, **\--format** *FORMAT*
+>
+> > Specify output format of value.
+> >
+> > -   **b**, **B**: Print value in binary.
+> >
+> > -   **d**, **D**: Print value in decimal.
+> >
+> > -   **x**, **X**: Print value in hexadecimal.
 
 **write** \[*OPTIONS*\] *REGISTER* *VALUE*
 

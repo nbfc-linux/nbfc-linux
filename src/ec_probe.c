@@ -178,6 +178,7 @@ enum Option {
   Option_Value,
   Option_BitOffset,
   Option_BitValue,
+  Option_Format,
   Option_Color,
   Option_NoColor,
   Option_File,
@@ -201,6 +202,7 @@ static const struct cli99_Option main_options[] = {
 static const struct cli99_Option read_command_options[] = {
   cli99_Options_Include(&main_options),
   {"-w|--word",                Option_Word,                cli99_NoArgument      },
+  {"-f|--format",              Option_Format,              cli99_RequiredArgument},
   {"register",                 Option_Register,            cli99_NormalPositional},
   cli99_Options_End()
 };
@@ -315,11 +317,42 @@ static struct {
   uint8_t       bit_value;
   bool          use_word;
   enum UseColor use_color;
+  char          format;
   const char*   acpi_call_method;
   uint64_t      acpi_call_args[8];
   int           acpi_call_args_size;
   uint64_t      _set;
 } options = {0};
+
+static const char* FormatValue(char* buf, size_t bufsz, char fmt, uint16_t val, bool word) {
+  switch (fmt) {
+    case 'b': /* fall-through */
+    case 'B':
+      snprintf(buf, bufsz, "0b%s", to_binary(val, (word ? 16U : 8U)));
+      break;
+
+    case 'd': /* fall-through */
+    case 'D':
+      snprintf(buf, bufsz, "%d", val);
+      break;
+
+    case 'x':
+      snprintf(buf, bufsz, "0x%.*x", (word ? 4 : 2), val);
+      break;
+
+    case 'X':
+      snprintf(buf, bufsz, "0x%.*X", (word ? 4 : 2), val);
+      break;
+
+    default:
+      if (word)
+        snprintf(buf, bufsz, "%d (0x%.4X 0b%s)", val, val, to_binary(val, 16U));
+      else
+        snprintf(buf, bufsz, "%d (0x%.2X 0b%s)", val, val, to_binary(val, 8U));
+  }
+
+  return buf;
+}
 
 const char RegisterHeader[] =
   "---|------------------------------------------------\n"
@@ -446,6 +479,14 @@ int main(int argc, char* const argv[]) {
         return NBFC_EXIT_CMDLINE;
       }
       break;
+    case Option_Format:
+      if (strlen(p.optarg) != 1 || !strrchr("bBdDxX", p.optarg[0])) {
+        Log_Error("%s: %s: Invalid format", p.option->optstring, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      options.format = p.optarg[0];
+      break;
     }
   }
 
@@ -562,17 +603,19 @@ static int Read(void) {
   check_root();
   Initialize_EC();
 
+  char buf[128];
+
   if (options.use_word) {
     uint16_t word;
     Error e = ec->ReadWord(options.register_, &word);
     e_die();
-    printf("%d (0x%.4X 0b%s)\n", word, word, to_binary(word, 16U));
+    printf("%s\n", FormatValue(buf, sizeof(buf), options.format, word, true));
   }
   else {
     uint8_t byte;
     Error e = ec->ReadByte(options.register_, &byte);
     e_die();
-    printf("%d (0x%.2X 0b%s)\n", byte, byte, to_binary(byte, 8U));
+    printf("%s\n", FormatValue(buf, sizeof(buf), options.format, byte, false));
   }
 
   return 0;

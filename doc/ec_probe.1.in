@@ -84,6 +84,22 @@ and the value of
 .I REGISTER + 1
 is read and combined into a single value.
 .RE
+
+.BR \-f ", " \-\-format
+.I FORMAT
+.RS
+Specify output format of value.
+
+.IP \(bu 2
+.BR b ", " B :
+Print value in binary.
+.IP \(bu 2
+.BR d ", " D :
+Print value in decimal.
+.IP \(bu 2
+.BR x ", " X :
+Print value in hexadecimal.
+.RE
 .RE
 
 .PP

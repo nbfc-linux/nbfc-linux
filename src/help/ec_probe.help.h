@@ -49,7 +49,7 @@
  ""
 
 #define EC_PROBE_READ_HELP_TEXT                                                \
- "Usage: %s read [-h] [-w] REGISTER\n"                                         \
+ "Usage: %s read [-h] [-w] [-f FORMAT] REGISTER\n"                             \
  "\n"                                                                          \
  "Read a byte from a EC register.\n"                                           \
  "\n"                                                                          \
@@ -57,8 +57,14 @@
  "  REGISTER    Register source\n"                                             \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help  Show this help message and exit\n"                             \
- "  -w, --word  Read two registers as one word\n"                              \
+ "  -h, --help            Show this help message and exit\n"                   \
+ "  -w, --word            Read two registers as one word\n"                    \
+ "  -f, --format FORMAT   Specify output format\n"                             \
+ "\n"                                                                          \
+ "Available output formats:\n"                                                 \
+ "  Binary:       -fb  -fB\n"                                                  \
+ "  Decimal:      -fd  -fD\n"                                                  \
+ "  Hexadecimal:  -fx  -fX\n"                                                  \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
