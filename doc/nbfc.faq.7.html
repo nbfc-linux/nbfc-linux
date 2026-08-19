@@ -307,6 +307,16 @@ GFRM</strong></p>
 <p><strong>sudo ec_probe write --word</strong> <em>REGISTER</em>
 <em>VALUE</em></p>
 </blockquote>
+<p>For reading a single bit from a register:</p>
+<blockquote>
+<p><strong>sudo ec_probe read_bit</strong> <em>REGISTER</em>
+<em>OFFSET</em></p>
+</blockquote>
+<p>For writing a single bit to a register:</p>
+<blockquote>
+<p><strong>sudo ec_probe write_bit</strong> <em>REGISTER</em>
+<em>OFFSET</em> <em>VALUE</em></p>
+</blockquote>
 <h2>Invoking ACPI methods</h2>
 <p>To call an ACPI method, run:</p>
 <blockquote>

@@ -354,6 +354,14 @@ For writing to a 16-bit register:
 
 > **sudo ec_probe write \--word** *REGISTER* *VALUE*
 
+For reading a single bit from a register:
+
+> **sudo ec_probe read_bit** *REGISTER* *OFFSET*
+
+For writing a single bit to a register:
+
+> **sudo ec_probe write_bit** *REGISTER* *OFFSET* *VALUE*
+
 ## Invoking ACPI methods
 
 To call an ACPI method, run:

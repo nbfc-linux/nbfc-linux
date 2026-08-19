@@ -440,6 +440,21 @@ For writing to a 16-bit register:
 .I VALUE
 .RE
 
+For reading a single bit from a register:
+.RS
+.B sudo ec_probe read_bit
+.I REGISTER
+.I OFFSET
+.RE
+
+For writing a single bit to a register:
+.RS
+.B sudo ec_probe write_bit
+.I REGISTER
+.I OFFSET
+.I VALUE
+.RE
+
 .SS "Invoking ACPI methods"
 
 To call an ACPI method, run:
