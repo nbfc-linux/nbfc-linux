@@ -240,7 +240,7 @@ Read commands from STDIN.
 .RE
 
 All input values are interpreted as decimal numbers by default.
-Hexadecimal values may be entered by prefixing them with "0x".
+Use the "0x" prefix for hexadecimal values and "0b" for binary values.
 
 .SH EXIT STATUS
 .RS

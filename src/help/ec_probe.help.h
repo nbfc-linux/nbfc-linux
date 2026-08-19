@@ -22,7 +22,7 @@
  "  graph                 Visualize recordings made by `ec_probe monitor -r`\n"\
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
- "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
+ "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
  ""
 
 #define EC_PROBE_DUMP_HELP_TEXT                                                \
@@ -61,7 +61,7 @@
  "  -w, --word  Read two registers as one word\n"                              \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
- "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
+ "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
  ""
 
 #define EC_PROBE_WRITE_HELP_TEXT                                               \
@@ -78,7 +78,7 @@
  "  -w, --word  Write VALUE to two registers\n"                                \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
- "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
+ "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
  ""
 
 #define EC_PROBE_READ_BIT_HELP_TEXT                                            \
@@ -94,7 +94,7 @@
  "  -h, --help  Show this help message and exit\n"                             \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
- "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
+ "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
  ""
 
 #define EC_PROBE_WRITE_BIT_HELP_TEXT                                           \
@@ -112,7 +112,7 @@
  "  -d, --dry   Print the resulting value without writing it\n"                \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
- "Hexadecimal values may be entered by prefixing them with \"0x\".\n"          \
+ "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
  ""
 
 #define EC_PROBE_MONITOR_HELP_TEXT                                             \

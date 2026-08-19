@@ -147,8 +147,8 @@ Probing tool for the embedded controller
 
 > Read commands from STDIN.
 
-All input values are interpreted as decimal numbers by default.
-Hexadecimal values may be entered by prefixing them with \"0x\".
+All input values are interpreted as decimal numbers by default. Use the
+\"0x\" prefix for hexadecimal values and \"0b\" for binary values.
 
 # EXIT STATUS
 
