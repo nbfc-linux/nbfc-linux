@@ -297,6 +297,31 @@ static Error Acpi_Analysis_Extract_OperationRegions(const char* output, array_of
 }
 
 /*
+ * Collects the names of all "EmbeddedControl" operation regions and stores
+ * them in AcpiInfo->ec_region_names.
+ */
+static void Acpi_Analysis_AddEcRegionNames(AcpiInfo* info) {
+  array_size_t num_regions = 0;
+  for_each_array(AcpiOperationRegion*, region, info->regions)
+    num_regions += !strcmp(region->type, "EmbeddedControl");
+
+  info->ec_region_names.size = 0;
+  info->ec_region_names.data = Mem_Calloc(num_regions, sizeof(AcpiOperationRegionName));
+
+  for_each_array(AcpiOperationRegion*, region, info->regions) {
+    if (strcmp(region->type, "EmbeddedControl"))
+      continue;
+
+    const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
+    snprintf(
+      info->ec_region_names.data[info->ec_region_names.size++],
+      sizeof(AcpiOperationRegionName),
+      "%s",
+      name);
+  }
+}
+
+/*
  * Extracts a list of registers, methods and operation regions from the
  * given AML files.
  *
@@ -349,24 +374,7 @@ Error Acpi_Analysis_Get_Info(array_of(str)* files, AcpiInfo* out) {
   if (e)
     goto end;
 
-  array_size_t num_ec_regions = 0;
-  for_each_array(AcpiOperationRegion*, region, out->regions)
-    num_ec_regions += !strcmp(region->type, "EmbeddedControl");
-
-  out->ec_region_names.size = 0;
-  out->ec_region_names.data = Mem_Calloc(num_ec_regions, sizeof(AcpiOperationRegionName));
-
-  for_each_array(AcpiOperationRegion*, region, out->regions) {
-    if (strcmp(region->type, "EmbeddedControl"))
-      continue;
-
-    const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
-    snprintf(
-      out->ec_region_names.data[out->ec_region_names.size++],
-      sizeof(AcpiOperationRegionName),
-      "%s",
-      name);
-  }
+  Acpi_Analysis_AddEcRegionNames(out);
 
 end:
   for (size_t i = 0; i < files->size + 5; ++i)
