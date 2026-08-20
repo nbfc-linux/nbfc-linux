@@ -40,6 +40,7 @@ enum Option {
   Option_Rate_Config_All,
   Option_Rate_Config_Full_Help,
   Option_Rate_Config_Json,
+  Option_Rate_Config_Input,
   Option_Rate_Config_Rules,
   Option_Rate_Config_No_Download,
   Option_Rate_Config_Print_Rules,

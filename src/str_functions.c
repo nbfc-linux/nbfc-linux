@@ -67,6 +67,15 @@ size_t str_rstrip_whitespace(char* s, size_t len) {
   return len;
 }
 
+size_t str_count_newlines(const char* s) {
+  size_t count = 0;
+
+  for (; *s; ++s)
+    count += (*s == '\n');
+
+  return count;
+}
+
 static size_t levenshtein_min(size_t a, size_t b, size_t c) {
   if (a <= b && a <= c) {
     return a;

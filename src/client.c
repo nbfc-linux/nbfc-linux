@@ -399,8 +399,26 @@ int main(int argc, char* const argv[]) {
     // Rate-Config options
     // ========================================================================
 
+    case Option_Rate_Config_All:
+      RateConfig_SetAction(RateConfig_Action_RateAll, p.option->optstring);
+      break;
+
     case Option_Rate_Config_File:
+      RateConfig_SetAction(RateConfig_Action_RateFile, p.option->optstring);
       Rate_Config_Options.file = p.optarg;
+      break;
+
+    case Option_Rate_Config_Input:
+      RateConfig_SetAction(RateConfig_Action_RateFromFile, p.option->optstring);
+      Rate_Config_Options.input_file = p.optarg;
+      break;
+
+    case Option_Rate_Config_Full_Help:
+      RateConfig_SetAction(RateConfig_Action_PrintFullHelp, p.option->optstring);
+      break;
+
+    case Option_Rate_Config_Print_Rules:
+      RateConfig_SetAction(RateConfig_Action_PrintRules, p.option->optstring);
       break;
 
     case Option_Rate_Config_DSDT_File:
@@ -424,20 +442,8 @@ int main(int argc, char* const argv[]) {
       Rate_Config_Options.no_download = true;
       break;
 
-    case Option_Rate_Config_All:
-      Rate_Config_Options.all = true;
-      break;
-
-    case Option_Rate_Config_Full_Help:
-      Rate_Config_Options.full_help = true;
-      break;
-
     case Option_Rate_Config_Json:
       Rate_Config_Options.json = true;
-      break;
-
-    case Option_Rate_Config_Print_Rules:
-      Rate_Config_Options.print_rules = true;
       break;
 
     case Option_Rate_Config_Min_Score:

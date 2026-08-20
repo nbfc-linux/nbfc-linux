@@ -10,6 +10,7 @@ char*       str_replace_prefix(const char*, const char*, const char*);
 int         str_cmp_ignorecase(const char*, const char*);
 bool        str_starts_with_ignorecase(const char*, const char*);
 size_t      str_rstrip_whitespace(char*, size_t);
+size_t      str_count_newlines(const char*);
 float       str_similarity(const char*, const char*);
 
 #endif
