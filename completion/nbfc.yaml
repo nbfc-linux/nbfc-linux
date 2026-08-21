@@ -163,6 +163,11 @@ options:
     metavar: "SCORE"
     complete: ["float"]
 
+  - option_strings: ["-i", "--input"]
+    help: "Read configuration files from file"
+    metavar: "FILE"
+    complete: ["file"]
+
   - option_strings: ["-j", "--json"]
     help: "Use JSON output"
 
@@ -176,6 +181,9 @@ options:
 
   - option_strings: ["-n", "--no-download"]
     help: "Don't download rules file from the repository"
+
+  - option_strings: ["-u", "--unverified"]
+    help: "Include unverified EC registers"
 
 positionals:
   - number: 1
@@ -211,6 +219,9 @@ help: "List all available registers"
 ---
 prog: "nbfc acpi-dump ec-registers"
 help: "List all available EC registers"
+options:
+  - option_strings: ["-u", "--unverified"]
+    help: "Include unverified EC registers"
 ---
 prog: "nbfc acpi-dump methods"
 help: "List all available ACPI methods"

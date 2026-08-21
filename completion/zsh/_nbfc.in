@@ -341,10 +341,12 @@ _nbfc_rate_config() {
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT dir]':DIRECTORY:_directories
     '(--min-score -m)'{-m+,--min-score=}'[Set minimum rating threshold for configurations]':SCORE:"_numbers -f 'Set minimum rating threshold for configurations'"
+    '(--input -i)'{-i+,--input=}'[Read configuration files from file]':FILE:_files
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--print-rules)'--print-rules'[Print configuration rules]'
     '(--rules -r)'{-r+,--rules=}'[Use an alternative rules file]':FILE:_files
     '(--no-download -n)'{-n,--no-download}"[Don't download rules file from the repository]"
+    '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -392,6 +394,7 @@ _nbfc_acpi_dump_registers() {
 
 _nbfc_acpi_dump_ec_registers() {
   local -a args=(
+    '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'

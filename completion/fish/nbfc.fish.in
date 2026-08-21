@@ -213,8 +213,9 @@ function _nbfc__prepare
     '(set)=>-a --auto -s= --speed= -f= --fan=' \
     '(sensors)>(set)=>-f= --fan= -a= --algorithm= -s= --sensor= --force' \
     '(update)=>-p= --parallel= -q --quiet' \
-    '(rate\-config)=>-H --full-help -a --all -d= --dsdt= -D= --dsdt-dir= -m= --min-score= -j --json --print-rules -r= --rules= -n --no-download' \
+    '(rate\-config)=>-H --full-help -a --all -d= --dsdt= -D= --dsdt-dir= -m= --min-score= -i= --input= -j --json --print-rules -r= --rules= -n --no-download -u --unverified' \
     '(acpi\-dump)=>-d= --dsdt= -D= --dsdt-dir= -j --json' \
+    '(acpi\-dump)>(ec\-registers)=>-u --unverified' \
     '(support)=>--upload-firmware --print-command --create-archive='
   return 0
 end
@@ -346,21 +347,25 @@ set -l C002 "not $has_option -a --all"
 set -l C003 "not $has_option -D --dsdt-dir"
 set -l C004 "not $has_option -d --dsdt -D --dsdt-dir"
 set -l C005 "not $has_option -m --min-score"
-set -l C006 "not $has_option -j --json"
-set -l C007 "not $has_option --print-rules"
-set -l C008 "not $has_option -r --rules"
-set -l C009 "not $has_option -n --no-download"
-set -l C010 "$num_of_positionals -eq 1"
+set -l C006 "not $has_option -i --input"
+set -l C007 "not $has_option -j --json"
+set -l C008 "not $has_option --print-rules"
+set -l C009 "not $has_option -r --rules"
+set -l C010 "not $has_option -n --no-download"
+set -l C011 "not $has_option -u --unverified"
+set -l C012 "$num_of_positionals -eq 1"
 complete -c $prog -n $P -n $C000 -n $C001 -s H -l full-help -d 'Show full help' -f
 complete -c $prog -n $P -n $C000 -n $C002 -s a -l all -d 'Rate all available configuration files' -f
 complete -c $prog -n $P -n $C000 -n $C003 -s d -l dsdt -d 'Use an alternative DSDT file' -Fr
 complete -c $prog -n $P -n $C000 -n $C004 -s D -l dsdt-dir -d 'Use an alternative DSDT dir' -x -a '(__fish_complete_directories)'
 complete -c $prog -n $P -n $C000 -n $C005 -s m -l min-score -d 'Set minimum rating threshold for configurations' -x
-complete -c $prog -n $P -n $C000 -n $C006 -s j -l json -d 'Use JSON output' -f
-complete -c $prog -n $P -n $C000 -n $C007 -l print-rules -d 'Print configuration rules' -f
-complete -c $prog -n $P -n $C000 -n $C008 -s r -l rules -d 'Use an alternative rules file' -Fr
-complete -c $prog -n $P -n $C000 -n $C009 -s n -l no-download -d "Don't download rules file from the repository" -f
-complete -c $prog -n $P -n $C010 -n $C000 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
+complete -c $prog -n $P -n $C000 -n $C006 -s i -l input -d 'Read configuration files from file' -Fr
+complete -c $prog -n $P -n $C000 -n $C007 -s j -l json -d 'Use JSON output' -f
+complete -c $prog -n $P -n $C000 -n $C008 -l print-rules -d 'Print configuration rules' -f
+complete -c $prog -n $P -n $C000 -n $C009 -s r -l rules -d 'Use an alternative rules file' -Fr
+complete -c $prog -n $P -n $C000 -n $C010 -s n -l no-download -d "Don't download rules file from the repository" -f
+complete -c $prog -n $P -n $C000 -n $C011 -s u -l unverified -d 'Include unverified EC registers' -f
+complete -c $prog -n $P -n $C012 -n $C000 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
 
 # command nbfc acpi-dump
 set -l C000 "$positional_contains 1 acpi-dump"
@@ -372,6 +377,12 @@ complete -c $prog -n $P -n $C000 -n $C001 -s d -l dsdt -d 'Use an alternative DS
 complete -c $prog -n $P -n $C000 -n $C002 -s D -l dsdt-dir -d 'Use an alternative DSDT directory' -x -a '(__fish_complete_directories)'
 complete -c $prog -n $P -n $C000 -n $C003 -s j -l json -d 'Use JSON output' -f
 complete -c $prog -n $P -n $C004 -n $C000 -d Commands -f -a '(_nbfc_acpi_dump__command)'
+
+# command nbfc acpi-dump ec-registers
+set -l C000 "$positional_contains 1 acpi-dump"
+set -l C001 "$positional_contains 2 ec-registers"
+set -l C002 "not $has_option -u --unverified"
+complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s u -l unverified -d 'Include unverified EC registers' -f
 
 # command nbfc xml2json
 set -l C000 "$num_of_positionals -eq 1"

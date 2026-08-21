@@ -67,6 +67,11 @@ _nbfc__parse_commandline() {
         --create-archive) VAR=OPT_create_archive; ARGS=1; return;;
       esac
     esac
+    case "$1" in root:acpi-dump:ec-registers*)
+      case "$2" in
+        -u|--unverified) VAR=OPT_unverified; ARGS=0; return;;
+      esac
+    esac
     case "$1" in root:acpi-dump*)
       case "$2" in
         -d|--dsdt) VAR=OPT_dsdt; ARGS=1; return;;
@@ -81,10 +86,12 @@ _nbfc__parse_commandline() {
         -d|--dsdt) VAR=OPT_dsdt; ARGS=1; return;;
         -D|--dsdt-dir) VAR=OPT_dsdt_dir; ARGS=1; return;;
         -m|--min-score) VAR=OPT_min_score; ARGS=1; return;;
+        -i|--input) VAR=OPT_input; ARGS=1; return;;
         -j|--json) VAR=OPT_json; ARGS=0; return;;
         --print-rules) VAR=OPT_print_rules; ARGS=0; return;;
         -r|--rules) VAR=OPT_rules; ARGS=1; return;;
         -n|--no-download) VAR=OPT_no_download; ARGS=0; return;;
+        -u|--unverified) VAR=OPT_unverified; ARGS=0; return;;
       esac
     esac
     case "$1" in root:update*)
@@ -234,9 +241,9 @@ _nbfc() {
   local -a OPT_help OPT_version OPT_read_only OPT_all OPT_service OPT_fan
   local -a OPT_watch OPT_list OPT_set OPT_apply OPT_recommend OPT_auto OPT_speed
   local -a OPT_algorithm OPT_sensor OPT_force OPT_parallel OPT_quiet
-  local -a OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_json
-  local -a OPT_print_rules OPT_rules OPT_no_download OPT_upload_firmware
-  local -a OPT_print_command OPT_create_archive
+  local -a OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_input OPT_json
+  local -a OPT_print_rules OPT_rules OPT_no_download OPT_unverified
+  local -a OPT_upload_firmware OPT_print_command OPT_create_archive
   _nbfc__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -573,7 +580,7 @@ _nbfc_rate_config() {
     local opt="$1" cur="$2" ret=0
 
     case "$opt" in
-      -d|--dsdt|-r|--rules)
+      -@(-@(dsdt|input|rules)|d|i|r))
         _filedir;;
       -D|--dsdt-dir)
         _filedir -d;;
@@ -586,7 +593,7 @@ _nbfc_rate_config() {
 
   case "$prev" in
     --*) __complete_option "$prev" "$cur" && return 0;;
-    -*([Hajnh])[dDmr])
+    -*([Hajnuh])[dDmir])
          __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
@@ -594,7 +601,7 @@ _nbfc_rate_config() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*([Hajnh])[dDmr]*)
+    -*([Hajnuh])[dDmir]*)
       local i
       for ((i=2; i <= ${#cur}; ++i)); do
         local pre="${cur:0:$i}" value="${cur:$i}"
@@ -612,10 +619,12 @@ _nbfc_rate_config() {
     (( ! ${#OPT_dsdt_dir[@]} )) && opts+=(-d --dsdt=)
     (( ! ${#OPT_dsdt[@]} && ! ${#OPT_dsdt_dir[@]} )) && opts+=(-D --dsdt-dir=)
     (( ! ${#OPT_min_score[@]} )) && opts+=(-m --min-score=)
+    (( ! ${#OPT_input[@]} )) && opts+=(-i --input=)
     (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
     (( ! ${#OPT_print_rules[@]} )) && opts+=(--print-rules)
     (( ! ${#OPT_rules[@]} )) && opts+=(-r --rules=)
     (( ! ${#OPT_no_download[@]} )) && opts+=(-n --no-download)
+    (( ! ${#OPT_unverified[@]} )) && opts+=(-u --unverified)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
@@ -645,7 +654,7 @@ _nbfc_acpi_dump() {
   if (( 1 < ${#POSITIONALS[@]} )); then
     case "${POSITIONALS[1]}" in
       registers);;
-      ec-registers);;
+      ec-registers) _nbfc_acpi_dump_ec_registers && return 0;;
       methods);;
       dsl);;
     esac
@@ -700,6 +709,18 @@ _nbfc_acpi_dump() {
     COMPREPLY=($(compgen -W 'registers ec-registers methods dsl' -- "$cur"))
     return 0;
   }
+
+  return 1
+}
+
+_nbfc_acpi_dump_ec_registers() {
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_unverified[@]} )) && opts+=(-u --unverified)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
 
   return 1
 }
