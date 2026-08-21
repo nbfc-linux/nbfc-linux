@@ -131,6 +131,18 @@
   ""
 
 /*
+ * Operation regions of type "SystemMemory" that may be accessible through the
+ * embedded controller, though this is not guaranteed.
+ */
+static const AcpiOperationRegionName Acpi_Analysis_UnverifiedEmbeddedControllerRegions[] = {
+  "ECMM",
+  "H2RM",
+  "EC",
+  "RAM",
+  "PECM",
+};
+
+/*
  * Checks if the `iasl` program is installed.
  */
 Error Acpi_Analysis_Is_IASL_Installed(void) {
@@ -297,27 +309,100 @@ static Error Acpi_Analysis_Extract_OperationRegions(const char* output, array_of
 }
 
 /*
+ * Returns true if two segments are equal, ignoring trailing underscores.
+ */
+static bool Acpi_Analysis_SegmentEqualsIgnoreTrailingUnderscore(const char* a, const char* b) {
+  while (*a && *b && *a == *b)
+    ++a, ++b;
+
+  while (*a == '_')
+    ++a;
+
+  while (*b == '_')
+    ++b;
+
+  return *a == '\0' && *b == '\0';
+}
+
+/*
+ * Appends an operation region name to AcpiInfo->ec_region_names.
+ */
+void Acpi_Analysis_AddEmbeddedControllerRegion(AcpiInfo* info, const char* name) {
+  const size_t idx = info->ec_region_names.size++;
+
+  info->ec_region_names.data = Mem_Realloc(
+      info->ec_region_names.data, (idx + 1) * sizeof(AcpiOperationRegionName)
+  );
+
+  snprintf(
+      info->ec_region_names.data[idx],
+      sizeof(AcpiOperationRegionName),
+      "%s",
+      name
+  );
+}
+
+/*
  * Collects the names of all "EmbeddedControl" operation regions and stores
  * them in AcpiInfo->ec_region_names.
  */
-static void Acpi_Analysis_AddEcRegionNames(AcpiInfo* info) {
-  array_size_t num_regions = 0;
-  for_each_array(AcpiOperationRegion*, region, info->regions)
-    num_regions += !strcmp(region->type, "EmbeddedControl");
-
-  info->ec_region_names.size = 0;
-  info->ec_region_names.data = Mem_Calloc(num_regions, sizeof(AcpiOperationRegionName));
-
+static void Acpi_Analysis_AddTrustedEmbeddedControllerRegions(AcpiInfo* info) {
   for_each_array(AcpiOperationRegion*, region, info->regions) {
     if (strcmp(region->type, "EmbeddedControl"))
       continue;
 
     const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
-    snprintf(
-      info->ec_region_names.data[info->ec_region_names.size++],
-      sizeof(AcpiOperationRegionName),
-      "%s",
-      name);
+    Acpi_Analysis_AddEmbeddedControllerRegion(info, name);
+  }
+}
+
+static bool Acpi_Analysis_UnverifiedEmbeddedControllerRegions_Contains(const char* name) {
+  for (size_t i = 0; i < ARRAY_SIZE(Acpi_Analysis_UnverifiedEmbeddedControllerRegions); ++i) {
+    const char* const unverified_name = Acpi_Analysis_UnverifiedEmbeddedControllerRegions[i];
+    if (Acpi_Analysis_SegmentEqualsIgnoreTrailingUnderscore(unverified_name, name))
+      return true;
+  }
+
+  return false;
+}
+
+/*
+ * Returns true if the operation region may be accessible through the embedded
+ * controller, though this is not guaranteed.
+ */
+static bool Acpi_Analysis_IsUnverifiedEcRegion(AcpiInfo* info, AcpiOperationRegion* region) {
+  if (strcmp(region->type, "SystemMemory"))
+    return false;
+
+  const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
+  if (! Acpi_Analysis_UnverifiedEmbeddedControllerRegions_Contains(name))
+    return false;
+
+  for_each_array(AcpiRegister*, acpi_register, info->registers) {
+    if (strcmp(acpi_register->region, name))
+      continue;
+
+    if ((acpi_register->bit_offset / 8) > 255)
+      return false;
+  }
+
+  return true;
+}
+
+/*
+ * Collects the names of all operation regions that may be accessible through
+ * the embedded controller and appends them to `out`.
+ *
+ * It is not guaranteed that these operation regions are actually accessible
+ * through the embedded controller.
+ */
+void Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(AcpiInfo* info) {
+  for_each_array(AcpiOperationRegion*, region, info->regions) {
+    if (! Acpi_Analysis_IsUnverifiedEcRegion(info, region))
+      continue;
+
+    const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
+    Acpi_Analysis_AddEmbeddedControllerRegion(info, name);
   }
 }
 
@@ -374,7 +459,7 @@ Error Acpi_Analysis_Get_Info(array_of(str)* files, AcpiInfo* out) {
   if (e)
     goto end;
 
-  Acpi_Analysis_AddEcRegionNames(out);
+  Acpi_Analysis_AddTrustedEmbeddedControllerRegions(out);
 
 end:
   for (size_t i = 0; i < files->size + 5; ++i)
@@ -593,6 +678,18 @@ const char* Acpi_Analysis_Get_Register_Basename(const char* path) {
   }
 
   return p;
+}
+
+/*
+ * Check if `name` is an operation region that is exposed through the
+ * embedded controller.
+ */
+bool Acpi_Analysis_IsEmbeddedControllerRegion(AcpiInfo* info, const char* name) {
+  for_each_array(AcpiOperationRegionName*, region, info->ec_region_names)
+    if (Acpi_Analysis_SegmentEqualsIgnoreTrailingUnderscore(*region, name))
+      return true;
+
+  return false;
 }
 
 /**

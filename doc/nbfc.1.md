@@ -202,6 +202,15 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Use an alternative rules file.
 >
+> **-u**, **\--unverified**
+>
+> > Normally, only registers belonging to an **EmbeddedControl**
+> > operation region are taken into account when rating a configuration.
+> > With this option, registers from **SystemMemory** operation regions
+> > that may be accessible through the embedded controller are also
+> > considered. Their accessibility through the embedded controller
+> > cannot be guaranteed.
+>
 > **\--print-rules**
 >
 > > Print configuration rating rules.
@@ -218,9 +227,16 @@ This program is used to control the NoteBook FanControl service.
 >
 > > List all available registers.
 >
-> **ec-registers**
+> **ec-registers** \[**-u**\|**\--unverified**\]
 >
 > > List all available embedded controller registers.
+> >
+> > Normally, only registers belonging to an **EmbeddedControl**
+> > operation region are printed. If **-u**\|**\--unverified** is
+> > specified, also registers from **SystemMemory** operation regions
+> > that may be accessible through the embedded controller are printed.
+> > Their accessibility through the embedded controller cannot be
+> > guaranteed.
 >
 > **methods**
 >

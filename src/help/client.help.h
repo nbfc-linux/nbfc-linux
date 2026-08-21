@@ -89,6 +89,7 @@
  "  -m, --min-score SCORE Set minimum rating threshold for configurations\n"   \
  "  -n, --no-download     Don't download rules from the repository\n"          \
  "  -r, --rules FILE      Use an alternative rules file\n"                     \
+ "  -u, --unverified      Include unverified EC registers\n"                   \
  "  --print-rules         Print configuration rating rules\n"                  \
  ""
 
@@ -101,7 +102,7 @@
  "\n"                                                                          \
  "Commands:\n"                                                                 \
  "    registers           List all available registers\n"                      \
- "    ec-registers        List all available EC registers\n"                   \
+ "    ec-registers [-u]   List all available EC registers\n"                   \
  "    methods             List all available ACPI methods\n"                   \
  "    dsl                 Disassemble your ACPI tables\n"                      \
  "\n"                                                                          \
@@ -110,6 +111,7 @@
  "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
  "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
  "  -j, --json            Use JSON output\n"                                   \
+ "  -u, --unverified      Include unverified EC registers\n"                   \
  ""
 
 #define CLIENT_STATUS_HELP_TEXT                                                \

@@ -13,10 +13,11 @@
 
 const struct cli99_Option AcpiDump_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),
-  {"command",       Option_Acpi_Dump_Command,   cli99_NormalPositional},
-  {"-d|--dsdt",     Option_Acpi_Dump_DSDT_File, cli99_RequiredArgument},
-  {"-D|--dsdt-dir", Option_Acpi_Dump_DSDT_Dir,  cli99_RequiredArgument},
-  {"-j|--json",     Option_Acpi_Dump_Json,      cli99_NoArgument      },
+  {"command",         Option_Acpi_Dump_Command,    cli99_NormalPositional},
+  {"-d|--dsdt",       Option_Acpi_Dump_DSDT_File,  cli99_RequiredArgument},
+  {"-D|--dsdt-dir",   Option_Acpi_Dump_DSDT_Dir,   cli99_RequiredArgument},
+  {"-j|--json",       Option_Acpi_Dump_Json,       cli99_NoArgument      },
+  {"-u|--unverified", Option_Acpi_Dump_Unverified, cli99_NoArgument      },
   cli99_Options_End()
 };
 
@@ -31,11 +32,13 @@ enum NBFC_PACKED_ENUM AcpiDump_Action {
 struct {
   enum AcpiDump_Action action;
   bool json;
+  bool unverified;
   const char* files[ACPI_ANALYSIS_MAX_AML_FILES];
   size_t files_size;
   const char* dir;
 } Acpi_Dump_Options = {
   AcpiDump_Action_None,
+  false,
   false,
   {0},
   0,
@@ -120,24 +123,12 @@ static int AcpiDump_Methods(array_of(str)* aml_files, bool json) {
 }
 
 /*
- * Check if `name` is a region contained in `ec_regions`.
- */
-static bool AcpiDump_ContainsRegion(array_of(AcpiOperationRegionName)* ec_regions, const char* name) {
-  for_each_array(AcpiOperationRegionName*, region, *ec_regions) {
-    if (! strcmp(*region, name))
-      return true;
-  }
-
-  return false;
-}
-
-/*
  * Dump all available registers from the given AML files to stdout.
  *
  * If `only_ec` is true, only output registers that are available
  * through the embedded controller.
  */
-static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec) {
+static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec, bool unverified) {
   Error e;
   AcpiInfo acpi_info = {0};
 
@@ -162,6 +153,13 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec)
   }
 
   // ==========================================================================
+  // Add unverified EC registers
+  // ==========================================================================
+
+  if (unverified)
+    Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(&acpi_info);
+
+  // ==========================================================================
   // Output
   // ==========================================================================
 
@@ -170,7 +168,7 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec)
     nx_json* array = create_json_array(NULL, &root);
 
     for_each_array(AcpiRegister*, register_, acpi_info.registers) {
-      if (only_ec && !AcpiDump_ContainsRegion(&acpi_info.ec_region_names, register_->region))
+      if (only_ec && !Acpi_Analysis_IsEmbeddedControllerRegion(&acpi_info, register_->region))
         continue;
 
       AcpiRegister_ToJson(register_, NULL, array);
@@ -184,7 +182,7 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec)
   }
   else {
     for_each_array(AcpiRegister*, register_, acpi_info.registers) {
-      if (only_ec && !AcpiDump_ContainsRegion(&acpi_info.ec_region_names, register_->region))
+      if (only_ec && !Acpi_Analysis_IsEmbeddedControllerRegion(&acpi_info, register_->region))
         continue;
 
       printf("%s [%s] byte=%u byte_hex=0x%X bit=%u total_bit=%u len=%u acc=%u\n",
@@ -228,9 +226,10 @@ int AcpiDump(void) {
   Error e;
   array_of(str) aml_files = {0};
   const bool json = Acpi_Dump_Options.json;
+  const bool unverified = Acpi_Dump_Options.unverified;
 
   if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
-    Log_Error("Missing command");
+    Log_Error("acpi-dump: Missing command");
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -254,8 +253,8 @@ int AcpiDump(void) {
   switch (Acpi_Dump_Options.action) {
     case AcpiDump_Action_DSL:         return AcpiDump_DSL(&aml_files);
     case AcpiDump_Action_Methods:     return AcpiDump_Methods(&aml_files, json);
-    case AcpiDump_Action_Registers:   return AcpiDump_Registers(&aml_files, json, false);
-    case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(&aml_files, json, true);
+    case AcpiDump_Action_Registers:   return AcpiDump_Registers(&aml_files, json, false, unverified);
+    case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(&aml_files, json, true, unverified);
     default:                          return NBFC_EXIT_FAILURE;
   }
 }

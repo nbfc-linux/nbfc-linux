@@ -273,6 +273,17 @@ Don't download configuration rules from the repository.
 Use an alternative rules file.
 .RE
 
+.BR \-u ", " \-\-unverified
+.RS
+Normally, only registers belonging to an
+.B EmbeddedControl
+operation region are taken into account when rating a configuration.
+With this option, registers from
+.B SystemMemory
+operation regions that may be accessible through the embedded controller are also considered.
+Their accessibility through the embedded controller cannot be guaranteed.
+.RE
+
 .B \-\-print\-rules
 .RS
 Print configuration rating rules.
@@ -293,8 +304,19 @@ List all available registers.
 .RE
 
 .B ec\-registers
+.RB [ \-u | \-\-unverified ]
 .RS
 List all available embedded controller registers.
+
+Normally, only registers belonging to an
+.B EmbeddedControl
+operation region are printed.
+If
+.BR \-u | \-\-unverified
+is specified, also registers from
+.B SystemMemory
+operation regions that may be accessible through the embedded controller are printed.
+Their accessibility through the embedded controller cannot be guaranteed.
 .RE
 
 .B methods

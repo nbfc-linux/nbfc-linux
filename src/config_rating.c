@@ -115,11 +115,11 @@ static AcpiRegister* ConfigRating_FindEcRegister(
     if ((acpi_register->bit_offset / 8) != offset)
       continue;
 
-    for_each_array(AcpiOperationRegionName*, region, config_rating->acpi_info.ec_region_names) {
-      if (! strcmp(acpi_register->region, *region)) {
-        return acpi_register;
-      }
-    }
+    const bool in_ec_region = Acpi_Analysis_IsEmbeddedControllerRegion(
+        &config_rating->acpi_info, acpi_register->region);
+
+    if (in_ec_region)
+      return acpi_register;
   }
 
   return NULL;
@@ -153,7 +153,7 @@ static ConfigRating_RegisterRating ConfigRating_RateRegister(
   ConfigRating_RegisterRating rated = {0};
   rated.type = type;
   rated.offset = offset;
-  rated.info= ConfigRating_FindEcRegister(config_rating, offset);
+  rated.info = ConfigRating_FindEcRegister(config_rating, offset);
 
   if (! rated.info) {
     rated.score = RegisterScore_NotFound;

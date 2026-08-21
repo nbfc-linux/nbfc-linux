@@ -118,6 +118,9 @@ Error Acpi_Analysis_Get_DSL(const char*, char**);
 Error Acpi_Analysis_Get_Info(array_of(str)*, AcpiInfo*);
 
 bool  Acpi_Analysis_Path_Equals(const char*, const char*);
+bool  Acpi_Analysis_IsEmbeddedControllerRegion(AcpiInfo*, const char*);
+void  Acpi_Analysis_AddEmbeddedControllerRegion(AcpiInfo*, const char*);
+void  Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(AcpiInfo*);
 const char* Acpi_Analysis_Get_Register_Basename(const char*);
 
 nx_json* AcpiMethod_ToJson(AcpiMethod*, const char*, nx_json*);

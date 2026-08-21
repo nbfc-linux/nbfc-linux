@@ -195,6 +195,15 @@ on the current system.</p>
 <blockquote>
 <p>Use an alternative rules file.</p>
 </blockquote>
+<p><strong>-u</strong>, <strong>--unverified</strong></p>
+<blockquote>
+<p>Normally, only registers belonging to an
+<strong>EmbeddedControl</strong> operation region are taken into account
+when rating a configuration. With this option, registers from
+<strong>SystemMemory</strong> operation regions that may be accessible
+through the embedded controller are also considered. Their accessibility
+through the embedded controller cannot be guaranteed.</p>
+</blockquote>
 <p><strong>--print-rules</strong></p>
 <blockquote>
 <p>Print configuration rating rules.</p>
@@ -211,9 +220,16 @@ on the current system.</p>
 <blockquote>
 <p>List all available registers.</p>
 </blockquote>
-<p><strong>ec-registers</strong></p>
+<p><strong>ec-registers</strong>
+[<strong>-u</strong>|<strong>--unverified</strong>]</p>
 <blockquote>
 <p>List all available embedded controller registers.</p>
+<p>Normally, only registers belonging to an
+<strong>EmbeddedControl</strong> operation region are printed. If
+<strong>-u</strong>|<strong>--unverified</strong> is specified, also
+registers from <strong>SystemMemory</strong> operation regions that may
+be accessible through the embedded controller are printed. Their
+accessibility through the embedded controller cannot be guaranteed.</p>
 </blockquote>
 <p><strong>methods</strong></p>
 <blockquote>

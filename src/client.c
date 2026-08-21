@@ -446,6 +446,10 @@ int main(int argc, char* const argv[]) {
       Rate_Config_Options.json = true;
       break;
 
+    case Option_Rate_Config_Unverified:
+      Rate_Config_Options.unverified = true;
+      break;
+
     case Option_Rate_Config_Min_Score:
       Rate_Config_Options.min_score_set = true;
       Rate_Config_Options.min_score = (float) parse_double(p.optarg, 0, 10, &err);
@@ -474,6 +478,10 @@ int main(int argc, char* const argv[]) {
 
     case Option_Acpi_Dump_Json:
       Acpi_Dump_Options.json = true;
+      break;
+
+    case Option_Acpi_Dump_Unverified:
+      Acpi_Dump_Options.unverified = true;
       break;
 
     case Option_Acpi_Dump_Command:

@@ -16,6 +16,7 @@
 #include "client_global.h"
 
 #define RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE 9.0
+#define RATE_CONFIG_REGIONS_MAX               4
 
 #define RATE_CONFIG_RULES_JSON_URL \
   "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/config_rating_rules_v1.json"
@@ -31,6 +32,7 @@ const struct cli99_Option RateConfig_CommandLine[] = {
   {"-n|--no-download", Option_Rate_Config_No_Download, cli99_NoArgument      },
   {"-r|--rules",       Option_Rate_Config_Rules,       cli99_RequiredArgument},
   {"-i|--input",       Option_Rate_Config_Input,       cli99_RequiredArgument},
+  {"-u|--unverified",  Option_Rate_Config_Unverified,  cli99_NoArgument      },
   {"--print-rules",    Option_Rate_Config_Print_Rules, cli99_NoArgument      },
   {"file",             Option_Rate_Config_File,        cli99_NormalPositional},
   cli99_Options_End()
@@ -51,6 +53,7 @@ struct {
   bool        json;
   bool        no_download;
   bool        min_score_set;
+  bool        unverified;
   float       min_score;
   const char* file;
   const char* dsdt_files[ACPI_ANALYSIS_MAX_AML_FILES];
@@ -61,6 +64,7 @@ struct {
 } Rate_Config_Options = {
   NULL,
   RateConfig_Action_None,
+  false,
   false,
   false,
   false,
@@ -745,15 +749,35 @@ int RateConfig(void) {
   }
 
   // ==========================================================================
+  // Add unverified EC registers
+  // ==========================================================================
+
+  if (Rate_Config_Options.unverified)
+    Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(&config_rating.acpi_info);
+
+  // ==========================================================================
   // Call desired function
   // ==========================================================================
 
-  if (Rate_Config_Options.action == RateConfig_Action_RateAll)
-    e = RateConfig_RateAll(&config_rating, Rate_Config_Options.json, Rate_Config_Options.min_score);
-  else if (Rate_Config_Options.action == RateConfig_Action_RateFromFile)
-    e = RateConfig_RateFromFile(&config_rating, Rate_Config_Options.input_file, Rate_Config_Options.json, Rate_Config_Options.min_score);
-  else
-    e = RateConfig_RateSingle(&config_rating, Rate_Config_Options.json, Rate_Config_Options.file);
+  if (Rate_Config_Options.action == RateConfig_Action_RateAll) {
+    e = RateConfig_RateAll(
+        &config_rating,
+        Rate_Config_Options.json,
+        Rate_Config_Options.min_score);
+  }
+  else if (Rate_Config_Options.action == RateConfig_Action_RateFromFile) {
+    e = RateConfig_RateFromFile(
+        &config_rating,
+        Rate_Config_Options.input_file,
+        Rate_Config_Options.json,
+        Rate_Config_Options.min_score);
+  }
+  else {
+    e = RateConfig_RateSingle(
+        &config_rating,
+        Rate_Config_Options.json,
+        Rate_Config_Options.file);
+  }
 
 #if STRICT_CLEANUP
   ConfigRating_Free(&config_rating);

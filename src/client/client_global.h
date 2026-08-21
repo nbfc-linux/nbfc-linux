@@ -45,12 +45,14 @@ enum Option {
   Option_Rate_Config_No_Download,
   Option_Rate_Config_Print_Rules,
   Option_Rate_Config_Min_Score,
+  Option_Rate_Config_Unverified,
 
   // Acpi-Dump options
   Option_Acpi_Dump_Command,
   Option_Acpi_Dump_DSDT_File,
   Option_Acpi_Dump_DSDT_Dir,
   Option_Acpi_Dump_Json,
+  Option_Acpi_Dump_Unverified,
 
   // Set options
   Option_Set_Auto,
