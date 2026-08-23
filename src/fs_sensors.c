@@ -78,7 +78,7 @@ static Error FS_Sensors_Init_HwMon(void) {
   array_size_t n_sources = 0;
 
   for (const char* const* hwmonDir = LinuxHwmonDirs; *hwmonDir; ++hwmonDir) {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 20; i++) {
       snprintf(dir,  PATH_MAX, *hwmonDir, i);
       snprintf(file, PATH_MAX, "%s/name", dir);
 
