@@ -91,15 +91,23 @@ enum NBFC_PACKED_ENUM MethodScore {
  * score:
  *   Score indicating how well the register matches the firwmare.
  *
+ * priority:
+ *   Stores the priority (0 - 100).
+ *
  * info:
  *   Looked up register information.
  *   If `score` is `RegisterScore_NotFound` this field is NULL.
+ *
+ * notice:
+ *   A notice that will be printed for a register.
  */
 struct ConfigRating_RegisterRating {
   unsigned offset;
   enum RegisterType type;
   enum RegisterScore score;
+  uint8_t priority;
   AcpiRegister* info;
+  const char* notice;
 };
 typedef struct ConfigRating_RegisterRating ConfigRating_RegisterRating;
 declare_array_of(ConfigRating_RegisterRating);

@@ -19,7 +19,7 @@
 #define RATE_CONFIG_REGIONS_MAX               4
 
 #define RATE_CONFIG_RULES_JSON_URL \
-  "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/config_rating_rules_v1.json"
+  "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/config_rating_rules_v2.json"
 
 const struct cli99_Option RateConfig_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),

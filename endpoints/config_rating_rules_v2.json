@@ -2,7 +2,8 @@
   "FanRegisterFullMatch": [
     {
       "Name": "PFAN",
-      "Mode": "rw"
+      "Mode": "rw",
+      "WritePriority": 100
     },
     {
       "Name": "SFAN",
@@ -10,7 +11,8 @@
     },
     {
       "Name": "CFAN",
-      "Mode": "rw"
+      "Mode": "rw",
+      "ReadPriority": 100
     },
     {
       "Name": "XFAN",
@@ -22,11 +24,13 @@
     },
     {
       "Name": "FSW1",
-      "Mode": "rw"
+      "Mode": "rw",
+      "WritePriority": 100
     },
     {
       "Name": "RTMP",
-      "Mode": "rw"
+      "Mode": "rw",
+      "Notice": "Temperature register; may cause CPU throttling or emergency shutdown"
     },
     {
       "Name": "GPUF",
@@ -46,19 +50,23 @@
     },
     {
       "Name": "FRDC",
-      "Mode": "r"
+      "Mode": "r",
+      "ReadPriority": 100
     },
     {
       "Name": "FTGC",
-      "Mode": "w"
+      "Mode": "w",
+      "WritePriority": 100
     },
     {
       "Name": "FR2C",
-      "Mode": "r"
+      "Mode": "r",
+      "ReadPriority": 100
     },
     {
       "Name": "FT2C",
-      "Mode": "w"
+      "Mode": "w",
+      "WritePriority": 100
     }
   ],
   "FanRegisterPartialMatch": [

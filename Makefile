@@ -343,6 +343,9 @@ src/generated/: .force
 	mkdir -p src/generated
 	./tools/config.py source > src/generated/model_config.generated.c
 	./tools/config.py header > src/generated/model_config.generated.h
+	./tools/config_rating_rules.py v1 > endpoints/config_rating_rules_v1.json
+	./tools/config_rating_rules.py v2 > endpoints/config_rating_rules_v2.json
+	./tools/config_rating_rules.py c_code > src/generated/config_rating_rules_default.h
 
 # =============================================================================
 # Documentation ===============================================================

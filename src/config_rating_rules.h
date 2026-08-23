@@ -4,56 +4,7 @@
 #include "macros.h"
 #include "nxjson.h"
 #include "acpi_analysis.h"
-
-/*
- * Default rules for rating a configuration.
- */
-#define CONFIG_RATING_DEFAULT_RULES             \
-  "{"                                           \
-    "\"FanRegisterFullMatch\":["                \
-      "{\"Name\":\"PFAN\",\"Mode\":\"rw\"},"    \
-      "{\"Name\":\"SFAN\",\"Mode\":\"rw\"},"    \
-      "{\"Name\":\"CFAN\",\"Mode\":\"rw\"},"    \
-      "{\"Name\":\"XFAN\",\"Mode\":\"rw\"},"    \
-      "{\"Name\":\"FAN1\",\"Mode\":\"rw\"},"    \
-      "{\"Name\":\"FSW1\",\"Mode\":\"rw\"},"    \
-      "{\"Name\":\"FRDC\",\"Mode\":\"r\"},"     \
-      "{\"Name\":\"FTGC\",\"Mode\":\"w\"},"     \
-      "{\"Name\":\"FR2C\",\"Mode\":\"r\"},"     \
-      "{\"Name\":\"FT2C\",\"Mode\":\"w\"}"      \
-    "],"                                        \
-                                                \
-    "\"FanRegisterPartialMatch\":["             \
-      "\"FAN\","                                \
-      "\"RPM\","                                \
-      "\"PWM\""                                 \
-    "],"                                        \
-                                                \
-    "\"RegisterWriteFullMatch\":["              \
-      "\"TEMP\","                               \
-      "\"CRZN\","                               \
-      "\"FSH1\""                                \
-    "],"                                        \
-                                                \
-    "\"RegisterWritePartialMatch\":["           \
-    "],"                                        \
-                                                \
-    "\"BadRegisterFullMatch\":["                \
-      "\"FBCM\","                               \
-      "\"FBGI\","                               \
-      "\"FBAE\","                               \
-      "\"FBCB\","                               \
-      "\"FBW1\","                               \
-      "\"FBW2\","                               \
-      "\"FBID\","                               \
-      "\"FUAE\","                               \
-      "\"FRPS\""                                \
-    "],"                                        \
-                                                \
-    "\"BadRegisterPartialMatch\":["             \
-      "\"BAT\""                                 \
-    "]"                                         \
-  "}"
+#include "generated/config_rating_rules_default.h"
 
 /*
  * Bitwise flags specifying which fan access modes a register rule applies to.
@@ -78,10 +29,22 @@ enum NBFC_PACKED_ENUM RegisterRuleFanMode {
  *
  * Mode:
  *   The mode of the EC register.
+ *
+ * ReadPriority:
+ *   Priority assigned when this register is use for reading (0 - 100).
+ *
+ * WritePriority
+ *   Priority assigned when this register is use for writing (0 - 100).
+ *
+ * Notice:
+ *   A notice that will be printed for a register.
  */
 struct RegisterRule {
   AcpiRegisterName Name;
   enum RegisterRuleFanMode Mode;
+  uint8_t ReadPriority;
+  uint8_t WritePriority;
+  char* Notice;
 };
 typedef struct RegisterRule RegisterRule;
 declare_array_of(RegisterRule);

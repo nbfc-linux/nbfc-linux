@@ -48,7 +48,13 @@ static Error ParseRegisterNamesArray(array_of(AcpiRegisterName)* out, const nx_j
  * Parse a register rule.
  *
  * Example input:
- *   {"Name": "XFAN", "Mode": "rw"}
+ *   {
+ *     "Name": "XFAN",
+ *     "Mode": "rw",
+ *     "ReadPriority": 100,
+ *     "WritePriority": 100,
+ *     "Notice": "Foo bar"
+ *   }
  */
 static Error ParseRegisterRule(RegisterRule* out, const nx_json* json) {
   Error e;
@@ -60,6 +66,9 @@ static Error ParseRegisterRule(RegisterRule* out, const nx_json* json) {
 
   out->Mode = RegisterRuleFanMode_None;
   out->Name[0] = '\0';
+  out->ReadPriority = 0;
+  out->WritePriority = 0;
+  out->Notice = NULL;
 
   nx_json_for_each(child, json) {
     if (! strcmp(child->key, "Name")) {
@@ -99,19 +108,53 @@ static Error ParseRegisterRule(RegisterRule* out, const nx_json* json) {
         }
       }
     }
+    else if (! strcmp(child->key, "ReadPriority")) {
+      if (child->type != NX_JSON_INTEGER) {
+        e = err_string("ReadPriority: Not an integer");
+        return e;
+      }
+
+      if (child->val.i < 0 || child->val.i > 100) {
+        e = err_string("ReadPriority: Not in range (0 - 100)");
+        return e;
+      }
+
+      out->ReadPriority = child->val.i;
+    }
+    else if (! strcmp(child->key, "WritePriority")) {
+      if (child->type != NX_JSON_INTEGER) {
+        e = err_string("WritePriority: Not an integer");
+        return e;
+      }
+
+      if (child->val.i < 0 || child->val.i > 100) {
+        e = err_string("WritePriority: Not in range (0 - 100)");
+        return e;
+      }
+
+      out->WritePriority = child->val.i;
+    }
+    else if (! strcmp(child->key, "Notice")) {
+      if (child->type != NX_JSON_STRING) {
+        e = err_string("Notice: Not a string");
+        return e;
+      }
+
+      out->Notice = Mem_Strdup(child->val.text);
+    }
     else {
       e = err_stringf("Unknown key: %s", child->key);
       return e;
     }
   }
 
-  if (out->Mode == RegisterRuleFanMode_None) {
-    e = err_string("Missing key: Mode");
+  if (! out->Name[0]) {
+    e = err_string("Missing key: Name");
     return e;
   }
 
-  if (! out->Name[0]) {
-    e = err_string("Missing key: Name");
+  if (out->Mode == RegisterRuleFanMode_None) {
+    e = err_string("Missing key: Mode");
     return e;
   }
 
@@ -240,6 +283,15 @@ static void ConfigRatingRules_RegisterRulesToJson(
     nx_json* object = create_json_object(NULL, array);
     create_json_string("Name", object, rule->Name);
     create_json_string("Mode", object, RegisterRuleFanMode_ToStr(rule->Mode));
+
+    if (rule->ReadPriority)
+      create_json_integer("ReadPriority", object, rule->ReadPriority);
+
+    if (rule->WritePriority)
+      create_json_integer("WritePriority", object, rule->WritePriority);
+
+    if (rule->Notice)
+      create_json_string("Notice", object, rule->Notice);
   }
 }
 
@@ -294,6 +346,9 @@ void ConfigRatingRules_Print(ConfigRatingRules* rules) {
 }
 
 void ConfigRatingRules_Free(ConfigRatingRules* rules) {
+  for_each_array(RegisterRule*, rule, rules->FanRegisterFullMatch)
+    Mem_Free(rule->Notice);
+
   Mem_Free(rules->FanRegisterFullMatch.data);
   Mem_Free(rules->FanRegisterPartialMatch.data);
   Mem_Free(rules->RegisterWriteFullMatch.data);

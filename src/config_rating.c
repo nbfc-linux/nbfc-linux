@@ -38,30 +38,15 @@ void ConfigRating_Free(ConfigRating* config_rating) {
   memset(config_rating, 0, sizeof(*config_rating));
 }
 
-enum RegisterMatchType {
-  RegisterMatchType_NoMatch,
-  RegisterMatchType_NoModeMatch,
-  RegisterMatchType_FullMatch,
-};
-
-static enum RegisterMatchType ConfigRating_IsKnownFanRegister(
+static RegisterRule* ConfigRating_FindKnownFanRegister(
   ConfigRating* config_rating,
-  enum RegisterType type,
   const char* s)
 {
-  for_each_array(RegisterRule*, rule, config_rating->rules.FanRegisterFullMatch) {
-    if (! strcmp(s, rule->Name)) {
-      if (type == RegisterType_FanReadRegister && rule->Mode & RegisterRuleFanMode_Read)
-        return RegisterMatchType_FullMatch;
+  for_each_array(RegisterRule*, rule, config_rating->rules.FanRegisterFullMatch)
+    if (! strcmp(s, rule->Name))
+      return rule;
 
-      if (type == RegisterType_FanWriteRegister && rule->Mode & RegisterRuleFanMode_Write)
-        return RegisterMatchType_FullMatch;
-
-      return RegisterMatchType_NoModeMatch;
-    }
-  }
-
-  return RegisterMatchType_NoMatch;
+  return NULL;
 }
 
 static bool ConfigRating_IsSomeFanRegister(ConfigRating* config_rating, const char* s) {
@@ -153,6 +138,8 @@ static ConfigRating_RegisterRating ConfigRating_RateRegister(
   ConfigRating_RegisterRating rated = {0};
   rated.type = type;
   rated.offset = offset;
+  rated.priority = 0;
+  rated.notice = NULL;
   rated.info = ConfigRating_FindEcRegister(config_rating, offset);
 
   if (! rated.info) {
@@ -163,16 +150,26 @@ static ConfigRating_RegisterRating ConfigRating_RateRegister(
   const char* const name = Acpi_Analysis_Get_Register_Basename(rated.info->name);
 
   if (type == RegisterType_FanReadRegister || type == RegisterType_FanWriteRegister) {
-    enum RegisterMatchType match = ConfigRating_IsKnownFanRegister(config_rating, type, name);
-    switch (match) {
-      case RegisterMatchType_NoMatch:
-        break;
-      case RegisterMatchType_FullMatch:
+    RegisterRule* rule = ConfigRating_FindKnownFanRegister(config_rating, name);
+
+    if (rule) {
+      if (type == RegisterType_FanReadRegister && rule->Mode & RegisterRuleFanMode_Read) {
         rated.score = RegisterScore_FullMatch;
+        rated.priority = rule->ReadPriority;
+        rated.notice = rule->Notice;
         goto ret;
-      case RegisterMatchType_NoModeMatch:
-        rated.score = RegisterScore_NoMatch;
+      }
+
+      if (type == RegisterType_FanWriteRegister && rule->Mode & RegisterRuleFanMode_Write) {
+        rated.score = RegisterScore_FullMatch;
+        rated.priority = rule->WritePriority;
+        rated.notice = rule->Notice;
         goto ret;
+      }
+
+      // Rule found, but mode does not match -> RegisterScore_NoMatch
+      rated.score = RegisterScore_NoMatch;
+      goto ret;
     }
 
     if (ConfigRating_IsBadRegister(config_rating, name)) {
@@ -250,6 +247,9 @@ static void ConfigRating_RegisterRatingPrint(ConfigRating_RegisterRating* rating
     printf("\t\tType:   RegisterWriteConfiguration register\n");
     break;
   }
+
+  if (rating->notice)
+    printf("\t\tNote:   %s\n", rating->notice);
 
   if (rating->score != RegisterScore_NotFound) {
     printf("\t\tName:   %s\n", rating->info->name);
@@ -378,9 +378,10 @@ Error ConfigRating_RateModelConfig(
   // ==========================================================================
 
   int points = 0;
-  int priority = (registers_size + methods_size);
+  int priority = (registers_size + (methods_size * 10000));
 
   for_each_array(ConfigRating_RegisterRating*, reg_rating, rating->register_ratings) {
+    priority += reg_rating->priority;
     int register_points = 0;
 
     if (reg_rating->type == RegisterType_FanReadRegister || reg_rating->type == RegisterType_FanWriteRegister) {
@@ -424,7 +425,6 @@ Error ConfigRating_RateModelConfig(
     switch (met_rating->score) {
       case MethodScore_Found:
         method_points = 10;
-        priority += 100;
         break;
 
       case MethodScore_NotFound:
