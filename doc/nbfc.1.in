@@ -251,6 +251,13 @@ Use an alternative DSDT file. Can be specified multiple times.
 Use an alternative DSDT directory.
 .RE
 
+.BR \-i ", " \-\-input
+.I FILE
+.RS
+Read configuration files from
+.IR FILE .
+.RE
+
 .BR \-j ", " \-\-json
 .RS
 Use JSON output.

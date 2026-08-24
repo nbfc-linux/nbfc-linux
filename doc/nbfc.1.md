@@ -185,6 +185,10 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Use an alternative DSDT directory.
 >
+> **-i**, **\--input** *FILE*
+>
+> > Read configuration files from *FILE*.
+>
 > **-j**, **\--json**
 >
 > > Use JSON output.

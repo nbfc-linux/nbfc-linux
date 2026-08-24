@@ -87,6 +87,7 @@
  "  -a, --all             Rate all available configuration files\n"            \
  "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
  "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
+ "  -i, --input FILE      Read configuration files from FILE\n"                \
  "  -j, --json            Use JSON output\n"                                   \
  "  -m, --min-score SCORE Set minimum rating threshold for configurations\n"   \
  "  -n, --no-download     Don't download rules from the repository\n"          \
