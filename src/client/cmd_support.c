@@ -16,27 +16,6 @@
 #define SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL \
   "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/firmware_upload_v2"
 
-#define SUPPORT_PAYPAL_URL "https://paypal.me/BenjaminAbendroth"
-
-#define SUPPORT_GITHUB_URL "https://github.com/nbfc-linux/nbfc-linux"
-
-#define SUPPORT_TEXT                                                           \
-  "Thank you for using NBFC-Linux!\n"                                          \
-  "\n"                                                                         \
-  "If you'd like to support the project, you can:\n"                           \
-  "\n"                                                                         \
-  " - Send a donation via PayPal:\n"                                           \
-  "     " SUPPORT_PAYPAL_URL "\n"                                              \
-  "\n"                                                                         \
-  " - Simply star the project on GitHub:\n"                                    \
-  "     " SUPPORT_GITHUB_URL "\n"                                              \
-  "\n"                                                                         \
-  " - Upload your notebook firmware:\n"                                        \
-  "     $ sudo nbfc support --upload-firmware\n"                               \
-  "\n"                                                                         \
-  "   Run 'nbfc support -h' for more information on firmware uploads.\n"       \
-  ""
-
 const struct cli99_Option Support_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),
   {"--upload-firmware", Option_Support_Upload_Firmware, cli99_NoArgument},
@@ -340,7 +319,7 @@ int Support(void) {
   int ret = NBFC_EXIT_FAILURE;
 
   if (Support_Options.action == Support_Action_None) {
-    puts(SUPPORT_TEXT);
+    puts(CLIENT_SUPPORT_HELP_TEXT);
     return NBFC_EXIT_SUCCESS;
   }
 

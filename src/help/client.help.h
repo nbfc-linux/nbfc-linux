@@ -260,6 +260,10 @@
  "  -h, --help            Shows this message and exit\n"                       \
  ""
 
+#define SUPPORT_PAYPAL_URL "https://paypal.me/BenjaminAbendroth"
+
+#define SUPPORT_GITHUB_URL "https://github.com/nbfc-linux/nbfc-linux"
+
 #define CLIENT_SUPPORT_HELP_TEXT                                               \
  "Usage: nbfc support [-h] [--upload-firmware] [--print-command]\n"            \
  "                         [--create-archive=FILE]\n"                          \
@@ -272,6 +276,19 @@
  "  --create-archive      Create a tar.gz archive containing your firmware\n"  \
  "  -h, --help            Shows this message and exit\n"                       \
  "\n"                                                                          \
+ "Thank you for using NBFC-Linux!\n"                                           \
+ "\n"                                                                          \
+ "If you'd like to support the project, you can:\n"                            \
+ "\n"                                                                          \
+ " - Send a donation via PayPal:\n"                                            \
+ "     " SUPPORT_PAYPAL_URL "\n"                                               \
+ "\n"                                                                          \
+ " - Simply star the project on GitHub:\n"                                     \
+ "     " SUPPORT_GITHUB_URL "\n"                                               \
+ "\n"                                                                          \
+ " - Upload your notebook firmware:\n"                                         \
+ "     $ sudo nbfc support --upload-firmware\n"                                \
+ "\n"                                                                          \
  "Uploading your notebook firmware helps the developer to understand existing\n"\
  "configuration files.\n"                                                      \
  "\n"                                                                          \
@@ -279,17 +296,16 @@
  "need help creating a configuration file for your notebook.\n"                \
  "\n"                                                                          \
  "The following data will be transmitted:\n"                                   \
- "- The laptop manufacturer (/sys/devices/virtual/dmi/id/sys_vendor)\n"        \
- "- The laptop model (/sys/devices/virtual/dmi/id/product_name)\n"             \
- "- The ACPI DSDT firmware table (/sys/firmware/acpi/tables/DSDT)\n"           \
- "- The ACPI SSDT firmware tables (/sys/firmware/acpi/tables/SSDT*)\n"         \
+ " - The laptop manufacturer (/sys/devices/virtual/dmi/id/sys_vendor)\n"       \
+ " - The laptop model (/sys/devices/virtual/dmi/id/product_name)\n"            \
+ " - The ACPI DSDT firmware table (/sys/firmware/acpi/tables/DSDT)\n"          \
+ " - The ACPI SSDT firmware tables (/sys/firmware/acpi/tables/SSDT*)\n"        \
  "\n"                                                                          \
  "The preferred method for uploading your notebook firmware is to use:\n"      \
  "  $ sudo nbfc support --upload-firmware\n"                                   \
  "\n"                                                                          \
  "However, if you're paranoid, you can upload it manually using curl:\n"       \
  "  $ nbfc support --print-command\n"                                          \
- "\n"                                                                          \
  ""
 
 #define CLIENT_XML2JSON_HELP_TEXT                                              \
