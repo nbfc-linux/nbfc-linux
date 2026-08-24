@@ -25,6 +25,8 @@
  "    support             Show how to support the project\n"                   \
  "    warranty            Show warranty\n"                                     \
  "    faq                 Show frequently asked questions\n"                   \
+ "\n"                                                                          \
+ "NBFC-Linux needs your support! Run `nbfc support` for details.\n"            \
  ""
 
 #define CLIENT_START_HELP_TEXT                                                 \

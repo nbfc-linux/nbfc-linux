@@ -130,6 +130,7 @@ int main(int argc, char* const argv[])
   atexit(Log_Close);
 
   Log_Info("NBFC-Linux comes with no warranty. Run `nbfc warranty` for details.");
+  Log_Info("NBFC-Linux needs your support. Run `nbfc support` for details.");
   Log_Info("Running version " NBFC_VERSION);
   Log_Info("SYSCONFDIR is \"%s\"", SYSCONFDIR);
   Log_Info("DATADIR is \"%s\"", DATADIR);
