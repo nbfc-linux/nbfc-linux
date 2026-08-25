@@ -322,6 +322,7 @@ Error ConfigRating_RateModelConfig(
 {
   Error e;
   ConfigAnalysis* analysis;
+  memset(rating, 0, sizeof(*rating));
 
   // ==========================================================================
   // Collect information about registers and methods
@@ -377,6 +378,7 @@ Error ConfigRating_RateModelConfig(
   // Calculate the score
   // ==========================================================================
 
+  bool bad = false;
   int points = 0;
   int priority = (registers_size + (methods_size * 10000));
 
@@ -391,7 +393,7 @@ Error ConfigRating_RateModelConfig(
         case RegisterScore_MinimalMatch:   register_points = 7;  break;
         case RegisterScore_NoMatch:        register_points = 0;  break;
         case RegisterScore_NotFound:       register_points = 0;  break;
-        case RegisterScore_BadRegister:    points = 0;           goto end;
+        case RegisterScore_BadRegister:    points = 0; bad = true; goto end;
       }
 
       if (reg_rating->score != RegisterScore_NotFound) {
@@ -412,7 +414,7 @@ Error ConfigRating_RateModelConfig(
         case RegisterScore_MinimalMatch:   register_points = 7;  break;
         case RegisterScore_NoMatch:        register_points = 2;  break;
         case RegisterScore_NotFound:       register_points = 0;  break;
-        case RegisterScore_BadRegister:    points = 0;           goto end;
+        case RegisterScore_BadRegister:    points = 0; bad = true; goto end;
       }
     }
 
@@ -453,6 +455,7 @@ Error ConfigRating_RateModelConfig(
   }
 
 end:
+  rating->bad = bad;
   rating->score = (float) points / (float) (registers_size + methods_size);
   rating->priority = priority;
   return err_success();

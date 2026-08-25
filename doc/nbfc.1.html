@@ -169,6 +169,10 @@ on the current system.</p>
 <blockquote>
 <p>Rate all available configuration files.</p>
 </blockquote>
+<p><strong>-b</strong>, <strong>--bad</strong></p>
+<blockquote>
+<p>List only bad configs that are otherwise omitted.</p>
+</blockquote>
 <p><strong>-d</strong>, <strong>--dsdt</strong> <em>FILE</em></p>
 <blockquote>
 <p>Use an alternative DSDT file. Can be specified multiple times.</p>
@@ -177,6 +181,10 @@ on the current system.</p>
 <em>DIRECTORY</em></p>
 <blockquote>
 <p>Use an alternative DSDT directory.</p>
+</blockquote>
+<p><strong>-f</strong>, <strong>--fan-count</strong> <em>NUMBER</em></p>
+<blockquote>
+<p>Limit output to configurations with the specified number of fans.</p>
 </blockquote>
 <p><strong>-i</strong>, <strong>--input</strong> <em>FILE</em></p>
 <blockquote>
@@ -207,6 +215,10 @@ when rating a configuration. With this option, registers from
 <strong>SystemMemory</strong> operation regions that may be accessible
 through the embedded controller are also considered. Their accessibility
 through the embedded controller cannot be guaranteed.</p>
+</blockquote>
+<p><strong>-q</strong>, <strong>--quiet</strong></p>
+<blockquote>
+<p>Do not print register ratings.</p>
 </blockquote>
 <p><strong>--print-rules</strong></p>
 <blockquote>

@@ -151,10 +151,14 @@ declare_array_of(ConfigRating_MethodRating);
  *
  * method_ratings:
  *   Stores the method ratings.
+ *
+ * bad:
+ *   Configuration contains a bad register.
  */
 struct ConfigRating_Rating {
   float score;
   int priority;
+  bool bad;
   array_of(ConfigRating_RegisterRating) register_ratings;
   array_of(ConfigRating_MethodRating) method_ratings;
 };

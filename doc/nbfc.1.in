@@ -239,6 +239,11 @@ Show help on how to interpret the results.
 Rate all available configuration files.
 .RE
 
+.BR \-b ", " \-\-bad
+.RS
+List only bad configs that are otherwise omitted.
+.RE
+
 .BR \-d ", " \-\-dsdt
 .I FILE
 .RS
@@ -249,6 +254,12 @@ Use an alternative DSDT file. Can be specified multiple times.
 .I DIRECTORY
 .RS
 Use an alternative DSDT directory.
+.RE
+
+.BR \-f ", " \-\-fan\-count
+.I NUMBER
+.RS
+Limit output to configurations with the specified number of fans.
 .RE
 
 .BR \-i ", " \-\-input
@@ -289,6 +300,11 @@ With this option, registers from
 .B SystemMemory
 operation regions that may be accessible through the embedded controller are also considered.
 Their accessibility through the embedded controller cannot be guaranteed.
+.RE
+
+.BR \-q ", " \-\-quiet
+.RS
+Do not print register ratings.
 .RE
 
 .B \-\-print\-rules

@@ -92,6 +92,9 @@ _nbfc__parse_commandline() {
         -r|--rules) VAR=OPT_rules; ARGS=1; return;;
         -n|--no-download) VAR=OPT_no_download; ARGS=0; return;;
         -u|--unverified) VAR=OPT_unverified; ARGS=0; return;;
+        -b|--bad) VAR=OPT_bad; ARGS=0; return;;
+        -q|--quiet) VAR=OPT_quiet; ARGS=0; return;;
+        -f|--fan-count) VAR=OPT_fan_count; ARGS=1; return;;
       esac
     esac
     case "$1" in root:update*)
@@ -242,8 +245,9 @@ _nbfc() {
   local -a OPT_watch OPT_list OPT_set OPT_apply OPT_recommend OPT_auto OPT_speed
   local -a OPT_algorithm OPT_sensor OPT_force OPT_parallel OPT_quiet
   local -a OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_input OPT_json
-  local -a OPT_print_rules OPT_rules OPT_no_download OPT_unverified
-  local -a OPT_upload_firmware OPT_print_command OPT_create_archive
+  local -a OPT_print_rules OPT_rules OPT_no_download OPT_unverified OPT_bad
+  local -a OPT_fan_count OPT_upload_firmware OPT_print_command
+  local -a OPT_create_archive
   _nbfc__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -585,6 +589,8 @@ _nbfc_rate_config() {
       -D|--dsdt-dir)
         _filedir -d;;
       -m|--min-score);;
+      -f|--fan-count)
+        COMPREPLY=($(compgen -W '{0..255}' -- "$cur"));;
       *) ret=1;;
     esac
 
@@ -593,7 +599,7 @@ _nbfc_rate_config() {
 
   case "$prev" in
     --*) __complete_option "$prev" "$cur" && return 0;;
-    -*([Hajnuh])[dDmir])
+    -*([Hajnubqh])[dDmirf])
          __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
@@ -601,7 +607,7 @@ _nbfc_rate_config() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*([Hajnuh])[dDmir]*)
+    -*([Hajnubqh])[dDmirf]*)
       local i
       for ((i=2; i <= ${#cur}; ++i)); do
         local pre="${cur:0:$i}" value="${cur:$i}"
@@ -625,6 +631,9 @@ _nbfc_rate_config() {
     (( ! ${#OPT_rules[@]} )) && opts+=(-r --rules=)
     (( ! ${#OPT_no_download[@]} )) && opts+=(-n --no-download)
     (( ! ${#OPT_unverified[@]} )) && opts+=(-u --unverified)
+    (( ! ${#OPT_bad[@]} )) && opts+=(-b --bad)
+    opts+=(-q --quiet)
+    (( ! ${#OPT_fan_count[@]} )) && opts+=(-f --fan-count=)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1

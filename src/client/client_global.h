@@ -46,6 +46,9 @@ enum Option {
   Option_Rate_Config_Print_Rules,
   Option_Rate_Config_Min_Score,
   Option_Rate_Config_Unverified,
+  Option_Rate_Config_Bad,
+  Option_Rate_Config_Quiet,
+  Option_Rate_Config_FanCount,
 
   // Acpi-Dump options
   Option_Acpi_Dump_Command,

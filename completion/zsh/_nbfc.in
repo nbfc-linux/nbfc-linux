@@ -347,6 +347,9 @@ _nbfc_rate_config() {
     '(--rules -r)'{-r+,--rules=}'[Use an alternative rules file]':FILE:_files
     '(--no-download -n)'{-n,--no-download}"[Don't download rules file from the repository]"
     '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
+    '(--bad -b)'{-b,--bad}'[List only bad configurations]'
+    '*'{-q,--quiet}'[Do not print register ratings]'
+    '(--fan-count -f)'{-f+,--fan-count=}'[Limit configurations by fan count]':NUM:'({0..255})'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command

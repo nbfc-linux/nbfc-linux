@@ -177,6 +177,10 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Rate all available configuration files.
 >
+> **-b**, **\--bad**
+>
+> > List only bad configs that are otherwise omitted.
+>
 > **-d**, **\--dsdt** *FILE*
 >
 > > Use an alternative DSDT file. Can be specified multiple times.
@@ -184,6 +188,10 @@ This program is used to control the NoteBook FanControl service.
 > **-D**, **\--dsdt-dir** *DIRECTORY*
 >
 > > Use an alternative DSDT directory.
+>
+> **-f**, **\--fan-count** *NUMBER*
+>
+> > Limit output to configurations with the specified number of fans.
 >
 > **-i**, **\--input** *FILE*
 >
@@ -214,6 +222,10 @@ This program is used to control the NoteBook FanControl service.
 > > that may be accessible through the embedded controller are also
 > > considered. Their accessibility through the embedded controller
 > > cannot be guaranteed.
+>
+> **-q**, **\--quiet**
+>
+> > Do not print register ratings.
 >
 > **\--print-rules**
 >

@@ -185,6 +185,18 @@ options:
   - option_strings: ["-u", "--unverified"]
     help: "Include unverified EC registers"
 
+  - option_strings: ["-b", "--bad"]
+    help: "List only bad configurations"
+
+  - option_strings: ["-q", "--quiet"]
+    help: "Do not print register ratings"
+    repeatable: true
+
+  - option_strings: ["-f", "--fan-count"]
+    metavar: "NUM"
+    help: "Limit configurations by fan count"
+    complete: ["range", 0, 255]
+
 positionals:
   - number: 1
     metavar: "FILE"

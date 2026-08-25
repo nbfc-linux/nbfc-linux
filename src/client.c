@@ -459,6 +459,23 @@ int main(int argc, char* const argv[]) {
       }
       break;
 
+    case Option_Rate_Config_Bad:
+      Rate_Config_Options.filter = RateConfig_FilterBadOnly;
+      break;
+
+    case Option_Rate_Config_Quiet:
+      if (Rate_Config_Options.style)
+        Rate_Config_Options.style--;
+      break;
+
+    case Option_Rate_Config_FanCount:
+      Rate_Config_Options.fan_count = (uint8_t) parse_number(p.optarg, 0, 255, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
     // ========================================================================
     // Acpi-Dump options
     // ========================================================================

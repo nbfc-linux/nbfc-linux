@@ -85,14 +85,17 @@
  "  -h, --help            Show this help message and exit\n"                   \
  "  -H, --full-help       Show full help\n"                                    \
  "  -a, --all             Rate all available configuration files\n"            \
+ "  -b, --bad             List only bad configs that are otherwise omitted\n"  \
  "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
  "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
+ "  -f, --fan-count NUM   Limit configurations by fan count\n"                 \
  "  -i, --input FILE      Read configuration files from FILE\n"                \
  "  -j, --json            Use JSON output\n"                                   \
  "  -m, --min-score SCORE Set minimum rating threshold for configurations\n"   \
  "  -n, --no-download     Don't download rules from the repository\n"          \
  "  -r, --rules FILE      Use an alternative rules file\n"                     \
  "  -u, --unverified      Include unverified EC registers\n"                   \
+ "  -q, --quiet           Do not print register ratings\n"                     \
  "  --print-rules         Print configuration rating rules\n"                  \
  ""
 

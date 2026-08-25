@@ -33,6 +33,9 @@ const struct cli99_Option RateConfig_CommandLine[] = {
   {"-r|--rules",       Option_Rate_Config_Rules,       cli99_RequiredArgument},
   {"-i|--input",       Option_Rate_Config_Input,       cli99_RequiredArgument},
   {"-u|--unverified",  Option_Rate_Config_Unverified,  cli99_NoArgument      },
+  {"-b|--bad",         Option_Rate_Config_Bad,         cli99_NoArgument      },
+  {"-q|--quiet",       Option_Rate_Config_Quiet,       cli99_NoArgument      },
+  {"-f|--fan-count",   Option_Rate_Config_FanCount,    cli99_RequiredArgument},
   {"--print-rules",    Option_Rate_Config_Print_Rules, cli99_NoArgument      },
   {"file",             Option_Rate_Config_File,        cli99_NormalPositional},
   cli99_Options_End()
@@ -47,13 +50,28 @@ enum NBFC_PACKED_ENUM RateConfig_Action {
   RateConfig_Action_PrintFullHelp,
 };
 
+enum NBFC_PACKED_ENUM RateConfig_PrintStyle {
+  RateConfig_PrintName,
+  RateConfig_PrintNameAndScore,
+  RateConfig_PrintFull,
+};
+
+enum NBFC_PACKED_ENUM RateConfig_Filter {
+  RateConfig_FilterBadOnly,
+  RateConfig_FilterGoodOnly,
+  RateConfig_FilterAll,
+};
+
 struct {
   const char* action_option_string;
   enum RateConfig_Action action;
+  enum RateConfig_PrintStyle style;
+  enum RateConfig_Filter filter;
   bool        json;
   bool        no_download;
   bool        min_score_set;
   bool        unverified;
+  uint8_t     fan_count;
   float       min_score;
   const char* file;
   const char* dsdt_files[ACPI_ANALYSIS_MAX_AML_FILES];
@@ -64,10 +82,13 @@ struct {
 } Rate_Config_Options = {
   NULL,
   RateConfig_Action_None,
+  RateConfig_PrintFull,
+  RateConfig_FilterGoodOnly,
   false,
   false,
   false,
   false,
+  0,
   RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE,
   NULL,
   {0},
@@ -369,6 +390,39 @@ static bool RateConfig_GroupHasMinScore(
   return false;
 }
 
+static bool RateConfig_GroupHasFanCount(
+  array_of(ConfigWithData)* results,
+  array_size_t group_id
+) {
+  if (! Rate_Config_Options.fan_count)
+    return true;
+
+  for_each_array(ConfigWithData*, result, *results) {
+    if (result->group_id == group_id)
+      return (result->model_config.FanConfigurations.size == Rate_Config_Options.fan_count);
+  }
+
+  return false;
+}
+
+static bool RateConfig_GroupFilterBad(
+  array_of(ConfigWithData)* results,
+  array_size_t group_id,
+  enum RateConfig_Filter filter
+) {
+  for_each_array(ConfigWithData*, result, *results) {
+    if (result->group_id == group_id) {
+      switch (filter) {
+      case RateConfig_FilterBadOnly:  return result->rating.bad;
+      case RateConfig_FilterGoodOnly: return !result->rating.bad;
+      case RateConfig_FilterAll:      return true;
+      }
+    }
+  }
+
+  return true;
+}
+
 static void RateConfig_PrintResultGroup(
   array_of(ConfigWithData)* results,
   array_size_t group_id
@@ -379,20 +433,37 @@ static void RateConfig_PrintResultGroup(
     if (result->group_id != group_id)
       continue;
 
-    printf("%s\n", result->file);
+    switch (Rate_Config_Options.style) {
+      case RateConfig_PrintFull:
+      case RateConfig_PrintName:
+        printf("%s\n", result->file);
+        break;
+      case RateConfig_PrintNameAndScore:
+        printf("%s (%.2f/10)\n", result->file, result->rating.score);
+        break;
+    }
+
     last_result = result;
   }
 
-  ConfigRating_RatingPrint(&last_result->rating);
+  if (Rate_Config_Options.style == RateConfig_PrintFull)
+    ConfigRating_RatingPrint(&last_result->rating);
 }
 
 static void RateConfig_PrintResults(
   array_of(ConfigWithData)* results,
   array_size_t num_groups,
-  float min_score
+  float min_score,
+  enum RateConfig_Filter bad_filter
 ) {
   for (array_size_t group_id = 0; group_id < num_groups; ++group_id) {
     if (! RateConfig_GroupHasMinScore(results, group_id, min_score))
+      continue;
+
+    if (! RateConfig_GroupHasFanCount(results, group_id))
+      continue;
+
+    if (! RateConfig_GroupFilterBad(results, group_id, bad_filter))
       continue;
 
     RateConfig_PrintResultGroup(results, group_id);
@@ -423,13 +494,20 @@ static void RateConfig_AddJsonResult(
 static void RateConfig_PrintResultsJson(
   array_of(ConfigWithData)* results,
   array_size_t num_groups,
-  float min_score
+  float min_score,
+  enum RateConfig_Filter bad_filter
 ) {
   nx_json root = {0};
   nx_json* array = create_json_array(NULL, &root);
 
   for (array_size_t group_id = 0; group_id < num_groups; ++group_id) {
     if (! RateConfig_GroupHasMinScore(results, group_id, min_score))
+      continue;
+
+    if (! RateConfig_GroupHasFanCount(results, group_id))
+      continue;
+
+    if (! RateConfig_GroupFilterBad(results, group_id, bad_filter))
       continue;
 
     RateConfig_AddJsonResult(array, results, group_id);
@@ -451,7 +529,8 @@ static Error RateConfig_RateFiles(
   ConfigRating* config_rating,
   array_of(ConfigFile)* files,
   bool json,
-  float min_score
+  float min_score,
+  enum RateConfig_Filter bad_filter
 ) {
   array_of(ConfigWithData) ratings;
 
@@ -469,9 +548,9 @@ static Error RateConfig_RateFiles(
 
   // Print results
   if (json)
-    RateConfig_PrintResultsJson(&ratings, num_groups, min_score);
+    RateConfig_PrintResultsJson(&ratings, num_groups, min_score, bad_filter);
   else
-    RateConfig_PrintResults(&ratings, num_groups, min_score);
+    RateConfig_PrintResults(&ratings, num_groups, min_score, bad_filter);
 
   // Free
 #if STRICT_CLEANUP
@@ -495,11 +574,17 @@ static inline void PrintFullHelpNotice(void) {
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateMany(ConfigRating* config_rating, array_of(ConfigFile)* files, bool json, float min_score) {
+static Error RateConfig_RateMany(
+  ConfigRating* config_rating,
+  array_of(ConfigFile)* files,
+  bool json,
+  float min_score,
+  enum RateConfig_Filter bad_filter
+) {
   Error e;
 
   // Rate configs
-  e = RateConfig_RateFiles(config_rating, files, json, min_score);
+  e = RateConfig_RateFiles(config_rating, files, json, min_score, bad_filter);
   if (!json) {
     if (! Rate_Config_Options.min_score_set) {
       printf(
@@ -519,14 +604,19 @@ static Error RateConfig_RateMany(ConfigRating* config_rating, array_of(ConfigFil
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateAll(ConfigRating* config_rating, bool json, float min_score) {
+static Error RateConfig_RateAll(
+  ConfigRating* config_rating,
+  bool json,
+  float min_score,
+  enum RateConfig_Filter bad_filter
+) {
   Error e;
 
   // Get all configuration files
   array_of(ConfigFile) all_configs = List_All_Configs();
 
   // Do the rating
-  e = RateConfig_RateMany(config_rating, &all_configs, json, min_score);
+  e = RateConfig_RateMany(config_rating, &all_configs, json, min_score, bad_filter);
 
   // Free
 #if STRICT_CLEANUP
@@ -541,7 +631,13 @@ static Error RateConfig_RateAll(ConfigRating* config_rating, bool json, float mi
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateFromFile(ConfigRating* config_rating, const char* file, bool json, float min_score) {
+static Error RateConfig_RateFromFile(
+  ConfigRating* config_rating,
+  const char* file,
+  bool json,
+  float min_score,
+  enum RateConfig_Filter bad_filter
+) {
   Error e;
   char* content;
   file_op_result res;
@@ -577,7 +673,7 @@ static Error RateConfig_RateFromFile(ConfigRating* config_rating, const char* fi
     files.data[files.size++].config_name = line;
 
   // Do the rating
-  e = RateConfig_RateMany(config_rating, &files, json, min_score);
+  e = RateConfig_RateMany(config_rating, &files, json, min_score, bad_filter);
 
   // Free
 #if STRICT_CLEANUP
@@ -603,7 +699,7 @@ static Error RateConfig_RateSingle(ConfigRating* config_rating, bool json, const
   configs.size = 1;
   configs.data = &cfg_file;
 
-  e = RateConfig_RateFiles(config_rating, &configs, json, 0.0);
+  e = RateConfig_RateFiles(config_rating, &configs, json, 0.0, RateConfig_FilterAll);
   if (!json)
     PrintFullHelpNotice();
 
@@ -763,14 +859,16 @@ int RateConfig(void) {
     e = RateConfig_RateAll(
         &config_rating,
         Rate_Config_Options.json,
-        Rate_Config_Options.min_score);
+        Rate_Config_Options.min_score,
+        Rate_Config_Options.filter);
   }
   else if (Rate_Config_Options.action == RateConfig_Action_RateFromFile) {
     e = RateConfig_RateFromFile(
         &config_rating,
         Rate_Config_Options.input_file,
         Rate_Config_Options.json,
-        Rate_Config_Options.min_score);
+        Rate_Config_Options.min_score,
+        Rate_Config_Options.filter);
   }
   else {
     e = RateConfig_RateSingle(

@@ -213,7 +213,7 @@ function _nbfc__prepare
     '(set)=>-a --auto -s= --speed= -f= --fan=' \
     '(sensors)>(set)=>-f= --fan= -a= --algorithm= -s= --sensor= --force' \
     '(update)=>-p= --parallel= -q --quiet' \
-    '(rate\-config)=>-H --full-help -a --all -d= --dsdt= -D= --dsdt-dir= -m= --min-score= -i= --input= -j --json --print-rules -r= --rules= -n --no-download -u --unverified' \
+    '(rate\-config)=>-H --full-help -a --all -d= --dsdt= -D= --dsdt-dir= -m= --min-score= -i= --input= -j --json --print-rules -r= --rules= -n --no-download -u --unverified -b --bad -q --quiet -f= --fan-count=' \
     '(acpi\-dump)=>-d= --dsdt= -D= --dsdt-dir= -j --json' \
     '(acpi\-dump)>(ec\-registers)=>-u --unverified' \
     '(support)=>--upload-firmware --print-command --create-archive='
@@ -353,7 +353,9 @@ set -l C008 "not $has_option --print-rules"
 set -l C009 "not $has_option -r --rules"
 set -l C010 "not $has_option -n --no-download"
 set -l C011 "not $has_option -u --unverified"
-set -l C012 "$num_of_positionals -eq 1"
+set -l C012 "not $has_option -b --bad"
+set -l C013 "not $has_option -f --fan-count"
+set -l C014 "$num_of_positionals -eq 1"
 complete -c $prog -n $P -n $C000 -n $C001 -s H -l full-help -d 'Show full help' -f
 complete -c $prog -n $P -n $C000 -n $C002 -s a -l all -d 'Rate all available configuration files' -f
 complete -c $prog -n $P -n $C000 -n $C003 -s d -l dsdt -d 'Use an alternative DSDT file' -Fr
@@ -365,7 +367,10 @@ complete -c $prog -n $P -n $C000 -n $C008 -l print-rules -d 'Print configuration
 complete -c $prog -n $P -n $C000 -n $C009 -s r -l rules -d 'Use an alternative rules file' -Fr
 complete -c $prog -n $P -n $C000 -n $C010 -s n -l no-download -d "Don't download rules file from the repository" -f
 complete -c $prog -n $P -n $C000 -n $C011 -s u -l unverified -d 'Include unverified EC registers' -f
-complete -c $prog -n $P -n $C012 -n $C000 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
+complete -c $prog -n $P -n $C000 -n $C012 -s b -l bad -d 'List only bad configurations' -f
+complete -c $prog -n $P -n $C000 -s q -l quiet -d 'Do not print register ratings' -f
+complete -c $prog -n $P -n $C000 -n $C013 -s f -l fan-count -d 'Limit configurations by fan count' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C014 -n $C000 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
 
 # command nbfc acpi-dump
 set -l C000 "$positional_contains 1 acpi-dump"
