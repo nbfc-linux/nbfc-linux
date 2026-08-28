@@ -71,7 +71,7 @@ static Error ConfigAnalysis_PushMethod(const char* method, bool unique) {
 
   if (unique) {
     for (size_t i = 0; i < ConfigAnalysis_Info.methods_size; ++i)
-      if (Acpi_Analysis_Path_Equals(method, ConfigAnalysis_Info.methods[i]))
+      if (AcpiAnalysis_Path_Equals(method, ConfigAnalysis_Info.methods[i]))
         return err_success();
   }
 

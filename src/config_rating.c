@@ -16,7 +16,7 @@ Error ConfigRating_Init(ConfigRating* config_rating, array_of(str)* aml_files, c
     goto end;
   }
 
-  e = Acpi_Analysis_Get_Info(aml_files, &config_rating->acpi_info);
+  e = AcpiAnalysis_GetInfo(aml_files, &config_rating->acpi_info);
   if (e)
     goto end;
 
@@ -100,7 +100,7 @@ static AcpiRegister* ConfigRating_FindEcRegister(
     if ((acpi_register->bit_offset / 8) != offset)
       continue;
 
-    const bool in_ec_region = Acpi_Analysis_IsEmbeddedControllerRegion(
+    const bool in_ec_region = AcpiAnalysis_IsEmbeddedControllerRegion(
         &config_rating->acpi_info, acpi_register->region);
 
     if (in_ec_region)
@@ -115,7 +115,7 @@ static AcpiMethod* ConfigRating_FindMethod(
   const char* method_call
 ) {
   for_each_array(AcpiMethod*, method, config_rating->acpi_info.methods) {
-    if (Acpi_Analysis_Path_Equals(method_call, method->name)) {
+    if (AcpiAnalysis_Path_Equals(method_call, method->name)) {
       return method;
     }
   }
@@ -147,7 +147,7 @@ static ConfigRating_RegisterRating ConfigRating_RateRegister(
     goto ret;
   }
 
-  const char* const name = Acpi_Analysis_Get_Register_Basename(rated.info->name);
+  const char* const name = AcpiAnalysis_RegisterBasename(rated.info->name);
 
   if (type == RegisterType_FanReadRegister || type == RegisterType_FanWriteRegister) {
     RegisterRule* rule = ConfigRating_FindKnownFanRegister(config_rating, name);

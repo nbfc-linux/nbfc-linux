@@ -3,7 +3,7 @@
 #include <ctype.h>  // tolower
 #include <string.h> // strlen, strncmp, memcpy
 
-#include "../memory.h"
+#include "memory.h"
 
 const char* str_from_bool(bool val) {
   return val ? "true" : "false";

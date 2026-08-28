@@ -10,7 +10,7 @@
  * TODO: Check if arguments are also equal
  */
 static bool AcpiMethodCall_Equal(const char* a, const char* b) {
-  return Acpi_Analysis_Path_Equals(a, b);
+  return AcpiAnalysis_Path_Equals(a, b);
 }
 
 /*

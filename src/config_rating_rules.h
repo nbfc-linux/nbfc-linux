@@ -85,7 +85,7 @@ declare_array_of(ConfigRatingRules);
 
 Error ConfigRatingRules_FromJson(ConfigRatingRules*, const char*);
 void  ConfigRatingRules_Free(ConfigRatingRules*);
-void  ConfigRatingRules_Print(ConfigRatingRules*);
+void  ConfigRatingRules_Print(const ConfigRatingRules*);
 nx_json* ConfigRatingRules_ToJson(ConfigRatingRules*);
 
 #endif

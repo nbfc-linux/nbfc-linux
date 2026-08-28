@@ -248,7 +248,7 @@ static int Support_Upload_Firmware(void) {
   // Accessing `ACPI_ANALYSIS_ACPI_DIR` requires root
   check_root();
 
-  e = Acpi_Analysis_Get_All_AML_Files(NULL, &files);
+  e = AcpiAnalysis_GetAmlFiles(NULL, &files);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -272,7 +272,7 @@ static int Support_Print_Command(void) {
   array_of(str) files;
   char* endpoint_url = Support_Get_Real_Firmware_Upload_Endpoint_URL();
 
-  e = Acpi_Analysis_Get_All_AML_Files(NULL, &files);
+  e = AcpiAnalysis_GetAmlFiles(NULL, &files);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;

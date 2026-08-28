@@ -16,11 +16,11 @@ const struct cli99_Option ShowVariable_CommandLine[] = {
 
 struct {
   const char* variable;
-} Show_Variable_Options = {0};
+} ShowVariable_Options = {0};
 
-int Show_Variable(void) {
+int ShowVariable(void) {
   int ret = NBFC_EXIT_SUCCESS;
-  const char* const variable = Show_Variable_Options.variable;
+  const char* const variable = ShowVariable_Options.variable;
 
   if (! variable) {
     Log_Error("Missing argument: VARIABLE");

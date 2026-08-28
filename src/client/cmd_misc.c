@@ -11,7 +11,7 @@
 #include "dmi.h"
 #include "service_control.h"
 
-static int Wait_For_Hwmon(void) {
+static int WaitForHwmon(void) {
   const char* hwmon_file_names[] = {
     "/sys/class/hwmon/hwmon%d/name",
     "/sys/class/hwmon/hwmon%d/device/name",
@@ -47,12 +47,12 @@ static int Wait_For_Hwmon(void) {
   return NBFC_EXIT_FAILURE;
 }
 
-static int Get_Model_Name(void) {
+static int GetModelName(void) {
   printf("%s\n", DMI_Get_Model_Name());
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Complete_Fans(void) {
+static int CompleteFans(void) {
   ModelConfig model_config = {0};
 
   close(STDERR_FILENO);
@@ -66,7 +66,7 @@ static int Complete_Fans(void) {
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Complete_Sensors(void) {
+static int CompleteSensors(void) {
   FS_Sensors_Init();
 
   const char* having[4096];

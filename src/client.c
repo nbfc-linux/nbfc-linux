@@ -92,14 +92,14 @@ const struct cli99_Option Main_CommandLine[] = {
   o("restart",          Restart,          RESTART,          Start)         \
   o("sensors",          Sensors,          SENSORS,          Sensors)       \
   o("config",           Config,           CONFIG,           Config)        \
-  o("rate-config",      Rate_Config,      RATE_CONFIG,      RateConfig)    \
-  o("acpi-dump",        Acpi_Dump,        ACPI_DUMP,        AcpiDump)      \
+  o("rate-config",      RateConfig,       RATE_CONFIG,      RateConfig)    \
+  o("acpi-dump",        AcpiDump,         ACPI_DUMP,        AcpiDump)      \
   o("update",           Update,           UPDATE,           Update)        \
   o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   Main)          \
   o("get-model-name",   Get_Model_Name,   GET_MODEL,        Main)          \
   o("complete-fans",    Complete_Fans,    COMPLETE_FANS,    Main)          \
   o("complete-sensors", Complete_Sensors, COMPLETE_SENSORS, Main)          \
-  o("show-variable",    Show_Variable,    SHOW_VARIABLE,    ShowVariable)  \
+  o("show-variable",    ShowVariable,     SHOW_VARIABLE,    ShowVariable)  \
   o("xml2json",         Xml2Json,         XML2JSON,         Xml2Json)      \
   o("warranty",         Warranty,         WARRANTY,         Main)          \
   o("donate",           Donate,           SUPPORT,          Main)          \
@@ -399,77 +399,77 @@ int main(int argc, char* const argv[]) {
     // Rate-Config options
     // ========================================================================
 
-    case Option_Rate_Config_All:
+    case Option_RateConfig_All:
       RateConfig_SetAction(RateConfig_Action_RateAll, p.option->optstring);
       break;
 
-    case Option_Rate_Config_File:
+    case Option_RateConfig_File:
       RateConfig_SetAction(RateConfig_Action_RateFile, p.option->optstring);
-      Rate_Config_Options.file = p.optarg;
+      RateConfig_Options.file = p.optarg;
       break;
 
-    case Option_Rate_Config_Input:
+    case Option_RateConfig_Input:
       RateConfig_SetAction(RateConfig_Action_RateFromFile, p.option->optstring);
-      Rate_Config_Options.input_file = p.optarg;
+      RateConfig_Options.input_file = p.optarg;
       break;
 
-    case Option_Rate_Config_Full_Help:
+    case Option_RateConfig_Full_Help:
       RateConfig_SetAction(RateConfig_Action_PrintFullHelp, p.option->optstring);
       break;
 
-    case Option_Rate_Config_Print_Rules:
+    case Option_RateConfig_Print_Rules:
       RateConfig_SetAction(RateConfig_Action_PrintRules, p.option->optstring);
       break;
 
-    case Option_Rate_Config_DSDT_File:
-      if (Rate_Config_Options.dsdt_files_size >= ACPI_ANALYSIS_MAX_AML_FILES) {
+    case Option_RateConfig_DSDT_File:
+      if (RateConfig_Options.dsdt_files_size >= ACPI_ANALYSIS_MAX_AML_FILES) {
         Log_Error("%s: Too many files given", p.option->optstring);
         return NBFC_EXIT_CMDLINE;
       }
 
-      Rate_Config_Options.dsdt_files[Rate_Config_Options.dsdt_files_size++] = p.optarg;
+      RateConfig_Options.dsdt_files[RateConfig_Options.dsdt_files_size++] = p.optarg;
       break;
 
-   case Option_Rate_Config_DSDT_Dir:
-      Rate_Config_Options.dsdt_dir = p.optarg;
+   case Option_RateConfig_DSDT_Dir:
+      RateConfig_Options.dsdt_dir = p.optarg;
       break;
 
-   case Option_Rate_Config_Rules:
-      Rate_Config_Options.rules_file = p.optarg;
+   case Option_RateConfig_Rules:
+      RateConfig_Options.rules_file = p.optarg;
       break;
 
-   case Option_Rate_Config_No_Download:
-      Rate_Config_Options.no_download = true;
+   case Option_RateConfig_No_Download:
+      RateConfig_Options.no_download = true;
       break;
 
-    case Option_Rate_Config_Json:
-      Rate_Config_Options.json = true;
+    case Option_RateConfig_Json:
+      RateConfig_Options.json = true;
       break;
 
-    case Option_Rate_Config_Unverified:
-      Rate_Config_Options.unverified = true;
+    case Option_RateConfig_Unverified:
+      RateConfig_Options.unverified = true;
       break;
 
-    case Option_Rate_Config_Min_Score:
-      Rate_Config_Options.min_score_set = true;
-      Rate_Config_Options.min_score = (float) parse_double(p.optarg, 0, 10, &err);
+    case Option_RateConfig_Min_Score:
+      RateConfig_Options.min_score_set = true;
+      RateConfig_Options.min_score = (float) parse_double(p.optarg, 0, 10, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
 
-    case Option_Rate_Config_Bad:
-      Rate_Config_Options.filter = RateConfig_FilterBadOnly;
+    case Option_RateConfig_Bad:
+      RateConfig_Options.filter = RateConfig_FilterBadOnly;
       break;
 
-    case Option_Rate_Config_Quiet:
-      if (Rate_Config_Options.style)
-        Rate_Config_Options.style--;
+    case Option_RateConfig_Quiet:
+      if (RateConfig_Options.style)
+        RateConfig_Options.style--;
       break;
 
-    case Option_Rate_Config_FanCount:
-      Rate_Config_Options.fan_count = (uint8_t) parse_number(p.optarg, 0, 255, &err);
+    case Option_RateConfig_FanCount:
+      RateConfig_Options.fan_count = (uint8_t) parse_number(p.optarg, 0, 255, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
@@ -480,30 +480,30 @@ int main(int argc, char* const argv[]) {
     // Acpi-Dump options
     // ========================================================================
 
-    case Option_Acpi_Dump_DSDT_File:
-      if (Acpi_Dump_Options.files_size >= ACPI_ANALYSIS_MAX_AML_FILES) {
+    case Option_AcpiDump_DSDT_File:
+      if (AcpiDump_Options.files_size >= ACPI_ANALYSIS_MAX_AML_FILES) {
         Log_Error("%s: Too many files given", p.option->optstring);
         return NBFC_EXIT_CMDLINE;
       }
 
-      Acpi_Dump_Options.files[Acpi_Dump_Options.files_size++] = p.optarg;
+      AcpiDump_Options.files[AcpiDump_Options.files_size++] = p.optarg;
       break;
 
-    case Option_Acpi_Dump_DSDT_Dir:
-      Acpi_Dump_Options.dir = p.optarg;
+    case Option_AcpiDump_DSDT_Dir:
+      AcpiDump_Options.dir = p.optarg;
       break;
 
-    case Option_Acpi_Dump_Json:
-      Acpi_Dump_Options.json = true;
+    case Option_AcpiDump_Json:
+      AcpiDump_Options.json = true;
       break;
 
-    case Option_Acpi_Dump_Unverified:
-      Acpi_Dump_Options.unverified = true;
+    case Option_AcpiDump_Unverified:
+      AcpiDump_Options.unverified = true;
       break;
 
-    case Option_Acpi_Dump_Command:
-      Acpi_Dump_Options.action = AcpiDump_CommandFromString(p.optarg);
-      if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
+    case Option_AcpiDump_Command:
+      AcpiDump_Options.action = AcpiDump_CommandFromString(p.optarg);
+      if (AcpiDump_Options.action == AcpiDump_Action_None) {
         Log_Error("Invalid command: %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
@@ -514,7 +514,7 @@ int main(int argc, char* const argv[]) {
     // ========================================================================
 
     case Option_ShowVariable_Variable:
-      Show_Variable_Options.variable = p.optarg;
+      ShowVariable_Options.variable = p.optarg;
       break;
 
     // ========================================================================
@@ -540,17 +540,17 @@ int main(int argc, char* const argv[]) {
   case Command_Stop:              return Stop();
   case Command_Restart:           return Restart();
   case Command_Config:            return Config();
-  case Command_Rate_Config:       return RateConfig();
-  case Command_Acpi_Dump:         return AcpiDump();
+  case Command_RateConfig:        return RateConfig();
+  case Command_AcpiDump:          return AcpiDump();
   case Command_Set:               return Set();
   case Command_Status:            return Status();
   case Command_Sensors:           return Sensors();
   case Command_Update:            return Update();
-  case Command_Wait_For_Hwmon:    return Wait_For_Hwmon();
-  case Command_Get_Model_Name:    return Get_Model_Name();
-  case Command_Show_Variable:     return Show_Variable();
-  case Command_Complete_Fans:     return Complete_Fans();
-  case Command_Complete_Sensors:  return Complete_Sensors();
+  case Command_Wait_For_Hwmon:    return WaitForHwmon();
+  case Command_Get_Model_Name:    return GetModelName();
+  case Command_ShowVariable:      return ShowVariable();
+  case Command_Complete_Fans:     return CompleteFans();
+  case Command_Complete_Sensors:  return CompleteSensors();
   case Command_Warranty:          return Warranty();
   case Command_Donate:            return Support();
   case Command_Support:           return Support();

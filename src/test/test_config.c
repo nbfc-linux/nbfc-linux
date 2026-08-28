@@ -22,6 +22,7 @@
 #include "../program_name.c"
 #include "../lua_bindings.c"
 #include "../acpi_call.c"
+#include "../str_functions.c"
 
 const EC_VTable* ec = NULL;
 

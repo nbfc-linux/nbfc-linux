@@ -13,11 +13,11 @@
 
 const struct cli99_Option AcpiDump_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),
-  {"command",         Option_Acpi_Dump_Command,    cli99_NormalPositional},
-  {"-d|--dsdt",       Option_Acpi_Dump_DSDT_File,  cli99_RequiredArgument},
-  {"-D|--dsdt-dir",   Option_Acpi_Dump_DSDT_Dir,   cli99_RequiredArgument},
-  {"-j|--json",       Option_Acpi_Dump_Json,       cli99_NoArgument      },
-  {"-u|--unverified", Option_Acpi_Dump_Unverified, cli99_NoArgument      },
+  {"command",         Option_AcpiDump_Command,    cli99_NormalPositional},
+  {"-d|--dsdt",       Option_AcpiDump_DSDT_File,  cli99_RequiredArgument},
+  {"-D|--dsdt-dir",   Option_AcpiDump_DSDT_Dir,   cli99_RequiredArgument},
+  {"-j|--json",       Option_AcpiDump_Json,       cli99_NoArgument      },
+  {"-u|--unverified", Option_AcpiDump_Unverified, cli99_NoArgument      },
   cli99_Options_End()
 };
 
@@ -36,7 +36,7 @@ struct {
   const char* files[ACPI_ANALYSIS_MAX_AML_FILES];
   size_t files_size;
   const char* dir;
-} Acpi_Dump_Options = {
+} AcpiDump_Options = {
   AcpiDump_Action_None,
   false,
   false,
@@ -60,14 +60,14 @@ static int AcpiDump_DSL(array_of(str)* aml_files) {
   Error e;
   char* out;
 
-  e = Acpi_Analysis_Is_IASL_Installed();
+  e = AcpiAnalysis_IsIaslInstalled();
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 
   for_each_array(str*, file, *aml_files) {
-    e = Acpi_Analysis_Get_DSL(*file, &out);
+    e = AcpiAnalysis_DisassembleFile(*file, &out);
     if (e) {
       Log_Error("%s", err_print_all(e));
       return NBFC_EXIT_FAILURE;
@@ -87,13 +87,13 @@ static int AcpiDump_Methods(array_of(str)* aml_files, bool json) {
   Error e;
   AcpiInfo acpi_info = {0};
 
-  e = Acpi_Analysis_Is_AcpiExec_Installed();
+  e = AcpiAnalysis_IsAcpiExecInstalled();
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 
-  e = Acpi_Analysis_Get_Info(aml_files, &acpi_info);
+  e = AcpiAnalysis_GetInfo(aml_files, &acpi_info);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -136,7 +136,7 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
   // Check if apcica-tools are installed
   // ==========================================================================
 
-  e = Acpi_Analysis_Is_AcpiExec_Installed();
+  e = AcpiAnalysis_IsAcpiExecInstalled();
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -146,7 +146,7 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
   // Get ACPI info
   // ==========================================================================
 
-  e = Acpi_Analysis_Get_Info(aml_files, &acpi_info);
+  e = AcpiAnalysis_GetInfo(aml_files, &acpi_info);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -157,7 +157,7 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
   // ==========================================================================
 
   if (unverified)
-    Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(&acpi_info);
+    AcpiAnalysis_AddUnverifiedEmbeddedControllerRegions(&acpi_info);
 
   // ==========================================================================
   // Output
@@ -168,7 +168,7 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
     nx_json* array = create_json_array(NULL, &root);
 
     for_each_array(AcpiRegister*, register_, acpi_info.registers) {
-      if (only_ec && !Acpi_Analysis_IsEmbeddedControllerRegion(&acpi_info, register_->region))
+      if (only_ec && !AcpiAnalysis_IsEmbeddedControllerRegion(&acpi_info, register_->region))
         continue;
 
       AcpiRegister_ToJson(register_, NULL, array);
@@ -182,7 +182,7 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
   }
   else {
     for_each_array(AcpiRegister*, register_, acpi_info.registers) {
-      if (only_ec && !Acpi_Analysis_IsEmbeddedControllerRegion(&acpi_info, register_->region))
+      if (only_ec && !AcpiAnalysis_IsEmbeddedControllerRegion(&acpi_info, register_->region))
         continue;
 
       printf("%s [%s] byte=%u byte_hex=0x%X bit=%u total_bit=%u len=%u acc=%u\n",
@@ -209,37 +209,37 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
 }
 
 static Error AcpiDump_MakeAMLFilesArray(array_of(str)* out) {
-  if (Acpi_Dump_Options.files_size) {
-    out->data = Acpi_Dump_Options.files;
-    out->size = Acpi_Dump_Options.files_size;
+  if (AcpiDump_Options.files_size) {
+    out->data = AcpiDump_Options.files;
+    out->size = AcpiDump_Options.files_size;
     return err_success();
   }
-  else if (Acpi_Dump_Options.dir) {
-    return Acpi_Analysis_Get_All_AML_Files(Acpi_Dump_Options.dir, out);
+  else if (AcpiDump_Options.dir) {
+    return AcpiAnalysis_GetAmlFiles(AcpiDump_Options.dir, out);
   }
   else {
-    return Acpi_Analysis_Get_All_AML_Files(NULL, out);
+    return AcpiAnalysis_GetAmlFiles(NULL, out);
   }
 }
 
 int AcpiDump(void) {
   Error e;
   array_of(str) aml_files = {0};
-  const bool json = Acpi_Dump_Options.json;
-  const bool unverified = Acpi_Dump_Options.unverified;
+  const bool json = AcpiDump_Options.json;
+  const bool unverified = AcpiDump_Options.unverified;
 
-  if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
+  if (AcpiDump_Options.action == AcpiDump_Action_None) {
     Log_Error("acpi-dump: Missing command");
     return NBFC_EXIT_CMDLINE;
   }
 
-  if (! Acpi_Dump_Options.files_size && ! Acpi_Dump_Options.dir) {
+  if (! AcpiDump_Options.files_size && ! AcpiDump_Options.dir) {
     check_root();
   }
 
-  for (size_t i = 0; i < Acpi_Dump_Options.files_size; ++i) {
-    if (! file_is_readable(Acpi_Dump_Options.files[i])) {
-      Log_Error("%s: %s", Acpi_Dump_Options.files[i], strerror(errno));
+  for (size_t i = 0; i < AcpiDump_Options.files_size; ++i) {
+    if (! file_is_readable(AcpiDump_Options.files[i])) {
+      Log_Error("%s: %s", AcpiDump_Options.files[i], strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -250,7 +250,7 @@ int AcpiDump(void) {
     return NBFC_EXIT_FAILURE;
   }
 
-  switch (Acpi_Dump_Options.action) {
+  switch (AcpiDump_Options.action) {
     case AcpiDump_Action_DSL:         return AcpiDump_DSL(&aml_files);
     case AcpiDump_Action_Methods:     return AcpiDump_Methods(&aml_files, json);
     case AcpiDump_Action_Registers:   return AcpiDump_Registers(&aml_files, json, false, unverified);

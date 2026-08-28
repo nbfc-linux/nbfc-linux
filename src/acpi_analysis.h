@@ -111,22 +111,22 @@ struct AcpiInfo {
 };
 typedef struct AcpiInfo AcpiInfo;
 
-Error Acpi_Analysis_Is_IASL_Installed(void);
-Error Acpi_Analysis_Is_AcpiExec_Installed(void);
+Error AcpiAnalysis_IsIaslInstalled(void);
+Error AcpiAnalysis_IsAcpiExecInstalled(void);
 
-Error Acpi_Analysis_Get_DSL(const char*, char**);
-Error Acpi_Analysis_Get_Info(array_of(str)*, AcpiInfo*);
+Error AcpiAnalysis_DisassembleFile(const char*, char**);
+Error AcpiAnalysis_GetInfo(array_of(str)*, AcpiInfo*);
 
-bool  Acpi_Analysis_Path_Equals(const char*, const char*);
-bool  Acpi_Analysis_IsEmbeddedControllerRegion(AcpiInfo*, const char*);
-void  Acpi_Analysis_AddEmbeddedControllerRegion(AcpiInfo*, const char*);
-void  Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(AcpiInfo*);
-const char* Acpi_Analysis_Get_Register_Basename(const char*);
+bool  AcpiAnalysis_Path_Equals(const char*, const char*);
+bool  AcpiAnalysis_IsEmbeddedControllerRegion(const AcpiInfo*, const char*);
+void  AcpiAnalysis_AddEmbeddedControllerRegion(AcpiInfo*, const char*);
+void  AcpiAnalysis_AddUnverifiedEmbeddedControllerRegions(AcpiInfo*);
+const char* AcpiAnalysis_RegisterBasename(const char*);
 
-nx_json* AcpiMethod_ToJson(AcpiMethod*, const char*, nx_json*);
-nx_json* AcpiRegister_ToJson(AcpiRegister*, const char*, nx_json*);
+nx_json* AcpiMethod_ToJson(const AcpiMethod*, const char*, nx_json*);
+nx_json* AcpiRegister_ToJson(const AcpiRegister*, const char*, nx_json*);
 
-Error Acpi_Analysis_Get_All_AML_Files(const char*, array_of(str)*);
+Error AcpiAnalysis_GetAmlFiles(const char*, array_of(str)*);
 
 void AcpiInfo_Free(AcpiInfo*);
 void AcpiMethod_Free(AcpiMethod*);

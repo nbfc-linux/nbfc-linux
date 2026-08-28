@@ -319,7 +319,7 @@ nx_json* ConfigRatingRules_ToJson(ConfigRatingRules* rules) {
   return object;
 }
 
-void ConfigRatingRules_Print(ConfigRatingRules* rules) {
+void ConfigRatingRules_Print(const ConfigRatingRules* rules) {
   printf("FanRegisterFullMatch:\n");
   for_each_array(RegisterRule*, rule, rules->FanRegisterFullMatch)
     printf("\t%s (%s)\n", rule->Name, RegisterRuleFanMode_ToStr(rule->Mode));

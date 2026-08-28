@@ -14,7 +14,7 @@ int main(int argc, const char** argv) {
     return 0;
   }
 
-  e = Acpi_Analysis_Get_All_AML_Files(NULL, &aml_files);
+  e = AcpiAnalysis_GetAmlFiles(NULL, &aml_files);
   if (e) {
     printf("%s", err_print_all(e));
     return 1;

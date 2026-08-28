@@ -9,6 +9,7 @@
 #include "../file_utils.c"
 #include "../memory.c"
 #include "../nxjson.c"
+#include "../str_functions.c"
 
 #include <stdio.h>  // printf
 #include <stdlib.h> // exit

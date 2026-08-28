@@ -30,7 +30,7 @@ Error AML_Analysis_Init(AML_Analysis* analysis, array_of(str)* aml_files) {
     const char* const file = aml_files->data[i];
     AML_LexedSource* source = &analysis->sources.data[i];
 
-    e = Acpi_Analysis_Get_DSL(file, &source->source);
+    e = AcpiAnalysis_DisassembleFile(file, &source->source);
     if (e) {
       Log_Error("%s", err_print_all(e));
       ++num_failures;

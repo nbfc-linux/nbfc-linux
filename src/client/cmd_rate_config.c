@@ -23,21 +23,21 @@
 
 const struct cli99_Option RateConfig_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),
-  {"-d|--dsdt",        Option_Rate_Config_DSDT_File,   cli99_RequiredArgument},
-  {"-D|--dsdt-dir",    Option_Rate_Config_DSDT_Dir,    cli99_RequiredArgument},
-  {"-a|--all",         Option_Rate_Config_All,         cli99_NoArgument      },
-  {"-H|--full-help",   Option_Rate_Config_Full_Help,   cli99_NoArgument      },
-  {"-j|--json",        Option_Rate_Config_Json,        cli99_NoArgument      },
-  {"-m|--min-score",   Option_Rate_Config_Min_Score,   cli99_RequiredArgument},
-  {"-n|--no-download", Option_Rate_Config_No_Download, cli99_NoArgument      },
-  {"-r|--rules",       Option_Rate_Config_Rules,       cli99_RequiredArgument},
-  {"-i|--input",       Option_Rate_Config_Input,       cli99_RequiredArgument},
-  {"-u|--unverified",  Option_Rate_Config_Unverified,  cli99_NoArgument      },
-  {"-b|--bad",         Option_Rate_Config_Bad,         cli99_NoArgument      },
-  {"-q|--quiet",       Option_Rate_Config_Quiet,       cli99_NoArgument      },
-  {"-f|--fan-count",   Option_Rate_Config_FanCount,    cli99_RequiredArgument},
-  {"--print-rules",    Option_Rate_Config_Print_Rules, cli99_NoArgument      },
-  {"file",             Option_Rate_Config_File,        cli99_NormalPositional},
+  {"-d|--dsdt",        Option_RateConfig_DSDT_File,   cli99_RequiredArgument},
+  {"-D|--dsdt-dir",    Option_RateConfig_DSDT_Dir,    cli99_RequiredArgument},
+  {"-a|--all",         Option_RateConfig_All,         cli99_NoArgument      },
+  {"-H|--full-help",   Option_RateConfig_Full_Help,   cli99_NoArgument      },
+  {"-j|--json",        Option_RateConfig_Json,        cli99_NoArgument      },
+  {"-m|--min-score",   Option_RateConfig_Min_Score,   cli99_RequiredArgument},
+  {"-n|--no-download", Option_RateConfig_No_Download, cli99_NoArgument      },
+  {"-r|--rules",       Option_RateConfig_Rules,       cli99_RequiredArgument},
+  {"-i|--input",       Option_RateConfig_Input,       cli99_RequiredArgument},
+  {"-u|--unverified",  Option_RateConfig_Unverified,  cli99_NoArgument      },
+  {"-b|--bad",         Option_RateConfig_Bad,         cli99_NoArgument      },
+  {"-q|--quiet",       Option_RateConfig_Quiet,       cli99_NoArgument      },
+  {"-f|--fan-count",   Option_RateConfig_FanCount,    cli99_RequiredArgument},
+  {"--print-rules",    Option_RateConfig_Print_Rules, cli99_NoArgument      },
+  {"file",             Option_RateConfig_File,        cli99_NormalPositional},
   cli99_Options_End()
 };
 
@@ -79,7 +79,7 @@ struct {
   const char* dsdt_dir;
   const char* rules_file;
   const char* input_file;
-} Rate_Config_Options = {
+} RateConfig_Options = {
   NULL,
   RateConfig_Action_None,
   RateConfig_PrintFull,
@@ -99,13 +99,13 @@ struct {
 };
 
 void RateConfig_SetAction(enum RateConfig_Action action, const char* option) {
-  if (Rate_Config_Options.action != RateConfig_Action_None) {
-    Log_Error("%s cannot be used with %s", Rate_Config_Options.action_option_string, option);
+  if (RateConfig_Options.action != RateConfig_Action_None) {
+    Log_Error("%s cannot be used with %s", RateConfig_Options.action_option_string, option);
     exit(NBFC_EXIT_CMDLINE);
   }
 
-  Rate_Config_Options.action = action;
-  Rate_Config_Options.action_option_string = option;
+  RateConfig_Options.action = action;
+  RateConfig_Options.action_option_string = option;
 }
 
 /*
@@ -394,12 +394,12 @@ static bool RateConfig_GroupHasFanCount(
   array_of(ConfigWithData)* results,
   array_size_t group_id
 ) {
-  if (! Rate_Config_Options.fan_count)
+  if (! RateConfig_Options.fan_count)
     return true;
 
   for_each_array(ConfigWithData*, result, *results) {
     if (result->group_id == group_id)
-      return (result->model_config.FanConfigurations.size == Rate_Config_Options.fan_count);
+      return (result->model_config.FanConfigurations.size == RateConfig_Options.fan_count);
   }
 
   return false;
@@ -433,7 +433,7 @@ static void RateConfig_PrintResultGroup(
     if (result->group_id != group_id)
       continue;
 
-    switch (Rate_Config_Options.style) {
+    switch (RateConfig_Options.style) {
       case RateConfig_PrintFull:
       case RateConfig_PrintName:
         printf("%s\n", result->file);
@@ -446,7 +446,7 @@ static void RateConfig_PrintResultGroup(
     last_result = result;
   }
 
-  if (Rate_Config_Options.style == RateConfig_PrintFull)
+  if (RateConfig_Options.style == RateConfig_PrintFull)
     ConfigRating_RatingPrint(&last_result->rating);
 }
 
@@ -586,7 +586,7 @@ static Error RateConfig_RateMany(
   // Rate configs
   e = RateConfig_RateFiles(config_rating, files, json, min_score, bad_filter);
   if (!json) {
-    if (! Rate_Config_Options.min_score_set) {
+    if (! RateConfig_Options.min_score_set) {
       printf(
         "Only configurations with the minimum recommended score of %.2f are shown.\n"
         "You can change this threshold by using -m|--min-score, but doing so can lead\n"
@@ -737,16 +737,16 @@ static int RateConfig_PrintRules(const char* rules_json, bool json) {
 }
 
 static Error RateConfig_MakeAMLFilesArray(array_of(str)* out) {
-  if (Rate_Config_Options.dsdt_files_size) {
-    out->data = Rate_Config_Options.dsdt_files;
-    out->size = Rate_Config_Options.dsdt_files_size;
+  if (RateConfig_Options.dsdt_files_size) {
+    out->data = RateConfig_Options.dsdt_files;
+    out->size = RateConfig_Options.dsdt_files_size;
     return err_success();
   }
-  else if (Rate_Config_Options.dsdt_dir) {
-    return Acpi_Analysis_Get_All_AML_Files(Rate_Config_Options.dsdt_dir, out);
+  else if (RateConfig_Options.dsdt_dir) {
+    return AcpiAnalysis_GetAmlFiles(RateConfig_Options.dsdt_dir, out);
   }
   else {
-    return Acpi_Analysis_Get_All_AML_Files(NULL, out);
+    return AcpiAnalysis_GetAmlFiles(NULL, out);
   }
 }
 
@@ -760,7 +760,7 @@ int RateConfig(void) {
   // Check command line arguments
   // ==========================================================================
 
-  if (Rate_Config_Options.action == RateConfig_Action_None) {
+  if (RateConfig_Options.action == RateConfig_Action_None) {
     Log_Error("Missing configuration file");
     return NBFC_EXIT_CMDLINE;
   }
@@ -769,7 +769,7 @@ int RateConfig(void) {
   // Print full help
   // ==========================================================================
 
-  if (Rate_Config_Options.action == RateConfig_Action_PrintFullHelp) {
+  if (RateConfig_Options.action == RateConfig_Action_PrintFullHelp) {
     PrintFullHelp();
     return NBFC_EXIT_SUCCESS;
   }
@@ -788,11 +788,11 @@ int RateConfig(void) {
   // Print configuration rules
   // ==========================================================================
 
-  if (Rate_Config_Options.action == RateConfig_Action_PrintRules) {
-    rules = RateConfig_GetRules(Rate_Config_Options.rules_file, Rate_Config_Options.no_download);
+  if (RateConfig_Options.action == RateConfig_Action_PrintRules) {
+    rules = RateConfig_GetRules(RateConfig_Options.rules_file, RateConfig_Options.no_download);
     if (! rules)
       return NBFC_EXIT_FAILURE;
-    int ret = RateConfig_PrintRules(rules, Rate_Config_Options.json);
+    int ret = RateConfig_PrintRules(rules, RateConfig_Options.json);
 #if STRICT_CLEANUP
     Mem_Free(rules);
 #endif
@@ -803,13 +803,13 @@ int RateConfig(void) {
   // Check if AML files are readable
   // ==========================================================================
 
-  if (! Rate_Config_Options.dsdt_files_size && ! Rate_Config_Options.dsdt_dir) {
+  if (! RateConfig_Options.dsdt_files_size && ! RateConfig_Options.dsdt_dir) {
     check_root();
   }
 
-  for (size_t i = 0; i < Rate_Config_Options.dsdt_files_size; ++i) {
-    if (! file_is_readable(Rate_Config_Options.dsdt_files[i])) {
-      Log_Error("%s: %s", Rate_Config_Options.dsdt_files[i], strerror(errno));
+  for (size_t i = 0; i < RateConfig_Options.dsdt_files_size; ++i) {
+    if (! file_is_readable(RateConfig_Options.dsdt_files[i])) {
+      Log_Error("%s: %s", RateConfig_Options.dsdt_files[i], strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
@@ -824,7 +824,7 @@ int RateConfig(void) {
   // Check if needed programs are installed
   // ==========================================================================
 
-  e = Acpi_Analysis_Is_AcpiExec_Installed();
+  e = AcpiAnalysis_IsAcpiExecInstalled();
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -834,7 +834,7 @@ int RateConfig(void) {
   // Initialize ConfigRating
   // ==========================================================================
 
-  rules = RateConfig_GetRules(Rate_Config_Options.rules_file, Rate_Config_Options.no_download);
+  rules = RateConfig_GetRules(RateConfig_Options.rules_file, RateConfig_Options.no_download);
   if (! rules)
     return NBFC_EXIT_FAILURE;
 
@@ -848,33 +848,33 @@ int RateConfig(void) {
   // Add unverified EC registers
   // ==========================================================================
 
-  if (Rate_Config_Options.unverified)
-    Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(&config_rating.acpi_info);
+  if (RateConfig_Options.unverified)
+    AcpiAnalysis_AddUnverifiedEmbeddedControllerRegions(&config_rating.acpi_info);
 
   // ==========================================================================
   // Call desired function
   // ==========================================================================
 
-  if (Rate_Config_Options.action == RateConfig_Action_RateAll) {
+  if (RateConfig_Options.action == RateConfig_Action_RateAll) {
     e = RateConfig_RateAll(
         &config_rating,
-        Rate_Config_Options.json,
-        Rate_Config_Options.min_score,
-        Rate_Config_Options.filter);
+        RateConfig_Options.json,
+        RateConfig_Options.min_score,
+        RateConfig_Options.filter);
   }
-  else if (Rate_Config_Options.action == RateConfig_Action_RateFromFile) {
+  else if (RateConfig_Options.action == RateConfig_Action_RateFromFile) {
     e = RateConfig_RateFromFile(
         &config_rating,
-        Rate_Config_Options.input_file,
-        Rate_Config_Options.json,
-        Rate_Config_Options.min_score,
-        Rate_Config_Options.filter);
+        RateConfig_Options.input_file,
+        RateConfig_Options.json,
+        RateConfig_Options.min_score,
+        RateConfig_Options.filter);
   }
   else {
     e = RateConfig_RateSingle(
         &config_rating,
-        Rate_Config_Options.json,
-        Rate_Config_Options.file);
+        RateConfig_Options.json,
+        RateConfig_Options.file);
   }
 
 #if STRICT_CLEANUP

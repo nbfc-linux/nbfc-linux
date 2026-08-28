@@ -134,7 +134,7 @@
  * Operation regions of type "SystemMemory" that may be accessible through the
  * embedded controller, though this is not guaranteed.
  */
-static const AcpiOperationRegionName Acpi_Analysis_UnverifiedEmbeddedControllerRegions[] = {
+static const AcpiOperationRegionName AcpiAnalysis_UnverifiedEmbeddedControllerRegions[] = {
   "ECMM",
   "H2RM",
   "EC",
@@ -145,7 +145,7 @@ static const AcpiOperationRegionName Acpi_Analysis_UnverifiedEmbeddedControllerR
 /*
  * Checks if the `iasl` program is installed.
  */
-Error Acpi_Analysis_Is_IASL_Installed(void) {
+Error AcpiAnalysis_IsIaslInstalled(void) {
   if (system("type " ACPI_ANALYSIS_IASL_BIN " >/dev/null 2>/dev/null") == 0)
     return err_success();
 
@@ -156,7 +156,7 @@ Error Acpi_Analysis_Is_IASL_Installed(void) {
 /*
  * Checks if the `acpiexec` program is installed.
  */
-Error Acpi_Analysis_Is_AcpiExec_Installed(void) {
+Error AcpiAnalysis_IsAcpiExecInstalled(void) {
   if (system("type " ACPI_ANALYSIS_ACPIEXEC_BIN " >/dev/null 2>/dev/null") == 0)
     return err_success();
 
@@ -203,7 +203,7 @@ void AcpiInfo_Free(AcpiInfo* acpi_info) {
  *
  * Parses output from `acpiexec -b 'Objects RegionField'`.
  */
-static Error Acpi_Analysis_Extract_Registers(const char* output, array_of(AcpiRegister)* out) {
+static Error AcpiAnalysis_ExtractRegisters(const char* output, array_of(AcpiRegister)* out) {
   regex_t regex;
   regmatch_t matches[ACPI_REGION_FIELDS_RE_GROUPS + 1];
   size_t num_matches;
@@ -242,7 +242,7 @@ static Error Acpi_Analysis_Extract_Registers(const char* output, array_of(AcpiRe
  *
  * Parses output from `acpiexec -b 'Methods'`.
  */
-static Error Acpi_Analysis_Extract_Methods(const char* output, array_of(AcpiMethod)* out) {
+static Error AcpiAnalysis_ExtractMethods(const char* output, array_of(AcpiMethod)* out) {
   regex_t regex;
   regmatch_t matches[ACPI_METHODS_RE_GROUPS + 1];
   size_t num_matches;
@@ -278,7 +278,7 @@ static Error Acpi_Analysis_Extract_Methods(const char* output, array_of(AcpiMeth
  *
  * Parses output from `acpiexec -b 'Objects Region'`.
  */
-static Error Acpi_Analysis_Extract_OperationRegions(const char* output, array_of(AcpiOperationRegion)* out) {
+static Error AcpiAnalysis_ExtractOperationRegions(const char* output, array_of(AcpiOperationRegion)* out) {
   regex_t regex;
   regmatch_t matches[ACPI_OPERATION_REGION_RE_GROUPS + 1];
   size_t num_matches;
@@ -311,7 +311,7 @@ static Error Acpi_Analysis_Extract_OperationRegions(const char* output, array_of
 /*
  * Returns true if two segments are equal, ignoring trailing underscores.
  */
-static bool Acpi_Analysis_SegmentEqualsIgnoreTrailingUnderscore(const char* a, const char* b) {
+static bool AcpiAnalysis_SegmentEqualsIgnoreTrailingUnderscore(const char* a, const char* b) {
   while (*a && *b && *a == *b)
     ++a, ++b;
 
@@ -327,7 +327,7 @@ static bool Acpi_Analysis_SegmentEqualsIgnoreTrailingUnderscore(const char* a, c
 /*
  * Appends an operation region name to AcpiInfo->ec_region_names.
  */
-void Acpi_Analysis_AddEmbeddedControllerRegion(AcpiInfo* info, const char* name) {
+void AcpiAnalysis_AddEmbeddedControllerRegion(AcpiInfo* info, const char* name) {
   const size_t idx = info->ec_region_names.size++;
 
   info->ec_region_names.data = Mem_Realloc(
@@ -346,20 +346,20 @@ void Acpi_Analysis_AddEmbeddedControllerRegion(AcpiInfo* info, const char* name)
  * Collects the names of all "EmbeddedControl" operation regions and stores
  * them in AcpiInfo->ec_region_names.
  */
-static void Acpi_Analysis_AddTrustedEmbeddedControllerRegions(AcpiInfo* info) {
+static void AcpiAnalysis_AddTrustedEmbeddedControllerRegions(AcpiInfo* info) {
   for_each_array(AcpiOperationRegion*, region, info->regions) {
     if (strcmp(region->type, "EmbeddedControl"))
       continue;
 
-    const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
-    Acpi_Analysis_AddEmbeddedControllerRegion(info, name);
+    const char* const name = AcpiAnalysis_RegisterBasename(region->name);
+    AcpiAnalysis_AddEmbeddedControllerRegion(info, name);
   }
 }
 
-static bool Acpi_Analysis_UnverifiedEmbeddedControllerRegions_Contains(const char* name) {
-  for (size_t i = 0; i < ARRAY_SIZE(Acpi_Analysis_UnverifiedEmbeddedControllerRegions); ++i) {
-    const char* const unverified_name = Acpi_Analysis_UnverifiedEmbeddedControllerRegions[i];
-    if (Acpi_Analysis_SegmentEqualsIgnoreTrailingUnderscore(unverified_name, name))
+static bool AcpiAnalysis_UnverifiedEmbeddedControllerRegions_Contains(const char* name) {
+  for (size_t i = 0; i < ARRAY_SIZE(AcpiAnalysis_UnverifiedEmbeddedControllerRegions); ++i) {
+    const char* const unverified_name = AcpiAnalysis_UnverifiedEmbeddedControllerRegions[i];
+    if (AcpiAnalysis_SegmentEqualsIgnoreTrailingUnderscore(unverified_name, name))
       return true;
   }
 
@@ -370,12 +370,12 @@ static bool Acpi_Analysis_UnverifiedEmbeddedControllerRegions_Contains(const cha
  * Returns true if the operation region may be accessible through the embedded
  * controller, though this is not guaranteed.
  */
-static bool Acpi_Analysis_IsUnverifiedEcRegion(AcpiInfo* info, AcpiOperationRegion* region) {
+static bool AcpiAnalysis_IsUnverifiedEcRegion(AcpiInfo* info, AcpiOperationRegion* region) {
   if (strcmp(region->type, "SystemMemory"))
     return false;
 
-  const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
-  if (! Acpi_Analysis_UnverifiedEmbeddedControllerRegions_Contains(name))
+  const char* const name = AcpiAnalysis_RegisterBasename(region->name);
+  if (! AcpiAnalysis_UnverifiedEmbeddedControllerRegions_Contains(name))
     return false;
 
   for_each_array(AcpiRegister*, acpi_register, info->registers) {
@@ -396,13 +396,13 @@ static bool Acpi_Analysis_IsUnverifiedEcRegion(AcpiInfo* info, AcpiOperationRegi
  * It is not guaranteed that these operation regions are actually accessible
  * through the embedded controller.
  */
-void Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(AcpiInfo* info) {
+void AcpiAnalysis_AddUnverifiedEmbeddedControllerRegions(AcpiInfo* info) {
   for_each_array(AcpiOperationRegion*, region, info->regions) {
-    if (! Acpi_Analysis_IsUnverifiedEcRegion(info, region))
+    if (! AcpiAnalysis_IsUnverifiedEcRegion(info, region))
       continue;
 
-    const char* const name = Acpi_Analysis_Get_Register_Basename(region->name);
-    Acpi_Analysis_AddEmbeddedControllerRegion(info, name);
+    const char* const name = AcpiAnalysis_RegisterBasename(region->name);
+    AcpiAnalysis_AddEmbeddedControllerRegion(info, name);
   }
 }
 
@@ -412,7 +412,7 @@ void Acpi_Analysis_AddUnverifiedEmbeddedControllerRegions(AcpiInfo* info) {
  *
  * This function requires the `acpiexec` program.
  */
-Error Acpi_Analysis_Get_Info(array_of(str)* files, AcpiInfo* out) {
+Error AcpiAnalysis_GetInfo(array_of(str)* files, AcpiInfo* out) {
   Error e = err_success();
 
   // Clear output arrays
@@ -447,19 +447,19 @@ Error Acpi_Analysis_Get_Info(array_of(str)* files, AcpiInfo* out) {
     goto end;
   }
 
-  e = Acpi_Analysis_Extract_Registers(stdout_, &out->registers);
+  e = AcpiAnalysis_ExtractRegisters(stdout_, &out->registers);
   if (e)
     goto end;
 
-  e = Acpi_Analysis_Extract_Methods(stdout_, &out->methods);
+  e = AcpiAnalysis_ExtractMethods(stdout_, &out->methods);
   if (e)
     goto end;
 
-  e = Acpi_Analysis_Extract_OperationRegions(stdout_, &out->regions);
+  e = AcpiAnalysis_ExtractOperationRegions(stdout_, &out->regions);
   if (e)
     goto end;
 
-  Acpi_Analysis_AddTrustedEmbeddedControllerRegions(out);
+  AcpiAnalysis_AddTrustedEmbeddedControllerRegions(out);
 
 end:
   for (size_t i = 0; i < files->size + 5; ++i)
@@ -529,7 +529,7 @@ end:
  *
  * This function requires the `iasl` program.
  */
-Error Acpi_Analysis_Get_DSL(const char* file, char** out) {
+Error AcpiAnalysis_DisassembleFile(const char* file, char** out) {
   Error e;
 
   *out = NULL;
@@ -596,7 +596,7 @@ end:
  *
  * Parsing stops at NUL, '.' or any whitespace / control characters.
  */
-static uint32_t Acpi_Analysis_Segment_To_UInt(const char** s) {
+static uint32_t AcpiAnalysis_Segment_To_UInt(const char** s) {
   uint32_t val = 0;
 
   for (int i = 0; i < 4; ++i) {
@@ -618,9 +618,9 @@ static uint32_t Acpi_Analysis_Segment_To_UInt(const char** s) {
  * Checks if both segments are equal while advancing both pointers to the
  * end of the segments.
  */
-static inline bool Acpi_Analysis_Segment_Equal(const char** s1, const char** s2) {
-  const uint32_t i1 = Acpi_Analysis_Segment_To_UInt(s1);
-  const uint32_t i2 = Acpi_Analysis_Segment_To_UInt(s2);
+static inline bool AcpiAnalysis_Segment_Equal(const char** s1, const char** s2) {
+  const uint32_t i1 = AcpiAnalysis_Segment_To_UInt(s1);
+  const uint32_t i2 = AcpiAnalysis_Segment_To_UInt(s2);
   return i1 == i2;
 }
 
@@ -631,7 +631,7 @@ static inline bool Acpi_Analysis_Segment_Equal(const char** s1, const char** s2)
  *
  * The path may start with a backslash.
  */
-bool Acpi_Analysis_Path_Equals(const char* s1, const char* s2) {
+bool AcpiAnalysis_Path_Equals(const char* s1, const char* s2) {
   // Check for leading backslash
   if (*s1 == '\\' || *s2 == '\\') {
     if (*s1 != *s2)
@@ -646,7 +646,7 @@ bool Acpi_Analysis_Path_Equals(const char* s1, const char* s2) {
     if (*s1 <= 32 || *s2 <= 32)
       return (*s1 <= 32 && *s2 <= 32);
 
-    if (! Acpi_Analysis_Segment_Equal(&s1, &s2))
+    if (! AcpiAnalysis_Segment_Equal(&s1, &s2))
       return false;
 
     if (*s1 == '.' || *s2 == '.') {
@@ -666,7 +666,7 @@ bool Acpi_Analysis_Path_Equals(const char* s1, const char* s2) {
  *   Input:  \_SB.PC00.LPCB.EC0.ERBD
  *   Output: ERDB
  */
-const char* Acpi_Analysis_Get_Register_Basename(const char* path) {
+const char* AcpiAnalysis_RegisterBasename(const char* path) {
   const size_t len = strlen(path);
   const char* p = path + len;
 
@@ -684,9 +684,9 @@ const char* Acpi_Analysis_Get_Register_Basename(const char* path) {
  * Check if `name` is an operation region that is exposed through the
  * embedded controller.
  */
-bool Acpi_Analysis_IsEmbeddedControllerRegion(AcpiInfo* info, const char* name) {
+bool AcpiAnalysis_IsEmbeddedControllerRegion(const AcpiInfo* info, const char* name) {
   for_each_array(AcpiOperationRegionName*, region, info->ec_region_names)
-    if (Acpi_Analysis_SegmentEqualsIgnoreTrailingUnderscore(*region, name))
+    if (AcpiAnalysis_SegmentEqualsIgnoreTrailingUnderscore(*region, name))
       return true;
 
   return false;
@@ -697,7 +697,7 @@ bool Acpi_Analysis_IsEmbeddedControllerRegion(AcpiInfo* info, const char* name) 
  *
  * The array must not be free'd.
  */
-Error Acpi_Analysis_Get_All_AML_Files(const char* dir, array_of(str)* out) {
+Error AcpiAnalysis_GetAmlFiles(const char* dir, array_of(str)* out) {
   static char data[ACPI_ANALYSIS_MAX_AML_FILES][PATH_MAX];
   static const char* files[ACPI_ANALYSIS_MAX_AML_FILES];
   array_size_t files_size = 0;
@@ -734,7 +734,7 @@ Error Acpi_Analysis_Get_All_AML_Files(const char* dir, array_of(str)* out) {
  * Converts an ACPI method to a JSON object and attaches it to parent under
  * the given key.
  */
-nx_json* AcpiMethod_ToJson(AcpiMethod* method, const char* key, nx_json* parent) {
+nx_json* AcpiMethod_ToJson(const AcpiMethod* method, const char* key, nx_json* parent) {
   nx_json* object = create_json_object(key, parent);
   create_json_string("name", object, method->name);
   create_json_integer("length", object, method->length);
@@ -745,7 +745,7 @@ nx_json* AcpiMethod_ToJson(AcpiMethod* method, const char* key, nx_json* parent)
  * Converts an ACPI register to a JSON object and attaches it to parent under
  * the given key.
  */
-nx_json* AcpiRegister_ToJson(AcpiRegister* register_, const char* key, nx_json* parent) {
+nx_json* AcpiRegister_ToJson(const AcpiRegister* register_, const char* key, nx_json* parent) {
   nx_json* object = create_json_object(key, parent);
   create_json_string("name", object, register_->name);
   create_json_string("region", object, register_->region);
