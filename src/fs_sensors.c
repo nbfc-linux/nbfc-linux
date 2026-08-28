@@ -133,7 +133,7 @@ end:
   }
 
   FS_Sensors_Sources.size = n_sources;
-  FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Calloc(n_sources, sizeof(FS_TemperatureSource));
+  array_calloc(FS_TemperatureSource, FS_Sensors_Sources, n_sources);
   memcpy(FS_Sensors_Sources.data, sources, n_sources * sizeof(FS_TemperatureSource));
   Buffer_Release((char*) sources, FS_SENSORS_BUFFER_SIZE);
   return err_success();
@@ -258,7 +258,7 @@ Error FS_Sensors_Init(void) {
       }
 
       const array_size_t idx = FS_Sensors_Sources.size;
-      FS_Sensors_Sources.data = Mem_Realloc(FS_Sensors_Sources.data, (idx + 1) * sizeof(FS_TemperatureSource));
+      array_realloc(FS_TemperatureSource, FS_Sensors_Sources, (idx + 1));
       FS_Sensors_Sources.data[idx].name = Mem_Strdup("nvidia-ml");
       FS_Sensors_Sources.data[idx].file = Mem_Strdup("none");
       FS_Sensors_Sources.data[idx].multiplier = 1;

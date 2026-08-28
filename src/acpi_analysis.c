@@ -217,7 +217,7 @@ static Error AcpiAnalysis_ExtractRegisters(const char* output, array_of(AcpiRegi
 
   // Allocate space for output array
   num_matches = RegEx_Count(&regex, matches, ACPI_REGION_FIELDS_RE_GROUPS + 1, output);
-  out->data = Mem_Calloc(num_matches, sizeof(AcpiRegister));
+  array_calloc(AcpiRegister, *out, num_matches);
 
   // Iterate over matches and fill output array
   const char* text = output;
@@ -256,7 +256,7 @@ static Error AcpiAnalysis_ExtractMethods(const char* output, array_of(AcpiMethod
 
   // Allocate space for output array
   num_matches = RegEx_Count(&regex, matches, ACPI_METHODS_RE_GROUPS + 1, output);
-  out->data = Mem_Calloc(num_matches, sizeof(AcpiMethod));
+  array_calloc(AcpiMethod, *out, num_matches);
 
   // Iterate over matches and fill output array
   const char* text = output;
@@ -291,7 +291,7 @@ static Error AcpiAnalysis_ExtractOperationRegions(const char* output, array_of(A
     return err_string("Invalid regular expression");
 
   num_matches = RegEx_Count(&regex, matches, ACPI_OPERATION_REGION_RE_GROUPS + 1, output);
-  out->data = Mem_Calloc(num_matches, sizeof(AcpiOperationRegion));
+  array_calloc(AcpiOperationRegion, *out, num_matches);
 
   // Iterate over matches and fill output array
   const char* text = output;
@@ -330,9 +330,7 @@ static bool AcpiAnalysis_SegmentEqualsIgnoreTrailingUnderscore(const char* a, co
 void AcpiAnalysis_AddEmbeddedControllerRegion(AcpiInfo* info, const char* name) {
   const size_t idx = info->ec_region_names.size++;
 
-  info->ec_region_names.data = Mem_Realloc(
-      info->ec_region_names.data, (idx + 1) * sizeof(AcpiOperationRegionName)
-  );
+  array_realloc(AcpiOperationRegionName, info->ec_region_names, (idx + 1));
 
   snprintf(
       info->ec_region_names.data[idx],

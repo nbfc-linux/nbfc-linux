@@ -54,10 +54,10 @@ int ConfigFile_CompareByDiff(const void* a, const void* b) {
 // Return an array of ConfigFile for each file in `path`
 static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
   array_size_t capacity = 512;
-  array_of(ConfigFile) files = {
-    .data = Mem_Calloc(capacity, sizeof(ConfigFile)),
-    .size = 0
-  };
+  array_of(ConfigFile) files;
+
+  files.size = 0;
+  array_calloc(ConfigFile, files, capacity);
 
   DIR* directory = opendir(path);
   if (!directory) {
@@ -77,7 +77,7 @@ static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
 
     if (files.size == capacity) {
       capacity *= 2;
-      files.data = Mem_Realloc(files.data, capacity * sizeof(ConfigFile));
+      array_realloc(ConfigFile, files, capacity);
     }
 
     files.data[files.size++].config_name = Mem_Strdup(file->d_name);
@@ -91,8 +91,8 @@ static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
 // removing duplicates based on `config_name`.
 static array_of(ConfigFile) Merge_Configs(array_of(ConfigFile)* a, array_of(ConfigFile)* b) {
   array_of(ConfigFile) files;
-  files.data = Mem_Calloc((a->size + b->size), sizeof(ConfigFile));
   files.size = 0;
+  array_calloc(ConfigFile, files, (a->size + b->size));
 
   for_each_array(ConfigFile*, file, *a) {
     files.data[files.size++].config_name = Mem_Strdup(file->config_name);

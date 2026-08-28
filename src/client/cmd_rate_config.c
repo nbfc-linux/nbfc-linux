@@ -255,7 +255,7 @@ static array_of(ConfigWithData) RateConfig_RateConfigs(
 
   // Allocate memory for result
   result.size = 0;
-  result.data = Mem_Calloc(files->size, sizeof(ConfigWithData));
+  array_calloc(ConfigWithData, result, files->size);
 
   for_each_array(ConfigFile*, file, *files) {
     Trace trace = {0};
@@ -654,7 +654,7 @@ static Error RateConfig_RateFromFile(
 
   // Allocate space
   files.size = 0;
-  files.data = Mem_Calloc((str_count_newlines(content) + 1), sizeof(ConfigFile));
+  array_calloc(ConfigFile, files, (str_count_newlines(content) + 1));
 
   // Populate files array with lines
   char* line = content;

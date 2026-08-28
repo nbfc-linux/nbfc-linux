@@ -351,10 +351,10 @@ Error ConfigRating_RateModelConfig(
   // ==========================================================================
 
   rating->register_ratings.size = 0;
-  rating->register_ratings.data = Mem_Calloc(registers_size, sizeof(ConfigRating_RegisterRating));
+  array_calloc(ConfigRating_RegisterRating, rating->register_ratings, registers_size);
 
   rating->method_ratings.size = 0;
-  rating->method_ratings.data = Mem_Calloc(methods_size, sizeof(ConfigRating_MethodRating));
+  array_calloc(ConfigRating_MethodRating, rating->method_ratings, methods_size);
 
   // ==========================================================================
   // Do the actual rating

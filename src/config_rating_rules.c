@@ -20,8 +20,7 @@ static Error ParseRegisterNamesArray(array_of(AcpiRegisterName)* out, const nx_j
   }
 
   out->size = 0;
-  out->data = Mem_Realloc(out->data,
-    json->val.children.length * sizeof(AcpiRegisterName));
+  array_realloc(AcpiRegisterName, *out, json->val.children.length);
 
   nx_json_for_each(child, json) {
     if (child->type != NX_JSON_STRING) {
@@ -176,8 +175,7 @@ static Error ParseRegisterRuleArray(array_of(RegisterRule)* out, const nx_json* 
   }
 
   out->size = 0;
-  out->data = Mem_Realloc(out->data,
-    json->val.children.length * sizeof(RegisterRule));
+  array_realloc(RegisterRule, *out, json->val.children.length);
 
   nx_json_for_each(object, json) {
     e = ParseRegisterRule(&out->data[out->size], object);

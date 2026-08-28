@@ -100,7 +100,7 @@ static FanTemperatureSourceConfig* Sensors_GetFTSCByFanIndex(array_size_t fanInd
       return ftsc;
 
   const array_size_t idx = service_config.FanTemperatureSources.size;
-  service_config.FanTemperatureSources.data = Mem_Realloc(service_config.FanTemperatureSources.data, (idx + 1) * sizeof(FanTemperatureSourceConfig));
+  array_realloc(FanTemperatureSourceConfig, service_config.FanTemperatureSources, (idx + 1));
   service_config.FanTemperatureSources.size = (idx + 1);
   return &service_config.FanTemperatureSources.data[idx];
 }

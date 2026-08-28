@@ -32,6 +32,12 @@
 #define for_each_array_reverse(TYPE, VAR, ARRAY) \
   for (TYPE VAR = (ARRAY).data + (ARRAY).size; --VAR != (ARRAY).data;)
 
+#define array_calloc(TYPE, ARRAY, SIZE) \
+  (ARRAY).data = (TYPE*) Mem_Calloc((SIZE), sizeof(TYPE))
+
+#define array_realloc(TYPE, ARRAY, SIZE) \
+  (ARRAY).data = (TYPE*) Mem_Realloc((ARRAY).data, sizeof(TYPE) * (SIZE))
+
 typedef size_t array_size_t;
 
 #define declare_array_of(T)                           \

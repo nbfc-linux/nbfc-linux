@@ -412,7 +412,7 @@ AML_Token AML_Lexer_GetToken(AML_Lexer* l) {
 Error AML_Lexer_GetTokens(AML_Lexer* l, array_of(AML_Token)* out) {
   size_t capacity = 1024;
   out->size = 0;
-  out->data = Mem_Malloc(capacity * sizeof(AML_Token));
+  array_calloc(AML_Token, *out, capacity);
 
   for (;;) {
     AML_Token t = AML_Lexer_GetToken(l);
@@ -425,7 +425,7 @@ Error AML_Lexer_GetTokens(AML_Lexer* l, array_of(AML_Token)* out) {
 
     if (out->size >= capacity) {
       capacity += 1024;
-      out->data = Mem_Realloc(out->data, capacity * sizeof(AML_Token));
+      array_realloc(AML_Token, *out, capacity);
     }
 
     out->data[out->size++] = t;

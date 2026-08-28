@@ -230,7 +230,7 @@ int main(int argc, char* const argv[]) {
 
         if (! have_fan) {
           fans->size++;
-          fans->data = Mem_Realloc(fans->data, fans->size * sizeof(int));
+          array_realloc(array_size_t, *fans, fans->size);
           fans->data[fans->size - 1] = fan;
         }
       }
@@ -272,7 +272,7 @@ int main(int argc, char* const argv[]) {
       {
         array_of(str)* sensors = &Sensors_Options.sensors;
         sensors->size++;
-        sensors->data = Mem_Realloc(sensors->data, sensors->size * sizeof(str));
+        array_realloc(str, *sensors, sensors->size);
         sensors->data[sensors->size - 1] = p.optarg;
       }
       break;

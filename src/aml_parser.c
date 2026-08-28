@@ -328,7 +328,7 @@ Error AML_Parser_ExtractMethods(AML_Parser* p, array_of(AML_Method)* out) {
     switch (t.type) {
     case AML_TOK_Keyword:
       if (AML_Token_StrEq(&t, "Method", STRLEN("Method"))) {
-        out->data = Mem_Realloc(out->data, (out->size + 1) * sizeof(AML_Method));
+        array_realloc(AML_Method, *out, (out->size + 1));
 
         if (! AML_Parse_MethodArgs(p, &args.method) ||
             ! AML_Parser_ExtractMethod(p, &args.method.name, &out->data[out->size]))

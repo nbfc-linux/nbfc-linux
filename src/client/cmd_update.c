@@ -319,7 +319,7 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
     goto end;
   }
 
-  out->data = Mem_Calloc(root->val.children.length, sizeof(GitHubFile));
+  array_calloc(GitHubFile, *out, root->val.children.length);
 
   nx_json_for_each(object, root) {
     if (object->type != NX_JSON_OBJECT) {

@@ -107,7 +107,7 @@ Error Service_Init(void) {
 
   // Fans =====================================================================
   Service_Fans.size = Service_ModelConfig.FanConfigurations.size;
-  Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
+  array_calloc(FanTemperatureControl, Service_Fans, Service_Fans.size);
   Service_State = Initialized_4_Fans;
 
   for_enumerate_array(array_size_t, i, Service_Fans) {
@@ -422,7 +422,7 @@ static bool IsAcpiCallUsed(void) {
 void Service_WriteTargetFanSpeedsToState(void) {
   const array_size_t fancount = Service_ModelConfig.FanConfigurations.size;
 
-  service_state.TargetFanSpeeds.data = Mem_Realloc(service_state.TargetFanSpeeds.data, sizeof(float) * fancount);
+  array_realloc(float, service_state.TargetFanSpeeds, fancount);
   service_state.TargetFanSpeeds.size = fancount;
 
   for_enumerate_array(array_size_t, i, Service_Fans) {

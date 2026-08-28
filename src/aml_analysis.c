@@ -23,8 +23,7 @@ Error AML_Analysis_Init(AML_Analysis* analysis, array_of(str)* aml_files) {
   AML_Parser p;
 
   memset(analysis, 0, sizeof(AML_Analysis));
-
-  analysis->sources.data = Mem_Calloc(aml_files->size, sizeof(AML_LexedSource));
+  array_calloc(AML_LexedSource, analysis->sources, aml_files->size);
 
   for_enumerate_array(array_size_t, i, *aml_files) {
     const char* const file = aml_files->data[i];
