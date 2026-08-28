@@ -40,13 +40,12 @@ src/nbfc_service
 src/nbfc_service-debug
 src/ec_probe
 src/ec_probe-debug
-src/test_model_config
-src/test_model_config-debug
 
 src/test/test_acpi_call
 src/test/test_aml_analysis
 src/test/test_aml_lexer
-src/test/test_config
+src/test/test_model_config
+src/test/test_config_validation
 src/test/DSDT.aml
 src/test/fingerprint_current_firmware
 

@@ -6,29 +6,33 @@
 #define _XOPEN_SOURCE 500 // unistd.h: export pwrite()/pread()
 #define _GNU_SOURCE
 
+#ifndef DATADIR
+#define DATADIR ""
+#endif
+
 #include <string.h>
 #include <locale.h>
 #include <getopt.h>
 #include <limits.h>
 
-#include "ec.h"
-#include "nbfc.h"
-#include "buffer.c"
-#include "log.c"
-#include "lua_bindings.c"
-#include "error.c"
-#include "file_utils.c"
-#include "trace.c"
-#include "memory.c"
-#include "nxjson_memory.c"
-#include "nxjson.c"
-#include "model_config.c"
-#include "program_name.c"
-#include "fan.c"
-#include "acpi_call.c"
-#include "process.c"
-#include "str_functions.c"
-#include "temperature_threshold_manager.c"
+#include "../ec.h"
+#include "../nbfc.h"
+#include "../buffer.c"
+#include "../log.c"
+#include "../lua_bindings.c"
+#include "../error.c"
+#include "../file_utils.c"
+#include "../trace.c"
+#include "../memory.c"
+#include "../nxjson_memory.c"
+#include "../nxjson.c"
+#include "../model_config.c"
+#include "../program_name.c"
+#include "../fan.c"
+#include "../acpi_call.c"
+#include "../process.c"
+#include "../str_functions.c"
+#include "../temperature_threshold_manager.c"
 
 const EC_VTable* ec;
 

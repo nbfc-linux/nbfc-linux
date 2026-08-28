@@ -30,7 +30,6 @@ endif
 LDLIBS_CLIENT = -lcurl -lcrypto $(LUA_LDLIBS) $(XML_LDLIBS) -ldl
 LDLIBS_SERVICE = -lm $(LUA_LDLIBS) -ldl
 LDLIBS_EC_PROBE =
-LDLIBS_TEST_MODEL_CONFIG = -lm $(LUA_LDLIBS) -ldl
 
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(sysconfdir)\"    \
@@ -39,7 +38,7 @@ override CPPFLAGS += \
 	-DRUNSTATEDIR=\"$(runstatedir)\"  \
 	-DVERSION=\"$(version)\"
 
-CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
+CORE  = src/nbfc_service src/nbfc src/ec_probe
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5 doc/nbfc.faq.7
 SYSTEMD = etc/systemd/system/nbfc_service.service
 OPEN_RC = etc/init.d/nbfc_service.openrc
@@ -326,18 +325,6 @@ src/nbfc: \
 	src/str_functions.h \
 	src/xml2json.h src/xml2json.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
-
-src/test_model_config: \
-	src/config.h \
-	src/error.c \
-	src/generated/model_config.generated.h \
-	src/generated/model_config.generated.c \
-	src/log.h src/log.c \
-	src/lua_bindings.h src/lua_bindings.c \
-	src/memory.c \
-	src/nxjson.c \
-	src/program_name.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/test_model_config.c -o src/test_model_config $(LDLIBS_TEST_MODEL_CONFIG) $(LDFLAGS)
 
 src/generated/: .force
 	mkdir -p src/generated
