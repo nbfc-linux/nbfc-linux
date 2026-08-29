@@ -172,7 +172,6 @@ install: install-core install-configs install-$(INIT_SYSTEM) install-docs instal
 uninstall:
 	# Binaries
 	rm -f $(DESTDIR)$(bindir)/nbfc
-	rm -f $(DESTDIR)$(bindir)/nbfc_config
 	rm -f $(DESTDIR)$(bindir)/nbfc_service
 	rm -f $(DESTDIR)$(bindir)/ec_probe
 	
