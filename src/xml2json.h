@@ -7,7 +7,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-Error Xml2Json_Convert(xmlNode*, nx_json**);
+Error Xml2Json_Convert(const xmlNode*, nx_json**);
 Error Xml2Json_ConvertFile(const char*, nx_json**);
 
 #endif

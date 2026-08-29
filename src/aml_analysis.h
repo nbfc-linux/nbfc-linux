@@ -28,8 +28,8 @@ struct AML_Analysis {
   array_of(AML_LexedSource) sources;
 };
 
-Error AML_Analysis_Init(AML_Analysis*, array_of(str)*);
+Error AML_Analysis_Init(AML_Analysis*, const array_of(str)*);
 void  AML_Analysis_Free(AML_Analysis*);
-Error AML_Analysis_MatchFingerprint(AML_Analysis*, const char*, bool*);
+Error AML_Analysis_MatchFingerprint(const AML_Analysis*, const char*, bool*);
 
 #endif

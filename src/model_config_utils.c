@@ -115,8 +115,8 @@ static bool RegisterWriteConfiguration_IsSimilar(
  * Checks if two array_of(FanConfiguration) are similar.
  */
 static bool FanConfigurations_AreSimilar(
-  array_of(FanConfiguration)* fans1,
-  array_of(FanConfiguration)* fans2
+  const array_of(FanConfiguration)* fans1,
+  const array_of(FanConfiguration)* fans2
 ) {
   if (fans1->size != fans2->size)
     return false;
@@ -151,8 +151,8 @@ static bool FanConfigurations_AreSimilar(
  * Checks if two array_of(RegisterWriteConfiguration) are similar.
  */
 static bool RegisterWriteConfigurations_AreSimilar(
-  array_of(RegisterWriteConfiguration)* rwcs1,
-  array_of(RegisterWriteConfiguration)* rwcs2
+  const array_of(RegisterWriteConfiguration)* rwcs1,
+  const array_of(RegisterWriteConfiguration)* rwcs2
 ) {
   if (rwcs1->size != rwcs2->size)
     return false;
@@ -187,8 +187,8 @@ static bool RegisterWriteConfigurations_AreSimilar(
  * Checks if two ModelConfigs are similar.
  */
 bool ModelConfig_IsSimilar(
-  ModelConfig* a,
-  ModelConfig* b
+  const ModelConfig* a,
+  const ModelConfig* b
 ) {
   return
     FanConfigurations_AreSimilar(&a->FanConfigurations, &b->FanConfigurations) &&

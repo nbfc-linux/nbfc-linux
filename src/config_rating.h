@@ -168,11 +168,11 @@ declare_array_of(ConfigRating_Rating);
 Error ConfigRatingRules_FromJson(ConfigRatingRules*, const char*);
 void  ConfigRatingRules_Free(ConfigRatingRules*);
 
-Error ConfigRating_Init(ConfigRating*, array_of(str)*, const char*);
+Error ConfigRating_Init(ConfigRating*, const array_of(str)*, const char*);
 void  ConfigRating_Free(ConfigRating*);
 
-Error ConfigRating_RateModelConfig(ConfigRating*, ModelConfig*, ConfigRating_Rating*);
-void  ConfigRating_RatingPrint(ConfigRating_Rating*);
+Error ConfigRating_RateModelConfig(const ConfigRating*, const ModelConfig*, ConfigRating_Rating*);
+void  ConfigRating_RatingPrint(const ConfigRating_Rating*);
 
 void  ConfigRating_RatingFree(ConfigRating_Rating*);
 void  ConfigRating_MethodRatingFree(ConfigRating_MethodRating*);
@@ -181,6 +181,6 @@ void  ConfigRating_RegisterRatingFree(ConfigRating_RegisterRating*);
 const char* RegisterType_ToStr(enum RegisterType);
 const char* RegisterScore_ToStr(enum RegisterScore);
 const char* MethodScore_ToStr(enum MethodScore);
-nx_json* ConfigRating_ToJson(ConfigRating_Rating*, const char*, nx_json*);
+nx_json* ConfigRating_ToJson(const ConfigRating_Rating*, const char*, nx_json*);
 
 #endif

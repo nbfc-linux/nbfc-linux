@@ -11,7 +11,7 @@
 /**
  * Read a string from an XML node and store it in the parent's JSON child.
  */
-static Error Xml2Json_ParseString(xmlNode* node, const char* key, nx_json* parent) {
+static Error Xml2Json_ParseString(const xmlNode* node, const char* key, nx_json* parent) {
   xmlChar* content = xmlNodeGetContent(node);
   if (! content)
     return err_string("xmlNodeGetContent() returned NULL");
@@ -24,7 +24,7 @@ static Error Xml2Json_ParseString(xmlNode* node, const char* key, nx_json* paren
 /**
  * Parse an integer from an XML node and store it in the parent's JSON child.
  */
-static Error Xml2Json_ParseInt(xmlNode* node, const char* key, nx_json* parent) {
+static Error Xml2Json_ParseInt(const xmlNode* node, const char* key, nx_json* parent) {
   xmlChar* content = xmlNodeGetContent(node);
   if (! content)
     return err_string("xmlNodeGetContent() returned NULL");
@@ -42,7 +42,7 @@ static Error Xml2Json_ParseInt(xmlNode* node, const char* key, nx_json* parent) 
 /**
  * Parse a float from an XML node and store it in the parent's JSON child.
  */
-static Error Xml2Json_ParseFloat(xmlNode* node, const char* key, nx_json* parent) {
+static Error Xml2Json_ParseFloat(const xmlNode* node, const char* key, nx_json* parent) {
   xmlChar* content = xmlNodeGetContent(node);
   if (! content)
     return err_string("xmlNodeGetContent() return NULL");
@@ -60,7 +60,7 @@ static Error Xml2Json_ParseFloat(xmlNode* node, const char* key, nx_json* parent
 /**
  * Parse a boolean from an XML node and store it in the parent's JSON child.
  */
-static Error Xml2Json_ParseBool(xmlNode* node, const char* key, nx_json* parent) {
+static Error Xml2Json_ParseBool(const xmlNode* node, const char* key, nx_json* parent) {
   xmlChar* content = xmlNodeGetContent(node);
   if (! content)
     return err_string("xmlNodeGetContent() returned NULL");
@@ -112,7 +112,7 @@ static Error Xml2Json_ParseBool(xmlNode* node, const char* key, nx_json* parent)
 #define PARSE_BOL(NODE, KEY, PARENT) \
   e = Xml2Json_ParseBool(NODE, KEY, PARENT)
 
-static Error Xml2Json_ParseTemperatureThreshold(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseTemperatureThreshold(const xmlNode* root, nx_json* parent) {
   nx_json* obj = create_json_object(NULL, parent);
   XML2JSON_PARSE_BEGIN()
   ON("UpThreshold")           { PARSE_INT(node, "UpThreshold",        obj); }
@@ -122,7 +122,7 @@ static Error Xml2Json_ParseTemperatureThreshold(xmlNode* root, nx_json* parent) 
   return err_success();
 }
 
-static Error Xml2Json_ParseTemperatureThresholds(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseTemperatureThresholds(const xmlNode* root, nx_json* parent) {
   nx_json* array = create_json_array("TemperatureThresholds", parent);
 
   for (xmlNode* node = root->children; node; node = node->next)
@@ -135,7 +135,7 @@ static Error Xml2Json_ParseTemperatureThresholds(xmlNode* root, nx_json* parent)
   return err_success();
 }
 
-static Error Xml2Json_ParseFanSpeedPercentageOverride(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseFanSpeedPercentageOverride(const xmlNode* root, nx_json* parent) {
   nx_json* obj = create_json_object(NULL, parent);
   XML2JSON_PARSE_BEGIN()
   ON("FanSpeedPercentage")    { PARSE_FLT(node, "FanSpeedPercentage", obj); }
@@ -145,7 +145,7 @@ static Error Xml2Json_ParseFanSpeedPercentageOverride(xmlNode* root, nx_json* pa
   return err_success();
 }
 
-static Error Xml2Json_ParseFanSpeedPercentageOverrides(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseFanSpeedPercentageOverrides(const xmlNode* root, nx_json* parent) {
   nx_json* array = create_json_array("FanSpeedPercentageOverrides", parent);
 
   for (xmlNode* node = root->children; node; node = node->next)
@@ -158,7 +158,7 @@ static Error Xml2Json_ParseFanSpeedPercentageOverrides(xmlNode* root, nx_json* p
   return err_success();
 }
 
-static Error Xml2Json_ParseRegisterWriteConfiguration(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseRegisterWriteConfiguration(const xmlNode* root, nx_json* parent) {
   nx_json* obj = create_json_object(NULL, parent);
   XML2JSON_PARSE_BEGIN()
   ON("WriteMode")             { PARSE_STR(node, "WriteMode",          obj); }
@@ -173,7 +173,7 @@ static Error Xml2Json_ParseRegisterWriteConfiguration(xmlNode* root, nx_json* pa
   return err_success();
 }
 
-static Error Xml2Json_ParseRegisterWriteConfigurations(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseRegisterWriteConfigurations(const xmlNode* root, nx_json* parent) {
   nx_json* array = create_json_array("RegisterWriteConfigurations", parent);
 
   for (xmlNode* node = root->children; node; node = node->next)
@@ -186,7 +186,7 @@ static Error Xml2Json_ParseRegisterWriteConfigurations(xmlNode* root, nx_json* p
   return err_success();
 }
 
-static Error Xml2Json_ParseFanConfiguration(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseFanConfiguration(const xmlNode* root, nx_json* parent) {
   nx_json* obj = create_json_object(NULL, parent);
   XML2JSON_PARSE_BEGIN()
   ON("FanDisplayName")        { PARSE_STR(node, "FanDisplayName",     obj); }
@@ -205,7 +205,7 @@ static Error Xml2Json_ParseFanConfiguration(xmlNode* root, nx_json* parent) {
   return err_success();
 }
 
-static Error Xml2Json_ParseFanConfigurations(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseFanConfigurations(const xmlNode* root, nx_json* parent) {
   nx_json* array = create_json_array("FanConfigurations", parent);
 
   for (xmlNode* node = root->children; node; node = node->next)
@@ -218,7 +218,7 @@ static Error Xml2Json_ParseFanConfigurations(xmlNode* root, nx_json* parent) {
   return err_success();
 }
 
-static Error Xml2Json_ParseModelConfig(xmlNode* root, nx_json* parent) {
+static Error Xml2Json_ParseModelConfig(const xmlNode* root, nx_json* parent) {
   nx_json* obj = parent;
   XML2JSON_PARSE_BEGIN()
   ON("NotebookModel")         { PARSE_STR(node, "NotebookModel",       obj); }
@@ -244,7 +244,7 @@ static Error Xml2Json_ParseModelConfig(xmlNode* root, nx_json* parent) {
 /**
  * Convert a NBFC configuration stored in an XML DOM to a JSON structure.
  */
-Error Xml2Json_Convert(xmlNode* root, nx_json** out) {
+Error Xml2Json_Convert(const xmlNode* root, nx_json** out) {
   nx_json js_root = {0};
   nx_json* object = create_json_object(NULL, &js_root);
   Error e = Xml2Json_ParseModelConfig(root, object);

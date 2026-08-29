@@ -271,7 +271,7 @@ static const char* RegisterRuleFanMode_ToStr(enum RegisterRuleFanMode mode) {
 }
 
 static void ConfigRatingRules_RegisterRulesToJson(
-  array_of(RegisterRule)* rules,
+  const array_of(RegisterRule)* rules,
   const char* key,
   nx_json* parent)
 {
@@ -294,7 +294,7 @@ static void ConfigRatingRules_RegisterRulesToJson(
 }
 
 static void ConfigRatingRules_RegisterNamesToJson(
-  array_of(AcpiRegisterName)* names,
+  const array_of(AcpiRegisterName)* names,
   const char* key,
   nx_json* parent)
 {
@@ -305,7 +305,7 @@ static void ConfigRatingRules_RegisterNamesToJson(
   }
 }
 
-nx_json* ConfigRatingRules_ToJson(ConfigRatingRules* rules) {
+nx_json* ConfigRatingRules_ToJson(const ConfigRatingRules* rules) {
   nx_json root = {0};
   nx_json* object = create_json_object(NULL, &root);
   ConfigRatingRules_RegisterRulesToJson(&rules->FanRegisterFullMatch, "FanRegisterFullMatch", object);

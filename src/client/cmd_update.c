@@ -127,7 +127,7 @@ static void Files_Set_FileState(array_of(GitHubFile)* files) {
 }
 
 // Print a short summary
-static void Print_Summary(array_of(GitHubFile)* files) {
+static void Print_Summary(const array_of(GitHubFile)* files) {
   int files_new = 0;
   int files_changed = 0;
 

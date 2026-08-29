@@ -246,8 +246,8 @@ static void PrintFullHelp(void) {
  * - The model configuration is rated (stored in ConfigWithData.rating)
  */
 static array_of(ConfigWithData) RateConfig_RateConfigs(
-  ConfigRating* config_rating,
-  array_of(ConfigFile)* files
+  const ConfigRating* config_rating,
+  const array_of(ConfigFile)* files
 ) {
   Error e;
   char path[PATH_MAX];
@@ -378,7 +378,7 @@ static void RateConfig_SortResultByPriority(array_of(ConfigWithData)* result) {
 }
 
 static bool RateConfig_GroupHasMinScore(
-  array_of(ConfigWithData)* results,
+  const array_of(ConfigWithData)* results,
   array_size_t group_id,
   float min_score
 ) {
@@ -391,7 +391,7 @@ static bool RateConfig_GroupHasMinScore(
 }
 
 static bool RateConfig_GroupHasFanCount(
-  array_of(ConfigWithData)* results,
+  const array_of(ConfigWithData)* results,
   array_size_t group_id
 ) {
   if (! RateConfig_Options.fan_count)
@@ -406,7 +406,7 @@ static bool RateConfig_GroupHasFanCount(
 }
 
 static bool RateConfig_GroupFilterBad(
-  array_of(ConfigWithData)* results,
+  const array_of(ConfigWithData)* results,
   array_size_t group_id,
   enum RateConfig_Filter filter
 ) {
@@ -424,7 +424,7 @@ static bool RateConfig_GroupFilterBad(
 }
 
 static void RateConfig_PrintResultGroup(
-  array_of(ConfigWithData)* results,
+  const array_of(ConfigWithData)* results,
   array_size_t group_id
 ) {
   ConfigWithData* last_result = NULL;
@@ -451,7 +451,7 @@ static void RateConfig_PrintResultGroup(
 }
 
 static void RateConfig_PrintResults(
-  array_of(ConfigWithData)* results,
+  const array_of(ConfigWithData)* results,
   array_size_t num_groups,
   float min_score,
   enum RateConfig_Filter bad_filter
@@ -473,7 +473,7 @@ static void RateConfig_PrintResults(
 
 static void RateConfig_AddJsonResult(
   nx_json* array,
-  array_of(ConfigWithData)* results,
+  const array_of(ConfigWithData)* results,
   array_size_t group_id
 ) {
   ConfigWithData* last_result = NULL;
@@ -492,7 +492,7 @@ static void RateConfig_AddJsonResult(
 }
 
 static void RateConfig_PrintResultsJson(
-  array_of(ConfigWithData)* results,
+  const array_of(ConfigWithData)* results,
   array_size_t num_groups,
   float min_score,
   enum RateConfig_Filter bad_filter
@@ -526,8 +526,8 @@ static void RateConfig_PrintResultsJson(
  * Print result to stdout.
  */
 static Error RateConfig_RateFiles(
-  ConfigRating* config_rating,
-  array_of(ConfigFile)* files,
+  const ConfigRating* config_rating,
+  const array_of(ConfigFile)* files,
   bool json,
   float min_score,
   enum RateConfig_Filter bad_filter
@@ -575,8 +575,8 @@ static inline void PrintFullHelpNotice(void) {
  * Print result to stdout.
  */
 static Error RateConfig_RateMany(
-  ConfigRating* config_rating,
-  array_of(ConfigFile)* files,
+  const ConfigRating* config_rating,
+  const array_of(ConfigFile)* files,
   bool json,
   float min_score,
   enum RateConfig_Filter bad_filter
@@ -605,7 +605,7 @@ static Error RateConfig_RateMany(
  * Print result to stdout.
  */
 static Error RateConfig_RateAll(
-  ConfigRating* config_rating,
+  const ConfigRating* config_rating,
   bool json,
   float min_score,
   enum RateConfig_Filter bad_filter
@@ -632,7 +632,7 @@ static Error RateConfig_RateAll(
  * Print result to stdout.
  */
 static Error RateConfig_RateFromFile(
-  ConfigRating* config_rating,
+  const ConfigRating* config_rating,
   const char* file,
   bool json,
   float min_score,
@@ -689,7 +689,11 @@ static Error RateConfig_RateFromFile(
  *
  * Print result to stdout.
  */
-static Error RateConfig_RateSingle(ConfigRating* config_rating, bool json, const char* file) {
+static Error RateConfig_RateSingle(
+  const ConfigRating* config_rating,
+  bool json,
+  const char* file)
+{
   Error e;
   ConfigFile cfg_file;
   array_of(ConfigFile) configs;

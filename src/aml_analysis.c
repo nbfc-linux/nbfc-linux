@@ -16,7 +16,7 @@ static void AML_Analysis_RemoveDoubleParentheses(array_of(AML_Token)*);
  *
  * Returns error on failure.
  */
-Error AML_Analysis_Init(AML_Analysis* analysis, array_of(str)* aml_files) {
+Error AML_Analysis_Init(AML_Analysis* analysis, const array_of(str)* aml_files) {
   Error e = err_success();
   size_t num_failures = 0;
   AML_Lexer l;
@@ -381,7 +381,7 @@ static bool AML_Analysis_Tokens_Match_Pattern(
  *
  * If the fingerprint itself is invalid, an error is returned.
  */
-Error AML_Analysis_MatchFingerprint(AML_Analysis* analysis, const char* fingerprint, bool* match) {
+Error AML_Analysis_MatchFingerprint(const AML_Analysis* analysis, const char* fingerprint, bool* match) {
   Error e;
   AML_Analysis_Pattern pattern;
 

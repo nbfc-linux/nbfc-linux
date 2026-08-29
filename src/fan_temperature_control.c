@@ -335,7 +335,7 @@ Error FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
   return err_success();
 }
 
-void FanTemperatureControl_Log(array_of(FanTemperatureControl)* fans, ModelConfig* model_config) {
+void FanTemperatureControl_Log(const array_of(FanTemperatureControl)* fans, ModelConfig* model_config) {
   for_enumerate_array(array_size_t, fan_index, *fans) {
     FanTemperatureControl* ftc = &fans->data[fan_index];
 

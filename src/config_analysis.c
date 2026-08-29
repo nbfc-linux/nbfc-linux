@@ -236,8 +236,8 @@ static Error ConfigAnalysis_Begin(void) {
 }
 
 Error ConfigAnalysis_AnalyzeFanConfiguration(
-  FanConfiguration* fan_config,
-  ModelConfig* model_config
+  const FanConfiguration* fan_config,
+  const ModelConfig* model_config
 ) {
   Error e;
   uint64_t dummy;
@@ -305,7 +305,7 @@ Error ConfigAnalysis_AnalyzeFanConfiguration(
 }
 
 Error ConfigAnalysis_AnalyzeModelConfig(
-  ModelConfig* model_config,
+  const ModelConfig* model_config,
   ConfigAnalysis** out
 ) {
   Error e;

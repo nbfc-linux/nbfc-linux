@@ -25,7 +25,7 @@ static const char* const LinuxTempSensorFile = "temp%d_input";
 
 array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
-Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
+Error FS_TemperatureSource_GetTemperature(const FS_TemperatureSource* self, float* out) {
   char buf[32];
   file_op_result res;
   res.ok = true;

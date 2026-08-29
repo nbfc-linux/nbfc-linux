@@ -6,7 +6,7 @@
 #include <stdio.h>  // printf
 #include <string.h> // memset, strcmp, strstr
 
-Error ConfigRating_Init(ConfigRating* config_rating, array_of(str)* aml_files, const char* rules_json) {
+Error ConfigRating_Init(ConfigRating* config_rating, const array_of(str)* aml_files, const char* rules_json) {
   Error e;
   memset(config_rating, 0, sizeof(*config_rating));
 
@@ -39,7 +39,7 @@ void ConfigRating_Free(ConfigRating* config_rating) {
 }
 
 static RegisterRule* ConfigRating_FindKnownFanRegister(
-  ConfigRating* config_rating,
+  const ConfigRating* config_rating,
   const char* s)
 {
   for_each_array(RegisterRule*, rule, config_rating->rules.FanRegisterFullMatch)
@@ -49,7 +49,10 @@ static RegisterRule* ConfigRating_FindKnownFanRegister(
   return NULL;
 }
 
-static bool ConfigRating_IsSomeFanRegister(ConfigRating* config_rating, const char* s) {
+static bool ConfigRating_IsSomeFanRegister(
+  const ConfigRating* config_rating,
+  const char* s)
+{
   for_each_array(AcpiRegisterName*, name, config_rating->rules.FanRegisterPartialMatch)
     if (strstr(s, *name))
       return true;
@@ -57,7 +60,10 @@ static bool ConfigRating_IsSomeFanRegister(ConfigRating* config_rating, const ch
   return false;
 }
 
-static bool ConfigRating_IsKnownRegisterWriteConfigRegister(ConfigRating* config_rating, const char* s) {
+static bool ConfigRating_IsKnownRegisterWriteConfigRegister(
+  const ConfigRating* config_rating,
+  const char* s)
+{
   for_each_array(AcpiRegisterName*, name, config_rating->rules.RegisterWriteFullMatch)
     if (! strcmp(s, *name))
       return true;
@@ -65,7 +71,10 @@ static bool ConfigRating_IsKnownRegisterWriteConfigRegister(ConfigRating* config
   return false;
 }
 
-static bool ConfigRating_IsSomeRegisterWriteConfigRegister(ConfigRating* config_rating, const char* s) {
+static bool ConfigRating_IsSomeRegisterWriteConfigRegister(
+  const ConfigRating* config_rating,
+  const char* s)
+{
   for_each_array(AcpiRegisterName*, name, config_rating->rules.RegisterWritePartialMatch)
     if (strstr(s, *name))
       return true;
@@ -77,7 +86,10 @@ static bool ConfigRating_IsMinimalFanRegister(const char* s) {
   return (s[0] == 'F');
 }
 
-static bool ConfigRating_IsBadRegister(ConfigRating* config_rating, const char* s) {
+static bool ConfigRating_IsBadRegister(
+  const ConfigRating* config_rating,
+  const char* s)
+{
   if (s[0] == 'B')
     return true;
 
@@ -93,7 +105,7 @@ static bool ConfigRating_IsBadRegister(ConfigRating* config_rating, const char* 
 }
 
 static AcpiRegister* ConfigRating_FindEcRegister(
-  ConfigRating* config_rating,
+  const ConfigRating* config_rating,
   unsigned offset
 ) {
   for_each_array(AcpiRegister*, acpi_register, config_rating->acpi_info.registers) {
@@ -111,7 +123,7 @@ static AcpiRegister* ConfigRating_FindEcRegister(
 }
 
 static AcpiMethod* ConfigRating_FindMethod(
-  ConfigRating* config_rating,
+  const ConfigRating* config_rating,
   const char* method_call
 ) {
   for_each_array(AcpiMethod*, method, config_rating->acpi_info.methods) {
@@ -123,7 +135,7 @@ static AcpiMethod* ConfigRating_FindMethod(
   return NULL;
 }
 
-static bool ConfigRating_RegisterIsByteAligned(ConfigRating_RegisterRating* rating) {
+static bool ConfigRating_RegisterIsByteAligned(const ConfigRating_RegisterRating* rating) {
   if (! rating->info)
     return false;
 
@@ -131,7 +143,7 @@ static bool ConfigRating_RegisterIsByteAligned(ConfigRating_RegisterRating* rati
 }
 
 static ConfigRating_RegisterRating ConfigRating_RateRegister(
-  ConfigRating* config_rating,
+  const ConfigRating* config_rating,
   enum RegisterType type,
   unsigned offset
 ) {
@@ -218,7 +230,7 @@ ret:
 }
 
 static ConfigRating_MethodRating ConfigRating_RateMethod(
-  ConfigRating* config_rating,
+  const ConfigRating* config_rating,
   const char* method_call
 ) {
   ConfigRating_MethodRating rated = {0};
@@ -233,7 +245,7 @@ static ConfigRating_MethodRating ConfigRating_RateMethod(
   return rated;
 }
 
-static void ConfigRating_RegisterRatingPrint(ConfigRating_RegisterRating* rating) {
+static void ConfigRating_RegisterRatingPrint(const ConfigRating_RegisterRating* rating) {
   printf("\tEC Register %u (0x%X):\n", rating->offset, rating->offset);
 
   switch (rating->type) {
@@ -283,7 +295,7 @@ static void ConfigRating_RegisterRatingPrint(ConfigRating_RegisterRating* rating
   }
 }
 
-static void ConfigRating_MethodRatingPrint(ConfigRating_MethodRating* rating) {
+static void ConfigRating_MethodRatingPrint(const ConfigRating_MethodRating* rating) {
   printf("\tACPI Method \"%s\":\n", rating->call);
 
   switch (rating->score) {
@@ -297,7 +309,7 @@ static void ConfigRating_MethodRatingPrint(ConfigRating_MethodRating* rating) {
   }
 }
 
-void ConfigRating_RatingPrint(ConfigRating_Rating* rating) {
+void ConfigRating_RatingPrint(const ConfigRating_Rating* rating) {
   printf("\tConfig score: %.2f / 10.00\n", rating->score);
 
   for_each_array(ConfigRating_RegisterRating*, reg_rating, rating->register_ratings)
@@ -308,7 +320,7 @@ void ConfigRating_RatingPrint(ConfigRating_Rating* rating) {
 }
 
 Error ConfigRating_MatchFirmwareFingerprint(
-  ConfigRating* config_rating,
+  const ConfigRating* config_rating,
   const char* fingerprint,
   bool* match)
 {
@@ -316,8 +328,8 @@ Error ConfigRating_MatchFirmwareFingerprint(
 }
 
 Error ConfigRating_RateModelConfig(
-  ConfigRating* config_rating,
-  ModelConfig* model_config,
+  const ConfigRating* config_rating,
+  const ModelConfig* model_config,
   ConfigRating_Rating *rating)
 {
   Error e;
@@ -524,7 +536,7 @@ const char* MethodScore_ToStr(enum MethodScore score) {
   return "?";
 }
 
-static nx_json* RegisterRating_ToJson(ConfigRating_RegisterRating* rating, const char* key, nx_json* parent) {
+static nx_json* RegisterRating_ToJson(const ConfigRating_RegisterRating* rating, const char* key, nx_json* parent) {
   nx_json* object = create_json_object(key, parent);
 
   create_json_integer("offset", object, rating->offset);
@@ -538,7 +550,7 @@ static nx_json* RegisterRating_ToJson(ConfigRating_RegisterRating* rating, const
   return object;
 }
 
-static nx_json* MethodRating_ToJson(ConfigRating_MethodRating* rating, const char* key, nx_json* parent) {
+static nx_json* MethodRating_ToJson(const ConfigRating_MethodRating* rating, const char* key, nx_json* parent) {
   nx_json* object = create_json_object(key, parent);
 
   create_json_string("call", object, rating->call);
@@ -551,7 +563,7 @@ static nx_json* MethodRating_ToJson(ConfigRating_MethodRating* rating, const cha
   return object;
 }
 
-nx_json* ConfigRating_ToJson(ConfigRating_Rating* rating, const char* key, nx_json* parent) {
+nx_json* ConfigRating_ToJson(const ConfigRating_Rating* rating, const char* key, nx_json* parent) {
   nx_json* object = create_json_object(key, parent);
 
   create_json_double("score", object, rating->score);

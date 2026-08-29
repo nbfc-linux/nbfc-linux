@@ -36,6 +36,6 @@ struct ConfigAnalysis {
   size_t methods_size;
 };
 
-Error ConfigAnalysis_AnalyzeModelConfig(ModelConfig*, ConfigAnalysis**);
+Error ConfigAnalysis_AnalyzeModelConfig(const ModelConfig*, ConfigAnalysis**);
 
 #endif

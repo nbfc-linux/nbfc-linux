@@ -410,7 +410,7 @@ void AcpiAnalysis_AddUnverifiedEmbeddedControllerRegions(AcpiInfo* info) {
  *
  * This function requires the `acpiexec` program.
  */
-Error AcpiAnalysis_GetInfo(array_of(str)* files, AcpiInfo* out) {
+Error AcpiAnalysis_GetInfo(const array_of(str)* files, AcpiInfo* out) {
   Error e = err_success();
 
   // Clear output arrays
