@@ -235,6 +235,12 @@ options:
   - option_strings: ["-u", "--unverified"]
     help: "Include unverified EC registers"
 ---
+prog: "nbfc acpi-dump map"
+help: "Generate a map file for ec_probe"
+options:
+  - option_strings: ["-u", "--unverified"]
+    help: "Include unverified EC registers"
+---
 prog: "nbfc acpi-dump methods"
 help: "List all available ACPI methods"
 ---

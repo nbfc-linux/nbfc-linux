@@ -31,6 +31,11 @@ options:
   - option_strings: ["-w", "--word"]
     help: "Combine two registers into one"
 
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+
 positionals:
   - number: 1
     metavar: "REGISTER"
@@ -42,6 +47,11 @@ help: "Write a byte to a EC register"
 options:
   - option_strings: ["-w", "--word"]
     help: "Combine two registers into one"
+
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
 
 positionals:
   - number: 1
@@ -56,6 +66,12 @@ positionals:
 ---
 prog: "ec_probe read_bit"
 help: "Read a bit from a EC register"
+options:
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+
 positionals:
   - number: 1
     metavar: "REGISTER"
@@ -73,6 +89,10 @@ options:
   - option_strings: ["-d", "--dry"]
     help: "Print the resulting value without writing it"
 
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
 positionals:
   - number: 1
     metavar: "REGISTER"

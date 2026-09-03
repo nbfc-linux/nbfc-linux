@@ -162,6 +162,7 @@ _nbfc_acpi_dump__command() {
   local items=(
     registers:'List all available registers'
     ec-registers:'List all available EC registers'
+    map:'Generate a map file for ec_probe'
     methods:'List all available ACPI methods'
     dsl:'Disassemble your ACPI tables'
   )
@@ -366,6 +367,7 @@ _nbfc_acpi_dump() {
   case "$(_nbfc__query get_positional 2)" in
     registers) _nbfc_acpi_dump_registers; return $?;;
     ec-registers) _nbfc_acpi_dump_ec_registers; return $?;;
+    map) _nbfc_acpi_dump_map; return $?;;
     methods) _nbfc_acpi_dump_methods; return $?;;
     dsl) _nbfc_acpi_dump_dsl; return $?;;
   esac
@@ -396,6 +398,20 @@ _nbfc_acpi_dump_registers() {
 }
 
 _nbfc_acpi_dump_ec_registers() {
+  local -a args=(
+    '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
+    '(--json -j)'{-j,--json}'[Use JSON output]'
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+    2:command2:_nbfc_acpi_dump__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_acpi_dump_map() {
   local -a args=(
     '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files

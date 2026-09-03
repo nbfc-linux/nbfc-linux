@@ -49,7 +49,7 @@
  ""
 
 #define EC_PROBE_READ_HELP_TEXT                                                \
- "Usage: %s read [-h] [-w] [-f FORMAT] REGISTER\n"                             \
+ "Usage: %s read [-h] [-w] [-f FORMAT] [-m FILE] REGISTER\n"                   \
  "\n"                                                                          \
  "Read a byte from a EC register.\n"                                           \
  "\n"                                                                          \
@@ -60,6 +60,7 @@
  "  -h, --help            Show this help message and exit\n"                   \
  "  -w, --word            Read two registers as one word\n"                    \
  "  -f, --format FORMAT   Specify output format\n"                             \
+ "  -m, --map FILE        Resolve register name from FILE\n"                   \
  "\n"                                                                          \
  "Available output formats:\n"                                                 \
  "  Binary:       -fb  -fB\n"                                                  \
@@ -71,7 +72,7 @@
  ""
 
 #define EC_PROBE_WRITE_HELP_TEXT                                               \
- "Usage: %s write [-h] [-w] REGISTER VALUE\n"                                  \
+ "Usage: %s write [-h] [-w] [-m FILE] REGISTER VALUE\n"                        \
  "\n"                                                                          \
  "Write a byte to a EC register.\n"                                            \
  "\n"                                                                          \
@@ -80,15 +81,16 @@
  "  VALUE       Value to write\n"                                              \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help  Show this help message and exit\n"                             \
- "  -w, --word  Write VALUE to two registers\n"                                \
+ "  -h, --help      Show this help message and exit\n"                         \
+ "  -w, --word      Write two registers as one word\n"                         \
+ "  -m, --map FILE  Resolve register name from FILE\n"                         \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
  ""
 
 #define EC_PROBE_READ_BIT_HELP_TEXT                                            \
- "Usage: %s read_bit [-h] REGISTER BIT-OFFSET\n"                               \
+ "Usage: %s read_bit [-h] [-m FILE] REGISTER BIT-OFFSET\n"                     \
  "\n"                                                                          \
  "Read a bit from a EC register.\n"                                            \
  "\n"                                                                          \
@@ -97,14 +99,15 @@
  "  BIT-OFFSET  Bit offset (0 - 7)\n"                                          \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help  Show this help message and exit\n"                             \
+ "  -h, --help      Show this help message and exit\n"                         \
+ "  -m, --map FILE  Resolve register name from FILE\n"                         \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
  ""
 
 #define EC_PROBE_WRITE_BIT_HELP_TEXT                                           \
- "Usage: %s write_bit [-h] REGISTER BIT-OFFSET VALUE\n"                        \
+ "Usage: %s write_bit [-h] [-m FILE] REGISTER BIT-OFFSET VALUE\n"              \
  "\n"                                                                          \
  "Write a bit to a EC register.\n"                                             \
  "\n"                                                                          \
@@ -114,8 +117,9 @@
  "  VALUE       Value (0, 1)\n"                                                \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help  Show this help message and exit\n"                             \
- "  -d, --dry   Print the resulting value without writing it\n"                \
+ "  -h, --help      Show this help message and exit\n"                         \
+ "  -d, --dry       Print the resulting value without writing it\n"            \
+ "  -m, --map FILE  Resolve register name from FILE\n"                         \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\

@@ -111,6 +111,7 @@
  "    ec-registers [-u]   List all available EC registers\n"                   \
  "    methods             List all available ACPI methods\n"                   \
  "    dsl                 Disassemble your ACPI tables\n"                      \
+ "    map [-u]            Print a map for `ec_probe`\n"                        \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \

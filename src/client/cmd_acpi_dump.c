@@ -27,6 +27,7 @@ enum NBFC_PACKED_ENUM AcpiDump_Action {
   AcpiDump_Action_ECRegisters,
   AcpiDump_Action_Methods,
   AcpiDump_Action_DSL,
+  AcpiDump_Action_Map,
 };
 
 struct {
@@ -50,6 +51,7 @@ enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
   if (! strcmp(s, "ec-registers")) return AcpiDump_Action_ECRegisters;
   if (! strcmp(s, "methods"))      return AcpiDump_Action_Methods;
   if (! strcmp(s, "dsl"))          return AcpiDump_Action_DSL;
+  if (! strcmp(s, "map"))          return AcpiDump_Action_Map;
   return AcpiDump_Action_None;
 }
 
@@ -208,6 +210,76 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
   return NBFC_EXIT_SUCCESS;
 }
 
+/*
+ * Dumps a map file to stdout:
+ *
+ *   EC_REGISTER_NAME=ADDRESS
+ *   ...
+ *   METHOD_NAME
+ *
+ * Registers are limited to EC registers, identified by their basename
+ * and addressed by their byte offset (e.g. "CFAN=0x100").
+ * All ACPI methods are printed as well, one per line.
+ */
+static int AcpiDump_Map(array_of(str)* aml_files, bool unverified) {
+  Error e;
+  AcpiInfo acpi_info = {0};
+
+  // ==========================================================================
+  // Check if apcica-tools are installed
+  // ==========================================================================
+
+  e = AcpiAnalysis_IsAcpiExecInstalled();
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
+  // ==========================================================================
+  // Get ACPI info
+  // ==========================================================================
+
+  e = AcpiAnalysis_GetInfo(aml_files, &acpi_info);
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
+  // ==========================================================================
+  // Add unverified EC registers
+  // ==========================================================================
+
+  if (unverified)
+    AcpiAnalysis_AddUnverifiedEmbeddedControllerRegions(&acpi_info);
+
+  // ==========================================================================
+  // Output
+  // ==========================================================================
+
+  for_each_array(AcpiRegister*, register_, acpi_info.registers) {
+    if (! AcpiAnalysis_IsEmbeddedControllerRegion(&acpi_info, register_->region))
+      continue;
+
+    printf("%s=0x%X\n",
+      AcpiAnalysis_RegisterBasename(register_->name),
+      register_->bit_offset / 8);
+  }
+
+  for_each_array(AcpiMethod*, method, acpi_info.methods) {
+    printf("%s\n", method->name);
+  }
+
+  // ==========================================================================
+  // Free data
+  // ==========================================================================
+
+#if STRICT_CLEANUP
+  AcpiInfo_Free(&acpi_info);
+#endif
+
+  return NBFC_EXIT_SUCCESS;
+}
+
 static Error AcpiDump_MakeAMLFilesArray(array_of(str)* out) {
   if (AcpiDump_Options.files_size) {
     out->data = AcpiDump_Options.files;
@@ -255,6 +327,7 @@ int AcpiDump(void) {
     case AcpiDump_Action_Methods:     return AcpiDump_Methods(&aml_files, json);
     case AcpiDump_Action_Registers:   return AcpiDump_Registers(&aml_files, json, false, unverified);
     case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(&aml_files, json, true, unverified);
+    case AcpiDump_Action_Map:         return AcpiDump_Map(&aml_files, unverified);
     default:                          return NBFC_EXIT_FAILURE;
   }
 }

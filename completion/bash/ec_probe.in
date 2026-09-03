@@ -92,16 +92,24 @@ _ec_probe__parse_commandline() {
     case "$1" in root:write_bit*)
       case "$2" in
         -d|--dry) VAR=OPT_dry; ARGS=0; return;;
+        -m|--map) VAR=OPT_map; ARGS=1; return;;
+      esac
+    esac
+    case "$1" in root:read_bit*)
+      case "$2" in
+        -m|--map) VAR=OPT_map; ARGS=1; return;;
       esac
     esac
     case "$1" in root:write*)
       case "$2" in
         -w|--word) VAR=OPT_word; ARGS=0; return;;
+        -m|--map) VAR=OPT_map; ARGS=1; return;;
       esac
     esac
     case "$1" in root:read*)
       case "$2" in
         -w|--word) VAR=OPT_word; ARGS=0; return;;
+        -m|--map) VAR=OPT_map; ARGS=1; return;;
       esac
     esac
     case "$1" in root:dump*)
@@ -186,7 +194,8 @@ _ec_probe() {
 
   local END_OF_OPTIONS POSITIONALS
   local -a OPT_help OPT_embedded_controller OPT_color OPT_no_color OPT_word
-  local -a OPT_dry OPT_interval OPT_timespan OPT_report OPT_clearly OPT_decimal
+  local -a OPT_map OPT_dry OPT_interval OPT_timespan OPT_report OPT_clearly
+  local -a OPT_decimal
   _ec_probe__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -278,9 +287,43 @@ _ec_probe_load() {
 }
 
 _ec_probe_read() {
+  __complete_option() {
+    local opt="$1" cur="$2" ret=0
+
+    case "$opt" in
+      -m|--map)
+        _filedir;;
+      *) ret=1;;
+    esac
+
+    return $ret
+  }
+
+  case "$prev" in
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([wh])[me])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
+    --*);;
+    -*([wh])[me]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _ec_probe__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
+  esac
+
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
     (( ! ${#OPT_word[@]} )) && opts+=(-w --word)
+    (( ! ${#OPT_map[@]} )) && opts+=(-m --map=)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
@@ -295,9 +338,43 @@ _ec_probe_read() {
 }
 
 _ec_probe_write() {
+  __complete_option() {
+    local opt="$1" cur="$2" ret=0
+
+    case "$opt" in
+      -m|--map)
+        _filedir;;
+      *) ret=1;;
+    esac
+
+    return $ret
+  }
+
+  case "$prev" in
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([wh])[me])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
+    --*);;
+    -*([wh])[me]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _ec_probe__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
+  esac
+
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
     (( ! ${#OPT_word[@]} )) && opts+=(-w --word)
+    (( ! ${#OPT_map[@]} )) && opts+=(-m --map=)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
@@ -316,6 +393,47 @@ _ec_probe_write() {
 }
 
 _ec_probe_read_bit() {
+  __complete_option() {
+    local opt="$1" cur="$2" ret=0
+
+    case "$opt" in
+      -m|--map)
+        _filedir;;
+      *) ret=1;;
+    esac
+
+    return $ret
+  }
+
+  case "$prev" in
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([h])[me])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
+    --*);;
+    -*([h])[me]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _ec_probe__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
+  esac
+
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_map[@]} )) && opts+=(-m --map=)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
   (( ${#POSITIONALS[@]} == 2 )) && {
     COMPREPLY=($(compgen -W '{0..255}' -- "$cur"))
     return 0;
@@ -330,9 +448,43 @@ _ec_probe_read_bit() {
 }
 
 _ec_probe_write_bit() {
+  __complete_option() {
+    local opt="$1" cur="$2" ret=0
+
+    case "$opt" in
+      -m|--map)
+        _filedir;;
+      *) ret=1;;
+    esac
+
+    return $ret
+  }
+
+  case "$prev" in
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([dh])[me])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
+    --*);;
+    -*([dh])[me]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _ec_probe__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
+  esac
+
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
     (( ! ${#OPT_dry[@]} )) && opts+=(-d --dry)
+    (( ! ${#OPT_map[@]} )) && opts+=(-m --map=)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1

@@ -314,7 +314,7 @@ Print configuration rating rules.
 .RE
 
 .B acpi\-dump
-.RB { registers " | " ec\-registers " | " methods " | " dsl }
+.RB { registers " | " ec\-registers " | " methods " | " dsl " | " map }
 .RI [ OPTIONS ]
 .RS
 Dumps information of your ACPI tables.
@@ -350,6 +350,25 @@ List all available ACPI methods.
 .B dsl
 .RS
 Disassemble your ACPI tables.
+.RE
+
+.B map
+.RB [ \-u | \-\-unverified ]
+.RS
+Generate a map file that can be used by
+.BR "ec_probe -m|--map" .
+The map contains detected registers with their names and addresses as well as
+ACPI method names.
+
+Normally, only registers belonging to an
+.B EmbeddedControl
+operation region are printed.
+If
+.BR \-u | \-\-unverified
+is specified, also registers from
+.B SystemMemory
+operation regions that may be accessible through the embedded controller are printed.
+Their accessibility through the embedded controller cannot be guaranteed.
 .RE
 
 .BR \-d ", " \-\-dsdt

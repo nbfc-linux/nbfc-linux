@@ -173,6 +173,7 @@ _ec_probe_load() {
 _ec_probe_read() {
   local -a args=(
     '(--word -w)'{-w,--word}'[Combine two registers into one]'
+    '(--map -m)'{-m+,--map=}'[Specify map file for resolving register names]':FILE:_files
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
     1:command1:_ec_probe__command
@@ -184,6 +185,7 @@ _ec_probe_read() {
 _ec_probe_write() {
   local -a args=(
     '(--word -w)'{-w,--word}'[Combine two registers into one]'
+    '(--map -m)'{-m+,--map=}'[Specify map file for resolving register names]':FILE:_files
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
     1:command1:_ec_probe__command
@@ -195,6 +197,7 @@ _ec_probe_write() {
 
 _ec_probe_read_bit() {
   local -a args=(
+    '(--map -m)'{-m+,--map=}'[Specify map file for resolving register names]':FILE:_files
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
     1:command1:_ec_probe__command
@@ -207,6 +210,7 @@ _ec_probe_read_bit() {
 _ec_probe_write_bit() {
   local -a args=(
     '(--dry -d)'{-d,--dry}'[Print the resulting value without writing it]'
+    '(--map -m)'{-m+,--map=}'[Specify map file for resolving register names]':FILE:_files
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
     1:command1:_ec_probe__command

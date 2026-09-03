@@ -227,7 +227,7 @@ through the embedded controller cannot be guaranteed.</p>
 </blockquote>
 <p><strong>acpi-dump</strong> {<strong>registers</strong> |
 <strong>ec-registers</strong> | <strong>methods</strong> |
-<strong>dsl</strong>} [<em>OPTIONS</em>]</p>
+<strong>dsl</strong> | <strong>map</strong>} [<em>OPTIONS</em>]</p>
 <blockquote>
 <p>Dumps information of your ACPI tables.</p>
 <p>By default, the DSDT and all SSDTs are read from
@@ -254,6 +254,19 @@ accessibility through the embedded controller cannot be guaranteed.</p>
 <p><strong>dsl</strong></p>
 <blockquote>
 <p>Disassemble your ACPI tables.</p>
+</blockquote>
+<p><strong>map</strong>
+[<strong>-u</strong>|<strong>--unverified</strong>]</p>
+<blockquote>
+<p>Generate a map file that can be used by <strong>ec_probe
+-m|--map</strong>. The map contains detected registers with their names
+and addresses as well as ACPI method names.</p>
+<p>Normally, only registers belonging to an
+<strong>EmbeddedControl</strong> operation region are printed. If
+<strong>-u</strong>|<strong>--unverified</strong> is specified, also
+registers from <strong>SystemMemory</strong> operation regions that may
+be accessible through the embedded controller are printed. Their
+accessibility through the embedded controller cannot be guaranteed.</p>
 </blockquote>
 <p><strong>-d</strong>, <strong>--dsdt</strong> <em>FILE</em></p>
 <blockquote>

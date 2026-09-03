@@ -167,9 +167,10 @@ function _ec_probe__prepare
   _ec_probe__query_init \
     '=>-h --help -e= --embedded-controller=' \
     '(dump)=>-c --color -C --no-color' \
-    '(read)=>-w --word' \
-    '(write)=>-w --word' \
-    '(write_bit)=>-d --dry' \
+    '(read)=>-w --word -m= --map=' \
+    '(write)=>-w --word -m= --map=' \
+    '(read_bit)=>-m= --map=' \
+    '(write_bit)=>-d --dry -m= --map=' \
     '(monitor)=>-i= --interval= -t= --timespan= -r= --report= -c --clearly -d --decimal' \
     '(watch)=>-i= --interval= -t= --timespan=' \
     '(graph)=>-d --decimal'
@@ -226,36 +227,44 @@ complete -c $prog -n $P -n $C000 -n $C001 -Fr
 # command ec_probe read
 set -l C000 "$positional_contains 1 read"
 set -l C001 "not $has_option -w --word"
-set -l C002 "$num_of_positionals -eq 1"
+set -l C002 "not $has_option -m --map"
+set -l C003 "$num_of_positionals -eq 1"
 complete -c $prog -n $P -n $C000 -n $C001 -s w -l word -d 'Combine two registers into one' -f
-complete -c $prog -n $P -n $C002 -n $C000 -d 'Register source' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C000 -n $C002 -s m -l map -d 'Specify map file for resolving register names' -Fr
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Register source' -x -a '(seq 0 255)'
 
 # command ec_probe write
 set -l C000 "$positional_contains 1 write"
 set -l C001 "not $has_option -w --word"
-set -l C002 "$num_of_positionals -eq 1"
-set -l C003 "$num_of_positionals -eq 2"
+set -l C002 "not $has_option -m --map"
+set -l C003 "$num_of_positionals -eq 1"
+set -l C004 "$num_of_positionals -eq 2"
 complete -c $prog -n $P -n $C000 -n $C001 -s w -l word -d 'Combine two registers into one' -f
-complete -c $prog -n $P -n $C002 -n $C000 -d 'Register destination' -x -a '(seq 0 255)'
-complete -c $prog -n $P -n $C003 -n $C000 -d 'Value to write' -x
+complete -c $prog -n $P -n $C000 -n $C002 -s m -l map -d 'Specify map file for resolving register names' -Fr
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Register destination' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C004 -n $C000 -d 'Value to write' -x
 
 # command ec_probe read_bit
-set -l C000 "$num_of_positionals -eq 1"
-set -l C001 "$positional_contains 1 read_bit"
-set -l C002 "$num_of_positionals -eq 2"
-complete -c $prog -n $P -n $C000 -n $C001 -d 'Register source' -x -a '(seq 0 255)'
-complete -c $prog -n $P -n $C002 -n $C001 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
+set -l C000 "$positional_contains 1 read_bit"
+set -l C001 "not $has_option -m --map"
+set -l C002 "$num_of_positionals -eq 1"
+set -l C003 "$num_of_positionals -eq 2"
+complete -c $prog -n $P -n $C000 -n $C001 -s m -l map -d 'Specify map file for resolving register names' -Fr
+complete -c $prog -n $P -n $C002 -n $C000 -d 'Register source' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
 
 # command ec_probe write_bit
 set -l C000 "$positional_contains 1 write_bit"
 set -l C001 "not $has_option -d --dry"
-set -l C002 "$num_of_positionals -eq 1"
-set -l C003 "$num_of_positionals -eq 2"
-set -l C004 "$num_of_positionals -eq 3"
+set -l C002 "not $has_option -m --map"
+set -l C003 "$num_of_positionals -eq 1"
+set -l C004 "$num_of_positionals -eq 2"
+set -l C005 "$num_of_positionals -eq 3"
 complete -c $prog -n $P -n $C000 -n $C001 -s d -l dry -d 'Print the resulting value without writing it' -f
-complete -c $prog -n $P -n $C002 -n $C000 -d 'Register destination' -x -a '(seq 0 255)'
-complete -c $prog -n $P -n $C003 -n $C000 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
-complete -c $prog -n $P -n $C004 -n $C000 -d 'Value to write' -x -a '0 1'
+complete -c $prog -n $P -n $C000 -n $C002 -s m -l map -d 'Specify map file for resolving register names' -Fr
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Register destination' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C004 -n $C000 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
+complete -c $prog -n $P -n $C005 -n $C000 -d 'Value to write' -x -a '0 1'
 
 # command ec_probe monitor
 set -l C000 "$positional_contains 1 monitor"

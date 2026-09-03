@@ -232,7 +232,7 @@ This program is used to control the NoteBook FanControl service.
 > > Print configuration rating rules.
 
 **acpi-dump** {**registers** \| **ec-registers** \| **methods** \|
-**dsl**} \[*OPTIONS*\]
+**dsl** \| **map**} \[*OPTIONS*\]
 
 > Dumps information of your ACPI tables.
 >
@@ -261,6 +261,19 @@ This program is used to control the NoteBook FanControl service.
 > **dsl**
 >
 > > Disassemble your ACPI tables.
+>
+> **map** \[**-u**\|**\--unverified**\]
+>
+> > Generate a map file that can be used by **ec_probe -m\|\--map**. The
+> > map contains detected registers with their names and addresses as
+> > well as ACPI method names.
+> >
+> > Normally, only registers belonging to an **EmbeddedControl**
+> > operation region are printed. If **-u**\|**\--unverified** is
+> > specified, also registers from **SystemMemory** operation regions
+> > that may be accessible through the embedded controller are printed.
+> > Their accessibility through the embedded controller cannot be
+> > guaranteed.
 >
 > **-d**, **\--dsdt** *FILE*
 >

@@ -67,6 +67,11 @@ _nbfc__parse_commandline() {
         --create-archive) VAR=OPT_create_archive; ARGS=1; return;;
       esac
     esac
+    case "$1" in root:acpi-dump:map*)
+      case "$2" in
+        -u|--unverified) VAR=OPT_unverified; ARGS=0; return;;
+      esac
+    esac
     case "$1" in root:acpi-dump:ec-registers*)
       case "$2" in
         -u|--unverified) VAR=OPT_unverified; ARGS=0; return;;
@@ -664,6 +669,7 @@ _nbfc_acpi_dump() {
     case "${POSITIONALS[1]}" in
       registers);;
       ec-registers) _nbfc_acpi_dump_ec_registers && return 0;;
+      map) _nbfc_acpi_dump_map && return 0;;
       methods);;
       dsl);;
     esac
@@ -715,7 +721,7 @@ _nbfc_acpi_dump() {
   fi
 
   (( ${#POSITIONALS[@]} == 2 )) && {
-    COMPREPLY=($(compgen -W 'registers ec-registers methods dsl' -- "$cur"))
+    COMPREPLY=($(compgen -W 'registers ec-registers map methods dsl' -- "$cur"))
     return 0;
   }
 
@@ -723,6 +729,18 @@ _nbfc_acpi_dump() {
 }
 
 _nbfc_acpi_dump_ec_registers() {
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_unverified[@]} )) && opts+=(-u --unverified)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  return 1
+}
+
+_nbfc_acpi_dump_map() {
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
     (( ! ${#OPT_unverified[@]} )) && opts+=(-u --unverified)

@@ -216,6 +216,7 @@ function _nbfc__prepare
     '(rate\-config)=>-H --full-help -a --all -d= --dsdt= -D= --dsdt-dir= -m= --min-score= -i= --input= -j --json --print-rules -r= --rules= -n --no-download -u --unverified -b --bad -q --quiet -f= --fan-count=' \
     '(acpi\-dump)=>-d= --dsdt= -D= --dsdt-dir= -j --json' \
     '(acpi\-dump)>(ec\-registers)=>-u --unverified' \
+    '(acpi\-dump)>(map)=>-u --unverified' \
     '(support)=>--upload-firmware --print-command --create-archive='
   return 0
 end
@@ -231,6 +232,7 @@ function _nbfc_acpi_dump__command
   printf '%s\t%s\n' \
     registers 'List all available registers' \
     ec-registers 'List all available EC registers' \
+    map 'Generate a map file for ec_probe' \
     methods 'List all available ACPI methods' \
     dsl 'Disassemble your ACPI tables'
 end
@@ -386,6 +388,12 @@ complete -c $prog -n $P -n $C004 -n $C000 -d Commands -f -a '(_nbfc_acpi_dump__c
 # command nbfc acpi-dump ec-registers
 set -l C000 "$positional_contains 1 acpi-dump"
 set -l C001 "$positional_contains 2 ec-registers"
+set -l C002 "not $has_option -u --unverified"
+complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s u -l unverified -d 'Include unverified EC registers' -f
+
+# command nbfc acpi-dump map
+set -l C000 "$positional_contains 1 acpi-dump"
+set -l C001 "$positional_contains 2 map"
 set -l C002 "not $has_option -u --unverified"
 complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s u -l unverified -d 'Include unverified EC registers' -f
 

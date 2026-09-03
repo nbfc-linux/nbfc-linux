@@ -22,6 +22,8 @@
 #include "help/ec_probe.help.h"
 #include "program_name.c"
 #include "log.h"
+#include "memory.h"
+#include "file_utils.h"
 #include "client/check_root.h"
 
 #include <float.h>   // FLT_MAX
@@ -29,8 +31,9 @@
 #include <stdio.h>   // printf, fprintf, fopen, fread, fclose
 #include <stdint.h>  // uint8_t, uint16_t
 #include <stdlib.h>  // strtoll
-#include <string.h>  // strcmp
+#include <string.h>  // strcmp, strlen, strerror, strrchr
 #include <limits.h>  // INT_MAX
+#include <errno.h>   // errno
 #include <locale.h>  // setlocale, LC_NUMERIC
 #include <signal.h>  // signal, SIGINT, SIGTERM
 #include <unistd.h>  // geteuid, STDOUT_FILENO
@@ -96,6 +99,8 @@ static void         Register_WriteMonitorReport(RegisterBuf*, int, FILE*);
 static void         Register_PrintDump(RegisterBuf*, bool);
 static int          Register_LoadDump(RegisterBuf*, FILE*);
 static void         Handle_Signal(int);
+static Error        Map_Load(const char*);
+static bool         Map_LookupRegister(const char*, uint8_t*);
 
 static const EC_VTable* ec;
 static volatile int quit;
@@ -189,6 +194,7 @@ enum Option {
   Option_Interval,
   Option_AcpiCallMethod,
   Option_AcpiCallArgument,
+  Option_Map,
 };
 
 static const struct cli99_Option main_options[] = {
@@ -201,6 +207,7 @@ static const struct cli99_Option main_options[] = {
 
 static const struct cli99_Option read_command_options[] = {
   cli99_Options_Include(&main_options),
+  {"-m|--map",                 Option_Map,                 cli99_RequiredArgument},
   {"-w|--word",                Option_Word,                cli99_NoArgument      },
   {"-f|--format",              Option_Format,              cli99_RequiredArgument},
   {"register",                 Option_Register,            cli99_NormalPositional},
@@ -209,6 +216,7 @@ static const struct cli99_Option read_command_options[] = {
 
 static const struct cli99_Option write_command_options[] = {
   cli99_Options_Include(&main_options),
+  {"-m|--map",                 Option_Map,                 cli99_RequiredArgument},
   {"-w|--word",                Option_Word,                cli99_NoArgument      },
   {"register",                 Option_Register,            cli99_NormalPositional},
   {"value",                    Option_Value,               cli99_NormalPositional},
@@ -217,6 +225,7 @@ static const struct cli99_Option write_command_options[] = {
 
 static const struct cli99_Option read_bit_command_options[] = {
   cli99_Options_Include(&main_options),
+  {"-m|--map",                 Option_Map,                 cli99_RequiredArgument},
   {"register",                 Option_Register,            cli99_NormalPositional},
   {"bit_offset",               Option_BitOffset,           cli99_NormalPositional},
   cli99_Options_End()
@@ -224,6 +233,7 @@ static const struct cli99_Option read_bit_command_options[] = {
 
 static const struct cli99_Option write_bit_command_options[] = {
   cli99_Options_Include(&main_options),
+  {"-m|--map",                 Option_Map,                 cli99_RequiredArgument},
   {"-d|--dry",                 Option_Dry,                 cli99_NoArgument      },
   {"register",                 Option_Register,            cli99_NormalPositional},
   {"bit_offset",               Option_BitOffset,           cli99_NormalPositional},
@@ -308,9 +318,11 @@ static struct {
   float         interval;
   const char*   report;
   const char*   file;
+  const char*   map;
   bool          clearly;
   bool          decimal;
   bool          dry;
+  const char*   register_ref;
   uint8_t       register_;
   uint16_t      value;
   uint8_t       bit_offset;
@@ -323,6 +335,129 @@ static struct {
   int           acpi_call_args_size;
   uint64_t      _set;
 } options = {0};
+
+// ============================================================================
+// Map file code
+// ============================================================================
+
+typedef struct {
+  char    name[5];
+  uint8_t addr;
+} Map_Entry;
+declare_array_of(Map_Entry);
+
+static struct {
+  array_of(Map_Entry) registers;
+  array_size_t        registers_capacity;
+  array_of(str)       methods;
+  array_size_t        methods_capacity;
+  bool                loaded;
+} Map;
+
+static Error Map_AddRegister(const char* name, uint8_t addr) {
+  for_each_array(const Map_Entry*, entry, Map.registers) {
+    if (! strcmp(entry->name, name))
+      return err_stringf("Duplicate register name: %s", name);
+  }
+
+  if (Map.registers.size + 1 > Map.registers_capacity) {
+    Map.registers_capacity += 256;
+    array_realloc(Map_Entry, Map.registers, Map.registers_capacity);
+  }
+
+  snprintf(Map.registers.data[Map.registers.size].name, sizeof(Map.registers.data[0].name), "%s", name);
+  Map.registers.data[Map.registers.size].addr = addr;
+  Map.registers.size++;
+  return err_success();
+}
+
+static Error Map_ParseMethodLine(const char* line) {
+  if (Map.methods.size + 1 > Map.methods_capacity) {
+    Map.methods_capacity += 1024;
+    array_realloc(str, Map.methods, Map.methods_capacity);
+  }
+
+  Map.methods.data[Map.methods.size++] = Mem_Strdup(line);
+  return err_success();
+}
+
+static Error Map_ParseRegisterLine(const char* line) {
+  char register_name[5] = {0};
+  const char* p = line;
+  size_t n = 0;
+
+  for (; n < 4; ++n, ++p) {
+    const int ch = (unsigned char) *p;
+    if (*p == '=' || ! *p)
+      break;
+    if ((ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z') && (ch < '0' || ch > '9') && ch != '_')
+      return err_stringf("Invalid register name: %s", line);
+    register_name[n] = *p;
+  }
+
+  if (n == 4 && *p != '=')
+    return err_stringf("Name too long (max. 4 chars): %s", line);
+  if (! n)
+    return err_stringf("Empty register name: %s", line);
+  if (*p != '=')
+    return err_stringf("Expected NAME=ADDR: %s", line);
+
+  ++p;
+
+  const char* err;
+  const int64_t a = parse_number(p, 0, 255, &err);
+  if (err)
+    return err_stringf("%s: %s", err, line);
+  return Map_AddRegister(register_name, (uint8_t) a);
+}
+
+static Error Map_Load(const char* file) {
+  Error e;
+  char* content;
+
+  if (Map.loaded)
+    return err_success();
+
+  const file_op_result res = slurp_file_dynamic(&content, file);
+  if (! res.ok)
+    return err_stdlib(NULL);
+
+  for (char* p = content; p < content + res.len; ++p) {
+    bool has_equal = false;
+    char* line = p;
+    for (;;) {
+      switch (*p) {
+        case '=':
+          has_equal = true;
+          break;
+        case '\n':
+          *p = '\0'; /* fall-through */
+        case '\0':
+          if (p > line) {
+            e = has_equal ? Map_ParseRegisterLine(line) : Map_ParseMethodLine(line);
+            if (e)
+              return e;
+          }
+      }
+      if (*p == '\0')
+        break;
+      ++p;
+    }
+  }
+
+  Map.loaded = true;
+  return err_success();
+}
+
+static bool Map_LookupRegister(const char* name, uint8_t* out) {
+  for_each_array(const Map_Entry*, entry, Map.registers) {
+    if (! strcmp(entry->name, name)) {
+      *out = entry->addr;
+      return true;
+    }
+  }
+  return false;
+}
 
 static const char* FormatValue(char* buf, size_t bufsz, char fmt, uint16_t val, bool word) {
   switch (fmt) {
@@ -352,6 +487,38 @@ static const char* FormatValue(char* buf, size_t bufsz, char fmt, uint16_t val, 
   }
 
   return buf;
+}
+
+static void RegisterResolve(void) {
+  Error e;
+  const char* err;
+  const char* const register_ref = options.register_ref;
+
+  if (register_ref[0] >= '0' && register_ref[0] <= '9') {
+    options.register_ = (uint8_t) parse_number(register_ref, 0, 255, &err);
+    if (err) {
+      Log_Error("Register: %s", err);
+      exit(NBFC_EXIT_CMDLINE);
+    }
+    return;
+  }
+
+  if (! options.map) {
+    Log_Error("Register: %s: Not an integer and no -m|--map provided",
+              register_ref);
+    exit(NBFC_EXIT_CMDLINE);
+  }
+
+  e = Map_Load(options.map);
+  if (e) {
+    Log_Error("%s: %s: %s", "-m|--map", options.map, err_print_all(e));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  if (! Map_LookupRegister(register_ref, &options.register_)) {
+    Log_Error("Register: %s: Not found in map file", options.register_ref);
+    exit(NBFC_EXIT_CMDLINE);
+  }
 }
 
 const char RegisterHeader[] =
@@ -402,11 +569,7 @@ int main(int argc, char* const argv[]) {
       p.options = Options[cmd];
       break;
     case Option_Register:
-      options.register_ = (uint8_t) parse_number(p.optarg, 0, 255, &err);
-      if (err) {
-        Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
-        return NBFC_EXIT_CMDLINE;
-      }
+      options.register_ref = p.optarg;
       break;
     case Option_Value:
       options.value = (uint16_t) parse_number(p.optarg, 0, 65535, &err);
@@ -421,6 +584,7 @@ int main(int argc, char* const argv[]) {
     case Option_Decimal:  options.decimal  = 1;                    break;
     case Option_Word:     options.use_word = 1;                    break;
     case Option_Dry:      options.dry = 1;                         break;
+    case Option_Map:      options.map = p.optarg;                  break;
     case Option_Report:   options.report   = p.optarg;             break;
     case Option_Color:    options.use_color = ColorEnable;         break;
     case Option_NoColor:  options.use_color = ColorDisable;        break;
@@ -563,6 +727,9 @@ int main(int argc, char* const argv[]) {
     default:
       break;
   }
+
+  if (options.register_ref)
+    RegisterResolve();
 
   signal(SIGINT,  Handle_Signal);
   signal(SIGTERM, Handle_Signal);
