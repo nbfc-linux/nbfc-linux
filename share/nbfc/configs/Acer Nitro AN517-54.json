@@ -33,7 +33,10 @@
       "ResetAcpiMethod": "\\_SB.PC00.LPCB.EC0.FANW 33282 0xFF",
       "MinSpeedValue": 0,
       "MaxSpeedValue": 100,
-      "Sensors": ["acpitz"],
+      "IndependentReadMinMaxValues": true,
+      "MinSpeedValueRead": 0,
+      "MaxSpeedValueRead": 57,
+      "Sensors": ["@GPU"],
       "TemperatureThresholds": [
         { "UpThreshold": 0,  "DownThreshold": 0,  "FanSpeed": 0  },
         { "UpThreshold": 40, "DownThreshold": 35, "FanSpeed": 10 },
