@@ -12,6 +12,7 @@ enum NBFC_PACKED_ENUM RegisterWriteMode_ {
   RegisterWriteMode_And,
   RegisterWriteMode_Or,
   RegisterWriteMode_Call,
+  RegisterWriteMode_Lua,
   RegisterWriteMode_Unset,
 };
 
@@ -61,8 +62,11 @@ typedef char                          TemperatureAlgorithmType;
 
 #endif /* packed enums */
 
-typedef const char* str;
-declare_array_of(str);
+typedef struct LuaCode LuaCode;
+struct LuaCode {
+  int function;
+  const char* source;
+};
 
 #include "generated/model_config.generated.h"
 

@@ -107,7 +107,7 @@ static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
   nx_json *o = create_json_object(NULL, &root);
   create_json_string("Status", o, "OK");
 
-  Error e = Protocol_Send_Json(socket, o);
+  Error e = Protocol_SendJson(socket, o);
   nx_json_free(o);
   return e;
 }
@@ -125,7 +125,7 @@ static Error Server_Command_Status(int socket, const nx_json* json) {
   nx_json root = {0};
   nx_json *o = create_json_object(NULL, &root);
   create_json_integer("PID", o, getpid());
-  create_json_string("SelectedConfigId", o, service_config.SelectedConfigId);
+  create_json_string("SelectedConfigId", o, Service_ServiceConfig.SelectedConfigId);
   create_json_bool("ReadOnly", o, options.read_only);
   nx_json* fans = create_json_array("Fans", o);
 
@@ -142,7 +142,7 @@ static Error Server_Command_Status(int socket, const nx_json* json) {
     create_json_integer("SpeedSteps", fan_json, Fan_GetSpeedSteps(fan));
   }
 
-  Error e = Protocol_Send_Json(socket, o);
+  Error e = Protocol_SendJson(socket, o);
   nx_json_free(o);
   return e;
 }
@@ -153,12 +153,12 @@ static Error Server_Command_Status(int socket, const nx_json* json) {
  *
  * Also change the mode of the socket file to 0666.
  */
-Error Server_Init() {
+Error Server_Init(void) {
   Error e = err_success();
 
   memset(&Server_Address, 0, sizeof(Server_Address));
   Server_Address.sun_family = AF_UNIX;
-  snprintf(Server_Address.sun_path, sizeof(Server_Address.sun_path), NBFC_SOCKET_PATH);
+  snprintf(Server_Address.sun_path, sizeof(Server_Address.sun_path), "%s", NBFC_SOCKET_PATH);
 
   if ((Server_FD = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
     e = err_stdlib("socket()");
@@ -188,7 +188,7 @@ error:
 }
 
 // Return an inactive `Client` structure
-static Client* Server_AllocateClient() {
+static Client* Server_AllocateClient(void) {
   for (unsigned i = 0; i < NBFC_MAX_CONNECTIONS; ++i)
     if (! Server_Clients[i].active)
       return &Server_Clients[i];
@@ -229,7 +229,7 @@ static Client* Server_FindClientByFileDescriptor(int fd) {
 }
 
 // Get the number of active clients
-static size_t Server_GetNumberOfActiveClients() {
+static size_t Server_GetNumberOfActiveClients(void) {
   size_t num_clients = 0;
   for (unsigned i = 0; i < NBFC_MAX_CONNECTIONS; ++i)
     num_clients += Server_Clients[i].active;
@@ -237,7 +237,7 @@ static size_t Server_GetNumberOfActiveClients() {
 }
 
 // Accept a new connection and add setup client
-static Error Server_AcceptClient() {
+static Error Server_AcceptClient(void) {
   Error e;
   int addrlen = sizeof(Server_Address);
   int new_socket;
@@ -366,7 +366,7 @@ static void Server_HandleClient(Client* client) {
 end:
   nx_json_free(json);
   if (e)
-    Protocol_Send_Error(client->fd, err_print_all(e));
+    Protocol_SendError(client->fd, err_print_all(e));
   close(client->fd);
   client->active = false;
 }
@@ -425,7 +425,7 @@ Error Server_Loop(int timeout) {
   return err_success();
 }
 
-void Server_Close() {
+void Server_Close(void) {
   if (Server_FD != -1) {
     close(Server_FD);
     unlink(NBFC_SOCKET_PATH);

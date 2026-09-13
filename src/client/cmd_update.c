@@ -14,18 +14,18 @@
 #include "client_global.h"
 #include "curl_utils.h"
 
-#define UpdateParallelDefault 10
+#define UPDATE_PARALLEL_DEFAULT 10
 
-#define UpdateConfigVersion "1.0"
+#define UPDATE_CONFIG_VERSION "1.0"
 
-#define UpdateAPIContentsURL \
-  "https://api.github.com/repos/nbfc-linux/configs/contents/" UpdateConfigVersion "/configs"
+#define UPDATE_API_CONTENTS_URL \
+  "https://api.github.com/repos/nbfc-linux/configs/contents/" UPDATE_CONFIG_VERSION "/configs"
 
-#define UpdateAPIModelSupportURL \
-  "https://raw.githubusercontent.com/nbfc-linux/configs/main/" UpdateConfigVersion "/model_support.json"
+#define UPDATE_API_MODEL_SUPPORT_URL \
+  "https://raw.githubusercontent.com/nbfc-linux/configs/main/" UPDATE_CONFIG_VERSION "/model_support.json"
 
-const struct cli99_Option update_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Update_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"-p|--parallel", Option_Update_Parallel, cli99_RequiredArgument},
   {"-q|--quiet",    Option_Update_Quiet,    cli99_NoArgument      },
   cli99_Options_End()
@@ -35,7 +35,7 @@ struct {
   int  parallel;
   bool quiet;
 } Update_Options = {
-  UpdateParallelDefault,
+  UPDATE_PARALLEL_DEFAULT,
   false
 };
 
@@ -77,7 +77,7 @@ static bool File_Equals_Git_SHA1_Sum(const char* path, const char* sha1sum) {
   char size_plus_content[NBFC_MAX_FILE_SIZE + 64];
   char hash[SHA_DIGEST_LENGTH * 2 + 1] = {0};
 
-  file_op_result res = slurp_file(buf, sizeof(buf), path);
+  FileResult res = File_Read(buf, sizeof(buf), path);
   if (! res.ok) {
     Log_Error("Error reading file: %s: %s", path, strerror(errno));
     return false;
@@ -99,7 +99,7 @@ static void Files_Set_FileState(array_of(GitHubFile)* files) {
 
   for_each_array(GitHubFile*, file, *files) {
     snprintf(path, sizeof(path), "%s/%s", NBFC_MODEL_CONFIGS_DIR_MUTABLE, file->name);
-    if (file_exists(path)) {
+    if (File_Exists(path)) {
       if (File_Equals_Git_SHA1_Sum(path, file->sha)) {
         file->state = FileState_UpToDate;
         continue;
@@ -111,7 +111,7 @@ static void Files_Set_FileState(array_of(GitHubFile)* files) {
     }
 
     snprintf(path, sizeof(path), "%s/%s", NBFC_MODEL_CONFIGS_DIR, file->name);
-    if (file_exists(path)) {
+    if (File_Exists(path)) {
       if (File_Equals_Git_SHA1_Sum(path, file->sha)) {
         file->state = FileState_UpToDate;
         continue;
@@ -127,7 +127,7 @@ static void Files_Set_FileState(array_of(GitHubFile)* files) {
 }
 
 // Print a short summary
-static void Print_Summary(array_of(GitHubFile)* files) {
+static void Print_Summary(const array_of(GitHubFile)* files) {
   int files_new = 0;
   int files_changed = 0;
 
@@ -319,7 +319,7 @@ static int GitHub_Get_Dir_Contents(const char* url, array_of(GitHubFile)* out) {
     goto end;
   }
 
-  out->data = Mem_Calloc(root->val.children.length, sizeof(GitHubFile));
+  array_calloc(GitHubFile, *out, root->val.children.length);
 
   nx_json_for_each(object, root) {
     if (object->type != NX_JSON_OBJECT) {
@@ -372,19 +372,19 @@ end:
 }
 
 // Update compatibility database (model_config.json)
-static int UpdateModelCompatibilityDatabase() {
+static int UpdateModelCompatibilityDatabase(void) {
   int ret = 0;
-  CURL* curl = CurlWithMem_Create(UpdateAPIModelSupportURL, NBFC_MODEL_SUPPORT_FILE_MUTABLE);
+  CURL* curl = CurlWithMem_Create(UPDATE_API_MODEL_SUPPORT_URL, NBFC_MODEL_SUPPORT_FILE_MUTABLE);
   CURLcode code = curl_easy_perform(curl);
 
   if (code != CURLE_OK) {
-    Log_Download_Failed(UpdateAPIModelSupportURL, code);
+    Log_Download_Failed(UPDATE_API_MODEL_SUPPORT_URL, code);
     ret = -1;
     goto end;
   }
 
   if (! Update_Options.quiet)
-    Log_Download_Finished(UpdateAPIModelSupportURL);
+    Log_Download_Finished(UPDATE_API_MODEL_SUPPORT_URL);
 
   if (! CurlWithMem_WriteFile(curl)) {
     Log_Write_Failed(NBFC_MODEL_SUPPORT_FILE_MUTABLE, errno);
@@ -398,12 +398,12 @@ end:
 }
 
 // Update configuration files
-static int UpdateConfigurationFiles() {
+static int UpdateConfigurationFiles(void) {
   int ret = 0;
   array_of(GitHubFile) files = {0};
 
   // Get a list of configuration files in the GitHub repository
-  if (GitHub_Get_Dir_Contents(UpdateAPIContentsURL, &files) == -1) {
+  if (GitHub_Get_Dir_Contents(UPDATE_API_CONTENTS_URL, &files) == -1) {
     Log_Error("Failed to download configuration file list");
     ret = -1;
     goto end;
@@ -431,7 +431,7 @@ end:
   return ret;
 }
 
-int Update() {
+int Update(void) {
   check_root();
   int ret = NBFC_EXIT_SUCCESS;
 
@@ -448,7 +448,7 @@ int Update() {
   Log_Info("Updating configuration files ...");
   if (UpdateConfigurationFiles() == -1)
     ret = NBFC_EXIT_FAILURE;
-  
+
 #if STRICT_CLEANUP
   curl_global_cleanup();
 #endif

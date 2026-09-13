@@ -10,17 +10,27 @@
 #include "../memory.h"
 #include "../nxjson_utils.h"
 #include "../file_utils.h"
+#include "../str_functions.h"
 #include "dmi.h"
-#include "str_functions.h"
 
-// Check if `files` contains a config named `name`
-bool Contains_Config(array_of(ConfigFile)* files, const char* name) {
+// Find a ConfigFile by config_name (case-sensitive)
+ConfigFile* ConfigFiles_Find(array_of(ConfigFile)* files, const char* name) {
   for_each_array(ConfigFile*, file, *files) {
     if (! strcmp(file->config_name, name))
-      return true;
+      return file;
   }
 
-  return false;
+  return NULL;
+}
+
+// Find a ConfigFile by config_name (loose matching)
+ConfigFile* ConfigFiles_FindLoose(array_of(ConfigFile)* files, const char* name) {
+  for_each_array(ConfigFile*, file, *files) {
+    if (DMI_ModelNameEquals(file->config_name, name))
+      return file;
+  }
+
+  return NULL;
 }
 
 // Free an array of ConfigFile
@@ -31,23 +41,23 @@ void ConfigFiles_Free(array_of(ConfigFile)* files) {
 }
 
 // Compare function for qsort
-int ConfigFile_CompareByName(const void *a, const void *b) {
-  return strcmp(((struct ConfigFile *)a)->config_name, ((struct ConfigFile *)b)->config_name);
+int ConfigFile_CompareByName(const void* a, const void* b) {
+  return strcmp(((struct ConfigFile*) a)->config_name, ((struct ConfigFile*) b)->config_name);
 }
 
 // Compare function for qsort
-int ConfigFile_CompareByDiff(const void *a, const void *b) {
-  return (((struct ConfigFile *)b)->diff > ((struct ConfigFile *)a)->diff)
-       - (((struct ConfigFile *)b)->diff < ((struct ConfigFile *)a)->diff);
+int ConfigFile_CompareByDiff(const void* a, const void* b) {
+  return (((struct ConfigFile*) b)->diff > ((struct ConfigFile*) a)->diff)
+       - (((struct ConfigFile*) b)->diff < ((struct ConfigFile*) a)->diff);
 }
 
 // Return an array of ConfigFile for each file in `path`
 static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
   array_size_t capacity = 512;
-  array_of(ConfigFile) files = {
-    .data = Mem_Calloc(capacity, sizeof(ConfigFile)),
-    .size = 0
-  };
+  array_of(ConfigFile) files;
+
+  files.size = 0;
+  array_calloc(ConfigFile, files, capacity);
 
   DIR* directory = opendir(path);
   if (!directory) {
@@ -67,7 +77,7 @@ static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
 
     if (files.size == capacity) {
       capacity *= 2;
-      files.data = Mem_Realloc(files.data, capacity * sizeof(ConfigFile));
+      array_realloc(ConfigFile, files, capacity);
     }
 
     files.data[files.size++].config_name = Mem_Strdup(file->d_name);
@@ -80,17 +90,16 @@ static array_of(ConfigFile) List_Configs_In_Directory(const char* path) {
 // Merges two arrays of ConfigFile into a single array,
 // removing duplicates based on `config_name`.
 static array_of(ConfigFile) Merge_Configs(array_of(ConfigFile)* a, array_of(ConfigFile)* b) {
-  array_of(ConfigFile) files = {
-    .data = Mem_Calloc((a->size + b->size), sizeof(ConfigFile)),
-    .size = 0
-  };
+  array_of(ConfigFile) files;
+  files.size = 0;
+  array_calloc(ConfigFile, files, (a->size + b->size));
 
   for_each_array(ConfigFile*, file, *a) {
     files.data[files.size++].config_name = Mem_Strdup(file->config_name);
   }
 
   for_each_array(ConfigFile*, file, *b) {
-    if (! Contains_Config(&files, file->config_name)) {
+    if (! ConfigFiles_Find(&files, file->config_name)) {
       files.data[files.size++].config_name = Mem_Strdup(file->config_name);
     }
   }
@@ -99,13 +108,13 @@ static array_of(ConfigFile) Merge_Configs(array_of(ConfigFile)* a, array_of(Conf
 }
 
 // List all configs (in the static config directory as well as in the mutable config directory).
-array_of(ConfigFile) List_All_Configs() {
+array_of(ConfigFile) List_All_Configs(void) {
   array_of(ConfigFile) a = {0};
   array_of(ConfigFile) b = {0};
 
   a = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR);
 
-  if (file_exists(NBFC_MODEL_SUPPORT_FILE_MUTABLE))
+  if (File_Exists(NBFC_MODEL_CONFIGS_DIR_MUTABLE))
     b = List_Configs_In_Directory(NBFC_MODEL_CONFIGS_DIR_MUTABLE);
   else
     return a;
@@ -118,18 +127,20 @@ array_of(ConfigFile) List_All_Configs() {
 
 // List all configs (in the static config directory as well as in the mutable config directory).
 // The `diff` field of the ConfigFile structure will also be set.
-array_of(ConfigFile) List_Recommended_Configs() {
-  const char* model_name = DMI_Get_Model_Name();
+array_of(ConfigFile) List_Recommended_Configs(void) {
+  const char* model_name = DMI_GetModelName();
   array_of(ConfigFile) files = List_All_Configs();
   for_each_array(ConfigFile*, file, files) {
-    file->diff = str_similarity(model_name, file->config_name);
+    char* config_name = DMI_ReplaceVendorAlias(file->config_name);
+    file->diff = str_similarity(model_name, config_name);
+    Mem_Free(config_name);
   }
   qsort(files.data, files.size, sizeof(struct ConfigFile), ConfigFile_CompareByDiff);
   return files;
 }
 
 /*
- * Retrive the supported config for `model_name`.
+ * Retrieve the supported config for `model_name`.
  *
  * This function searches a model support database (a JSON file) for the
  * given `model_name` and returns the compatible output config for it.
@@ -172,7 +183,7 @@ char* Get_Supported_Config_From_SupportFile(const char* support_file, array_of(C
     if (model->type != NX_JSON_STRING) {
       Log_Warn("%s: Invalid value for model \"%s\": Not a string", support_file, model->key);
     }
-    else if (!strcmp(model->key, model_name)) {
+    else if (DMI_ModelNameEquals(model->key, model_name)) {
       if (config) {
         Log_Warn("%s: Duplicate model key: \"%s\"", support_file, model->key);
       }
@@ -186,8 +197,9 @@ end:
   if (config) {
     // Ensure that the model actually exists
     for_each_array(ConfigFile*, file, *config_files) {
-      if (!strcmp(file->config_name, config)) {
-        return config;
+      if (DMI_ModelNameEquals(file->config_name, config)) {
+        Mem_Free(config);
+        return Mem_Strdup(file->config_name);
       }
     }
 
@@ -199,8 +211,8 @@ end:
   else {
     // Not found in support database, try a direct match on `config_files`
     for_each_array(ConfigFile*, file, *config_files) {
-      if (!strcmp(file->config_name, model_name)) {
-        return Mem_Strdup(model_name);
+      if (DMI_ModelNameEquals(file->config_name, model_name)) {
+        return Mem_Strdup(file->config_name);
       }
     }
   }
@@ -211,7 +223,7 @@ end:
 char* Get_Supported_Config(array_of(ConfigFile)* files, const char* model) {
   char* config = NULL;
 
-  if (file_exists(NBFC_MODEL_SUPPORT_FILE_MUTABLE))
+  if (File_Exists(NBFC_MODEL_SUPPORT_FILE_MUTABLE))
     config = Get_Supported_Config_From_SupportFile(NBFC_MODEL_SUPPORT_FILE_MUTABLE, files, model);
 
   if (! config)

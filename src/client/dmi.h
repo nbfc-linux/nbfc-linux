@@ -1,8 +1,11 @@
 #ifndef NBFC_DMI_H_
 #define NBFC_DMI_H_
 
-const char* DMI_Get_System_Product();
-const char* DMI_Get_System_Vendor();
-const char* DMI_Get_Model_Name();
+#include <stdbool.h>
+
+const char* DMI_GetSystemProduct(void);
+const char* DMI_GetSystemVendor(void);
+const char* DMI_GetModelName(void);
+bool        DMI_ModelNameEquals(const char*, const char*);
 
 #endif

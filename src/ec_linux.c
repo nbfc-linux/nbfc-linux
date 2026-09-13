@@ -16,18 +16,18 @@
  *            Core/Plugins/StagWare.Plugins.ECLinux/ECLinux.cs                *
  * ========================================================================== */
 
-#define EC_Linux_PortFilePath "/dev/port"
+#define EC_LINUX_PORT_FILE_PATH "/dev/port"
 
 static int EC_Linux_FD = -1;
 
-Error EC_Linux_Open() {
-  EC_Linux_FD = open(EC_Linux_PortFilePath, O_RDWR);
+Error EC_Linux_Open(void) {
+  EC_Linux_FD = open(EC_LINUX_PORT_FILE_PATH, O_RDWR);
   if (EC_Linux_FD < 0)
-    return err_stdlib(EC_Linux_PortFilePath);
+    return err_stdlib(EC_LINUX_PORT_FILE_PATH);
   return err_success();
 }
 
-void EC_Linux_Close() {
+void EC_Linux_Close(void) {
   if (EC_Linux_FD >= 0) {
     close(EC_Linux_FD);
     EC_Linux_FD = -1;
@@ -91,7 +91,7 @@ static bool EC_Linux_WaitForEcStatus(enum ECStatus status, bool isSet)
       continue;
 
     if (isSet)
-      value = ~value;
+      value = (uint8_t) ~value;
 
     if ((status & value) == 0)
       return true;
@@ -101,12 +101,12 @@ static bool EC_Linux_WaitForEcStatus(enum ECStatus status, bool isSet)
   return false;
 }
 
-static inline bool EC_Linux_WaitWrite()
+static inline bool EC_Linux_WaitWrite(void)
 {
   return EC_Linux_WaitForEcStatus(ECStatus_InputBufferFull, false);
 }
 
-static bool EC_Linux_WaitRead()
+static bool EC_Linux_WaitRead(void)
 {
   if (EC_Linux_WaitReadFailures > EC_Linux_FailuresBeforeSkip) {
     return true;
@@ -148,12 +148,13 @@ static bool EC_Linux_TryReadWord(uint8_t register_, uint16_t* value)
 {
   // Byte order: little endian
 
-  uint8_t result[2];
+  uint8_t lsb;
+  uint8_t msb;
 
-  if (EC_Linux_TryReadByte(register_+0, &result[0]) &&
-      EC_Linux_TryReadByte(register_+1, &result[1]))
+  if (EC_Linux_TryReadByte(register_+0, &lsb) &&
+      EC_Linux_TryReadByte(register_+1, &msb))
   {
-    *value = ((uint16_t) result[0]) | (((uint16_t) result[1]) << 8);
+    *value = (uint16_t) (((uint16_t) lsb) | (((uint16_t) msb) << 8));
     return true;
   }
 

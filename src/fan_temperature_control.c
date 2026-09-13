@@ -167,7 +167,7 @@ static Error FanTemperatureControl_AddTemperatureSources(
     return e;
 
   const size_t idx = FS_Sensors_Sources.size;
-  FS_Sensors_Sources.data = Mem_Realloc(FS_Sensors_Sources.data, (idx + 1) * sizeof(FS_TemperatureSource));
+  array_realloc(FS_TemperatureSource, FS_Sensors_Sources, (idx + 1));
   FS_Sensors_Sources.data[idx].name = Mem_Strdup(source.name);
   FS_Sensors_Sources.data[idx].file = Mem_Strdup(source.file);
   FS_Sensors_Sources.data[idx].multiplier = source.multiplier;
@@ -207,7 +207,7 @@ static Error FanTemperatureControl_SetByModelConfig0(
 {
   Error e;
 
-  if (FanConfiguration_IsSet_TemperatureAlgorithmType(fc))
+  if (fc->isset.TemperatureAlgorithmType)
     ftc->TemperatureAlgorithmType = fc->TemperatureAlgorithmType;
 
   // Use default sensor names
@@ -248,7 +248,7 @@ static Error FanTemperatureControl_SetByModelConfig(
 // Initialize `fans` by `service_config`
 static Error FanTemperatureControl_SetByServiceConfig(
   array_of(FanTemperatureControl)* fans,
-  ServiceConfig* service_config) 
+  ServiceConfig* service_config)
 {
   Error e;
 
@@ -258,7 +258,7 @@ static Error FanTemperatureControl_SetByServiceConfig(
 
     FanTemperatureControl* ftc = &fans->data[ftsc->FanIndex];
 
-    if (FanTemperatureSourceConfig_IsSet_TemperatureAlgorithmType(ftsc))
+    if (ftsc->isset.TemperatureAlgorithmType)
       ftc->TemperatureAlgorithmType = ftsc->TemperatureAlgorithmType;
 
     // If no sensors are given, use the defaults
@@ -312,7 +312,7 @@ Error FanTemperatureControl_Init(
   if (e)
     return e;
 
-  // Set the temperature sources as specified in service_config 
+  // Set the temperature sources as specified in service_config
   e = FanTemperatureControl_SetByServiceConfig(fans, service_config);
   if (e)
     return e;
@@ -335,7 +335,7 @@ Error FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl* ftc) {
   return err_success();
 }
 
-void FanTemperatureControl_Log(array_of(FanTemperatureControl)* fans, ModelConfig* model_config) {
+void FanTemperatureControl_Log(const array_of(FanTemperatureControl)* fans, ModelConfig* model_config) {
   for_enumerate_array(array_size_t, fan_index, *fans) {
     FanTemperatureControl* ftc = &fans->data[fan_index];
 

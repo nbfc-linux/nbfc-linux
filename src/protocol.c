@@ -8,14 +8,14 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-Error Protocol_Send_Json(int socket, const nx_json* json) {
-  if (! nxjson_send_to_fd(json, socket))
+Error Protocol_SendJson(int socket, const nx_json* json) {
+  if (! nxjson_send_to_fd(json, socket, 2))
     return err_stdlib("send()");
 
-  return Protocol_Send_End(socket);
+  return Protocol_SendEnd(socket);
 }
 
-Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
+Error Protocol_ReceiveJson(int socket, char** buf, const nx_json** out) {
   char buffer[PROTOCOL_BUFFER_SIZE] = {0};
   ssize_t nread;
   const nx_json* json = NULL;
@@ -29,7 +29,7 @@ Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
     msg_size += (size_t) nread;
     msg[msg_size] = '\0';
 
-    char *end_marker_pos = strstr(msg, PROTOCOL_END_MARKER);
+    char* end_marker_pos = strstr(msg, PROTOCOL_END_MARKER);
     if (end_marker_pos != NULL) {
       *end_marker_pos = '\0';
       break;
@@ -52,7 +52,7 @@ Error Protocol_Receive_Json(int socket, char** buf, const nx_json** out) {
   return err_success();
 }
 
-Error Protocol_Send_Error(int socket, const char* message) {
+Error Protocol_SendError(int socket, const char* message) {
   nx_json error  = {0};
   error.type     = NX_JSON_STRING;
   error.key      = "Error";
@@ -64,5 +64,5 @@ Error Protocol_Send_Error(int socket, const char* message) {
   obj.val.children.first  = &error;
   obj.val.children.last   = &error;
 
-  return Protocol_Send_Json(socket, &obj);
+  return Protocol_SendJson(socket, &obj);
 }

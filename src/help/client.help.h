@@ -20,9 +20,13 @@
  "    get-model-name      Print out model name\n"                              \
  "    acpi-dump           Dumps information of your ACPI DSDT\n"               \
  "    rate-config         Rate a configuration file\n"                         \
+ "    xml2json            Convert an XML configuration to JSON\n"              \
  "    help                Show help\n"                                         \
  "    support             Show how to support the project\n"                   \
  "    warranty            Show warranty\n"                                     \
+ "    faq                 Show frequently asked questions\n"                   \
+ "\n"                                                                          \
+ "NBFC-Linux needs your support! Run `nbfc support` for details.\n"            \
  ""
 
 #define CLIENT_START_HELP_TEXT                                                 \
@@ -46,21 +50,21 @@
  ""
 
 #define CLIENT_CONFIG_HELP_TEXT                                                \
- "Usage: nbfc config [-h] (-l | -s config | -a config | -r)\n"                 \
+ "Usage: nbfc config [-h] (-l | -r | -s CONFIG)\n"                             \
  "\n"                                                                          \
  "Set or list configurations for the NBFC service.\n"                          \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
  "  -l, --list            List all available configs\n"                        \
- "  -s CONFIG, --set CONFIG\n"                                                 \
- "                        Set a config\n"                                      \
- "  -a CONFIG, --apply CONFIG\n"                                               \
- "                        Set a config and start the service\n"                \
- "  -r, --recommend       List configs which may work for your device\n"       \
+ "  -s, --set CONFIG      Set a configuration\n"                               \
+ "  -r, --recommend       List configs with a similar notebook model name\n"   \
  "\n"                                                                          \
  "If CONFIG is \"auto\", the service will attempt to automatically select\n"   \
  "a matching configuration.\n"                                                 \
+ "\n"                                                                          \
+ "CONFIG is the configuration filename without the \".json\" extension,\n"     \
+ "not the value of the \"NotebookModel\" field inside the configuration file.\n"\
  ""
 
 #define CLIENT_RATE_CONFIG_HELP_TEXT                                           \
@@ -69,6 +73,8 @@
  "Rates a configuration by analyzing whether it appears safe to execute\n"     \
  "on the current system.\n"                                                    \
  "\n"                                                                          \
+ "By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.\n"\
+ "\n"                                                                          \
  "Please run `nbfc rate-config --full-help` for a full explanation of how\n"   \
  "to interpret these results.\n"                                               \
  "\n"                                                                          \
@@ -76,29 +82,40 @@
  "  -h, --help            Show this help message and exit\n"                   \
  "  -H, --full-help       Show full help\n"                                    \
  "  -a, --all             Rate all available configuration files\n"            \
+ "  -b, --bad             List only bad configs that are otherwise omitted\n"  \
  "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
+ "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
+ "  -f, --fan-count NUM   Limit configurations by fan count\n"                 \
+ "  -i, --input FILE      Read configuration files from FILE\n"                \
  "  -j, --json            Use JSON output\n"                                   \
  "  -m, --min-score SCORE Set minimum rating threshold for configurations\n"   \
  "  -n, --no-download     Don't download rules from the repository\n"          \
  "  -r, --rules FILE      Use an alternative rules file\n"                     \
+ "  -u, --unverified      Include unverified EC registers\n"                   \
+ "  -q, --quiet           Do not print register ratings\n"                     \
  "  --print-rules         Print configuration rating rules\n"                  \
  ""
 
 #define CLIENT_ACPI_DUMP_HELP_TEXT                                             \
- "Usage: nbfc acpi-dump [-h] [-j|--json] [-f|--file=FILE] <COMMAND>\n"         \
+ "Usage: nbfc acpi-dump [-h] [-j|--json] [-d|--dsdt=FILE] <COMMAND>\n"         \
  "\n"                                                                          \
- "Dumps information of your ACPI DSDT.\n"                                      \
+ "Dumps information of your ACPI tables.\n"                                    \
+ "\n"                                                                          \
+ "By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.\n"\
  "\n"                                                                          \
  "Commands:\n"                                                                 \
  "    registers           List all available registers\n"                      \
- "    ec-registers        List all available EC registers\n"                   \
+ "    ec-registers [-u]   List all available EC registers\n"                   \
  "    methods             List all available ACPI methods\n"                   \
- "    dsl                 Disassemble your DSDT\n"                             \
+ "    dsl                 Disassemble your ACPI tables\n"                      \
+ "    map [-u]            Print a map for `ec_probe`\n"                        \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
- "  -f, --file FILE       Use an alternative DSDT file\n"                      \
+ "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
+ "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
  "  -j, --json            Use JSON output\n"                                   \
+ "  -u, --unverified      Include unverified EC registers\n"                   \
  ""
 
 #define CLIENT_STATUS_HELP_TEXT                                                \
@@ -176,6 +193,8 @@
  "\n"                                                                          \
  "Update the available configuration files and the model support database.\n"  \
  "\n"                                                                          \
+ "Downloaded files will be stored in /var/lib/nbfc/configs.\n"                 \
+ "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
  "  -p, --parallel NUM    Set the number of parallel downloads\n"              \
@@ -242,28 +261,84 @@
  "  -h, --help            Shows this message and exit\n"                       \
  ""
 
+#define SUPPORT_PAYPAL_URL "https://paypal.me/BenjaminAbendroth"
+
+#define SUPPORT_GITHUB_URL "https://github.com/nbfc-linux/nbfc-linux"
+
 #define CLIENT_SUPPORT_HELP_TEXT                                               \
  "Usage: nbfc support [-h] [--upload-firmware] [--print-command]\n"            \
+ "                         [--create-archive=FILE]\n"                          \
  "\n"                                                                          \
  "Displays information on how to support the project.\n"                       \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  --upload-firmware     Upload your notebook firmware without prompting\n"   \
  "  --print-command       Print command for manual firmware upload\n"          \
+ "  --create-archive      Create a tar.gz archive containing your firmware\n"  \
  "  -h, --help            Shows this message and exit\n"                       \
  "\n"                                                                          \
- "Uploading your notebook firmware helps the developer to create new\n"        \
- "configuration files.\n"\
+ "Thank you for using NBFC-Linux!\n"                                           \
+ "\n"                                                                          \
+ "If you'd like to support the project, you can:\n"                            \
+ "\n"                                                                          \
+ " - Send a donation via PayPal:\n"                                            \
+ "     " SUPPORT_PAYPAL_URL "\n"                                               \
+ "\n"                                                                          \
+ " - Simply star the project on GitHub:\n"                                     \
+ "     " SUPPORT_GITHUB_URL "\n"                                               \
+ "\n"                                                                          \
+ " - Upload your notebook firmware:\n"                                         \
+ "     $ sudo nbfc support --upload-firmware\n"                                \
+ "\n"                                                                          \
+ "Uploading your notebook firmware helps the developer to understand existing\n"\
+ "configuration files.\n"                                                      \
+ "\n"                                                                          \
+ "Please create an issue on https://github.com/nbfc-linux/nbfc-linux if you\n" \
+ "need help creating a configuration file for your notebook.\n"                \
  "\n"                                                                          \
  "The following data will be transmitted:\n"                                   \
- "- The laptop manufacturer (/sys/devices/virtual/dmi/id/sys_vendor)\n"        \
- "- The laptop model (/sys/devices/virtual/dmi/id/product_name)\n"             \
- "- The ACPI DSDT firmware table (/sys/firmware/acpi/tables/DSDT)\n"           \
+ " - The laptop manufacturer (/sys/devices/virtual/dmi/id/sys_vendor)\n"       \
+ " - The laptop model (/sys/devices/virtual/dmi/id/product_name)\n"            \
+ " - The ACPI DSDT firmware table (/sys/firmware/acpi/tables/DSDT)\n"          \
+ " - The ACPI SSDT firmware tables (/sys/firmware/acpi/tables/SSDT*)\n"        \
  "\n"                                                                          \
  "The preferred method for uploading your notebook firmware is to use:\n"      \
  "  $ sudo nbfc support --upload-firmware\n"                                   \
  "\n"                                                                          \
  "However, if you're paranoid, you can upload it manually using curl:\n"       \
  "  $ nbfc support --print-command\n"                                          \
+ ""
+
+#define CLIENT_XML2JSON_HELP_TEXT                                              \
+  "Usage: nbfc xml2json FILE\n"                                                \
+  "\n"                                                                         \
+  "Convert an XML configuration file to JSON.\n"                               \
+  "\n"                                                                         \
+  "This command can be used to convert configurations from the original\n"     \
+  "NBFC project into the NBFC-Linux format.\n"                                 \
+  ""
+
+#define CLIENT_FAQ_HELP_TEXT                                                   \
+ "Usage: nbfc faq [-h]\n"                                                      \
  "\n"                                                                          \
+ "Show the NBFC FAQ man page.\n"                                               \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
+ "\n"                                                                          \
+ ""
+
+#define CLIENT_RESET_EC_HELP_TEXT                                              \
+ "Usage: nbfc reset-ec [-h]\n"                                                 \
+ "\n"                                                                          \
+ "Resets the embedded controller registers to their configured reset values.\n"\
+ "\n"                                                                          \
+ "This command is intended for use after nbfc_service has been killed\n"       \
+ "unexpectedly, for example with SIGKILL, when the service has no opportunity\n"\
+ "to reset the EC registers during shutdown.\n"                                \
+ "\n"                                                                          \
+ "INTERNAL COMMAND ONLY\n"                                                     \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Shows this message and exit\n"                       \
  ""

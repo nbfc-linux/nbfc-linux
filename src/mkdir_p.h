@@ -3,6 +3,6 @@
 
 #include <sys/types.h> // mode_t
 
-int mkdir_p(const char *, mode_t);
+int mkdir_p(const char*, mode_t);
 
 #endif

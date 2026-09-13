@@ -8,8 +8,8 @@
 #include "../memory.h"
 #include "../nbfc.h"
 
-const struct cli99_Option set_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Set_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"-a|--auto",  Option_Set_Auto,  cli99_NoArgument      },
   {"-s|--speed", Option_Set_Speed, cli99_RequiredArgument},
   {"-f|--fan",   Option_Set_Fan,   cli99_RequiredArgument},
@@ -24,13 +24,13 @@ struct {
   -2.0f
 };
 
-int Set() {
+int Set(void) {
   if (Set_Options.speed == -2.0f) {
     printf("%s", CLIENT_SET_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;
   }
 
-  if (Service_Get_PID() == -1) {
+  if (Service_GetPID() == -1) {
     Log_Error("Service not running");
     return NBFC_EXIT_FAILURE;
   }

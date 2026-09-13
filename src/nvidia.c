@@ -16,7 +16,7 @@ typedef int nvmlReturn_t;
 // NVML-related globals used for dynamically accessing GPU temperature:
 // ============================================================================
 
-static void *Nvidia_DlHandle = NULL;
+static void* Nvidia_DlHandle = NULL;
 static nvmlDevice_t Nvidia_Device;
 
 nvmlReturn_t (*Nvidia_nvmlInit_fn)(void);
@@ -28,7 +28,7 @@ nvmlReturn_t (*Nvidia_nvmlDeviceGetTemperature_fn)(nvmlDevice_t, unsigned int, u
 // Nvidia_* Functions
 // ============================================================================
 
-Nvidia_Error Nvidia_Init() {
+Nvidia_Error Nvidia_Init(void) {
   if (! Nvidia_DlHandle) {
     Nvidia_DlHandle = dlopen("libnvidia-ml.so.1", RTLD_LAZY);
 
@@ -44,11 +44,11 @@ Nvidia_Error Nvidia_Init() {
   if (!Nvidia_nvmlShutdown_fn)
     return Nvidia_Error_DlOpen;
 
-  Nvidia_nvmlDeviceGetHandleByIndex_fn = (nvmlReturn_t (*)(unsigned int, nvmlDevice_t *)) dlsym(Nvidia_DlHandle, "nvmlDeviceGetHandleByIndex");
+  Nvidia_nvmlDeviceGetHandleByIndex_fn = (nvmlReturn_t (*)(unsigned int, nvmlDevice_t*)) dlsym(Nvidia_DlHandle, "nvmlDeviceGetHandleByIndex");
   if (!Nvidia_nvmlDeviceGetHandleByIndex_fn)
     return Nvidia_Error_DlOpen;
 
-  Nvidia_nvmlDeviceGetTemperature_fn = (nvmlReturn_t (*)(nvmlDevice_t, unsigned int, unsigned int *)) dlsym(Nvidia_DlHandle, "nvmlDeviceGetTemperature");
+  Nvidia_nvmlDeviceGetTemperature_fn = (nvmlReturn_t (*)(nvmlDevice_t, unsigned int, unsigned int*)) dlsym(Nvidia_DlHandle, "nvmlDeviceGetTemperature");
   if (!Nvidia_nvmlDeviceGetTemperature_fn)
     return Nvidia_Error_DlOpen;
 
@@ -65,7 +65,7 @@ Nvidia_Error Nvidia_Init() {
   return Nvidia_Error_OK;
 }
 
-void Nvidia_Close() {
+void Nvidia_Close(void) {
   if (Nvidia_nvmlShutdown_fn)
     Nvidia_nvmlShutdown_fn();
 

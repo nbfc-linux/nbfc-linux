@@ -31,6 +31,11 @@ options:
   - option_strings: ["-w", "--word"]
     help: "Combine two registers into one"
 
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+
 positionals:
   - number: 1
     metavar: "REGISTER"
@@ -43,6 +48,11 @@ options:
   - option_strings: ["-w", "--word"]
     help: "Combine two registers into one"
 
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+
 positionals:
   - number: 1
     metavar: "REGISTER"
@@ -53,6 +63,51 @@ positionals:
     metavar: "VALUE"
     help: "Value to write"
     complete: ["integer"]
+---
+prog: "ec_probe read_bit"
+help: "Read a bit from a EC register"
+options:
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+
+positionals:
+  - number: 1
+    metavar: "REGISTER"
+    help: "Register source"
+    complete: ["range", 0, 255]
+
+  - number: 2
+    metavar: "BIT-OFFSET"
+    help: "Bit offset (0-7)"
+    complete: ["range", 0, 7]
+---
+prog: "ec_probe write_bit"
+help: "Write a bit to a EC register"
+options:
+  - option_strings: ["-d", "--dry"]
+    help: "Print the resulting value without writing it"
+
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+positionals:
+  - number: 1
+    metavar: "REGISTER"
+    help: "Register destination"
+    complete: ["range", 0, 255]
+
+  - number: 2
+    metavar: "BIT-OFFSET"
+    help: "Bit offset (0-7)"
+    complete: ["range", 0, 7]
+
+  - number: 3
+    metavar: "VALUE"
+    help: "Value to write"
+    complete: ["choices", ["0", "1"]]
 ---
 prog: "ec_probe monitor"
 help: "Monitor all EC registers for changes"
@@ -138,6 +193,18 @@ positionals:
     metavar: "ARG8"
     help: "Eighth argument"
     complete: ["integer"]
+---
+prog: "ec_probe graph"
+help: "Visualize recordings made by `ec_probe monitor -r`"
+options:
+  - option_strings: ["-d", "--decimal"]
+    help: "Read register values as decimal numbers"
+
+positionals:
+  - number: 1
+    metavar: "FILE"
+    help: "CSV file containing the recordings"
+    complete: ["file"]
 ---
 prog: "ec_probe shell"
 help: "Read commands from STDIN"

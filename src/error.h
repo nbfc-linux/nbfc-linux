@@ -3,6 +3,7 @@
 
 #include "log.h"
 #include "macros.h"
+#include "nxjson.h"
 
 #include <stddef.h>
 
@@ -17,6 +18,7 @@ struct ErrorImpl {
   ErrorSystem system;
   union {
     int code;
+    enum nx_json_error nxjson_error;
     char message[1024];
   } value;
 };
@@ -36,7 +38,7 @@ typedef struct ErrorImpl* Error;
 #define err_nxjson(MESSAGE)      err_chain_nxjson(0, MESSAGE)
 
 Error err_chain_string(Error,  const char* message);
-Error err_chain_stringf(Error, const char* message, ...) PRINTF_LIKE(2, 3);
+Error err_chain_stringf(Error, const char* message, ...) NBFC_PRINTF_LIKE(2, 3);
 Error err_chain_stdlib(Error,  const char* message);
 Error err_chain_nxjson(Error,  const char* message);
 const char* err_print_all(Error);

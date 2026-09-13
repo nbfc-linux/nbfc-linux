@@ -12,7 +12,7 @@ Add this flake to inputs in your configuration:
   inputs = {
     # ...
     nbfc-linux = {
-      url = "github:nbfc-linux/nbfc-linux";
+      url = "github:nbfc-linux/nbfc-linux?dir=pkgbuilds/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # ...
@@ -82,7 +82,7 @@ in {
   ];
 ```
 
-### Chose configuration file
+### Choose configuration file
 
 Now if you try to set config the normal way you will encounter the following issue
 ```bash

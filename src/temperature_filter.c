@@ -14,7 +14,7 @@ Error TemperatureFilter_Init(TemperatureFilter* self, unsigned int poll_interval
 
   my.index = 0;
   my.ring_buffer.size = timespan / poll_interval + !!(timespan % poll_interval);
-  my.ring_buffer.data = (float*) Mem_Calloc(my.ring_buffer.size, sizeof(float));
+  array_calloc(float, my.ring_buffer, my.ring_buffer.size);
   my.buffer_is_full = false;
   return err_success();
 }

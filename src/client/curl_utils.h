@@ -9,7 +9,7 @@
 #include "../log.h"
 #include "../nbfc.h"
 
-#define UserAgent \
+#define CURL_UTILS_USER_AGENT \
   "NBFC-Linux/" NBFC_VERSION " libcurl/" LIBCURL_VERSION " (+https://github.com/nbfc-linux)"
 
 // Data structure for receiving content via `Curl_Write_Memory_Callback`

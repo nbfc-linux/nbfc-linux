@@ -11,9 +11,9 @@
 <h2>MISCELLANEOUS COMMANDS</h2>
 <p><strong>nbfc</strong> {<strong>update</strong> |
 <strong>rate-config</strong> | <strong>acpi-dump</strong> |
-<strong>get-model-name</strong> | <strong>support</strong> |
-<strong>warranty</strong> | <strong>help</strong>}
-[<em>OPTIONS</em>]</p>
+<strong>get-model-name</strong> | <strong>xml2json</strong> |
+<strong>support</strong> | <strong>warranty</strong> |
+<strong>faq</strong> | <strong>help</strong>} [<em>OPTIONS</em>]</p>
 <h1>OPTIONS</h1>
 <p><strong>-h</strong>, <strong>--help</strong></p>
 <blockquote>
@@ -73,16 +73,17 @@
 </blockquote>
 <p><strong>-r</strong>, <strong>--recommend</strong></p>
 <blockquote>
-<p>List configs which may work for your device.</p>
+<p>List configs with a similar notebook model name.</p>
 </blockquote>
 <p><strong>-s</strong>, <strong>--set</strong> <em>CONFIG</em></p>
 <blockquote>
 <p>Set a config.</p>
 </blockquote>
-<p><strong>-a</strong>, <strong>--apply</strong> <em>CONFIG</em></p>
-<blockquote>
-<p>Set a config and start the service.</p>
-</blockquote>
+<p>If <em>CONFIG</em> is <strong>auto</strong>, the service will attempt
+to automatically select a matching configuration.</p>
+<p><em>CONFIG</em> is the configuration filename without the
+<strong>.json</strong> extension, not the value of the
+<strong>NotebookModel</strong> field inside the configuration file.</p>
 </blockquote>
 <p><strong>set</strong> [<em>OPTIONS</em>]</p>
 <blockquote>
@@ -139,6 +140,8 @@ speed.</p>
 <p><strong>update</strong> [<em>OPTIONS</em>]</p>
 <blockquote>
 <p>Download new configuration files from the internet.</p>
+<p>Downloaded files will be stored in
+<em>/var/lib/nbfc/configs</em>.</p>
 <p><strong>-p</strong>, <strong>--parallel</strong> <em>NUM</em></p>
 <blockquote>
 <p>Set the number of parallel downloads (default: 10).</p>
@@ -152,6 +155,8 @@ speed.</p>
 <blockquote>
 <p>Rates a configuration by analyzing whether it appears safe to execute
 on the current system.</p>
+<p>By default, the DSDT and all SSDTs are read from
+/sys/firmware/acpi/tables.</p>
 <p><strong>-H</strong>, <strong>--full-help</strong></p>
 <blockquote>
 <p>Show help on how to interpret the results.</p>
@@ -160,9 +165,26 @@ on the current system.</p>
 <blockquote>
 <p>Rate all available configuration files.</p>
 </blockquote>
+<p><strong>-b</strong>, <strong>--bad</strong></p>
+<blockquote>
+<p>List only bad configs that are otherwise omitted.</p>
+</blockquote>
 <p><strong>-d</strong>, <strong>--dsdt</strong> <em>FILE</em></p>
 <blockquote>
-<p>Use an alternative DSDT file.</p>
+<p>Use an alternative DSDT file. Can be specified multiple times.</p>
+</blockquote>
+<p><strong>-D</strong>, <strong>--dsdt-dir</strong>
+<em>DIRECTORY</em></p>
+<blockquote>
+<p>Use an alternative DSDT directory.</p>
+</blockquote>
+<p><strong>-f</strong>, <strong>--fan-count</strong> <em>NUMBER</em></p>
+<blockquote>
+<p>Limit output to configurations with the specified number of fans.</p>
+</blockquote>
+<p><strong>-i</strong>, <strong>--input</strong> <em>FILE</em></p>
+<blockquote>
+<p>Read configuration files from <em>FILE</em>.</p>
 </blockquote>
 <p><strong>-j</strong>, <strong>--json</strong></p>
 <blockquote>
@@ -181,6 +203,19 @@ on the current system.</p>
 <blockquote>
 <p>Use an alternative rules file.</p>
 </blockquote>
+<p><strong>-u</strong>, <strong>--unverified</strong></p>
+<blockquote>
+<p>Normally, only registers belonging to an
+<strong>EmbeddedControl</strong> operation region are taken into account
+when rating a configuration. With this option, registers from
+<strong>SystemMemory</strong> operation regions that may be accessible
+through the embedded controller are also considered. Their accessibility
+through the embedded controller cannot be guaranteed.</p>
+</blockquote>
+<p><strong>-q</strong>, <strong>--quiet</strong></p>
+<blockquote>
+<p>Do not print register ratings.</p>
+</blockquote>
 <p><strong>--print-rules</strong></p>
 <blockquote>
 <p>Print configuration rating rules.</p>
@@ -188,16 +223,25 @@ on the current system.</p>
 </blockquote>
 <p><strong>acpi-dump</strong> {<strong>registers</strong> |
 <strong>ec-registers</strong> | <strong>methods</strong> |
-<strong>dsl</strong>} [<em>OPTIONS</em>]</p>
+<strong>dsl</strong> | <strong>map</strong>} [<em>OPTIONS</em>]</p>
 <blockquote>
-<p>Dumps information of your ACPI DSDT.</p>
+<p>Dumps information of your ACPI tables.</p>
+<p>By default, the DSDT and all SSDTs are read from
+/sys/firmware/acpi/tables.</p>
 <p><strong>registers</strong></p>
 <blockquote>
 <p>List all available registers.</p>
 </blockquote>
-<p><strong>ec-registers</strong></p>
+<p><strong>ec-registers</strong>
+[<strong>-u</strong>|<strong>--unverified</strong>]</p>
 <blockquote>
 <p>List all available embedded controller registers.</p>
+<p>Normally, only registers belonging to an
+<strong>EmbeddedControl</strong> operation region are printed. If
+<strong>-u</strong>|<strong>--unverified</strong> is specified, also
+registers from <strong>SystemMemory</strong> operation regions that may
+be accessible through the embedded controller are printed. Their
+accessibility through the embedded controller cannot be guaranteed.</p>
 </blockquote>
 <p><strong>methods</strong></p>
 <blockquote>
@@ -205,11 +249,29 @@ on the current system.</p>
 </blockquote>
 <p><strong>dsl</strong></p>
 <blockquote>
-<p>Disassemble your DSDT.</p>
+<p>Disassemble your ACPI tables.</p>
 </blockquote>
-<p><strong>-f</strong>, <strong>--file</strong> <em>FILE</em></p>
+<p><strong>map</strong>
+[<strong>-u</strong>|<strong>--unverified</strong>]</p>
 <blockquote>
-<p>Use an alternative DSDT file.</p>
+<p>Generate a map file that can be used by <strong>ec_probe
+-m|--map</strong>. The map contains detected registers with their names
+and addresses as well as ACPI method names.</p>
+<p>Normally, only registers belonging to an
+<strong>EmbeddedControl</strong> operation region are printed. If
+<strong>-u</strong>|<strong>--unverified</strong> is specified, also
+registers from <strong>SystemMemory</strong> operation regions that may
+be accessible through the embedded controller are printed. Their
+accessibility through the embedded controller cannot be guaranteed.</p>
+</blockquote>
+<p><strong>-d</strong>, <strong>--dsdt</strong> <em>FILE</em></p>
+<blockquote>
+<p>Use an alternative DSDT file. Can be specified multiple times.</p>
+</blockquote>
+<p><strong>-D</strong>, <strong>--dsdt-dir</strong>
+<em>DIRECTORY</em></p>
+<blockquote>
+<p>Use an alternative DSDT directory.</p>
 </blockquote>
 <p><strong>-j</strong>, <strong>--json</strong></p>
 <blockquote>
@@ -227,14 +289,36 @@ on the current system.</p>
 <blockquote>
 <p>Print command for manual firmware upload.</p>
 </blockquote>
+<p><strong>--create-archive</strong> <em>FILE</em></p>
+<blockquote>
+<p>Creates a compressed <strong>tar.gz</strong> archive containing
+information required for support and hardware analysis.</p>
+<p>The archive includes:</p>
+<ul>
+<li><p>The output of <strong>nbfc get-model-name</strong></p></li>
+<li><p>The output of <strong>nbfc sensors list</strong></p></li>
+<li><p>Firmware DSDT (<em>/sys/firmware/acpi/tables/DSDT</em>)</p></li>
+<li><p>Firmware SSDTs (<em>/sys/firmare/acpi/tables/SSDT*</em>)</p></li>
+</ul>
+</blockquote>
 </blockquote>
 <p><strong>get-model-name</strong></p>
 <blockquote>
 <p>Print out the notebook's model name.</p>
 </blockquote>
+<p><strong>xml2json</strong> <em>FILE</em></p>
+<blockquote>
+<p>Convert an XML configuration file to JSON.</p>
+<p>This command can be used to convert configurations from the original
+NBFC project into the NBFC-Linux format.</p>
+</blockquote>
 <p><strong>warranty</strong></p>
 <blockquote>
 <p>Show warranty.</p>
+</blockquote>
+<p><strong>faq</strong></p>
+<blockquote>
+<p>Show NBFC FAQ manual page.</p>
 </blockquote>
 <p><strong>help</strong></p>
 <blockquote>

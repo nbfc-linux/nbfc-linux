@@ -1,7 +1,7 @@
 #include <errno.h>        // errno
 #include <stdio.h>        // printf, fprintf
 #include <stdlib.h>       // exit, realpath, qsort
-#include <string.h>       // strcmp, strrchr, strerror
+#include <string.h>       // strrchr, strerror
 #include <unistd.h>       // isatty
 #include <linux/limits.h> // PATH_MAX
 
@@ -13,9 +13,10 @@
 
 #include "dmi.h"
 #include "check_root.h"
-#include "service_control.h"
 #include "config_files.h"
 #include "client_global.h"
+
+#define RECOMMENDED_CONFIG_MATCH_THRESHOLD 0.7f
 
 #define RECOMMENDED_WARNING \
   "\n"                                                                         \
@@ -44,6 +45,28 @@
   "\n"                                                                         \
   ""
 
+#define CONFIG_APPLY_NOTICE \
+  "The -a|--apply option has been removed.\n"                                  \
+  "\n"                                                                         \
+  "For setting up the service, use the following commands:\n"                  \
+  "  $ sudo nbfc config --set \"CONFIG\"\n"                                    \
+  "  $ sudo nbfc restart --read-only\n"                                        \
+  "\n"                                                                         \
+  "If the configuration works in read-only mode, you can restart the service\n"\
+  "in write-mode:\n"                                                           \
+  "  $ sudo nbfc restart\n"                                                    \
+  ""
+
+#define CONFIG_SET_NOTICE \
+  "Configuration has been set successfully.\n"                                 \
+  "\n"                                                                         \
+  "To test the configuration use:\n"                                           \
+  "  $ sudo nbfc restart --read-only\n"                                        \
+  "\n"                                                                         \
+  "Once you verified the configuration, start the service in write-mode:\n"    \
+  "  $ sudo nbfc restart\n"                                                    \
+  ""
+
 enum Config_Action {
   Config_Action_None = 0,
   Config_Action_Apply,
@@ -52,8 +75,8 @@ enum Config_Action {
   Config_Action_Recommend
 };
 
-const struct cli99_Option config_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Config_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"-l|--list",      Option_Config_List,      cli99_NoArgument      },
   {"-r|--recommend", Option_Config_Recommend, cli99_NoArgument      },
   {"-s|--set",       Option_Config_Set,       cli99_RequiredArgument},
@@ -77,7 +100,7 @@ void Set_Config_Action(enum Config_Action action) {
   Config_Options.action = action;
 }
 
-int List() {
+static int Config_List(void) {
   array_of(ConfigFile) files = List_All_Configs();
 
   qsort(files.data, files.size, sizeof(ConfigFile), ConfigFile_CompareByName);
@@ -89,13 +112,13 @@ int List() {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Recommend() {
+static int Config_Recommend(void) {
   if (isatty(STDOUT_FILENO) && !Config_Options.yes) {
     fprintf(stderr, "%s", RECOMMENDED_WARNING);
     return NBFC_EXIT_FAILURE;
   }
 
-  const char* model_name = DMI_Get_Model_Name();
+  const char* model_name = DMI_GetModelName();
   array_of(ConfigFile) files = List_Recommended_Configs();
   char* config = Get_Supported_Config(&files, model_name);
 
@@ -107,7 +130,7 @@ int Recommend() {
 
   bool have_match = false;
   for_each_array(ConfigFile*, file, files) {
-    if (file->diff >= RecommendedConfigMatchThreshold) {
+    if (file->diff >= RECOMMENDED_CONFIG_MATCH_THRESHOLD) {
       have_match = true;
       printf("%s\n", file->config_name);
     }
@@ -120,14 +143,15 @@ int Recommend() {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Set_Or_Apply() {
+static int Config_Set(void) {
   check_root();
-  char *config;
+  char* config;
   array_of(ConfigFile) files = List_All_Configs();
+  ServiceConfig service_config = {0};
 
   // "auto" ===================================================================
-  if (! strcmp(Config_Options.config, "auto")) {
-    config = Get_Supported_Config(&files, DMI_Get_Model_Name());
+  if (! str_cmp_ignorecase(Config_Options.config, "auto")) {
+    config = Get_Supported_Config(&files, DMI_GetModelName());
 
     if (! config) {
       Log_Error("No config found to apply automatically");
@@ -140,13 +164,16 @@ int Set_Or_Apply() {
     config = Mem_Strdup(Config_Options.config);
 
     char* dot = strrchr(config, '.');
-    if (dot && !strcmp(dot, ".json"))
+    if (dot && !str_cmp_ignorecase(dot, ".json"))
       *dot = '\0';
 
-    if  (! Contains_Config(&files, config)) {
+    ConfigFile* found = ConfigFiles_FindLoose(&files, config);
+    if (! found) {
       Log_Error("No such configuration available: %s", config);
       return NBFC_EXIT_FAILURE;
     }
+
+    config = Mem_Strdup(found->config_name);
   }
 
   // Path =====================================================================
@@ -159,12 +186,12 @@ int Set_Or_Apply() {
     }
   }
 
-  ServiceConfig_Load();
+  ServiceConfig_Load(&service_config);
 
   service_config.SelectedConfigId = config;
-  ServiceConfig_Set_SelectedConfigId(&service_config);
+  service_config.isset.SelectedConfigId = true;
 
-  Error e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
+  Error e = ServiceConfig_Write(&service_config, NBFC_SERVICE_CONFIG);
   Mem_Free(config);
 
   if (e) {
@@ -172,18 +199,21 @@ int Set_Or_Apply() {
     return NBFC_EXIT_FAILURE;
   }
 
-  if (Config_Options.action == Config_Action_Apply)
-    return Service_Restart(false);
-
+  printf("%s\n", CONFIG_SET_NOTICE);
   return NBFC_EXIT_SUCCESS;
 }
 
-int Config() {
+static int Config_Apply(void) {
+  printf("%s\n", CONFIG_APPLY_NOTICE);
+  return NBFC_EXIT_FAILURE;
+}
+
+int Config(void) {
   switch (Config_Options.action) {
-  case Config_Action_List:      return List();
-  case Config_Action_Recommend: return Recommend();
-  case Config_Action_Set:       return Set_Or_Apply();
-  case Config_Action_Apply:     return Set_Or_Apply();
+  case Config_Action_List:      return Config_List();
+  case Config_Action_Recommend: return Config_Recommend();
+  case Config_Action_Set:       return Config_Set();
+  case Config_Action_Apply:     return Config_Apply();
   default:
     printf("%s", CLIENT_CONFIG_HELP_TEXT);
     return NBFC_EXIT_CMDLINE;

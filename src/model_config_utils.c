@@ -2,13 +2,15 @@
 
 #include "acpi_analysis.h"
 
+#include <string.h> // strcmp
+
 /*
  * Checks if two ACPI method calls are equal.
  *
  * TODO: Check if arguments are also equal
  */
 static bool AcpiMethodCall_Equal(const char* a, const char* b) {
-  return Acpi_Analysis_Path_Equals(a, b);
+  return AcpiAnalysis_PathEquals(a, b);
 }
 
 /*
@@ -19,33 +21,48 @@ static bool FanConfiguration_IsSimilar(
   const FanConfiguration* b
 ) {
   const bool same_fields =
-    (FanConfiguration_IsSet_ReadRegister(a) == FanConfiguration_IsSet_ReadRegister(b)) &&
-    (FanConfiguration_IsSet_WriteRegister(a) == FanConfiguration_IsSet_WriteRegister(b)) &&
-    (FanConfiguration_IsSet_ReadAcpiMethod(a) == FanConfiguration_IsSet_ReadAcpiMethod(b)) &&
-    (FanConfiguration_IsSet_WriteAcpiMethod(a) == FanConfiguration_IsSet_WriteAcpiMethod(b)) &&
-    (FanConfiguration_IsSet_ResetAcpiMethod(a) == FanConfiguration_IsSet_ResetAcpiMethod(b));
+    (a->isset.ReadRegister == b->isset.ReadRegister) &&
+    (a->isset.WriteRegister == b->isset.WriteRegister) &&
+    (a->isset.ReadAcpiMethod == b->isset.ReadAcpiMethod) &&
+    (a->isset.WriteAcpiMethod == b->isset.WriteAcpiMethod) &&
+    (a->isset.ResetAcpiMethod == b->isset.ResetAcpiMethod) &&
+    (a->isset.ReadLuaCode == b->isset.ReadLuaCode) &&
+    (a->isset.WriteLuaCode == b->isset.WriteLuaCode) &&
+    (a->isset.ResetLuaCode == b->isset.ResetLuaCode);
 
   if (! same_fields)
     return false;
 
-  if (FanConfiguration_IsSet_ReadRegister(a))
+  if (a->isset.ReadRegister)
     if (a->ReadRegister != b->ReadRegister)
       return false;
 
-  if (FanConfiguration_IsSet_WriteRegister(a))
+  if (a->isset.WriteRegister)
     if (a->WriteRegister != b->WriteRegister)
       return false;
 
-  if (FanConfiguration_IsSet_ReadAcpiMethod(a))
+  if (a->isset.ReadAcpiMethod)
     if (! AcpiMethodCall_Equal(a->ReadAcpiMethod, b->ReadAcpiMethod))
       return false;
 
-  if (FanConfiguration_IsSet_WriteAcpiMethod(a))
+  if (a->isset.WriteAcpiMethod)
     if (! AcpiMethodCall_Equal(a->WriteAcpiMethod, b->WriteAcpiMethod))
       return false;
 
-  if (FanConfiguration_IsSet_ResetAcpiMethod(a))
+  if (a->isset.ResetAcpiMethod)
     if (! AcpiMethodCall_Equal(a->ResetAcpiMethod, b->ResetAcpiMethod))
+      return false;
+
+  if (a->isset.ReadLuaCode)
+    if (strcmp(a->ReadLuaCode.source, b->ReadLuaCode.source))
+      return false;
+
+  if (a->isset.WriteLuaCode)
+    if (strcmp(a->WriteLuaCode.source, b->WriteLuaCode.source))
+      return false;
+
+  if (a->isset.ResetLuaCode)
+    if (strcmp(a->ResetLuaCode.source, b->ResetLuaCode.source))
       return false;
 
   return true;
@@ -58,7 +75,7 @@ static bool RegisterWriteConfiguration_IsSimilar(
   const RegisterWriteConfiguration* a,
   const RegisterWriteConfiguration* b
 ) {
-  const bool same_modes = 
+  const bool same_modes =
     (a->WriteMode == b->WriteMode) &&
     (a->ResetWriteMode == b->ResetWriteMode);
 
@@ -69,6 +86,10 @@ static bool RegisterWriteConfiguration_IsSimilar(
     if (! AcpiMethodCall_Equal(a->AcpiMethod, b->AcpiMethod))
       return false;
   }
+  else if (a->WriteMode == RegisterWriteMode_Lua) {
+    if (strcmp(a->LuaCode.source, b->LuaCode.source))
+      return false;
+  }
   else {
     if (a->Register != b->Register)
       return false;
@@ -76,6 +97,10 @@ static bool RegisterWriteConfiguration_IsSimilar(
 
   if (a->ResetWriteMode == RegisterWriteMode_Call) {
     if (! AcpiMethodCall_Equal(a->ResetAcpiMethod, b->ResetAcpiMethod))
+      return false;
+  }
+  else if (a->ResetWriteMode == RegisterWriteMode_Lua) {
+    if (strcmp(a->ResetLuaCode.source, b->ResetLuaCode.source))
       return false;
   }
   else {
@@ -90,8 +115,8 @@ static bool RegisterWriteConfiguration_IsSimilar(
  * Checks if two array_of(FanConfiguration) are similar.
  */
 static bool FanConfigurations_AreSimilar(
-  array_of(FanConfiguration)* fans1,
-  array_of(FanConfiguration)* fans2
+  const array_of(FanConfiguration)* fans1,
+  const array_of(FanConfiguration)* fans2
 ) {
   if (fans1->size != fans2->size)
     return false;
@@ -126,8 +151,8 @@ static bool FanConfigurations_AreSimilar(
  * Checks if two array_of(RegisterWriteConfiguration) are similar.
  */
 static bool RegisterWriteConfigurations_AreSimilar(
-  array_of(RegisterWriteConfiguration)* rwcs1,
-  array_of(RegisterWriteConfiguration)* rwcs2
+  const array_of(RegisterWriteConfiguration)* rwcs1,
+  const array_of(RegisterWriteConfiguration)* rwcs2
 ) {
   if (rwcs1->size != rwcs2->size)
     return false;
@@ -162,8 +187,8 @@ static bool RegisterWriteConfigurations_AreSimilar(
  * Checks if two ModelConfigs are similar.
  */
 bool ModelConfig_IsSimilar(
-  ModelConfig* a,
-  ModelConfig* b 
+  const ModelConfig* a,
+  const ModelConfig* b
 ) {
   return
     FanConfigurations_AreSimilar(&a->FanConfigurations, &b->FanConfigurations) &&

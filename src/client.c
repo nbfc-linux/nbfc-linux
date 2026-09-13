@@ -19,9 +19,16 @@
 #include "parse_double.h"
 #include "client/client_global.h"
 
+#include "acpi_call.c"
 #include "buffer.c"
 #include "log.c"
+#include "lua_bindings.c"
 #include "error.c"
+#include "ec.c"
+#include "ec_linux.c"
+#include "ec_sys_linux.c"
+#include "ec_dummy.c"
+#include "fan.c"
 #include "file_utils.c"
 #include "model_config.c"
 #include "fs_sensors.c"
@@ -39,16 +46,26 @@
 #include "mkdir_p.c"
 #include "regex_utils.c"
 #include "acpi_analysis.c"
+#include "aml_lexer.c"
+#include "aml_parser.c"
+#include "aml_analysis.c"
+#include "config_analysis.c"
 #include "config_rating.c"
 #include "config_rating_rules.c"
 #include "model_config_utils.c"
+#include "model_config_to_json.c"
+#include "register_write_configuration_utils.c"
+#include "str_functions.c"
+#include "temperature_threshold_manager.c"
+#include "xml2json.c"
 #include "client/dmi.c"
 #include "client/curl_utils.c"
 #include "client/config_files.c"
-#include "client/str_functions.c"
 #include "client/service_control.c"
 
-const struct cli99_Option main_options[] = {
+const EC_VTable* ec = NULL;
+
+const struct cli99_Option Main_CommandLine[] = {
   {"-h|--help",     Option_Help,       cli99_NoArgument      },
   {"-v|--version",  Option_Version,    cli99_NoArgument      },
   {"command",       Option_Command,    cli99_NormalPositional},
@@ -71,28 +88,33 @@ const struct cli99_Option main_options[] = {
 #include "client/cmd_support.c"
 #include "client/cmd_acpi_dump.c"
 #include "client/cmd_rate_config.c"
+#include "client/cmd_reset_ec.c"
+#include "client/cmd_xml2json.c"
 
 #define NBFC_CLIENT_COMMANDS \
-  o("set",              Set,              SET,              set)           \
-  o("status",           Status,           STATUS,           status)        \
-  o("start",            Start,            START,            start)         \
-  o("stop",             Stop,             STOP,             main)          \
-  o("restart",          Restart,          RESTART,          start)         \
-  o("sensors",          Sensors,          SENSORS,          sensors)       \
-  o("config",           Config,           CONFIG,           config)        \
-  o("rate-config",      Rate_Config,      RATE_CONFIG,      rate_config)   \
-  o("acpi-dump",        Acpi_Dump,        ACPI_DUMP,        acpi_dump)     \
-  o("update",           Update,           UPDATE,           update)        \
-  o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   main)          \
-  o("get-model-name",   Get_Model_Name,   GET_MODEL,        main)          \
-  o("complete-fans",    Complete_Fans,    COMPLETE_FANS,    main)          \
-  o("complete-sensors", Complete_Sensors, COMPLETE_SENSORS, main)          \
-  o("show-variable",    Show_Variable,    SHOW_VARIABLE,    show_variable) \
-  o("warranty",         Warranty,         WARRANTY,         main)          \
-  o("donate",           Donate,           SUPPORT,          main)          \
-  o("support",          Support,          SUPPORT,          support)       \
-  o("help",             Help,             HELP,             main)
-//  COMMAND             ENUM              HELP TEXT         OPTIONS
+  o("set",              Set,              SET,              Set)           \
+  o("status",           Status,           STATUS,           Status)        \
+  o("start",            Start,            START,            Start)         \
+  o("stop",             Stop,             STOP,             Main)          \
+  o("restart",          Restart,          RESTART,          Start)         \
+  o("sensors",          Sensors,          SENSORS,          Sensors)       \
+  o("config",           Config,           CONFIG,           Config)        \
+  o("rate-config",      RateConfig,       RATE_CONFIG,      RateConfig)    \
+  o("acpi-dump",        AcpiDump,         ACPI_DUMP,        AcpiDump)      \
+  o("update",           Update,           UPDATE,           Update)        \
+  o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   Main)          \
+  o("get-model-name",   Get_Model_Name,   GET_MODEL,        Main)          \
+  o("complete-fans",    Complete_Fans,    COMPLETE_FANS,    Main)          \
+  o("complete-sensors", Complete_Sensors, COMPLETE_SENSORS, Main)          \
+  o("show-variable",    ShowVariable,     SHOW_VARIABLE,    ShowVariable)  \
+  o("xml2json",         Xml2Json,         XML2JSON,         Xml2Json)      \
+  o("warranty",         Warranty,         WARRANTY,         Main)          \
+  o("donate",           Donate,           SUPPORT,          Main)          \
+  o("support",          Support,          SUPPORT,          Support)       \
+  o("help",             Help,             HELP,             Main)          \
+  o("faq",              FAQ,              FAQ,              Main)          \
+  o("reset-ec",         ResetEc,          RESET_EC,         Main)
+//  COMMAND             ENUM              HELP TEXT         COMMANDLINE
 
 enum Command {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
@@ -101,7 +123,7 @@ enum Command {
 #undef o
 };
 
-static const char *HelpTexts[] = {
+static const char* HelpTexts[] = {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  CLIENT_ ## HELP ## _HELP_TEXT,
   NBFC_CLIENT_COMMANDS
 #undef o
@@ -121,8 +143,8 @@ static enum Command Command_FromString(const char* s) {
   return Command_End;
 }
 
-static const struct cli99_Option *Options[] = {
-#define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _options,
+static const struct cli99_Option* Options[] = {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _CommandLine,
   NBFC_CLIENT_COMMANDS
 #undef o
 };
@@ -131,7 +153,7 @@ static const struct cli99_Option *Options[] = {
 // Main
 // ============================================================================
 
-int main(int argc, char *const argv[]) {
+int main(int argc, char* const argv[]) {
   if (geteuid() == 0) {
     mkdir_p(NBFC_CONFIG_DIR, 0755);
     mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755);
@@ -149,7 +171,7 @@ int main(int argc, char *const argv[]) {
   const char* err;
   enum Command cmd = Command_Help;
   struct cli99 p;
-  cli99_Init(&p, main_options, argv, argc);
+  cli99_Init(&p, Main_CommandLine, argv, argc);
   while ((o = cli99_GetOpt(&p))) {
     switch (o) {
 
@@ -216,7 +238,7 @@ int main(int argc, char *const argv[]) {
 
         if (! have_fan) {
           fans->size++;
-          fans->data = Mem_Realloc(fans->data, fans->size * sizeof(int));
+          array_realloc(array_size_t, *fans, fans->size);
           fans->data[fans->size - 1] = fan;
         }
       }
@@ -242,7 +264,7 @@ int main(int argc, char *const argv[]) {
       }
 
       if (Sensors_Options.command == Sensors_Command_Set)
-        p.options = sensors_set_options;
+        p.options = Sensors_Set_CommandLine;
 
       break;
 
@@ -258,7 +280,7 @@ int main(int argc, char *const argv[]) {
       {
         array_of(str)* sensors = &Sensors_Options.sensors;
         sensors->size++;
-        sensors->data = Mem_Realloc(sensors->data, sensors->size * sizeof(str));
+        array_realloc(str, *sensors, sensors->size);
         sensors->data[sensors->size - 1] = p.optarg;
       }
       break;
@@ -368,53 +390,94 @@ int main(int argc, char *const argv[]) {
     // Support options
     // ========================================================================
 
-    case Option_Support_Upload_Firmware:
-      Support_Options.action = Support_Action_Upload_Firmware;
+    case Option_Support_UploadFirmware:
+      Support_Options.action = Support_Action_UploadFirmware;
       break;
 
-    case Option_Support_Print_Command:
-      Support_Options.action = Support_Action_Print_Command;
+    case Option_Support_PrintCommand:
+      Support_Options.action = Support_Action_PrintCommand;
+      break;
+
+    case Option_Support_CreateArchive:
+      Support_Options.action = Support_Action_CreateArchive;
+      Support_Options.archive_file = p.optarg;
       break;
 
     // ========================================================================
     // Rate-Config options
     // ========================================================================
 
-    case Option_Rate_Config_File:
-      Rate_Config_Options.file = p.optarg;
+    case Option_RateConfig_All:
+      RateConfig_SetAction(RateConfig_Action_RateAll, p.option->optstring);
       break;
 
-    case Option_Rate_Config_DSDT_File:
-      Rate_Config_Options.dsdt_file = p.optarg;
+    case Option_RateConfig_File:
+      RateConfig_SetAction(RateConfig_Action_RateFile, p.option->optstring);
+      RateConfig_Options.file = p.optarg;
       break;
 
-   case Option_Rate_Config_Rules:
-      Rate_Config_Options.rules_file = p.optarg;
+    case Option_RateConfig_Input:
+      RateConfig_SetAction(RateConfig_Action_RateFromFile, p.option->optstring);
+      RateConfig_Options.input_file = p.optarg;
       break;
 
-   case Option_Rate_Config_No_Download:
-      Rate_Config_Options.no_download = true;
+    case Option_RateConfig_Full_Help:
+      RateConfig_SetAction(RateConfig_Action_PrintFullHelp, p.option->optstring);
       break;
 
-    case Option_Rate_Config_All:
-      Rate_Config_Options.all = true;
+    case Option_RateConfig_Print_Rules:
+      RateConfig_SetAction(RateConfig_Action_PrintRules, p.option->optstring);
       break;
 
-    case Option_Rate_Config_Full_Help:
-      Rate_Config_Options.full_help = true;
+    case Option_RateConfig_DSDT_File:
+      if (RateConfig_Options.dsdt_files_size >= ACPI_ANALYSIS_MAX_AML_FILES) {
+        Log_Error("%s: Too many files given", p.option->optstring);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      RateConfig_Options.dsdt_files[RateConfig_Options.dsdt_files_size++] = p.optarg;
       break;
 
-    case Option_Rate_Config_Json:
-      Rate_Config_Options.json = true;
+   case Option_RateConfig_DSDT_Dir:
+      RateConfig_Options.dsdt_dir = p.optarg;
       break;
 
-    case Option_Rate_Config_Print_Rules:
-      Rate_Config_Options.print_rules = true;
+   case Option_RateConfig_Rules:
+      RateConfig_Options.rules_file = p.optarg;
       break;
 
-    case Option_Rate_Config_Min_Score:
-      Rate_Config_Options.min_score_set = true;
-      Rate_Config_Options.min_score = (float) parse_double(p.optarg, 0, 10, &err);
+   case Option_RateConfig_No_Download:
+      RateConfig_Options.no_download = true;
+      break;
+
+    case Option_RateConfig_Json:
+      RateConfig_Options.json = true;
+      break;
+
+    case Option_RateConfig_Unverified:
+      RateConfig_Options.unverified = true;
+      break;
+
+    case Option_RateConfig_Min_Score:
+      RateConfig_Options.min_score_set = true;
+      RateConfig_Options.min_score = (float) parse_double(p.optarg, 0, 10, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Option_RateConfig_Bad:
+      RateConfig_Options.filter = RateConfig_FilterBadOnly;
+      break;
+
+    case Option_RateConfig_Quiet:
+      if (RateConfig_Options.style)
+        RateConfig_Options.style--;
+      break;
+
+    case Option_RateConfig_FanCount:
+      RateConfig_Options.fan_count = (uint8_t) parse_number(p.optarg, 0, 255, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
         return NBFC_EXIT_CMDLINE;
@@ -425,17 +488,30 @@ int main(int argc, char *const argv[]) {
     // Acpi-Dump options
     // ========================================================================
 
-    case Option_Acpi_Dump_File:
-      Acpi_Dump_Options.file = p.optarg;
+    case Option_AcpiDump_DSDT_File:
+      if (AcpiDump_Options.files_size >= ACPI_ANALYSIS_MAX_AML_FILES) {
+        Log_Error("%s: Too many files given", p.option->optstring);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      AcpiDump_Options.files[AcpiDump_Options.files_size++] = p.optarg;
       break;
 
-    case Option_Acpi_Dump_Json:
-      Acpi_Dump_Options.json = true;
+    case Option_AcpiDump_DSDT_Dir:
+      AcpiDump_Options.dir = p.optarg;
       break;
 
-    case Option_Acpi_Dump_Command:
-      Acpi_Dump_Options.action = AcpiDump_CommandFromString(p.optarg);
-      if (Acpi_Dump_Options.action == AcpiDump_Action_None) {
+    case Option_AcpiDump_Json:
+      AcpiDump_Options.json = true;
+      break;
+
+    case Option_AcpiDump_Unverified:
+      AcpiDump_Options.unverified = true;
+      break;
+
+    case Option_AcpiDump_Command:
+      AcpiDump_Options.action = AcpiDump_CommandFromString(p.optarg);
+      if (AcpiDump_Options.action == AcpiDump_Action_None) {
         Log_Error("Invalid command: %s", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
@@ -446,7 +522,15 @@ int main(int argc, char *const argv[]) {
     // ========================================================================
 
     case Option_ShowVariable_Variable:
-      Show_Variable_Options.variable = p.optarg;
+      ShowVariable_Options.variable = p.optarg;
+      break;
+
+    // ========================================================================
+    // Xml2Json options
+    // ========================================================================
+
+    case Option_Xml2Json_File:
+      Xml2Json_Options.file = p.optarg;
       break;
 
     // ========================================================================
@@ -464,20 +548,23 @@ int main(int argc, char *const argv[]) {
   case Command_Stop:              return Stop();
   case Command_Restart:           return Restart();
   case Command_Config:            return Config();
-  case Command_Rate_Config:       return RateConfig();
-  case Command_Acpi_Dump:         return AcpiDump();
+  case Command_RateConfig:        return RateConfig();
+  case Command_AcpiDump:          return AcpiDump();
   case Command_Set:               return Set();
   case Command_Status:            return Status();
   case Command_Sensors:           return Sensors();
   case Command_Update:            return Update();
-  case Command_Wait_For_Hwmon:    return Wait_For_Hwmon();
-  case Command_Get_Model_Name:    return Get_Model_Name();
-  case Command_Show_Variable:     return Show_Variable();
-  case Command_Complete_Fans:     return Complete_Fans();
-  case Command_Complete_Sensors:  return Complete_Sensors();
+  case Command_Wait_For_Hwmon:    return WaitForHwmon();
+  case Command_Get_Model_Name:    return GetModelName();
+  case Command_ShowVariable:      return ShowVariable();
+  case Command_Complete_Fans:     return CompleteFans();
+  case Command_Complete_Sensors:  return CompleteSensors();
   case Command_Warranty:          return Warranty();
   case Command_Donate:            return Support();
   case Command_Support:           return Support();
+  case Command_Xml2Json:          return Xml2Json();
+  case Command_FAQ:               return FAQ();
+  case Command_ResetEc:           return ResetEc();
   default:                        return NBFC_EXIT_FAILURE;
   }
 }

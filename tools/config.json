@@ -81,6 +81,12 @@
         "required": false
       },
       {
+        "name": "LuaCode",
+        "type": "LuaCode",
+        "help": "The Lua code to execute",
+        "required": false
+      },
+      {
         "name": "ResetRequired",
         "type": "bool",
         "default": "false",
@@ -99,6 +105,12 @@
         "required": false
       },
       {
+        "name": "ResetLuaCode",
+        "type": "LuaCode",
+        "help": "The Lua code to execute on reset",
+        "required": false
+      },
+      {
         "name": "ResetWriteMode",
         "type": "RegisterWriteMode",
         "default": "RegisterWriteMode_Set",
@@ -107,8 +119,8 @@
       {
         "name": "Description",
         "type": "const char*",
-        "default": "Mem_Strdup(\"\")",
-        "help": "A short description of what effect the RegisterWriteConfiguration will have"
+        "help": "A short description of what effect the RegisterWriteConfiguration will have",
+        "required": false
       }
     ]
   },
@@ -135,6 +147,12 @@
         "required": false
       },
       {
+        "name": "ReadLuaCode",
+        "type": "LuaCode",
+        "help": "The Lua code to execute on read",
+        "required": false
+      },
+      {
         "name": "WriteRegister",
         "type": "uint8_t",
         "help": "The register which NBFC uses to control the fan",
@@ -144,6 +162,12 @@
         "name": "WriteAcpiMethod",
         "type": "const char*",
         "help": "The ACPI method for setting the fan speed.",
+        "required": false
+      },
+      {
+        "name": "WriteLuaCode",
+        "type": "LuaCode",
+        "help": "The Lua code to execute on write",
         "required": false
       },
       {
@@ -190,6 +214,12 @@
         "name": "ResetAcpiMethod",
         "type": "const char*",
         "help": "The ACPI method for resetting the fan speed.",
+        "required": false
+      },
+      {
+        "name": "ResetLuaCode",
+        "type": "LuaCode",
+        "help": "The Lua code to be executed on fan reset",
         "required": false
       },
       {
@@ -255,13 +285,20 @@
       {
         "name": "Author",
         "type": "const char*",
-        "default": "Mem_Strdup(\"\")",
-        "help": "The Author of the config file. Enter whatever you want."
+        "help": "The Author of the config file. Enter whatever you want.",
+        "required": false
       },
       {
         "name": "LegacyTemperatureThresholdsBehaviour",
         "type": "bool",
         "default": "false"
+      },
+      {
+        "name": "LuaLibraries",
+        "type": "bool",
+        "help": "Included Lua libraries",
+        "required": false,
+        "from_json": "LuaLibraries_FromJson"
       },
       {
         "name": "EcPollInterval",
@@ -291,6 +328,11 @@
         "name": "Sponsor",
         "type": "Sponsor",
         "help": "Sponsored by data",
+        "required": false
+      },
+      {
+        "name": "FirmwareFingerprint",
+        "type": "array_of(str)",
         "required": false
       },
       {

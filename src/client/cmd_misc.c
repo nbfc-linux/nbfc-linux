@@ -11,13 +11,13 @@
 #include "dmi.h"
 #include "service_control.h"
 
-static int Wait_For_Hwmon() {
-  const char *hwmon_file_names[] = {
+static int WaitForHwmon(void) {
+  const char* hwmon_file_names[] = {
     "/sys/class/hwmon/hwmon%d/name",
     "/sys/class/hwmon/hwmon%d/device/name",
     NULL
   };
-  const char *linux_temp_sensor_names[] = {
+  const char* linux_temp_sensor_names[] = {
     "coretemp", "k10temp", "zenpower", NULL
   };
 
@@ -28,7 +28,7 @@ static int Wait_For_Hwmon() {
     for (const char** format = hwmon_file_names; *format; ++format) {
       for (int i = 0; i < 10; i++) {
         snprintf(filename, sizeof(filename), *format, i);
-        if (! slurp_file(content, sizeof(content), filename).ok)
+        if (! File_Read(content, sizeof(content), filename).ok)
           continue;
 
         // trim the newline
@@ -47,17 +47,18 @@ static int Wait_For_Hwmon() {
   return NBFC_EXIT_FAILURE;
 }
 
-static int Get_Model_Name() {
-  printf("%s\n", DMI_Get_Model_Name());
+static int GetModelName(void) {
+  printf("%s\n", DMI_GetModelName());
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Complete_Fans() {
+static int CompleteFans(void) {
+  ServiceConfig service_config = {0};
   ModelConfig model_config = {0};
 
   close(STDERR_FILENO);
 
-  Service_LoadAllConfigFiles(&model_config);
+  Service_LoadAllConfigFiles(&service_config, &model_config);
 
   int idx = 0;
   for_each_array(const FanConfiguration*, fc, model_config.FanConfigurations)
@@ -66,7 +67,7 @@ static int Complete_Fans() {
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Complete_Sensors() {
+static int CompleteSensors(void) {
   FS_Sensors_Init();
 
   const char* having[4096];
@@ -102,4 +103,8 @@ static int Complete_Sensors() {
   }
 
   return NBFC_EXIT_SUCCESS;
+}
+
+static int FAQ(void) {
+  return execlp("man", "man", "nbfc.faq", NULL);
 }

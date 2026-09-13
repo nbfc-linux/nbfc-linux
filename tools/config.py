@@ -182,23 +182,18 @@ def parse_xml_file(file):
     xml_remove_comments(root)
     return handle_xml_node(root, structs['ModelConfig'])
 
-def get_set_field_for_struct(struct):
-    length = len(struct)
-    if length < 8:  return 'uint8_t'
-    if length < 16: return 'uint16_t'
-    return 'uint32_t'
-
 def write_header(fh):
     p = lambda *a,**kw: print(*a, **kw, file=fh)
 
     p('/* Auto generated code %r */\n' % sys.argv);
     for name, struct in structs.items():
-        _set_field_type = get_set_field_for_struct(struct)
-
         p(f'struct {name} {{')
         for field in struct:
             p(f'\t{field.type:<15} {field.var};')
-        p(f'\t{_set_field_type:<15} _set;')
+        p(f'\tstruct {{')
+        for field in struct:
+            p(f'\t\tbool {field.var:<15} : 1;')
+        p(f'\t}} isset;')
         p('};')
         p('')
         p(f'typedef struct {name} {name};')
@@ -206,22 +201,6 @@ def write_header(fh):
         p(f'Error {struct.name}_FromJson({struct.name}*, const nx_json*);')
         p(f'Error {struct.name}_ValidateFields({struct.name}*);')
         p('')
-
-        for i, field in enumerate(struct):
-            p(f'static inline void {name}_Set_{field.var}({name}* o) {{')
-            p(f'\to->_set |= ({_set_field_type}) (1U << {i});')
-            p(f'}}')
-            p('')
-
-            p(f'static inline void {name}_UnSet_{field.var}({name}* o) {{')
-            p(f'\to->_set &= ({_set_field_type}) ~(1U << {i});')
-            p(f'}}')
-            p('')
-
-            p(f'static inline bool {name}_IsSet_{field.var}(const {name}* o) {{')
-            p(f'\treturn o->_set & ({_set_field_type}) (1U << {i});')
-            p(f'}}')
-            p('')
 
 def write_source(fh):
     p = lambda *a,**kw: print(*a, **kw, file=fh)
@@ -241,7 +220,7 @@ def write_validate_fields(struct, fh):
         if field.required == False:
             is_unset = 'false'
         else:
-            is_unset = f'! {struct.name}_IsSet_{field.var}(self)'
+            is_unset = f'! self->isset.{field.var}'
 
         if field.default is not None:
             set_or_throw = f'self->{field.var} = {field.default}'
@@ -279,7 +258,7 @@ def write_parse_struct(struct, fh):
         p(f'\t\telse if (!strcmp(c->key, "{field.name}")) {{')
         p(f'\t\t\te = {field.from_json}(&obj->{field.var}, c);')
         p(f'\t\t\tif (!e)')
-        p(f'\t\t\t\t{struct.name}_Set_{field.var}(obj);')
+        p(f'\t\t\t\tobj->isset.{field.var} = true;')
         p(f'\t\t}}')
 
     p( '\t\telse')

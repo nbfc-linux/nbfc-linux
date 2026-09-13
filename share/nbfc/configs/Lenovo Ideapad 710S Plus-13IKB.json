@@ -1,0 +1,55 @@
+{
+ "LegacyTemperatureThresholdsBehaviour": true,
+ "NotebookModel": "Ideapad 710S Plus-13IKB",
+ "Author": "adrian.dinu95@gmail.com",
+ "EcPollInterval": 1500,
+ "ReadWriteWords": false,
+ "CriticalTemperature": 90,
+ "FanConfigurations": [
+  {
+   "ReadRegister": 6,
+   "WriteRegister": 176,
+   "MinSpeedValue": 38,
+   "MaxSpeedValue": 92,
+   "IndependentReadMinMaxValues": true,
+   "MinSpeedValueRead": 39,
+   "MaxSpeedValueRead": 61,
+   "ResetRequired": false,
+   "FanSpeedResetValue": 0,
+   "TemperatureThresholds": [
+    {
+     "UpThreshold": 20,
+     "DownThreshold": 20,
+     "FanSpeed": 0.0
+    },
+    {
+     "UpThreshold": 58,
+     "DownThreshold": 50,
+     "FanSpeed": 20.0
+    },
+    {
+     "UpThreshold": 68,
+     "DownThreshold": 60,
+     "FanSpeed": 60.0
+    },
+    {
+     "UpThreshold": 78,
+     "DownThreshold": 70,
+     "FanSpeed": 100.0
+    }
+   ],
+   "FanSpeedPercentageOverrides": [
+    {
+     "FanSpeedPercentage": 0.0,
+     "FanSpeedValue": 0,
+     "TargetOperation": "Write"
+    },
+    {
+     "FanSpeedPercentage": 0.0,
+     "FanSpeedValue": 0,
+     "TargetOperation": "Read"
+    }
+   ]
+  }
+ ]
+}

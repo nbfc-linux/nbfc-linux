@@ -5,6 +5,6 @@
 
 #include <stdbool.h>
 
-bool ModelConfig_IsSimilar(ModelConfig* a, ModelConfig* b);
+bool ModelConfig_IsSimilar(const ModelConfig* a, const ModelConfig* b);
 
 #endif

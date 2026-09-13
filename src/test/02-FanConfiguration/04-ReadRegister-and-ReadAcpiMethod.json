@@ -11,5 +11,5 @@
     }
   ],
 
-  "Expected": "FanConfigurations[0]: Cannot set both ReadRegister and ReadAcpiMethod"
+  "Expected": "FanConfigurations[0]: Can only set one of: ReadRegister, ReadAcpiMethod, ReadLuaCode"
 }

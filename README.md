@@ -35,7 +35,7 @@ Comparison of NBFC C# and NBFC Linux
 |Portability                      | Crossplatform                         | Linux                                       |
 |Runtime                          | Mono                                  | Native                                      |
 |Memory Consumption (ps\_mem)     | ~50MB                                 | ~230KB                                      |
-|Model Configuration Files        | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) (210 files) | [JSON](share/nbfc/configs) (311 files) |
+|Model Configuration Files        | [XML](https://github.com/hirschmann/nbfc/tree/master/Configs) (210 files) | [JSON](share/nbfc/configs) (312 files) |
 |Model Compatibility Database     | No                                    | [Yes](share/nbfc/model_support.json)        |
 |Fan Control Rights               | Any user                              | Any user                                    |
 |Service Control Rights           | Any user                              | Only root                                   |
@@ -50,23 +50,27 @@ The [service](doc/nbfc_service.1.md), the [client](doc/nbfc.1.md) and the [probi
 Installation
 ------------
 
+### Packages
+
+| Operating System      | Download                       | Command                                        |
+|-----------------------|--------------------------------|-------------------------------------------------
+| Arch Linux            | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/arch-linux-nbfc-linux-git-0.5.3-1-x86_64.pkg.tar.zst)       | `sudo pacman -U ./arch-linux-nbfc-linux-git-0.5.3-1-x86_64.pkg.tar.zst`         |
+| Debian Trixie         | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/debian-trixie-nbfc-linux_0.5.3_amd64.deb)   | `sudo apt install ./debian-trixie-nbfc-linux_0.5.3_amd64.deb`   |
+| Debian Bookworm       | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/debian-bookworm-nbfc-linux_0.5.3_amd64.deb) | `sudo apt install ./debian-bookworm-nbfc-linux_0.5.3_amd64.deb` |
+| Ubuntu Resolute       | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/ubuntu-resolute-nbfc-linux_0.5.3_amd64.deb) | `sudo apt install ./ubuntu-resolute-nbfc-linux_0.5.3_amd64.deb` |
+| Ubuntu Noble          | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/ubuntu-noble-nbfc-linux_0.5.3_amd64.deb)    | `sudo apt install ./ubuntu-noble-nbfc-linux_0.5.3_amd64.deb`    |
+| Ubuntu Jammy          | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/ubuntu-jammy-nbfc-linux_0.5.3_amd64.deb)    | `sudo apt install ./ubuntu-jammy-nbfc-linux_0.5.3_amd64.deb`    |
+| Linux Mint 22         | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/linux-mint-22-nbfc-linux_0.5.3_amd64.deb)   | `sudo apt install ./linux-mint-22-nbfc-linux_0.5.3_amd64.deb`   |
+| Linux Mint 21         | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/linux-mint-21-nbfc-linux_0.5.3_amd64.deb)   | `sudo apt install ./linux-mint-21-nbfc-linux_0.5.3_amd64.deb`   |
+| Fedora 44             | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/fedora-44-nbfc-linux-0.5.3-1.x86_64.rpm)       | `sudo dnf install ./fedora-44-nbfc-linux-0.5.3-1.x86_64.rpm`       |
+| Fedora 43             | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/fedora-43-nbfc-linux-0.5.3-1.x86_64.rpm)       | `sudo dnf install ./fedora-43-nbfc-linux-0.5.3-1.x86_64.rpm`       |
+| OpenSuse (Tumbleweed) | [0.5.3](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.5.3/opensuse-nbfc-linux-0.5.3-1.x86_64.rpm)        | `sudo zypper install ./opensuse-nbfc-linux-0.5.3-1.x86_64.rpm`     |
+
+### Alternative Installation Methods
+
 - Arch Linux:
-  - [Download Latest Version 0.4.0](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.0/arch-linux-nbfc-linux-git-0.4.0.pkg.tar.zst)
-  - Install NBFC-Linux: `pacman -U ./arch-linux-nbfc-linux-git-0.4.0.pkg.tar.zst`
-  - Or via AUR (`yay -S nbfc-linux`)
-  - Or by using the PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
-
-- Debian / Ubuntu:
-  - [Download Latest Version 0.4.0](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.0/debian-nbfc-linux_0.4.0_amd64.deb)
-  - Install NBFC-Linux: `apt install ./debian-nbfc-linux_0.4.0_amd64.deb`
-
-- Fedora:
-  - [Download Latest Version 0.4.0](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.0/fedora-nbfc-linux-0.4.0-1.x86_64.rpm)
-  - Install NBFC-Linux: `dnf install ./fedora-nbfc-linux-0.4.0-1.x86_64.rpm`
-
-- OpenSuse (Tumbleweed)
-  - [Download Latest Version 0.4.0](https://github.com/nbfc-linux/nbfc-linux/releases/download/0.4.0/opensuse-nbfc-linux-0.4.0-1.x86_64.rpm)
-  - Install NBFC-Linux: `zypper install ./opensuse-nbfc-linux-0.4.0-1.x86_64.rpm`
+  - Via AUR (`yay -S nbfc-linux`)
+  - Via PKGBUILD [nbfc-linux-git](pkgbuilds/nbfc-linux-git/PKGBUILD)
 
 - NixOS:
   - [Declaratively](nixos-installation-new.md)
@@ -76,7 +80,7 @@ Installation
   - ensure, that podman is installed
     - docker should work also, but is currently not tested
   - edit [pkgbuilds/rpm/nbfc-linux.spec](./pkgbuilds/rpm/nbfc-linux.spec) and
-    - set wanted Version (e.g. 0.4.0)
+    - set wanted Version (e.g. 0.5.3)
     - set wanted Releasenumber (e.g. 1%{?dist} or 2%{?dist})
   - `./pkgbuilds/rpm/buildNBFC-LINUX`
   - the resulting rpm can be found in [pkgbuilds directory](./pkgbuilds/)
@@ -95,7 +99,7 @@ Getting started with the GUI
 
 Graphical User Interfaces are available as separate projects.
 
-Currently there are two GUI implementations:
+Currently there are three GUI implementations:
 
 - [NBFC-Qt](https://github.com/nbfc-linux/nbfc-qt)
   - Simple GUI written in Python based on Qt5/Qt6
@@ -103,6 +107,9 @@ Currently there are two GUI implementations:
 
 - [NBFC-Gtk](https://github.com/nbfc-linux/nbfc-gtk)
   - Simple GUI written in Python based on Gtk4
+
+- [NBFC-XFCE4-Tray](https://github.com/nbfc-linux/nbfc-xfce4-tray)
+  - Simple XFCE4 Panel Plugin (only for controlling the fans)
 
 Getting started without the GUI
 -------------------------------
@@ -217,7 +224,7 @@ Differences in detail
 
 - The original NBFC service adjusts the fan speeds in intervals of `EcPollIntervall` according to `TemperatureThresholds`. - NBFC Linux directly sets the fan speed (also according to `TemperatureThresholds`).
 
-- The original NBFC service selects a TemperatureThreshold and applies its `FanSpeed` when the temperature exceeds its `UpThreshold`. In contrast, NBFC Linux will select the *next* TemperatureThreshold and apply its `FanSpeed` when the temperature exceeds the *current* `UpThreshold`. The provided config files have been reconfigured to account for this change, so that they provide the same behaviour as the original NBFC service. If you have a custom config file that works well with the original service, you can port it to NBFC Linux using the [provided tool](/tools/config_to_json.py) (requires python3-lxml).
+- The original NBFC service selects a TemperatureThreshold and applies its `FanSpeed` when the temperature exceeds its `UpThreshold`. In contrast, NBFC Linux will select the *next* TemperatureThreshold and apply its `FanSpeed` when the temperature exceeds the *current* `UpThreshold`. The provided config files have been reconfigured to account for this change, so that they provide the same behaviour as the original NBFC service. If you have a custom config file that works well with the original service, you can port it to NBFC Linux using `nbfc xml2json`.
 
 - NBFC Linux dropped the `Autostart` option, since it relies on the systemd service file only.
 

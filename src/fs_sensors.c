@@ -6,10 +6,13 @@
 #include "log.h"
 #include "sleep.h"
 #include "nvidia.h"
+#include "str_functions.h"
 
+#include <dirent.h>  // DIR, opendir, readdir, closedir
 #include <errno.h>   // ENODATA, EINVAL
 #include <stdio.h>   // snprintf
 #include <stdlib.h>  // strtod
+#include <string.h>  // strstr
 #include <linux/limits.h> // PATH_MAX
 
 static const char* const LinuxHwmonDirs[] = {
@@ -22,13 +25,13 @@ static const char* const LinuxTempSensorFile = "temp%d_input";
 
 array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
-Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out) {
+Error FS_TemperatureSource_GetTemperature(const FS_TemperatureSource* self, float* out) {
   char buf[32];
-  file_op_result res;
+  FileResult res;
   res.ok = true;
 
   if (self->type == FS_TemperatureSource_File) {
-    res = slurp_file(buf, sizeof(buf), my.file);
+    res = File_Read(buf, sizeof(buf), my.file);
   }
   else if (self->type == FS_TemperatureSource_Nvidia) {
     return Nvidia_GetTemperature(out);
@@ -66,7 +69,7 @@ Error FS_TemperatureSource_GetTemperature(FS_TemperatureSource* self, float* out
 #define FS_SENSORS_MAX_SOURCES 256
 #define FS_SENSORS_BUFFER_SIZE (sizeof(FS_TemperatureSource) * FS_SENSORS_MAX_SOURCES)
 
-static Error FS_Sensors_Init_HwMon() {
+static Error FS_Sensors_Init_HwMon(void) {
   Error e;
   char* dir = Buffer_Get(PATH_MAX);
   char* file = Buffer_Get(PATH_MAX);
@@ -75,12 +78,12 @@ static Error FS_Sensors_Init_HwMon() {
   array_size_t n_sources = 0;
 
   for (const char* const* hwmonDir = LinuxHwmonDirs; *hwmonDir; ++hwmonDir) {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 20; i++) {
       snprintf(dir,  PATH_MAX, *hwmonDir, i);
       snprintf(file, PATH_MAX, "%s/name", dir);
 
       char source_name[256];
-      file_op_result res = slurp_file(source_name, sizeof(source_name), file);
+      FileResult res = File_Read(source_name, sizeof(source_name), file);
       if (! res.ok) {
         if (errno != ENOENT) {
           e = err_stdlib(file);
@@ -89,8 +92,7 @@ static Error FS_Sensors_Init_HwMon() {
         continue;
       }
 
-      while (res.len && source_name[res.len] < 32)
-        source_name[res.len--] = '\0'; /* strip whitespace */
+      str_rstrip_whitespace(source_name, res.len);
 
       for (int j = 0; j < 10; j++) {
         if (n_sources >= FS_SENSORS_MAX_SOURCES)
@@ -131,18 +133,100 @@ end:
   }
 
   FS_Sensors_Sources.size = n_sources;
-  FS_Sensors_Sources.data = (FS_TemperatureSource*) Mem_Calloc(n_sources, sizeof(FS_TemperatureSource));
+  array_calloc(FS_TemperatureSource, FS_Sensors_Sources, n_sources);
   memcpy(FS_Sensors_Sources.data, sources, n_sources * sizeof(FS_TemperatureSource));
   Buffer_Release((char*) sources, FS_SENSORS_BUFFER_SIZE);
   return err_success();
 }
 
-void FS_Sensors_Log() {
+void FS_Sensors_Log(void) {
   for_each_array(FS_TemperatureSource*, source, FS_Sensors_Sources)
     Log_Info("Available temperature source: \"%s\" (%s)", source->name, source->file);
 }
 
-Error FS_Sensors_Init() {
+// ============================================================================
+// VFIO passthrough detection helpers
+// ============================================================================
+
+// Check /proc/cmdline for vfio-pci.ids or vfio_pci.ids (fast path).
+static bool FS_Sensors_VFIO_CheckProcCmdline(void) {
+  char cmdline[4096];
+  FileResult res = File_Read(cmdline, sizeof(cmdline), "/proc/cmdline");
+  if (!res.ok)
+    return false;
+
+  return strstr(cmdline, "vfio-pci.ids") || strstr(cmdline, "vfio_pci.ids");
+}
+
+#define FS_SENSORS_PCI_DEVICES_PATH "/sys/bus/pci/devices"
+
+// Scan /sys/bus/pci/devices/ for NVIDIA GPUs bound to vfio-pci or pci-stub.
+static bool FS_Sensors_VFIO_CheckSysBusPciDevices(void) {
+  DIR* dir = opendir(FS_SENSORS_PCI_DEVICES_PATH);
+  if (!dir) {
+    Log_Debug("Could not open " FS_SENSORS_PCI_DEVICES_PATH
+              " — cannot check PCI device bindings");
+    return false;
+  }
+
+  struct dirent* entry;
+  while ((entry = readdir(dir)) != NULL) {
+    if (entry->d_name[0] == '.')
+      continue;
+
+    // Read the vendor file for this PCI device
+    char vendor_path[PATH_MAX];
+    snprintf(vendor_path, sizeof(vendor_path),
+             "%s/%s/vendor", FS_SENSORS_PCI_DEVICES_PATH, entry->d_name);
+
+    char vendor[8];
+    FileResult res = File_Read(vendor, sizeof(vendor), vendor_path);
+    if (!res.ok)
+      continue;
+
+    str_rstrip_whitespace(vendor, res.len);
+
+    // NVIDIA PCI vendor ID is 0x10de / 10de
+    if (!strstr(vendor, "10de"))
+      continue;
+
+    // Check if this NVIDIA device is bound to vfio-pci or pci-stub
+    char driver_path[PATH_MAX];
+    snprintf(driver_path, sizeof(driver_path),
+             "%s/%s/driver", FS_SENSORS_PCI_DEVICES_PATH, entry->d_name);
+
+    char driver_target[PATH_MAX];
+    ssize_t linklen = readlink(driver_path, driver_target, sizeof(driver_target) - 1);
+    if (linklen <= 0)
+      continue;
+
+    driver_target[linklen] = '\0';
+
+    // Extract driver name (basename of the target path)
+    const char* driver_name = strrchr(driver_target, '/');
+    if (driver_name)
+      driver_name++;
+    else
+      driver_name = driver_target;
+
+    if (!strcmp(driver_name, "vfio-pci") || !strcmp(driver_name, "pci-stub")) {
+      Log_Info("NVIDIA GPU at %s bound to '%s' —"
+               " VFIO passthrough detected, skipping nvidia-ml sensor",
+               entry->d_name, driver_name);
+      closedir(dir);
+      return true;
+    }
+  }
+
+  closedir(dir);
+  return false;
+}
+
+// ============================================================================
+// FS_Sensors_Init / FS_Sensors_Cleanup
+// ============================================================================
+
+Error FS_Sensors_Init(void) {
   Error e;
   int slept;
   const int sleep_time = 30;
@@ -156,26 +240,32 @@ Error FS_Sensors_Init() {
     sleep_ms(1000);
   }
 
-  // Wait for nvidia module
-  for (; slept < sleep_time; ++slept) {
-    Nvidia_Error ne = Nvidia_Init();
-    if (ne == Nvidia_Error_DlOpen)
+  // If VFIO passthrough is active, skip nvidia-ml entirely.
+  // Checking /proc/cmdline alone is not enough because users may
+  // configure passthrough via /etc/modprobe.d/, driverctl, etc.
+  if (!FS_Sensors_VFIO_CheckProcCmdline() &&
+      !FS_Sensors_VFIO_CheckSysBusPciDevices()) {
+    // Wait for nvidia module
+    for (; slept < sleep_time; ++slept) {
+      Nvidia_Error ne = Nvidia_Init();
+      if (ne == Nvidia_Error_DlOpen)
+        break;
+
+      if (ne == Nvidia_Error_API) {
+        Log_Info("Waiting for nvidia sensor ...");
+        sleep_ms(1000);
+        continue;
+      }
+
+      const array_size_t idx = FS_Sensors_Sources.size;
+      array_realloc(FS_TemperatureSource, FS_Sensors_Sources, (idx + 1));
+      FS_Sensors_Sources.data[idx].name = Mem_Strdup("nvidia-ml");
+      FS_Sensors_Sources.data[idx].file = Mem_Strdup("none");
+      FS_Sensors_Sources.data[idx].multiplier = 1;
+      FS_Sensors_Sources.data[idx].type = FS_TemperatureSource_Nvidia;
+      FS_Sensors_Sources.size = idx + 1;
       break;
-
-    if (ne == Nvidia_Error_API) {
-      Log_Info("Waiting for nvidia sensor ...");
-      sleep_ms(1000);
-      continue;
     }
-
-    const array_size_t idx = FS_Sensors_Sources.size;
-    FS_Sensors_Sources.data = Mem_Realloc(FS_Sensors_Sources.data, (idx + 1) * sizeof(FS_TemperatureSource));
-    FS_Sensors_Sources.data[idx].name = Mem_Strdup("nvidia-ml");
-    FS_Sensors_Sources.data[idx].file = Mem_Strdup("none");
-    FS_Sensors_Sources.data[idx].multiplier = 1;
-    FS_Sensors_Sources.data[idx].type = FS_TemperatureSource_Nvidia;
-    FS_Sensors_Sources.size = idx + 1;
-    break;
   }
 
   if (! FS_Sensors_Sources.size)
@@ -184,7 +274,7 @@ Error FS_Sensors_Init() {
   return err_success();
 }
 
-void FS_Sensors_Cleanup() {
+void FS_Sensors_Cleanup(void) {
   Nvidia_Close();
 
   for_each_array(FS_TemperatureSource*, s, FS_Sensors_Sources) {

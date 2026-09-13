@@ -6,12 +6,6 @@
 
 _nbfc__query() {
 
-  __zsh_query_contains() {
-    local arg='' key="$1"; shift
-    for arg; do [[ "$key" == "$arg" ]] && return 0; done
-    return 1
-  }
-
   local cmd="$1"; shift
 
   case "$cmd" in
@@ -61,7 +55,7 @@ _nbfc__query() {
         HAVING_OPTIONS+=("${arg%%=*}")
         OPTION_VALUES+=("${arg#*=}");;
       --*)
-        if __zsh_query_contains "$arg" "${long_opts_with_arg[@]}"; then
+        if _nbfc__array_contains "$arg" "${long_opts_with_arg[@]}"; then
           if $have_trailing_arg; then
             HAVING_OPTIONS+=("$arg")
             OPTION_VALUES+=("${args[$((++argi))]}")
@@ -78,10 +72,10 @@ _nbfc__query() {
           local option="-${arg:$i:1}"
           local trailing_chars="${arg:$((i+1))}"
 
-          if __zsh_query_contains "$option" "${short_opts_without_arg[@]}"; then
+          if _nbfc__array_contains "$option" "${short_opts_without_arg[@]}"; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("")
-          elif __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
+          elif _nbfc__array_contains "$option" "${short_opts_with_arg[@]}"; then
             if [[ -n "$trailing_chars" ]]; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("$trailing_chars")
@@ -91,7 +85,7 @@ _nbfc__query() {
             fi
 
             continue 2
-          elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
+          elif _nbfc__array_contains "$option" "${short_opts_with_optional_arg[@]}"; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("$trailing_chars") # may be empty
             continue 2
@@ -104,11 +98,19 @@ _nbfc__query() {
   done
 }
 
+_nbfc__array_contains() {
+  local arg='' key="$1"; shift
+  for arg; do [[ "$key" == "$arg" ]] && return 0; done
+  return 1
+}
+
 _nbfc__exec() {
   local item='' desc='' describe=()
 
   while IFS=$'\t' read -r item desc; do
+    item="${item//\\/\\\\}"
     item="${item//:/\\:}"
+    desc="${desc//\\/\\\\}"
     [[ -n "$desc" ]] && describe+=("$item:$desc") || describe+=("$item")
   done < <(eval "$1")
 
@@ -129,8 +131,10 @@ _nbfc__command() {
     acpi-dump:'Dumps information of your ACPI DSDT'
     wait-for-hwmon:'Wait for /sys/class/hwmon/hwmon* files'
     get-model-name:'Print model name for notebook'
+    xml2json:'Convert an XML configuration to JSON'
     warranty:'Show warranty'
     support:'Show how to support the project'
+    faq:'Show NBFC FAQ manual'
     help:'Show help'
   )
 
@@ -158,8 +162,9 @@ _nbfc_acpi_dump__command() {
   local items=(
     registers:'List all available registers'
     ec-registers:'List all available EC registers'
+    map:'Generate a map file for ec_probe'
     methods:'List all available ACPI methods'
-    dsl:'Disassemble your DSDT'
+    dsl:'Disassemble your ACPI tables'
   )
 
   _describe -- command items
@@ -183,8 +188,10 @@ _nbfc() {
     acpi-dump) _nbfc_acpi_dump; return $?;;
     wait-for-hwmon) _nbfc_wait_for_hwmon; return $?;;
     get-model-name) _nbfc_get_model_name; return $?;;
+    xml2json) _nbfc_xml2json; return $?;;
     warranty) _nbfc_warranty; return $?;;
     support) _nbfc_support; return $?;;
+    faq) _nbfc_faq; return $?;;
     help) _nbfc_help; return $?;;
   esac
 
@@ -229,7 +236,7 @@ _nbfc_status() {
   local -a args=(
     '(--fan --service -f -s --all -a)'{-a,--all}'[Show service and fan status (default)]'
     '(--all --fan -a -f --service -s)'{-s,--service}'[Show service status]'
-    '(--all --service -a -s --fan -f)'{-f+,--fan=}'[Show status of fan (zero based)]':'FAN INDEX':"{_nbfc__exec 'nbfc complete-fans'}"
+    '(--all --service -a -s)''*'{-f+,--fan=}'[Show status of fan (zero based)]':'FAN INDEX':"{_nbfc__exec 'nbfc complete-fans'}"
     '(--watch -w)'{-w+,--watch=}'[Show status periodically]':SECONDS:"_numbers -f 'Show status periodically'"
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -240,10 +247,9 @@ _nbfc_status() {
 
 _nbfc_config() {
   local -a args=(
-    '(--apply --recommend --set -a -r -s --list -l)'{-l,--list}'[List all available configs (default)]'
-    '(--apply --list --recommend -a -l -r --set -s)'{-s+,--set=}'[Set a config]':config:'{_nbfc_config__-s}'
-    '(--list --recommend --set -l -r -s --apply -a)'{-a+,--apply=}'[Set a config and enable fan control]':config:'{_nbfc_config__-s}'
-    '(--apply --list --set -a -l -s --recommend -r)'{-r,--recommend}'[List configs which may work for your device]'
+    '(--recommend --set -r -s --list -l)'{-l,--list}'[List all available configs (default)]'
+    '(--list --recommend -l -r --set -s)'{-s+,--set=}'[Set a config]':config:'{_nbfc_config__-s}'
+    '(--list --set -l -s --recommend -r)'{-r,--recommend}'[List configs with names similar to your notebook]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -332,12 +338,18 @@ _nbfc_rate_config() {
   local -a args=(
     '(--full-help -H)'{-H,--full-help}'[Show full help]'
     '(--all -a)'{-a,--all}'[Rate all available configuration files]'
-    '(--dsdt -d)'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT dir]':DIRECTORY:_directories
     '(--min-score -m)'{-m+,--min-score=}'[Set minimum rating threshold for configurations]':SCORE:"_numbers -f 'Set minimum rating threshold for configurations'"
+    '(--input -i)'{-i+,--input=}'[Read configuration files from file]':FILE:_files
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--print-rules)'--print-rules'[Print configuration rules]'
     '(--rules -r)'{-r+,--rules=}'[Use an alternative rules file]':FILE:_files
     '(--no-download -n)'{-n,--no-download}"[Don't download rules file from the repository]"
+    '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
+    '(--bad -b)'{-b,--bad}'[List only bad configurations]'
+    '*'{-q,--quiet}'[Do not print register ratings]'
+    '(--fan-count -f)'{-f+,--fan-count=}'[Limit configurations by fan count]':NUM:'({0..255})'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -347,19 +359,21 @@ _nbfc_rate_config() {
 }
 
 _nbfc_acpi_dump() {
-  local opts='-f= --file= -j --json -h --help --version'
+  local opts='-d= --dsdt= -D= --dsdt-dir= -j --json -h --help --version'
   local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
   _nbfc__query init "$opts" "${words[@]}"
 
   case "$(_nbfc__query get_positional 2)" in
     registers) _nbfc_acpi_dump_registers; return $?;;
     ec-registers) _nbfc_acpi_dump_ec_registers; return $?;;
+    map) _nbfc_acpi_dump_map; return $?;;
     methods) _nbfc_acpi_dump_methods; return $?;;
     dsl) _nbfc_acpi_dump_dsl; return $?;;
   esac
 
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -371,7 +385,8 @@ _nbfc_acpi_dump() {
 
 _nbfc_acpi_dump_registers() {
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -383,7 +398,23 @@ _nbfc_acpi_dump_registers() {
 
 _nbfc_acpi_dump_ec_registers() {
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
+    '(--json -j)'{-j,--json}'[Use JSON output]'
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+    2:command2:_nbfc_acpi_dump__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_acpi_dump_map() {
+  local -a args=(
+    '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -395,7 +426,8 @@ _nbfc_acpi_dump_ec_registers() {
 
 _nbfc_acpi_dump_methods() {
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -407,7 +439,8 @@ _nbfc_acpi_dump_methods() {
 
 _nbfc_acpi_dump_dsl() {
   local -a args=(
-    '(--file -f)'{-f+,--file=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
@@ -435,6 +468,16 @@ _nbfc_get_model_name() {
   _arguments -S -s -w "${args[@]}"
 }
 
+_nbfc_xml2json() {
+  local -a args=(
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+    2:'Specify configuration file':_files
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
 _nbfc_warranty() {
   local -a args=(
     '(--help -h)'{-h,--help}'[show this help message and exit]'
@@ -446,8 +489,18 @@ _nbfc_warranty() {
 
 _nbfc_support() {
   local -a args=(
-    '(--upload-firmware)'--upload-firmware'[Upload your notebook firmware without prompting]'
-    '(--print-command)'--print-command'[Print command for manual firmware upload]'
+    '(--create-archive --print-command --upload-firmware)'--upload-firmware'[Upload your notebook firmware without prompting]'
+    '(--create-archive --upload-firmware --print-command)'--print-command'[Print command for manual firmware upload]'
+    '(--print-command --upload-firmware --create-archive)'--create-archive='[Create a support archive]':FILE:_files
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_faq() {
+  local -a args=(
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command

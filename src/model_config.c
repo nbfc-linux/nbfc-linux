@@ -2,6 +2,7 @@
 
 #include "nbfc.h"
 #include "log.h"
+#include "lua_bindings.h"
 #include "macros.h"
 #include "memory.h"
 #include "buffer.h"
@@ -9,10 +10,9 @@
 #include "file_utils.h"
 
 #include <assert.h>  // assert
-#include <string.h>  // strcmp
+#include <string.h>  // strcmp, strlen, memcpy
 #include <stdbool.h> // bool
-#include <limits.h>  // INT_MIN, SHRT_MIN
-#include <math.h>    // NAN
+#include <limits.h>  // INT_MIN, INT_MAX, INT8_MIN, INT8_MAX, ...
 #include <linux/limits.h>
 
 static inline Error bool_FromJson(bool* out, const nx_json* node) {
@@ -108,6 +108,7 @@ static Error RegisterWriteMode_FromJson(RegisterWriteMode* out, const nx_json* j
   else if (!strcmp(s, "And"))  *out = RegisterWriteMode_And;
   else if (!strcmp(s, "Or"))   *out = RegisterWriteMode_Or;
   else if (!strcmp(s, "Call")) *out = RegisterWriteMode_Call;
+  else if (!strcmp(s, "Lua"))  *out = RegisterWriteMode_Lua;
   else return err_stringf("Invalid value for %s: %s", "RegisterWriteMode", s);
   return e;
 }
@@ -160,6 +161,61 @@ static Error EmbeddedControllerType_FromJson(EmbeddedControllerType* out, const 
     return err_stringf("Invalid value for %s: %s", "EmbeddedControllerType", s);
   *out = t;
   return e;
+}
+
+static Error LuaCode_FromJson(LuaCode* out, const nx_json* json) {
+  char* code;
+
+  if (json->type == NX_JSON_STRING) {
+    code = Mem_Strdup(json->val.text);
+  }
+  else if (json->type == NX_JSON_ARRAY) {
+    size_t total_len = 0;
+    size_t line_len;
+
+    nx_json_for_each(line, json) {
+      if (line->type != NX_JSON_STRING)
+        return err_string("Array member not a string");
+
+      total_len += strlen(line->val.text) + 1 /* space for '\n' */;
+    }
+
+    code = Mem_Malloc(total_len + 1 /* space for '\0' */);
+    total_len = 0;
+
+    nx_json_for_each(line, json) {
+      line_len = strlen(line->val.text);
+      memcpy(code + total_len, line->val.text, line_len);
+      total_len += line_len;
+      code[total_len++] = '\n';
+    }
+
+    code[total_len] = '\0';
+  }
+  else
+    return err_string("Not a string or array of strings");
+
+  out->source = code;
+  return Lua_LoadCode(code, &out->function);
+}
+
+static Error LuaLibraries_FromJson(bool* out, const nx_json* json) {
+  Error e;
+  const char* str;
+  (void) *out;
+
+  e = nx_json_get_array(json);
+  e_check();
+
+  nx_json_for_each(item, json) {
+    e = nx_json_get_str(&str, item);
+    e_check();
+
+    e = Lua_UseLibrary(str);
+    e_check();
+  }
+
+  return err_success();
 }
 
 EmbeddedControllerType EmbeddedControllerType_FromString(const char* s) {
@@ -274,7 +330,7 @@ static Error array_of_FromJson(FromJson_Callback callback, void** v_data, array_
 }
 
 #define define_array_of_T_FromJson(T) \
-static inline Error array_of_##T##_FromJson(array_of(T)* v, const nx_json *json) { \
+static inline Error array_of_##T##_FromJson(array_of(T)* v, const nx_json* json) { \
   return array_of_FromJson((FromJson_Callback*) T ## _FromJson, (void**) &v->data, &v->size, sizeof(T), json); \
 }
 
@@ -292,12 +348,12 @@ define_array_of_T_FromJson(FanTemperatureSourceConfig)
 // ============================================================================
 
 static const TemperatureThreshold _Config_DefaultTemperatureThresholds[] = {
-  {60,  0,   0, 255},
-  {63, 48,  10, 255},
-  {66, 55,  20, 255},
-  {68, 59,  50, 255},
-  {71, 63,  70, 255},
-  {75, 67, 100, 255},
+  {60,  0,   0, {true, true, true}},
+  {63, 48,  10, {true, true, true}},
+  {66, 55,  20, {true, true, true}},
+  {68, 59,  50, {true, true, true}},
+  {71, 63,  70, {true, true, true}},
+  {75, 67, 100, {true, true, true}},
 };
 
 static const array_of_const(TemperatureThreshold) Config_DefaultTemperatureThresholds = {
@@ -306,12 +362,12 @@ static const array_of_const(TemperatureThreshold) Config_DefaultTemperatureThres
 };
 
 static const TemperatureThreshold _Config_DefaultLegacyTemperatureThresholds[] = {
-  {0,   0,   0, 255},
-  {60, 48,  10, 255},
-  {63, 55,  20, 255},
-  {66, 59,  50, 255},
-  {68, 63,  70, 255},
-  {71, 67, 100, 255},
+  {0,   0,   0, {true, true, true}},
+  {60, 48,  10, {true, true, true}},
+  {63, 55,  20, {true, true, true}},
+  {66, 59,  50, {true, true, true}},
+  {68, 63,  70, {true, true, true}},
+  {71, 67, 100, {true, true, true}},
 };
 
 static const array_of_const(TemperatureThreshold) Config_DefaultLegacyTemperatureThresholds = {
@@ -337,14 +393,31 @@ static array_of(FanSpeedPercentageOverride) Config_DefaultFanSpeedPercentageOver
 void ModelConfig_Free(ModelConfig* c) {
   Mem_Free((char*) c->NotebookModel);
   Mem_Free((char*) c->Author);
+  Mem_Free((char*) c->Sponsor.Name);
+  Mem_Free((char*) c->Sponsor.Description);
+  Mem_Free((char*) c->Sponsor.URL);
+  Mem_Free((char*) c->Sponsor.BannerURL);
+
+  for_each_array(str*, s, c->FirmwareFingerprint) {
+    Mem_Free((char*) *s);
+  }
+
+  Mem_Free(c->FirmwareFingerprint.data);
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
     Mem_Free((char*) f->FanDisplayName);
     Mem_Free((char*) f->ReadAcpiMethod);
     Mem_Free((char*) f->WriteAcpiMethod);
     Mem_Free((char*) f->ResetAcpiMethod);
+    Mem_Free((char*) f->ReadLuaCode.source);
+    Mem_Free((char*) f->WriteLuaCode.source);
+    Mem_Free((char*) f->ResetLuaCode.source);
     Mem_Free(f->TemperatureThresholds.data);
     Mem_Free(f->FanSpeedPercentageOverrides.data);
+
+    for_each_array(str*, s, f->Sensors)
+      Mem_Free((char*) *s);
+    Mem_Free(f->Sensors.data);
   }
 
   Mem_Free(c->FanConfigurations.data);
@@ -352,6 +425,8 @@ void ModelConfig_Free(ModelConfig* c) {
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
     Mem_Free((char*) r->AcpiMethod);
     Mem_Free((char*) r->ResetAcpiMethod);
+    Mem_Free((char*) r->LuaCode.source);
+    Mem_Free((char*) r->ResetLuaCode.source);
     Mem_Free((char*) r->Description);
   }
 
@@ -415,11 +490,13 @@ Error TemperatureThresholds_Validate(
 }
 
 static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguration* r) {
-  const bool AcpiMethod                  = RegisterWriteConfiguration_IsSet_AcpiMethod(r);
-  const bool ResetAcpiMethod             = RegisterWriteConfiguration_IsSet_ResetAcpiMethod(r);
-  const bool Register                    = RegisterWriteConfiguration_IsSet_Register(r);
-  const bool Value                       = RegisterWriteConfiguration_IsSet_Value(r);
-  const bool ResetValue                  = RegisterWriteConfiguration_IsSet_ResetValue(r);
+  const bool AcpiMethod                  = r->isset.AcpiMethod;
+  const bool ResetAcpiMethod             = r->isset.ResetAcpiMethod;
+  const bool LuaCode                     = r->isset.LuaCode;
+  const bool ResetLuaCode                = r->isset.ResetLuaCode;
+  const bool Register                    = r->isset.Register;
+  const bool Value                       = r->isset.Value;
+  const bool ResetValue                  = r->isset.ResetValue;
   const bool ResetRequired               = r->ResetRequired;
   const RegisterWriteMode WriteMode      = r->WriteMode;
   const RegisterWriteMode ResetWriteMode = r->ResetWriteMode;
@@ -428,8 +505,21 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
     if (! AcpiMethod)
       return err_stringf("%s: %s", "AcpiMethod", "Missing option");
 
+    if (LuaCode)
+      return err_string("LuaCode: Cannot be used with WriteMode == Call");
+
     if (Value)
       return err_string("Value: Cannot be used with WriteMode == Call");
+  }
+  else if (WriteMode == RegisterWriteMode_Lua) {
+    if (! LuaCode)
+      return err_stringf("%s: %s", "LuaCode", "Missing option");
+
+    if (AcpiMethod)
+      return err_string("AcpiMethod: Cannot be used with WriteMode == Lua");
+
+    if (Value)
+      return err_string("Value: Cannot be used with WriteMode == Lua");
   }
   else {
     if (! Register)
@@ -440,6 +530,9 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
 
     if (AcpiMethod)
       return err_string("AcpiMethod: Cannot be used with WriteMode == Set/And/Or");
+
+    if (LuaCode)
+      return err_string("LuaCode: Cannot be used with WriteMode == Set/And/Or");
   }
 
   if (ResetRequired) {
@@ -447,8 +540,21 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
       if (! ResetAcpiMethod)
         return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
+      if (ResetLuaCode)
+        return err_string("ResetLuaCode: Cannot be used with ResetWriteMode == Call");
+
       if (ResetValue)
         return err_string("ResetValue: Cannot be used with ResetWriteMode == Call");
+    }
+    else if (ResetWriteMode == RegisterWriteMode_Lua) {
+      if (! ResetLuaCode)
+        return err_stringf("%s: %s", "ResetLuaCode", "Missing option");
+
+      if (ResetAcpiMethod)
+        return err_string("ResetAcpiMethod: Cannot be used with ResetWriteMode == Lua");
+
+      if (ResetValue)
+        return err_string("ResetValue: Cannot be used with ResetWriteMode == Lua");
     }
     else {
       if (! Register)
@@ -459,6 +565,9 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
 
       if (ResetAcpiMethod)
         return err_string("ResetAcpiMethod: Cannot be used with ResetWriteMode == Set/And/Or");
+
+      if (ResetLuaCode)
+        return err_string("ResetLuaCode: Cannot be used with ResetWriteMode == Set/And/Or");
     }
   }
   else {
@@ -469,13 +578,28 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
       return err_string("ResetValue: Cannot be used with ResetRequired == false");
     */
 
+    if (ResetLuaCode)
+      return err_string("ResetLuaCode: Cannot be used with ResetRequired == false");
+
     if (ResetAcpiMethod)
-      return err_string("ResetAcpiComand: Cannot be used with ResetRequired == false");
+      return err_string("ResetAcpiMethod: Cannot be used with ResetRequired == false");
   }
 
-  if (WriteMode == RegisterWriteMode_Call && ResetWriteMode == RegisterWriteMode_Call) {
+  const bool WriteMode_Needs_Register = (
+    WriteMode == RegisterWriteMode_Set ||
+    WriteMode == RegisterWriteMode_And ||
+    WriteMode == RegisterWriteMode_Or
+  );
+
+  const bool ResetWriteMode_Needs_Register = (
+    ResetWriteMode == RegisterWriteMode_Set ||
+    ResetWriteMode == RegisterWriteMode_And ||
+    ResetWriteMode == RegisterWriteMode_Or
+  );
+
+  if (!WriteMode_Needs_Register && !ResetWriteMode_Needs_Register) {
     if (Register)
-      return err_string("Register: Cannot be used if both WriteMode == Call and ResetWriteMode == Call");
+      return err_string("Register: Cannot be used if both WriteMode == Call/Lua and ResetWriteMode == Call/Lua");
   }
 
   return err_success();
@@ -512,15 +636,21 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
       f->FanDisplayName = Mem_Strdup(fan_name);
     }
 
-    // If ResetRequired is true, ensure that one (and only one) of "FanSpeedResetValue" and "ResetAcpiMethod" is set
+    // If ResetRequired is true, ensure that one (and only one) of "FanSpeedResetValue",
+    // "ResetAcpiMethod" and "ResetLuaCode" is set
     if (f->ResetRequired) {
-      const int reset_group = (FanConfiguration_IsSet_FanSpeedResetValue(f) + FanConfiguration_IsSet_ResetAcpiMethod(f));
+      const int reset_group = (
+        f->isset.FanSpeedResetValue +
+        f->isset.ResetAcpiMethod +
+        f->isset.ResetLuaCode
+      );
+
       if (reset_group == 0) {
-        e = err_stringf("Missing option: %s or %s", "FanSpeedResetValue", "ResetAcpiMethod");
+        e = err_stringf("Missing option: %s or %s or %s", "FanSpeedResetValue", "ResetAcpiMethod", "ResetLuaCode");
         goto err;
       }
       if (reset_group > 1) {
-        e = err_stringf("Cannot set both %s and %s", "FanSpeedResetValue", "ResetAcpiMethod");
+        e = err_stringf("Can only set one of: %s, %s, %s", "FanSpeedResetValue", "ResetAcpiMethod", "ResetLuaCode");
         goto err;
       }
     }
@@ -528,37 +658,52 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
       /* This is actually the right behaviour, but too many old config files
        * have FanSpeedResetValue set even if ResetRequired is false.
        *
-      if (FanConfiguration_IsSet_FanSpeedResetValue(f)) {
+      if (f->isset.FanSpeedResetValue) {
         e = err_string("FanSpeedResetValue: Cannot be used with ResetRequired == false");
         goto err;
       }
        */
 
-      if (FanConfiguration_IsSet_ResetAcpiMethod(f)) {
+      if (f->isset.ResetAcpiMethod) {
         e = err_string("ResetAcpiMethod: Cannot be used with ResetRequired == false");
+        goto err;
+      }
+
+      if (f->isset.ResetLuaCode) {
+        e = err_string("ResetLuaCode: Cannot be used with ResetRequired == false");
         goto err;
       }
     }
 
-    // Ensure that one (and only one) of "WriteRegister" and "WriteAcpiMethod" is set
-    const int write_group = (FanConfiguration_IsSet_WriteRegister(f) + FanConfiguration_IsSet_WriteAcpiMethod(f));
+    // Ensure that one (and only one) of "WriteRegister", "WriteAcpiMethod" and "WriteLuaCode" is set
+    const int write_group = (
+      f->isset.WriteRegister +
+      f->isset.WriteAcpiMethod +
+      f->isset.WriteLuaCode
+    );
+
     if (write_group == 0) {
-      e = err_stringf("Missing option: %s or %s", "WriteRegister", "WriteAcpiMethod");
+      e = err_stringf("Missing option: %s or %s or %s", "WriteRegister", "WriteAcpiMethod", "WriteLuaCode");
       goto err;
     }
     if (write_group > 1) {
-      e = err_stringf("Cannot set both %s and %s", "WriteRegister", "WriteAcpiMethod");
+      e = err_stringf("Can only set one of: %s, %s, %s", "WriteRegister", "WriteAcpiMethod", "WriteLuaCode");
       goto err;
     }
 
-    // Ensure that one (and only one) of "ReadRegister" and "ReadAcpiMethod" is set
-    const int read_group = (FanConfiguration_IsSet_ReadRegister(f) + FanConfiguration_IsSet_ReadAcpiMethod(f));
+    // Ensure that one (and only one) of "ReadRegister", "ReadAcpiMethod" and "ReadLuaCode" is set
+    const int read_group = (
+      f->isset.ReadRegister +
+      f->isset.ReadAcpiMethod +
+      f->isset.ReadLuaCode
+    );
+
     if (read_group == 0) {
-      e = err_stringf("Missing option: %s or %s", "ReadRegister", "ReadAcpiMethod");
+      e = err_stringf("Missing option: %s or %s or %s", "ReadRegister", "ReadAcpiMethod", "ReadLuaCode");
       goto err;
     }
     if (read_group > 1) {
-      e = err_stringf("Cannot set both %s and %s", "ReadRegister", "ReadAcpiMethod");
+      e = err_stringf("Can only set one of: %s, %s, %s", "ReadRegister", "ReadAcpiMethod", "ReadLuaCode");
       goto err;
     }
 
@@ -568,12 +713,12 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
     }
 
     if (f->IndependentReadMinMaxValues) {
-      if (! FanConfiguration_IsSet_MinSpeedValueRead(f)) {
+      if (! f->isset.MinSpeedValueRead) {
         e = err_stringf("%s: %s", "MinSpeedValueRead", "Missing option");
         goto err;
       }
 
-      if (! FanConfiguration_IsSet_MaxSpeedValueRead(f)) {
+      if (! f->isset.MaxSpeedValueRead) {
         e = err_stringf("%s: %s", "MaxSpeedValueRead", "Missing option");
         goto err;
       }
@@ -643,22 +788,22 @@ err:
 Error ModelConfig_FindAndLoad(ModelConfig* config, char* resolved, const char* file) {
   // Try absolute path
   snprintf(resolved, PATH_MAX, "%s", file);
-  if (file_exists(file))
+  if (File_Exists(file))
     return ModelConfig_FromFile(config, file);
 
   // Try NBFC_MODEL_CONFIGS_DIR_MUTABLE (without additional ".json")
   snprintf(resolved, PATH_MAX, "%s/%s", NBFC_MODEL_CONFIGS_DIR_MUTABLE, file);
-  if (file_exists(resolved))
+  if (File_Exists(resolved))
     return ModelConfig_FromFile(config, resolved);
 
   // Try NBFC_MODEL_CONFIGS_DIR_MUTABLE (with additional ".json")
   snprintf(resolved, PATH_MAX, "%s/%s.json", NBFC_MODEL_CONFIGS_DIR_MUTABLE, file);
-  if (file_exists(resolved))
+  if (File_Exists(resolved))
     return ModelConfig_FromFile(config, resolved);
 
   // Try NBFC_MODEL_CONFIGS_DIR (without additional ".json")
   snprintf(resolved, PATH_MAX, "%s/%s", NBFC_MODEL_CONFIGS_DIR, file);
-  if (file_exists(resolved))
+  if (File_Exists(resolved))
     return ModelConfig_FromFile(config, resolved);
 
   // Try NBFC_MODEL_CONFIGS_DIR (with additional ".json")

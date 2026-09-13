@@ -13,7 +13,7 @@ struct StringBuf {
   int capacity; // including '\0'
 };
 
-static inline void PRINTF_LIKE(2, 3) StringBuf_Printf(StringBuf* s, const char* fmt, ...) {
+static inline void NBFC_PRINTF_LIKE(2, 3) StringBuf_Printf(StringBuf* s, const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
 

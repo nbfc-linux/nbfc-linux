@@ -61,7 +61,7 @@ CURL* CurlWithMem_Create(const char* url, const char* path) {
     exit(NBFC_EXIT_FAILURE);
   }
 
-  code = curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
+  code = curl_easy_setopt(curl, CURLOPT_USERAGENT, CURL_UTILS_USER_AGENT);
   if (code != CURLE_OK) {
     Log_Error("curl_easy_setopt(%s) failed", Curl_Get_EasyOpt_Name(CURLOPT_USERAGENT));
     exit(NBFC_EXIT_FAILURE);
@@ -113,7 +113,7 @@ void CurlWithMem_Destroy(CURL* curl) {
 static bool CurlMemory_WriteFile(const CurlMemory* mem) {
   const int open_flags = O_WRONLY|O_CREAT|O_TRUNC;
   const int mode_flags = S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH;
-  return write_file(mem->path, open_flags, mode_flags, mem->data, mem->size).ok;
+  return File_Write(mem->path, open_flags, mode_flags, mem->data, mem->size).ok;
 }
 
 /**

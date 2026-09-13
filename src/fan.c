@@ -89,7 +89,16 @@ static Error Fan_ECWriteValue(Fan* self, uint16_t value) {
     uint64_t out;
     Error e = AcpiCall_Call(my.fanConfig->WriteAcpiMethod, value, &out);
     if (e)
-      return err_chain_string(e, "WriteAcpiMethod");
+      return err_chain_stringf(e, "%s: WriteAcpiMethod", my.fanConfig->FanDisplayName);
+    else
+      return err_success();
+  }
+
+  if (my.fanConfig->WriteLuaCode.function) {
+    uint64_t out;
+    Error e = Lua_Call(my.fanConfig->WriteLuaCode.function, value, &out);
+    if (e)
+      return err_chain_stringf(e, "%s: WriteLuaCode", my.fanConfig->FanDisplayName);
     else
       return err_success();
   }
@@ -107,7 +116,17 @@ static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {
     uint64_t val;
     e = AcpiCall_Call(my.fanConfig->ReadAcpiMethod, 0, &val);
     if (e)
-      return err_chain_string(e, "ReadAcpiMethod");
+      return err_chain_stringf(e, "%s: ReadAcpiMethod", my.fanConfig->FanDisplayName);
+    else
+      *out = val;
+    return e;
+  }
+
+  if (my.fanConfig->ReadLuaCode.function) {
+    uint64_t val;
+    e = Lua_Call(my.fanConfig->ReadLuaCode.function, 0, &val);
+    if (e)
+      return err_chain_stringf(e, "%s: ReadLuaCode", my.fanConfig->FanDisplayName);
     else
       *out = val;
     return e;
@@ -186,18 +205,30 @@ float Fan_GetCurrentSpeed(const Fan* self) {
 Error Fan_UpdateCurrentSpeed(Fan* self) {
   uint16_t speed;
 
-  // If the value is out of range 3 or more times,
-  // minFanSpeed and/or maxFanSpeed are probably wrong.
-  for (range(int, i, 0, 3)) {
+  // If the value is out of range 10 or more times,
+  // MinSpeedValueRead and/or MaxSpeedValueRead are probably wrong.
+  for (range(int, i, 0, 10)) {
     Error e = Fan_ECReadValue(self, &speed);
     if (e)
       return e;
 
     if (speed >= my.minSpeedValueReadAbs && speed <= my.maxSpeedValueReadAbs) {
-      break;
+      goto apply_speed;
     }
   }
 
+  Log_Warn("%s: Fan speed value (%d) not range of %s/%s",
+    my.fanConfig->FanDisplayName,
+    speed,
+    "MinSpeedValueRead",
+    "MaxSpeedValueRead");
+
+  if (speed < my.minSpeedValueReadAbs)
+    speed = my.minSpeedValueReadAbs;
+  else if (speed > my.maxSpeedValueReadAbs)
+    speed = my.maxSpeedValueReadAbs;
+
+apply_speed:
   my.currentSpeed = Fan_FanSpeedToPercentage(self, speed);
   return err_success();
 }
@@ -214,7 +245,16 @@ Error Fan_ECReset(Fan* self) {
     uint64_t out;
     Error e = AcpiCall_Call(my.fanConfig->ResetAcpiMethod, 0, &out);
     if (e)
-      return err_chain_string(e, "ResetAcpiMethod");
+      return err_chain_stringf(e, "%s: ResetAcpiMethod", my.fanConfig->FanDisplayName);
+    else
+      return err_success();
+  }
+
+  if (my.fanConfig->ResetLuaCode.function) {
+    uint64_t out;
+    Error e = Lua_Call(my.fanConfig->ResetLuaCode.function, 0, &out);
+    if (e)
+      return err_chain_stringf(e, "%s: ResetLuaCode", my.fanConfig->FanDisplayName);
     else
       return err_success();
   }

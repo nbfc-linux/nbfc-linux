@@ -17,6 +17,7 @@
 #include "buffer.h"
 #include "macros.h"
 #include "model_config.h"
+#include "register_write_configuration_utils.h"
 
 #include <stdio.h>  // snprintf
 #include <math.h>   // fabs
@@ -36,20 +37,16 @@ enum Service_Initialization {
   Initialized_6_Temperature_Filter,
 };
 
-ModelConfig              Service_ModelConfig;
-array_of(FanTemperatureControl) Service_Fans;
+ModelConfig                        Service_ModelConfig = {0};
+ServiceConfig                      Service_ServiceConfig = {0};
+ServiceState                       Service_ServiceState = {0};
+array_of(FanTemperatureControl)    Service_Fans = {0};
 static enum Service_Initialization Service_State;
 
-static Error ApplyRegisterWriteConfigurations(bool);
-static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration*);
-static Error ResetRegisterWriteConfigurations();
-static Error ResetRegisterWriteConfig(RegisterWriteConfiguration*);
-static void  ResetEC();
-static bool  IsAcpiCallUsed();
-static EmbeddedControllerType EmbeddedControllerType_By_EC(const EC_VTable*);
-static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType);
+static void  ResetEC(void);
+static bool  IsAcpiCallUsed(void);
 
-Error Service_Init() {
+Error Service_Init(void) {
   Error e;
   Trace* trace = (Trace*) Buffer_Get(sizeof(Trace));
   char* path = Buffer_Get(PATH_MAX);
@@ -58,30 +55,31 @@ Error Service_Init() {
   Service_State = Initialized_0_None;
 
   // Service config ===========================================================
-  e = ServiceConfig_Init(options.service_config);
+  e = ServiceConfig_FromFile(&Service_ServiceConfig, options.service_config);
   if (e) {
     goto error;
   }
 
   // Service state ============================================================
-  ServiceState_Init(); // we don't care if this fails
+  // (we don't care if this fails)
+  ServiceState_FromFile(&Service_ServiceState, NBFC_STATE_FILE);
 
   // Be backwards compatible
-  if (ServiceConfig_IsSet_TargetFanSpeeds(&service_config)) {
-    ServiceState_Set_TargetFanSpeeds(&service_state);
-    service_state.TargetFanSpeeds = service_config.TargetFanSpeeds;
+  if (Service_ServiceConfig.isset.TargetFanSpeeds) {
+    Service_ServiceState.isset.TargetFanSpeeds = true;
+    Service_ServiceState.TargetFanSpeeds = Service_ServiceConfig.TargetFanSpeeds;
 
-    ServiceConfig_UnSet_TargetFanSpeeds(&service_config);
-    service_config.TargetFanSpeeds.data = NULL;
-    service_config.TargetFanSpeeds.size = 0;
-    ServiceConfig_Write(options.service_config);
+    Service_ServiceConfig.isset.TargetFanSpeeds = false;
+    Service_ServiceConfig.TargetFanSpeeds.data = NULL;
+    Service_ServiceConfig.TargetFanSpeeds.size = 0;
+    ServiceConfig_Write(&Service_ServiceConfig, options.service_config);
   }
 
   Service_State = Initialized_1_Service_Config;
 
   // Model config =============================================================
-  Log_Info("Using \"%s\" as model config", service_config.SelectedConfigId);
-  e = ModelConfig_FindAndLoad(&Service_ModelConfig, path, service_config.SelectedConfigId);
+  Log_Info("Using \"%s\" as model config", Service_ServiceConfig.SelectedConfigId);
+  e = ModelConfig_FindAndLoad(&Service_ModelConfig, path, Service_ServiceConfig.SelectedConfigId);
   if (e) {
     e = err_chain_string(e, path);
     goto error;
@@ -107,7 +105,7 @@ Error Service_Init() {
 
   // Fans =====================================================================
   Service_Fans.size = Service_ModelConfig.FanConfigurations.size;
-  Service_Fans.data = (FanTemperatureControl*) Mem_Calloc(Service_Fans.size, sizeof(FanTemperatureControl));
+  array_calloc(FanTemperatureControl, Service_Fans, Service_Fans.size);
   Service_State = Initialized_4_Fans;
 
   for_enumerate_array(array_size_t, i, Service_Fans) {
@@ -120,12 +118,12 @@ Error Service_Init() {
       goto error;
   }
 
-  for_enumerate_array(array_size_t, i, service_state.TargetFanSpeeds) {
+  for_enumerate_array(array_size_t, i, Service_ServiceState.TargetFanSpeeds) {
     if (i >= Service_Fans.size)
       continue;
 
-    if (service_state.TargetFanSpeeds.data[i] >= 0.0f) {
-      e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, service_state.TargetFanSpeeds.data[i]);
+    if (Service_ServiceState.TargetFanSpeeds.data[i] >= 0.0f) {
+      e = Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, Service_ServiceState.TargetFanSpeeds.data[i]);
       e_warn();
     }
     else
@@ -137,8 +135,8 @@ Error Service_Init() {
     // --embedded-controller given
     ec = EC_By_EmbeddedControllerType(options.embedded_controller_type);;
   }
-  else if (ServiceConfig_IsSet_EmbeddedControllerType(&service_config)) {
-    ec = EC_By_EmbeddedControllerType(service_config.EmbeddedControllerType);
+  else if (Service_ServiceConfig.isset.EmbeddedControllerType) {
+    ec = EC_By_EmbeddedControllerType(Service_ServiceConfig.EmbeddedControllerType);
   }
   else {
     e = EC_FindWorking(&ec);
@@ -174,13 +172,14 @@ Error Service_Init() {
 
   // Register Write configurations ============================================
   if (! options.read_only) {
-    e = ApplyRegisterWriteConfigurations(true);
+    e = RegisterWriteConfigurations_Apply(
+          &Service_ModelConfig.RegisterWriteConfigurations, true);
     if (e)
       goto error;
   }
 
   // Initialize fans with sensors and temperature filter ======================
-  e = FanTemperatureControl_Init(&Service_Fans, &service_config, &Service_ModelConfig);
+  e = FanTemperatureControl_Init(&Service_Fans, &Service_ServiceConfig, &Service_ModelConfig);
   if (e)
     goto error;
   Service_State = Initialized_6_Temperature_Filter;
@@ -198,7 +197,7 @@ error:
   return e;
 }
 
-Error Service_Loop() {
+Error Service_Loop(void) {
   Error e = err_success();
 
   bool re_init_required = false;
@@ -215,7 +214,9 @@ Error Service_Loop() {
   }
 
   if (! options.read_only) {
-    e = ApplyRegisterWriteConfigurations(re_init_required);
+    e = RegisterWriteConfigurations_Apply(
+          &Service_ModelConfig.RegisterWriteConfigurations, re_init_required);
+
     if (e)
       goto error;
   }
@@ -237,56 +238,13 @@ error:
   return e;
 }
 
-static EmbeddedControllerType EmbeddedControllerType_By_EC(const EC_VTable* ec_vtable) {
-#if ENABLE_EC_SYS
-  if (ec_vtable == &EC_SysLinux_VTable)
-    return EmbeddedControllerType_ECSysLinux;
-#endif
-#if ENABLE_EC_ACPI
-  if (ec_vtable == &EC_SysLinux_ACPI_VTable)
-    return EmbeddedControllerType_ECSysLinuxACPI;
-#endif
-#if ENABLE_EC_DEV_PORT
-  if (ec_vtable == &EC_Linux_VTable)
-    return EmbeddedControllerType_ECLinux;
-#endif
-#if ENABLE_EC_DUMMY
-  if (ec_vtable == &EC_Dummy_VTable)
-    return EmbeddedControllerType_ECDummy;
-#endif
-  return EmbeddedControllerType_Unset;
-}
-
-static const EC_VTable* EC_By_EmbeddedControllerType(EmbeddedControllerType t) {
-  switch (t) {
-#if ENABLE_EC_SYS
-  case EmbeddedControllerType_ECSysLinux:
-    return &EC_SysLinux_VTable;
-#endif
-#if ENABLE_EC_ACPI
-  case EmbeddedControllerType_ECSysLinuxACPI:
-    return &EC_SysLinux_ACPI_VTable;
-#endif
-#if ENABLE_EC_DEV_PORT
-  case EmbeddedControllerType_ECLinux:
-    return &EC_Linux_VTable;
-#endif
-#if ENABLE_EC_DUMMY
-  case EmbeddedControllerType_ECDummy:
-    return &EC_Dummy_VTable;
-#endif
-  default:
-    return NULL;
-  }
-}
-
-static void ResetEC() {
+static void ResetEC(void) {
   Error e;
   bool failed = false;
   int tries = 10;
 
   do {
-    e = ResetRegisterWriteConfigurations();
+    e = RegisterWriteConfigurations_Reset(&Service_ModelConfig.RegisterWriteConfigurations);
     e_warn();
     if (e)
       failed = true;
@@ -300,97 +258,15 @@ static void ResetEC() {
   } while (failed && --tries);
 }
 
-static Error ResetRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
-  Error e;
-  uint8_t mask;
-  uint64_t out;
-
-  switch (cfg->ResetWriteMode) {
-    case RegisterWriteMode_Set:
-      return ec->WriteByte(cfg->Register, cfg->ResetValue);
-
-    case RegisterWriteMode_And:
-      e = ec->ReadByte(cfg->Register, &mask);
-      e_check();
-      return ec->WriteByte(cfg->Register, cfg->ResetValue & mask);
-
-    case RegisterWriteMode_Or:
-      e = ec->ReadByte(cfg->Register, &mask);
-      e_check();
-      return ec->WriteByte(cfg->Register, cfg->ResetValue | mask);
-
-    case RegisterWriteMode_Call:
-      e = AcpiCall_Call(cfg->ResetAcpiMethod, 0, &out);
-      if (e)
-        return err_chain_string(e, "ResetAcpiMethod");
-      else
-        return err_success();
-
-    default:
-      return err_string("ERR-01");
-  }
-}
-
-static Error ResetRegisterWriteConfigurations() {
-  Error e = err_success();
-  for_each_array(RegisterWriteConfiguration*, cfg, Service_ModelConfig.RegisterWriteConfigurations)
-    if (cfg->ResetRequired) {
-      e = ResetRegisterWriteConfig(cfg);
-      e_warn();
-    }
-  return e;
-}
-
-static Error ApplyRegisterWriteConfig(RegisterWriteConfiguration* cfg) {
-  Error e;
-  uint8_t mask;
-  uint64_t out;
-
-  switch (cfg->WriteMode) {
-    case RegisterWriteMode_Set:
-      return ec->WriteByte(cfg->Register, cfg->Value);
-
-    case RegisterWriteMode_And:
-      e = ec->ReadByte(cfg->Register, &mask);
-      e_check();
-      return ec->WriteByte(cfg->Register, cfg->Value & mask);
-
-    case RegisterWriteMode_Or:
-      e = ec->ReadByte(cfg->Register, &mask);
-      e_check();
-      return ec->WriteByte(cfg->Register, cfg->Value | mask);
-
-    case RegisterWriteMode_Call:
-      e = AcpiCall_Call(cfg->AcpiMethod, 0, &out);
-      if (e)
-        return err_chain_string(e, "AcpiMethod");
-      else
-        return err_success();
-
-    default:
-      return err_string("ERR-02");
-  }
-}
-
-static Error ApplyRegisterWriteConfigurations(bool initializing) {
-  for_each_array(RegisterWriteConfiguration*, cfg, Service_ModelConfig.RegisterWriteConfigurations) {
-    if (initializing || cfg->WriteOccasion == RegisterWriteOccasion_OnWriteFanSpeed) {
-       Error e = ApplyRegisterWriteConfig(cfg);
-       e_check();
-    }
-  }
-  return err_success();
-}
-
-static bool IsAcpiCallUsed() {
+static bool IsAcpiCallUsed(void) {
   for_each_array(FanConfiguration*, fc, Service_ModelConfig.FanConfigurations) {
-    if (FanConfiguration_IsSet_WriteAcpiMethod(fc))
+    if (fc->isset.WriteAcpiMethod)
       return true;
 
-    if (FanConfiguration_IsSet_ReadAcpiMethod(fc))
+    if (fc->isset.ReadAcpiMethod)
       return true;
 
-    if (FanConfiguration_IsSet_ResetAcpiMethod(fc))
+    if (fc->isset.ResetAcpiMethod)
       return true;
   }
 
@@ -405,22 +281,22 @@ static bool IsAcpiCallUsed() {
   return false;
 }
 
-void Service_WriteTargetFanSpeedsToState() {
+void Service_WriteTargetFanSpeedsToState(void) {
   const array_size_t fancount = Service_ModelConfig.FanConfigurations.size;
 
-  service_state.TargetFanSpeeds.data = Mem_Realloc(service_state.TargetFanSpeeds.data, sizeof(float) * fancount);
-  service_state.TargetFanSpeeds.size = fancount;
+  array_realloc(float, Service_ServiceState.TargetFanSpeeds, fancount);
+  Service_ServiceState.TargetFanSpeeds.size = fancount;
 
   for_enumerate_array(array_size_t, i, Service_Fans) {
     Fan* fan = &Service_Fans.data[i].Fan;
     if (fan->mode == Fan_ModeAuto)
-      service_state.TargetFanSpeeds.data[i] = -1;
+      Service_ServiceState.TargetFanSpeeds.data[i] = -1;
     else
-      service_state.TargetFanSpeeds.data[i] = Fan_GetRequestedSpeed(fan);
+      Service_ServiceState.TargetFanSpeeds.data[i] = Fan_GetRequestedSpeed(fan);
   }
 }
 
-void Service_Cleanup() {
+void Service_Cleanup(void) {
   switch (Service_State) {
     case Initialized_6_Temperature_Filter:
       for_each_array(FanTemperatureControl*, ftc, Service_Fans)
@@ -441,9 +317,9 @@ void Service_Cleanup() {
       ModelConfig_Free(&Service_ModelConfig);
       /* fall through */
     case Initialized_1_Service_Config:
-      ServiceState_Write();
-      ServiceState_Free();
-      ServiceConfig_Free(&service_config);
+      ServiceState_Write(&Service_ServiceState, NBFC_STATE_FILE);
+      ServiceState_Free(&Service_ServiceState);
+      ServiceConfig_Free(&Service_ServiceConfig);
       /* fall through */
     case Initialized_0_None:
       break;

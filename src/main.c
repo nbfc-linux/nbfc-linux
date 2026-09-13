@@ -130,6 +130,7 @@ int main(int argc, char* const argv[])
   atexit(Log_Close);
 
   Log_Info("NBFC-Linux comes with no warranty. Run `nbfc warranty` for details.");
+  Log_Info("NBFC-Linux needs your support. Run `nbfc support` for details.");
   Log_Info("Running version " NBFC_VERSION);
   Log_Info("SYSCONFDIR is \"%s\"", SYSCONFDIR);
   Log_Info("DATADIR is \"%s\"", DATADIR);
@@ -139,7 +140,7 @@ int main(int argc, char* const argv[])
   // Sets the OOM (Out-Of-Memory) score adjustment for this process to -1000,
   // which tells the Linux kernel to never kill this process, even under
   // extreme memory pressure.
-  if (! write_file("/proc/self/oom_score_adj", O_WRONLY, 0, "-1000\n", 6).ok) {
+  if (! File_Write("/proc/self/oom_score_adj", O_WRONLY, 0, "-1000\n", 6).ok) {
     Log_Error("%s: %s", "/proc/self/oom_score_adj", strerror(errno));
     exit(NBFC_EXIT_FAILURE);
   }

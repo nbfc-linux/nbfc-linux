@@ -1,6 +1,6 @@
 #ifndef NBFC_SPONSOR_H_
 #define NBFC_SPONSOR_H_
 
-void Sponsor_Print();
+void Sponsor_Print(void);
 
 #endif

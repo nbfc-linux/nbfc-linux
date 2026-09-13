@@ -1,5 +1,5 @@
 .nh
-.TH "NBFC" "1" "FEBRUARY 2026" "Notebook FanControl @VERSION@"
+.TH "NBFC" "1" "APRIL 2026" "Notebook FanControl @VERSION@"
 .SH NAME
 .PP
 nbfc \- Notebook FanControl client
@@ -16,7 +16,7 @@ This program is used to control the NoteBook FanControl service.
 .RI [ OPTIONS ]
 .SS MISCELLANEOUS COMMANDS
 .B nbfc
-.RB { update " | " rate\-config " | " acpi\-dump " | " get\-model\-name " | " support " | " warranty " | " help }
+.RB { update " | " rate\-config " | " acpi\-dump " | " get\-model\-name " | " xml2json " | " support " | " warranty " | " faq " | " help }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -102,7 +102,7 @@ List all available configs.
 
 .BR \-r ", " \-\-recommend
 .RS
-List configs which may work for your device.
+List configs with a similar notebook model name.
 .RE
 
 .BR \-s ", " \-\-set
@@ -111,11 +111,18 @@ List configs which may work for your device.
 Set a config.
 .RE
 
-.BR \-a ", " \-\-apply
+If
 .I CONFIG
-.RS
-Set a config and start the service.
-.RE
+is
+.BR auto ,
+the service will attempt to automatically select a matching configuration.
+
+.I CONFIG
+is the configuration filename without the
+.B .json
+extension, not the value of the
+.B NotebookModel
+field inside the configuration file.
 .RE
 
 .B set
@@ -193,6 +200,9 @@ Force applying a sensor if it could not be found.
 .RS
 Download new configuration files from the internet.
 
+Downloaded files will be stored in
+.IR /var/lib/nbfc/configs .
+
 .BR \-p ", " \-\-parallel
 .I NUM
 .RS
@@ -211,6 +221,8 @@ Set quiet mode.
 Rates a configuration by analyzing whether it appears safe to execute on the
 current system.
 
+By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.
+
 .BR \-H ", " \-\-full\-help
 .RS
 Show help on how to interpret the results.
@@ -221,10 +233,34 @@ Show help on how to interpret the results.
 Rate all available configuration files.
 .RE
 
+.BR \-b ", " \-\-bad
+.RS
+List only bad configs that are otherwise omitted.
+.RE
+
 .BR \-d ", " \-\-dsdt
 .I FILE
 .RS
-Use an alternative DSDT file.
+Use an alternative DSDT file. Can be specified multiple times.
+.RE
+
+.BR \-D ", " \-\-dsdt\-dir
+.I DIRECTORY
+.RS
+Use an alternative DSDT directory.
+.RE
+
+.BR \-f ", " \-\-fan\-count
+.I NUMBER
+.RS
+Limit output to configurations with the specified number of fans.
+.RE
+
+.BR \-i ", " \-\-input
+.I FILE
+.RS
+Read configuration files from
+.IR FILE .
 .RE
 
 .BR \-j ", " \-\-json
@@ -249,6 +285,22 @@ Don't download configuration rules from the repository.
 Use an alternative rules file.
 .RE
 
+.BR \-u ", " \-\-unverified
+.RS
+Normally, only registers belonging to an
+.B EmbeddedControl
+operation region are taken into account when rating a configuration.
+With this option, registers from
+.B SystemMemory
+operation regions that may be accessible through the embedded controller are also considered.
+Their accessibility through the embedded controller cannot be guaranteed.
+.RE
+
+.BR \-q ", " \-\-quiet
+.RS
+Do not print register ratings.
+.RE
+
 .B \-\-print\-rules
 .RS
 Print configuration rating rules.
@@ -256,10 +308,12 @@ Print configuration rating rules.
 .RE
 
 .B acpi\-dump
-.RB { registers " | " ec\-registers " | " methods " | " dsl }
+.RB { registers " | " ec\-registers " | " methods " | " dsl " | " map }
 .RI [ OPTIONS ]
 .RS
-Dumps information of your ACPI DSDT.
+Dumps information of your ACPI tables.
+
+By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.
 
 .B registers
 .RS
@@ -267,8 +321,19 @@ List all available registers.
 .RE
 
 .B ec\-registers
+.RB [ \-u | \-\-unverified ]
 .RS
 List all available embedded controller registers.
+
+Normally, only registers belonging to an
+.B EmbeddedControl
+operation region are printed.
+If
+.BR \-u | \-\-unverified
+is specified, also registers from
+.B SystemMemory
+operation regions that may be accessible through the embedded controller are printed.
+Their accessibility through the embedded controller cannot be guaranteed.
 .RE
 
 .B methods
@@ -278,13 +343,38 @@ List all available ACPI methods.
 
 .B dsl
 .RS
-Disassemble your DSDT.
+Disassemble your ACPI tables.
 .RE
 
-.BR \-f ", " \-\-file
+.B map
+.RB [ \-u | \-\-unverified ]
+.RS
+Generate a map file that can be used by
+.BR "ec_probe -m|--map" .
+The map contains detected registers with their names and addresses as well as
+ACPI method names.
+
+Normally, only registers belonging to an
+.B EmbeddedControl
+operation region are printed.
+If
+.BR \-u | \-\-unverified
+is specified, also registers from
+.B SystemMemory
+operation regions that may be accessible through the embedded controller are printed.
+Their accessibility through the embedded controller cannot be guaranteed.
+.RE
+
+.BR \-d ", " \-\-dsdt
 .I FILE
 .RS
-Use an alternative DSDT file.
+Use an alternative DSDT file. Can be specified multiple times.
+.RE
+
+.BR \-D ", " \-\-dsdt\-dir
+.I DIRECTORY
+.RS
+Use an alternative DSDT directory.
 .RE
 
 .BR \-j ", " \-\-json
@@ -307,6 +397,29 @@ Upload your notebook firmware without prompting.
 .RS
 Print command for manual firmware upload.
 .RE
+
+.B \-\-create\-archive
+.I FILE
+.RS
+Creates a compressed
+.B tar.gz
+archive containing information required for support and hardware analysis.
+
+The archive includes:
+
+.IP \(bu 2
+The output of
+.B nbfc get-model-name
+.IP \(bu 2
+The output of
+.B nbfc sensors list
+.IP \(bu 2
+Firmware DSDT
+.RI ( /sys/firmware/acpi/tables/DSDT )
+.IP \(bu 2
+Firmware SSDTs
+.RI ( /sys/firmare/acpi/tables/SSDT* )
+.RE
 .RE
 
 .B get\-model\-name
@@ -314,9 +427,23 @@ Print command for manual firmware upload.
 Print out the notebook's model name.
 .RE
 
+.B xml2json
+.I FILE
+.RS
+Convert an XML configuration file to JSON.
+
+This command can be used to convert configurations from the original NBFC project
+into the NBFC\-Linux format.
+.RE
+
 .B warranty
 .RS
 Show warranty.
+.RE
+
+.B faq
+.RS
+Show NBFC FAQ manual page.
 .RE
 
 .B help

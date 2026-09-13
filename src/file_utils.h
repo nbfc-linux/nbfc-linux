@@ -6,21 +6,21 @@
 #include <unistd.h> // access, F_OK, R_OK
 #include <stdbool.h>
 
-struct file_op_result {
+struct FileResult {
   bool ok;
   size_t len;
 };
-typedef struct file_op_result file_op_result;
+typedef struct FileResult FileResult;
 
-file_op_result slurp_file(char*, size_t, const char*);
-file_op_result slurp_file_dynamic(char**, const char*);
-file_op_result write_file(const char*, int, mode_t, const char*, size_t);
+FileResult File_Read(char*, size_t, const char*);
+FileResult File_ReadDynamic(char**, const char*);
+FileResult File_Write(const char*, int, mode_t, const char*, size_t);
 
-static inline bool file_exists(const char* path) {
+static inline bool File_Exists(const char* path) {
   return (access(path, F_OK) == 0);
 }
 
-static inline bool file_is_readable(const char* path) {
+static inline bool File_IsReadable(const char* path) {
   return (access(path, R_OK) == 0);
 }
 

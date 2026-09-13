@@ -1,15 +1,15 @@
 #include "../nbfc.h"
 #include "../sleep.h"
 #include "../memory.h"
+#include "../str_functions.h"
 
-#include "str_functions.h"
 #include "service_control.h"
 #include "client_global.h"
 
 #define STATUS_CLEAR_SCREEN "\033c"
 
-const struct cli99_Option status_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Status_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"-a|--all",     Option_Status_All,     cli99_NoArgument      },
   {"-s|--service", Option_Status_Service, cli99_NoArgument      },
   {"-f|--fan",     Option_Status_Fan,     cli99_RequiredArgument},
@@ -24,7 +24,7 @@ struct {
   float                  watch;
 } Status_Options = {0};
 
-static void Status_Print_Fan(const FanInfo* fan) {
+static void Status_PrintFan(const FanInfo* fan) {
   printf(
     "Fan Display Name         : %s\n"
     "Temperature              : %.2f\n"
@@ -42,7 +42,7 @@ static void Status_Print_Fan(const FanInfo* fan) {
     fan->SpeedSteps);
 }
 
-static void Status_Print_Service(const ServiceInfo* service_info) {
+static void Status_PrintService(const ServiceInfo* service_info) {
   printf(
     "Read-only                : %s\n"
     "Selected Config Name     : %s\n",
@@ -50,7 +50,7 @@ static void Status_Print_Service(const ServiceInfo* service_info) {
     service_info->SelectedConfigId);
 }
 
-static void Status_Print() {
+static void Status_Print(void) {
   Error e;
   ServiceInfo service_info = {0};
 
@@ -58,12 +58,12 @@ static void Status_Print() {
   e_die();
 
   if (Status_Options.all || Status_Options.service)
-    Status_Print_Service(&service_info);
+    Status_PrintService(&service_info);
 
   if (Status_Options.all) {
     for_each_array(const FanInfo*, f, service_info.Fans) {
       printf("\n");
-      Status_Print_Fan(f);
+      Status_PrintFan(f);
     }
   }
   else if (Status_Options.fans.size) {
@@ -75,12 +75,12 @@ static void Status_Print() {
       }
 
       printf("\n");
-      Status_Print_Fan(&service_info.Fans.data[*fan_index]);
+      Status_PrintFan(&service_info.Fans.data[*fan_index]);
     }
   }
 }
 
-int Status() {
+int Status(void) {
   if (!Status_Options.service && !Status_Options.all && !Status_Options.fans.size)
     Status_Options.all = true;
 

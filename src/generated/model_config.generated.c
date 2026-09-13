@@ -3,13 +3,13 @@
 Error TemperatureThreshold_ValidateFields(TemperatureThreshold* self) {
 	(void) self;
 
-	if (! TemperatureThreshold_IsSet_UpThreshold(self))
+	if (! self->isset.UpThreshold)
 		return err_stringf("%s: %s", "UpThreshold", "Missing option");
 
-	if (! TemperatureThreshold_IsSet_DownThreshold(self))
+	if (! self->isset.DownThreshold)
 		return err_stringf("%s: %s", "DownThreshold", "Missing option");
 
-	if (! TemperatureThreshold_IsSet_FanSpeed(self))
+	if (! self->isset.FanSpeed)
 		return err_stringf("%s: %s", "FanSpeed", "Missing option");
 	else if (! (self->FanSpeed >= 0.0f && self->FanSpeed <= 100.0f))
 		return err_stringf("%s: %s", "FanSpeed", "requires: 0.0 <= parameter <= 100.0");
@@ -29,17 +29,17 @@ Error TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* js
 		else if (!strcmp(c->key, "UpThreshold")) {
 			e = int16_t_FromJson(&obj->UpThreshold, c);
 			if (!e)
-				TemperatureThreshold_Set_UpThreshold(obj);
+				obj->isset.UpThreshold = true;
 		}
 		else if (!strcmp(c->key, "DownThreshold")) {
 			e = int16_t_FromJson(&obj->DownThreshold, c);
 			if (!e)
-				TemperatureThreshold_Set_DownThreshold(obj);
+				obj->isset.DownThreshold = true;
 		}
 		else if (!strcmp(c->key, "FanSpeed")) {
 			e = float_FromJson(&obj->FanSpeed, c);
 			if (!e)
-				TemperatureThreshold_Set_FanSpeed(obj);
+				obj->isset.FanSpeed = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -51,15 +51,15 @@ Error TemperatureThreshold_FromJson(TemperatureThreshold* obj, const nx_json* js
 Error FanSpeedPercentageOverride_ValidateFields(FanSpeedPercentageOverride* self) {
 	(void) self;
 
-	if (! FanSpeedPercentageOverride_IsSet_FanSpeedPercentage(self))
+	if (! self->isset.FanSpeedPercentage)
 		return err_stringf("%s: %s", "FanSpeedPercentage", "Missing option");
 	else if (! (self->FanSpeedPercentage >= 0.0f && self->FanSpeedPercentage <= 100.0f))
 		return err_stringf("%s: %s", "FanSpeedPercentage", "requires: 0.0 <= parameter <= 100.0");
 
-	if (! FanSpeedPercentageOverride_IsSet_FanSpeedValue(self))
+	if (! self->isset.FanSpeedValue)
 		return err_stringf("%s: %s", "FanSpeedValue", "Missing option");
 
-	if (! FanSpeedPercentageOverride_IsSet_TargetOperation(self))
+	if (! self->isset.TargetOperation)
 		self->TargetOperation = OverrideTargetOperation_ReadWrite;
 	return err_success();
 }
@@ -77,17 +77,17 @@ Error FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const
 		else if (!strcmp(c->key, "FanSpeedPercentage")) {
 			e = float_FromJson(&obj->FanSpeedPercentage, c);
 			if (!e)
-				FanSpeedPercentageOverride_Set_FanSpeedPercentage(obj);
+				obj->isset.FanSpeedPercentage = true;
 		}
 		else if (!strcmp(c->key, "FanSpeedValue")) {
 			e = uint16_t_FromJson(&obj->FanSpeedValue, c);
 			if (!e)
-				FanSpeedPercentageOverride_Set_FanSpeedValue(obj);
+				obj->isset.FanSpeedValue = true;
 		}
 		else if (!strcmp(c->key, "TargetOperation")) {
 			e = OverrideTargetOperation_FromJson(&obj->TargetOperation, c);
 			if (!e)
-				FanSpeedPercentageOverride_Set_TargetOperation(obj);
+				obj->isset.TargetOperation = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -99,10 +99,10 @@ Error FanSpeedPercentageOverride_FromJson(FanSpeedPercentageOverride* obj, const
 Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self) {
 	(void) self;
 
-	if (! RegisterWriteConfiguration_IsSet_WriteMode(self))
+	if (! self->isset.WriteMode)
 		self->WriteMode = RegisterWriteMode_Set;
 
-	if (! RegisterWriteConfiguration_IsSet_WriteOccasion(self))
+	if (! self->isset.WriteOccasion)
 		self->WriteOccasion = RegisterWriteOccasion_OnInitialization;
 
 	if (false)
@@ -114,7 +114,10 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self
 	if (false)
 		return err_stringf("%s: %s", "AcpiMethod", "Missing option");
 
-	if (! RegisterWriteConfiguration_IsSet_ResetRequired(self))
+	if (false)
+		return err_stringf("%s: %s", "LuaCode", "Missing option");
+
+	if (! self->isset.ResetRequired)
 		self->ResetRequired = false;
 
 	if (false)
@@ -123,11 +126,14 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration* self
 	if (false)
 		return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
-	if (! RegisterWriteConfiguration_IsSet_ResetWriteMode(self))
+	if (false)
+		return err_stringf("%s: %s", "ResetLuaCode", "Missing option");
+
+	if (! self->isset.ResetWriteMode)
 		self->ResetWriteMode = RegisterWriteMode_Set;
 
-	if (! RegisterWriteConfiguration_IsSet_Description(self))
-		self->Description = Mem_Strdup("");
+	if (false)
+		return err_stringf("%s: %s", "Description", "Missing option");
 	return err_success();
 }
 
@@ -144,52 +150,62 @@ Error RegisterWriteConfiguration_FromJson(RegisterWriteConfiguration* obj, const
 		else if (!strcmp(c->key, "WriteMode")) {
 			e = RegisterWriteMode_FromJson(&obj->WriteMode, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_WriteMode(obj);
+				obj->isset.WriteMode = true;
 		}
 		else if (!strcmp(c->key, "WriteOccasion")) {
 			e = RegisterWriteOccasion_FromJson(&obj->WriteOccasion, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_WriteOccasion(obj);
+				obj->isset.WriteOccasion = true;
 		}
 		else if (!strcmp(c->key, "Register")) {
 			e = uint8_t_FromJson(&obj->Register, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_Register(obj);
+				obj->isset.Register = true;
 		}
 		else if (!strcmp(c->key, "Value")) {
 			e = uint8_t_FromJson(&obj->Value, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_Value(obj);
+				obj->isset.Value = true;
 		}
 		else if (!strcmp(c->key, "AcpiMethod")) {
 			e = str_FromJson(&obj->AcpiMethod, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_AcpiMethod(obj);
+				obj->isset.AcpiMethod = true;
+		}
+		else if (!strcmp(c->key, "LuaCode")) {
+			e = LuaCode_FromJson(&obj->LuaCode, c);
+			if (!e)
+				obj->isset.LuaCode = true;
 		}
 		else if (!strcmp(c->key, "ResetRequired")) {
 			e = bool_FromJson(&obj->ResetRequired, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_ResetRequired(obj);
+				obj->isset.ResetRequired = true;
 		}
 		else if (!strcmp(c->key, "ResetValue")) {
 			e = uint8_t_FromJson(&obj->ResetValue, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_ResetValue(obj);
+				obj->isset.ResetValue = true;
 		}
 		else if (!strcmp(c->key, "ResetAcpiMethod")) {
 			e = str_FromJson(&obj->ResetAcpiMethod, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_ResetAcpiMethod(obj);
+				obj->isset.ResetAcpiMethod = true;
+		}
+		else if (!strcmp(c->key, "ResetLuaCode")) {
+			e = LuaCode_FromJson(&obj->ResetLuaCode, c);
+			if (!e)
+				obj->isset.ResetLuaCode = true;
 		}
 		else if (!strcmp(c->key, "ResetWriteMode")) {
 			e = RegisterWriteMode_FromJson(&obj->ResetWriteMode, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_ResetWriteMode(obj);
+				obj->isset.ResetWriteMode = true;
 		}
 		else if (!strcmp(c->key, "Description")) {
 			e = str_FromJson(&obj->Description, c);
 			if (!e)
-				RegisterWriteConfiguration_Set_Description(obj);
+				obj->isset.Description = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -211,15 +227,21 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 		return err_stringf("%s: %s", "ReadAcpiMethod", "Missing option");
 
 	if (false)
+		return err_stringf("%s: %s", "ReadLuaCode", "Missing option");
+
+	if (false)
 		return err_stringf("%s: %s", "WriteRegister", "Missing option");
 
 	if (false)
 		return err_stringf("%s: %s", "WriteAcpiMethod", "Missing option");
 
-	if (! FanConfiguration_IsSet_MinSpeedValue(self))
+	if (false)
+		return err_stringf("%s: %s", "WriteLuaCode", "Missing option");
+
+	if (! self->isset.MinSpeedValue)
 		return err_stringf("%s: %s", "MinSpeedValue", "Missing option");
 
-	if (! FanConfiguration_IsSet_MaxSpeedValue(self))
+	if (! self->isset.MaxSpeedValue)
 		return err_stringf("%s: %s", "MaxSpeedValue", "Missing option");
 
 	if (false)
@@ -228,10 +250,10 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
 		return err_stringf("%s: %s", "MaxSpeedValueRead", "Missing option");
 
-	if (! FanConfiguration_IsSet_IndependentReadMinMaxValues(self))
+	if (! self->isset.IndependentReadMinMaxValues)
 		self->IndependentReadMinMaxValues = false;
 
-	if (! FanConfiguration_IsSet_ResetRequired(self))
+	if (! self->isset.ResetRequired)
 		self->ResetRequired = false;
 
 	if (false)
@@ -239,6 +261,9 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 
 	if (false)
 		return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
+
+	if (false)
+		return err_stringf("%s: %s", "ResetLuaCode", "Missing option");
 
 	if (false)
 		return err_stringf("%s: %s", "TemperatureAlgorithmType", "Missing option");
@@ -249,7 +274,7 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
 		return err_stringf("%s: %s", "TemperatureThresholds", "Missing option");
 
-	if (! FanConfiguration_IsSet_FanSpeedPercentageOverrides(self))
+	if (! self->isset.FanSpeedPercentageOverrides)
 		self->FanSpeedPercentageOverrides = Config_DefaultFanSpeedPercentageOverrides;
 	return err_success();
 }
@@ -267,87 +292,102 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 		else if (!strcmp(c->key, "FanDisplayName")) {
 			e = str_FromJson(&obj->FanDisplayName, c);
 			if (!e)
-				FanConfiguration_Set_FanDisplayName(obj);
+				obj->isset.FanDisplayName = true;
 		}
 		else if (!strcmp(c->key, "ReadRegister")) {
 			e = uint8_t_FromJson(&obj->ReadRegister, c);
 			if (!e)
-				FanConfiguration_Set_ReadRegister(obj);
+				obj->isset.ReadRegister = true;
 		}
 		else if (!strcmp(c->key, "ReadAcpiMethod")) {
 			e = str_FromJson(&obj->ReadAcpiMethod, c);
 			if (!e)
-				FanConfiguration_Set_ReadAcpiMethod(obj);
+				obj->isset.ReadAcpiMethod = true;
+		}
+		else if (!strcmp(c->key, "ReadLuaCode")) {
+			e = LuaCode_FromJson(&obj->ReadLuaCode, c);
+			if (!e)
+				obj->isset.ReadLuaCode = true;
 		}
 		else if (!strcmp(c->key, "WriteRegister")) {
 			e = uint8_t_FromJson(&obj->WriteRegister, c);
 			if (!e)
-				FanConfiguration_Set_WriteRegister(obj);
+				obj->isset.WriteRegister = true;
 		}
 		else if (!strcmp(c->key, "WriteAcpiMethod")) {
 			e = str_FromJson(&obj->WriteAcpiMethod, c);
 			if (!e)
-				FanConfiguration_Set_WriteAcpiMethod(obj);
+				obj->isset.WriteAcpiMethod = true;
+		}
+		else if (!strcmp(c->key, "WriteLuaCode")) {
+			e = LuaCode_FromJson(&obj->WriteLuaCode, c);
+			if (!e)
+				obj->isset.WriteLuaCode = true;
 		}
 		else if (!strcmp(c->key, "MinSpeedValue")) {
 			e = uint16_t_FromJson(&obj->MinSpeedValue, c);
 			if (!e)
-				FanConfiguration_Set_MinSpeedValue(obj);
+				obj->isset.MinSpeedValue = true;
 		}
 		else if (!strcmp(c->key, "MaxSpeedValue")) {
 			e = uint16_t_FromJson(&obj->MaxSpeedValue, c);
 			if (!e)
-				FanConfiguration_Set_MaxSpeedValue(obj);
+				obj->isset.MaxSpeedValue = true;
 		}
 		else if (!strcmp(c->key, "MinSpeedValueRead")) {
 			e = uint16_t_FromJson(&obj->MinSpeedValueRead, c);
 			if (!e)
-				FanConfiguration_Set_MinSpeedValueRead(obj);
+				obj->isset.MinSpeedValueRead = true;
 		}
 		else if (!strcmp(c->key, "MaxSpeedValueRead")) {
 			e = uint16_t_FromJson(&obj->MaxSpeedValueRead, c);
 			if (!e)
-				FanConfiguration_Set_MaxSpeedValueRead(obj);
+				obj->isset.MaxSpeedValueRead = true;
 		}
 		else if (!strcmp(c->key, "IndependentReadMinMaxValues")) {
 			e = bool_FromJson(&obj->IndependentReadMinMaxValues, c);
 			if (!e)
-				FanConfiguration_Set_IndependentReadMinMaxValues(obj);
+				obj->isset.IndependentReadMinMaxValues = true;
 		}
 		else if (!strcmp(c->key, "ResetRequired")) {
 			e = bool_FromJson(&obj->ResetRequired, c);
 			if (!e)
-				FanConfiguration_Set_ResetRequired(obj);
+				obj->isset.ResetRequired = true;
 		}
 		else if (!strcmp(c->key, "FanSpeedResetValue")) {
 			e = uint16_t_FromJson(&obj->FanSpeedResetValue, c);
 			if (!e)
-				FanConfiguration_Set_FanSpeedResetValue(obj);
+				obj->isset.FanSpeedResetValue = true;
 		}
 		else if (!strcmp(c->key, "ResetAcpiMethod")) {
 			e = str_FromJson(&obj->ResetAcpiMethod, c);
 			if (!e)
-				FanConfiguration_Set_ResetAcpiMethod(obj);
+				obj->isset.ResetAcpiMethod = true;
+		}
+		else if (!strcmp(c->key, "ResetLuaCode")) {
+			e = LuaCode_FromJson(&obj->ResetLuaCode, c);
+			if (!e)
+				obj->isset.ResetLuaCode = true;
 		}
 		else if (!strcmp(c->key, "TemperatureAlgorithmType")) {
 			e = TemperatureAlgorithmType_FromJson(&obj->TemperatureAlgorithmType, c);
 			if (!e)
-				FanConfiguration_Set_TemperatureAlgorithmType(obj);
+				obj->isset.TemperatureAlgorithmType = true;
 		}
 		else if (!strcmp(c->key, "Sensors")) {
 			e = array_of_str_FromJson(&obj->Sensors, c);
 			if (!e)
-				FanConfiguration_Set_Sensors(obj);
+				obj->isset.Sensors = true;
 		}
 		else if (!strcmp(c->key, "TemperatureThresholds")) {
 			e = array_of_TemperatureThreshold_FromJson(&obj->TemperatureThresholds, c);
 			if (!e)
-				FanConfiguration_Set_TemperatureThresholds(obj);
+				obj->isset.TemperatureThresholds = true;
 		}
 		else if (!strcmp(c->key, "FanSpeedPercentageOverrides")) {
 			e = array_of_FanSpeedPercentageOverride_FromJson(&obj->FanSpeedPercentageOverrides, c);
 			if (!e)
-				FanConfiguration_Set_FanSpeedPercentageOverrides(obj);
+				obj->isset.FanSpeedPercentageOverrides = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -359,16 +399,16 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 Error Sponsor_ValidateFields(Sponsor* self) {
 	(void) self;
 
-	if (! Sponsor_IsSet_Name(self))
+	if (! self->isset.Name)
 		return err_stringf("%s: %s", "Name", "Missing option");
 
 	if (false)
 		return err_stringf("%s: %s", "Description", "Missing option");
 
-	if (! Sponsor_IsSet_URL(self))
+	if (! self->isset.URL)
 		return err_stringf("%s: %s", "URL", "Missing option");
 
-	if (! Sponsor_IsSet_BannerURL(self))
+	if (! self->isset.BannerURL)
 		return err_stringf("%s: %s", "BannerURL", "Missing option");
 	return err_success();
 }
@@ -386,22 +426,22 @@ Error Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
 		else if (!strcmp(c->key, "Name")) {
 			e = str_FromJson(&obj->Name, c);
 			if (!e)
-				Sponsor_Set_Name(obj);
+				obj->isset.Name = true;
 		}
 		else if (!strcmp(c->key, "Description")) {
 			e = str_FromJson(&obj->Description, c);
 			if (!e)
-				Sponsor_Set_Description(obj);
+				obj->isset.Description = true;
 		}
 		else if (!strcmp(c->key, "URL")) {
 			e = str_FromJson(&obj->URL, c);
 			if (!e)
-				Sponsor_Set_URL(obj);
+				obj->isset.URL = true;
 		}
 		else if (!strcmp(c->key, "BannerURL")) {
 			e = str_FromJson(&obj->BannerURL, c);
 			if (!e)
-				Sponsor_Set_BannerURL(obj);
+				obj->isset.BannerURL = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -413,31 +453,37 @@ Error Sponsor_FromJson(Sponsor* obj, const nx_json* json) {
 Error ModelConfig_ValidateFields(ModelConfig* self) {
 	(void) self;
 
-	if (! ModelConfig_IsSet_NotebookModel(self))
+	if (! self->isset.NotebookModel)
 		return err_stringf("%s: %s", "NotebookModel", "Missing option");
 
-	if (! ModelConfig_IsSet_Author(self))
-		self->Author = Mem_Strdup("");
+	if (false)
+		return err_stringf("%s: %s", "Author", "Missing option");
 
-	if (! ModelConfig_IsSet_LegacyTemperatureThresholdsBehaviour(self))
+	if (! self->isset.LegacyTemperatureThresholdsBehaviour)
 		self->LegacyTemperatureThresholdsBehaviour = false;
 
-	if (! ModelConfig_IsSet_EcPollInterval(self))
+	if (false)
+		return err_stringf("%s: %s", "LuaLibraries", "Missing option");
+
+	if (! self->isset.EcPollInterval)
 		self->EcPollInterval = 3000;
 
-	if (! ModelConfig_IsSet_CriticalTemperature(self))
+	if (! self->isset.CriticalTemperature)
 		self->CriticalTemperature = 75;
 
-	if (! ModelConfig_IsSet_CriticalTemperatureOffset(self))
+	if (! self->isset.CriticalTemperatureOffset)
 		self->CriticalTemperatureOffset = 15;
 
-	if (! ModelConfig_IsSet_ReadWriteWords(self))
+	if (! self->isset.ReadWriteWords)
 		self->ReadWriteWords = false;
 
 	if (false)
 		return err_stringf("%s: %s", "Sponsor", "Missing option");
 
-	if (! ModelConfig_IsSet_FanConfigurations(self))
+	if (false)
+		return err_stringf("%s: %s", "FirmwareFingerprint", "Missing option");
+
+	if (! self->isset.FanConfigurations)
 		return err_stringf("%s: %s", "FanConfigurations", "Missing option");
 	else if (! (self->FanConfigurations.size > 0))
 		return err_stringf("%s: %s", "FanConfigurations", "requires: parameter.size > 0");
@@ -460,52 +506,62 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 		else if (!strcmp(c->key, "NotebookModel")) {
 			e = str_FromJson(&obj->NotebookModel, c);
 			if (!e)
-				ModelConfig_Set_NotebookModel(obj);
+				obj->isset.NotebookModel = true;
 		}
 		else if (!strcmp(c->key, "Author")) {
 			e = str_FromJson(&obj->Author, c);
 			if (!e)
-				ModelConfig_Set_Author(obj);
+				obj->isset.Author = true;
 		}
 		else if (!strcmp(c->key, "LegacyTemperatureThresholdsBehaviour")) {
 			e = bool_FromJson(&obj->LegacyTemperatureThresholdsBehaviour, c);
 			if (!e)
-				ModelConfig_Set_LegacyTemperatureThresholdsBehaviour(obj);
+				obj->isset.LegacyTemperatureThresholdsBehaviour = true;
+		}
+		else if (!strcmp(c->key, "LuaLibraries")) {
+			e = LuaLibraries_FromJson(&obj->LuaLibraries, c);
+			if (!e)
+				obj->isset.LuaLibraries = true;
 		}
 		else if (!strcmp(c->key, "EcPollInterval")) {
 			e = uint16_t_FromJson(&obj->EcPollInterval, c);
 			if (!e)
-				ModelConfig_Set_EcPollInterval(obj);
+				obj->isset.EcPollInterval = true;
 		}
 		else if (!strcmp(c->key, "CriticalTemperature")) {
 			e = int16_t_FromJson(&obj->CriticalTemperature, c);
 			if (!e)
-				ModelConfig_Set_CriticalTemperature(obj);
+				obj->isset.CriticalTemperature = true;
 		}
 		else if (!strcmp(c->key, "CriticalTemperatureOffset")) {
 			e = uint16_t_FromJson(&obj->CriticalTemperatureOffset, c);
 			if (!e)
-				ModelConfig_Set_CriticalTemperatureOffset(obj);
+				obj->isset.CriticalTemperatureOffset = true;
 		}
 		else if (!strcmp(c->key, "ReadWriteWords")) {
 			e = bool_FromJson(&obj->ReadWriteWords, c);
 			if (!e)
-				ModelConfig_Set_ReadWriteWords(obj);
+				obj->isset.ReadWriteWords = true;
 		}
 		else if (!strcmp(c->key, "Sponsor")) {
 			e = Sponsor_FromJson(&obj->Sponsor, c);
 			if (!e)
-				ModelConfig_Set_Sponsor(obj);
+				obj->isset.Sponsor = true;
+		}
+		else if (!strcmp(c->key, "FirmwareFingerprint")) {
+			e = array_of_str_FromJson(&obj->FirmwareFingerprint, c);
+			if (!e)
+				obj->isset.FirmwareFingerprint = true;
 		}
 		else if (!strcmp(c->key, "FanConfigurations")) {
 			e = array_of_FanConfiguration_FromJson(&obj->FanConfigurations, c);
 			if (!e)
-				ModelConfig_Set_FanConfigurations(obj);
+				obj->isset.FanConfigurations = true;
 		}
 		else if (!strcmp(c->key, "RegisterWriteConfigurations")) {
 			e = array_of_RegisterWriteConfiguration_FromJson(&obj->RegisterWriteConfigurations, c);
 			if (!e)
-				ModelConfig_Set_RegisterWriteConfigurations(obj);
+				obj->isset.RegisterWriteConfigurations = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -517,7 +573,7 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 Error FanTemperatureSourceConfig_ValidateFields(FanTemperatureSourceConfig* self) {
 	(void) self;
 
-	if (! FanTemperatureSourceConfig_IsSet_FanIndex(self))
+	if (! self->isset.FanIndex)
 		return err_stringf("%s: %s", "FanIndex", "Missing option");
 
 	if (false)
@@ -541,17 +597,17 @@ Error FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const
 		else if (!strcmp(c->key, "FanIndex")) {
 			e = uint8_t_FromJson(&obj->FanIndex, c);
 			if (!e)
-				FanTemperatureSourceConfig_Set_FanIndex(obj);
+				obj->isset.FanIndex = true;
 		}
 		else if (!strcmp(c->key, "TemperatureAlgorithmType")) {
 			e = TemperatureAlgorithmType_FromJson(&obj->TemperatureAlgorithmType, c);
 			if (!e)
-				FanTemperatureSourceConfig_Set_TemperatureAlgorithmType(obj);
+				obj->isset.TemperatureAlgorithmType = true;
 		}
 		else if (!strcmp(c->key, "Sensors")) {
 			e = array_of_str_FromJson(&obj->Sensors, c);
 			if (!e)
-				FanTemperatureSourceConfig_Set_Sensors(obj);
+				obj->isset.Sensors = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -563,7 +619,7 @@ Error FanTemperatureSourceConfig_FromJson(FanTemperatureSourceConfig* obj, const
 Error ServiceConfig_ValidateFields(ServiceConfig* self) {
 	(void) self;
 
-	if (! ServiceConfig_IsSet_SelectedConfigId(self))
+	if (! self->isset.SelectedConfigId)
 		return err_stringf("%s: %s", "SelectedConfigId", "Missing option");
 
 	if (false)
@@ -590,22 +646,22 @@ Error ServiceConfig_FromJson(ServiceConfig* obj, const nx_json* json) {
 		else if (!strcmp(c->key, "SelectedConfigId")) {
 			e = str_FromJson(&obj->SelectedConfigId, c);
 			if (!e)
-				ServiceConfig_Set_SelectedConfigId(obj);
+				obj->isset.SelectedConfigId = true;
 		}
 		else if (!strcmp(c->key, "EmbeddedControllerType")) {
 			e = EmbeddedControllerType_FromJson(&obj->EmbeddedControllerType, c);
 			if (!e)
-				ServiceConfig_Set_EmbeddedControllerType(obj);
+				obj->isset.EmbeddedControllerType = true;
 		}
 		else if (!strcmp(c->key, "TargetFanSpeeds")) {
 			e = array_of_float_FromJson(&obj->TargetFanSpeeds, c);
 			if (!e)
-				ServiceConfig_Set_TargetFanSpeeds(obj);
+				obj->isset.TargetFanSpeeds = true;
 		}
 		else if (!strcmp(c->key, "FanTemperatureSources")) {
 			e = array_of_FanTemperatureSourceConfig_FromJson(&obj->FanTemperatureSources, c);
 			if (!e)
-				ServiceConfig_Set_FanTemperatureSources(obj);
+				obj->isset.FanTemperatureSources = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -635,7 +691,7 @@ Error ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
 		else if (!strcmp(c->key, "TargetFanSpeeds")) {
 			e = array_of_float_FromJson(&obj->TargetFanSpeeds, c);
 			if (!e)
-				ServiceState_Set_TargetFanSpeeds(obj);
+				obj->isset.TargetFanSpeeds = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -647,28 +703,28 @@ Error ServiceState_FromJson(ServiceState* obj, const nx_json* json) {
 Error FanInfo_ValidateFields(FanInfo* self) {
 	(void) self;
 
-	if (! FanInfo_IsSet_Name(self))
+	if (! self->isset.Name)
 		return err_stringf("%s: %s", "Name", "Missing option");
 
-	if (! FanInfo_IsSet_Temperature(self))
+	if (! self->isset.Temperature)
 		return err_stringf("%s: %s", "Temperature", "Missing option");
 
-	if (! FanInfo_IsSet_AutoMode(self))
+	if (! self->isset.AutoMode)
 		return err_stringf("%s: %s", "AutoMode", "Missing option");
 
-	if (! FanInfo_IsSet_Critical(self))
+	if (! self->isset.Critical)
 		return err_stringf("%s: %s", "Critical", "Missing option");
 
-	if (! FanInfo_IsSet_CurrentSpeed(self))
+	if (! self->isset.CurrentSpeed)
 		return err_stringf("%s: %s", "CurrentSpeed", "Missing option");
 
-	if (! FanInfo_IsSet_TargetSpeed(self))
+	if (! self->isset.TargetSpeed)
 		return err_stringf("%s: %s", "TargetSpeed", "Missing option");
 
-	if (! FanInfo_IsSet_RequestedSpeed(self))
+	if (! self->isset.RequestedSpeed)
 		return err_stringf("%s: %s", "RequestedSpeed", "Missing option");
 
-	if (! FanInfo_IsSet_SpeedSteps(self))
+	if (! self->isset.SpeedSteps)
 		return err_stringf("%s: %s", "SpeedSteps", "Missing option");
 	return err_success();
 }
@@ -686,42 +742,42 @@ Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 		else if (!strcmp(c->key, "Name")) {
 			e = str_FromJson(&obj->Name, c);
 			if (!e)
-				FanInfo_Set_Name(obj);
+				obj->isset.Name = true;
 		}
 		else if (!strcmp(c->key, "Temperature")) {
 			e = float_FromJson(&obj->Temperature, c);
 			if (!e)
-				FanInfo_Set_Temperature(obj);
+				obj->isset.Temperature = true;
 		}
 		else if (!strcmp(c->key, "AutoMode")) {
 			e = bool_FromJson(&obj->AutoMode, c);
 			if (!e)
-				FanInfo_Set_AutoMode(obj);
+				obj->isset.AutoMode = true;
 		}
 		else if (!strcmp(c->key, "Critical")) {
 			e = bool_FromJson(&obj->Critical, c);
 			if (!e)
-				FanInfo_Set_Critical(obj);
+				obj->isset.Critical = true;
 		}
 		else if (!strcmp(c->key, "CurrentSpeed")) {
 			e = float_FromJson(&obj->CurrentSpeed, c);
 			if (!e)
-				FanInfo_Set_CurrentSpeed(obj);
+				obj->isset.CurrentSpeed = true;
 		}
 		else if (!strcmp(c->key, "TargetSpeed")) {
 			e = float_FromJson(&obj->TargetSpeed, c);
 			if (!e)
-				FanInfo_Set_TargetSpeed(obj);
+				obj->isset.TargetSpeed = true;
 		}
 		else if (!strcmp(c->key, "RequestedSpeed")) {
 			e = float_FromJson(&obj->RequestedSpeed, c);
 			if (!e)
-				FanInfo_Set_RequestedSpeed(obj);
+				obj->isset.RequestedSpeed = true;
 		}
 		else if (!strcmp(c->key, "SpeedSteps")) {
 			e = uint16_t_FromJson(&obj->SpeedSteps, c);
 			if (!e)
-				FanInfo_Set_SpeedSteps(obj);
+				obj->isset.SpeedSteps = true;
 		}
 		else
 			e = err_string("Unknown option");
@@ -733,16 +789,16 @@ Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 Error ServiceInfo_ValidateFields(ServiceInfo* self) {
 	(void) self;
 
-	if (! ServiceInfo_IsSet_PID(self))
+	if (! self->isset.PID)
 		return err_stringf("%s: %s", "PID", "Missing option");
 
-	if (! ServiceInfo_IsSet_SelectedConfigId(self))
+	if (! self->isset.SelectedConfigId)
 		return err_stringf("%s: %s", "SelectedConfigId", "Missing option");
 
-	if (! ServiceInfo_IsSet_ReadOnly(self))
+	if (! self->isset.ReadOnly)
 		return err_stringf("%s: %s", "ReadOnly", "Missing option");
 
-	if (! ServiceInfo_IsSet_Fans(self))
+	if (! self->isset.Fans)
 		return err_stringf("%s: %s", "Fans", "Missing option");
 	return err_success();
 }
@@ -760,22 +816,22 @@ Error ServiceInfo_FromJson(ServiceInfo* obj, const nx_json* json) {
 		else if (!strcmp(c->key, "PID")) {
 			e = int_FromJson(&obj->PID, c);
 			if (!e)
-				ServiceInfo_Set_PID(obj);
+				obj->isset.PID = true;
 		}
 		else if (!strcmp(c->key, "SelectedConfigId")) {
 			e = str_FromJson(&obj->SelectedConfigId, c);
 			if (!e)
-				ServiceInfo_Set_SelectedConfigId(obj);
+				obj->isset.SelectedConfigId = true;
 		}
 		else if (!strcmp(c->key, "ReadOnly")) {
 			e = bool_FromJson(&obj->ReadOnly, c);
 			if (!e)
-				ServiceInfo_Set_ReadOnly(obj);
+				obj->isset.ReadOnly = true;
 		}
 		else if (!strcmp(c->key, "Fans")) {
 			e = array_of_FanInfo_FromJson(&obj->Fans, c);
 			if (!e)
-				ServiceInfo_Set_Fans(obj);
+				obj->isset.Fans = true;
 		}
 		else
 			e = err_string("Unknown option");

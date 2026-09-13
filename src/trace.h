@@ -11,7 +11,7 @@ struct Trace {
 };
 typedef struct Trace Trace;
 
-void Trace_Push(Trace*, const char*, ...) PRINTF_LIKE(2, 3);
+void Trace_Push(Trace*, const char*, ...) NBFC_PRINTF_LIKE(2, 3);
 void Trace_Pop(Trace*);
 
 static inline void Trace_Init(Trace* trace) {

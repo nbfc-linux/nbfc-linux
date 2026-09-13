@@ -1,4 +1,4 @@
-AC_INIT([nbfc-linux], [0.4.0], [braph93@gmx.de])
+AC_INIT([nbfc-linux], [0.5.3], [braph93@gmx.de])
 
 # Checks for programs.
 AC_PROG_CC
@@ -29,6 +29,8 @@ AC_FUNC_STRTOD
 AC_CHECK_FUNCS([atexit memset mkdir realpath setlocale socket strchr strrchr strstr strcspn strdup strerror strtol strtoull])
 AC_CHECK_LIB([curl], [curl_easy_init], [], [AC_MSG_ERROR([libcurl not found])])
 AC_CHECK_LIB([crypto], [SHA1], [], [AC_MSG_ERROR([libcrypto (OpenSSL) not found])])
+
+libdir='${prefix}/lib'
 
 # =============================================================================
 # Init-System

@@ -1,0 +1,55 @@
+{
+  "LegacyTemperatureThresholdsBehaviour": false,
+  "NotebookModel": "HP Envy x360 2-in-1 Laptop 15-fh0xxx",
+  "Author": "ferant2406",
+  "EcPollInterval": 1000,
+  "CriticalTemperature": 100,
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "CPU Fan",
+      "ResetRequired": true,
+      "ReadAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANG 33026",
+      "WriteAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANW 33026 $",
+      "ResetAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANW 33030 0x8",
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "TemperatureThresholds": [
+        {
+          "UpThreshold": 80,
+          "DownThreshold": 0,
+          "FanSpeed": 0
+        },
+        {
+          "UpThreshold": 85,
+          "DownThreshold": 80,
+          "FanSpeed": 15
+        },
+        {
+          "UpThreshold": 90,
+          "DownThreshold": 85,
+          "FanSpeed": 30
+        },
+        {
+          "UpThreshold": 95,
+          "DownThreshold": 90,
+          "FanSpeed": 45
+        },
+        {
+          "UpThreshold": 98,
+          "DownThreshold": 95,
+          "FanSpeed": 100
+        }
+      ]
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Call",
+      "WriteOccasion": "OnWriteFanSpeed",
+      "AcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANW 33030 0xFF",
+      "ResetRequired": true,
+      "ResetWriteMode": "Call",
+      "ResetAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANW 33030 0x8"
+    }
+  ]
+}

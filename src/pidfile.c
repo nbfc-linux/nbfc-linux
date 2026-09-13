@@ -6,7 +6,7 @@
 #include <errno.h>  // errno, EEXIST
 #include <stdio.h>  // snprintf
 #include <unistd.h> // getpid
-#include <sys/stat.h>
+#include <sys/stat.h> // O_WRONLY, O_CREAT, O_TRUNC, S_IRUSR, ...
 
 Error PID_Write(enum PID_LockMode lock_mode) {
   Error e = err_success();
@@ -15,7 +15,7 @@ Error PID_Write(enum PID_LockMode lock_mode) {
   char buf[32];
   int len = snprintf(buf, sizeof(buf), "%d", getpid());
 
-  if (! write_file(NBFC_PID_FILE, flags, mode, buf, (size_t) len).ok) {
+  if (! File_Write(NBFC_PID_FILE, flags, mode, buf, (size_t) len).ok) {
     e = err_stdlib(NBFC_PID_FILE);
 
     if (errno == EEXIST)
@@ -25,6 +25,6 @@ Error PID_Write(enum PID_LockMode lock_mode) {
   return e;
 }
 
-void PID_Cleanup() {
+void PID_Cleanup(void) {
   unlink(NBFC_PID_FILE);
 }

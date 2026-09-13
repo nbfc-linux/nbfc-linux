@@ -8,16 +8,16 @@
 
 #include "memory.h"
 
+#define         EC_DUMMY_FAKE_REGISTERS_SIZE 256
 static uint8_t* EC_Dummy_FakeRegisters = NULL;
-#define         EC_Dummy_FakeRegistersSize 256
 
-Error EC_Dummy_Open() {
+Error EC_Dummy_Open(void) {
   if (! EC_Dummy_FakeRegisters)
-    EC_Dummy_FakeRegisters = (uint8_t*) Mem_Calloc(EC_Dummy_FakeRegistersSize, sizeof(uint8_t));
+    EC_Dummy_FakeRegisters = (uint8_t*) Mem_Calloc(EC_DUMMY_FAKE_REGISTERS_SIZE, sizeof(uint8_t));
   return err_success();
 }
 
-void EC_Dummy_Close() {
+void EC_Dummy_Close(void) {
   Mem_Free(EC_Dummy_FakeRegisters);
   EC_Dummy_FakeRegisters = NULL;
 }
@@ -33,9 +33,10 @@ Error EC_Dummy_WriteByte(uint8_t register_, uint8_t value) {
 }
 
 Error EC_Dummy_ReadWord(uint8_t register_, uint16_t* out) {
-  if (register_ + 1 < EC_Dummy_FakeRegistersSize) {
-    *out = ((uint16_t) EC_Dummy_FakeRegisters[register_]) |
-          (((uint16_t) EC_Dummy_FakeRegisters[register_+1]) << 8);
+  if (register_ + 1 < EC_DUMMY_FAKE_REGISTERS_SIZE) {
+    const uint16_t lsb = EC_Dummy_FakeRegisters[register_];
+    const uint16_t msb = EC_Dummy_FakeRegisters[register_ + 1];
+    *out = (uint16_t) ((msb << 8) | lsb);
   }
   return err_success();
 }
@@ -43,10 +44,10 @@ Error EC_Dummy_ReadWord(uint8_t register_, uint16_t* out) {
 Error EC_Dummy_WriteWord(uint8_t register_, uint16_t value) {
   value = htole16(value);
 
-  uint8_t msb = (uint8_t) (value >> 8);
-  uint8_t lsb = (uint8_t) value;
+  const uint8_t msb = (uint8_t) (value >> 8);
+  const uint8_t lsb = (uint8_t) value;
 
-  if (register_ + 1 < EC_Dummy_FakeRegistersSize) {
+  if (register_ + 1 < EC_DUMMY_FAKE_REGISTERS_SIZE) {
     EC_Dummy_FakeRegisters[register_] = lsb;
     EC_Dummy_FakeRegisters[register_ + 1] = msb;
   }

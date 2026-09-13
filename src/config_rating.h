@@ -3,7 +3,9 @@
 
 #include "macros.h"
 #include "model_config.h"
+#include "aml_analysis.h"
 #include "acpi_analysis.h"
+#include "config_analysis.h"
 #include "config_rating_rules.h"
 #include "nxjson.h"
 
@@ -15,25 +17,19 @@
  * acpi_info:
  *   Contains ACPI information (registers, methods, operation regions).
  *
+ * aml_analysis:
+ *   Contains disassembled and tokenized ACPI tables.
+ *
  * rules:
  *   Contains the rules for rating configurations.
  */
 struct ConfigRating {
   AcpiInfo acpi_info;
+  AML_Analysis aml_analysis;
   ConfigRatingRules rules;
 };
 typedef struct ConfigRating ConfigRating;
 declare_array_of(ConfigRating);
-
-/*
- * Specifies the category of a register, e.g. whether it is a fan register or
- * a miscellaneous register used for register-write configurations.
- */
-enum NBFC_PACKED_ENUM RegisterType {
-  RegisterType_FanReadRegister,
-  RegisterType_FanWriteRegister,
-  RegisterType_RegisterWriteConfigurationRegister
-};
 
 /*
  * Indicates how well an EC register name matches the firmware according to the
@@ -95,15 +91,23 @@ enum NBFC_PACKED_ENUM MethodScore {
  * score:
  *   Score indicating how well the register matches the firwmare.
  *
+ * priority:
+ *   Stores the priority (0 - 100).
+ *
  * info:
  *   Looked up register information.
  *   If `score` is `RegisterScore_NotFound` this field is NULL.
+ *
+ * notice:
+ *   A notice that will be printed for a register.
  */
 struct ConfigRating_RegisterRating {
   unsigned offset;
   enum RegisterType type;
   enum RegisterScore score;
+  uint8_t priority;
   AcpiRegister* info;
+  const char* notice;
 };
 typedef struct ConfigRating_RegisterRating ConfigRating_RegisterRating;
 declare_array_of(ConfigRating_RegisterRating);
@@ -147,10 +151,14 @@ declare_array_of(ConfigRating_MethodRating);
  *
  * method_ratings:
  *   Stores the method ratings.
+ *
+ * bad:
+ *   Configuration contains a bad register.
  */
 struct ConfigRating_Rating {
   float score;
   int priority;
+  bool bad;
   array_of(ConfigRating_RegisterRating) register_ratings;
   array_of(ConfigRating_MethodRating) method_ratings;
 };
@@ -160,11 +168,11 @@ declare_array_of(ConfigRating_Rating);
 Error ConfigRatingRules_FromJson(ConfigRatingRules*, const char*);
 void  ConfigRatingRules_Free(ConfigRatingRules*);
 
-Error ConfigRating_Init(ConfigRating*, const char*, const char*);
+Error ConfigRating_Init(ConfigRating*, const array_of(str)*, const char*);
 void  ConfigRating_Free(ConfigRating*);
 
-void  ConfigRating_RateModelConfig(ConfigRating*, ModelConfig*, ConfigRating_Rating*);
-void  ConfigRating_RatingPrint(ConfigRating_Rating*);
+Error ConfigRating_RateModelConfig(const ConfigRating*, const ModelConfig*, ConfigRating_Rating*);
+void  ConfigRating_RatingPrint(const ConfigRating_Rating*);
 
 void  ConfigRating_RatingFree(ConfigRating_Rating*);
 void  ConfigRating_MethodRatingFree(ConfigRating_MethodRating*);
@@ -173,6 +181,6 @@ void  ConfigRating_RegisterRatingFree(ConfigRating_RegisterRating*);
 const char* RegisterType_ToStr(enum RegisterType);
 const char* RegisterScore_ToStr(enum RegisterScore);
 const char* MethodScore_ToStr(enum MethodScore);
-nx_json* ConfigRating_ToJson(ConfigRating_Rating*, const char*, nx_json*);
+nx_json* ConfigRating_ToJson(const ConfigRating_Rating*, const char*, nx_json*);
 
 #endif

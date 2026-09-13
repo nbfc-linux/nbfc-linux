@@ -37,6 +37,7 @@ options:
     metavar: "FAN INDEX"
     help: "Show status of fan (zero based)"
     groups: ["group1"]
+    repeatable: true
     complete: ["exec", "nbfc complete-fans"]
 
   - option_strings: ["-w", "--watch"]
@@ -61,18 +62,8 @@ options:
       ["file"]
     ]]
 
-  - option_strings: ["-a", "--apply"]
-    metavar: "config"
-    help: "Set a config and enable fan control"
-    groups: ["group1"]
-    complete: ['combine', [
-      ["file", {"directory": "/@DATADIR@/nbfc/configs"}],
-      ["file", {"directory": "/var/lib/nbfc/configs"}],
-      ["file"]
-    ]]
-
   - option_strings: ["-r", "--recommend"]
-    help: "List configs which may work for your device"
+    help: "List configs with names similar to your notebook"
     groups: ["group1"]
 ---
 prog: "nbfc set"
@@ -147,12 +138,25 @@ options:
   - option_strings: ["-d", "--dsdt"]
     help: "Use an alternative DSDT file"
     metavar: "FILE"
+    repeatable: true
+    groups: ["group1"]
     complete: ["file"]
+
+  - option_strings: ["-D", "--dsdt-dir"]
+    help: "Use an alternative DSDT dir"
+    metavar: "DIRECTORY"
+    groups: ["group1"]
+    complete: ["directory"]
 
   - option_strings: ["-m", "--min-score"]
     help: "Set minimum rating threshold for configurations"
     metavar: "SCORE"
     complete: ["float"]
+
+  - option_strings: ["-i", "--input"]
+    help: "Read configuration files from file"
+    metavar: "FILE"
+    complete: ["file"]
 
   - option_strings: ["-j", "--json"]
     help: "Use JSON output"
@@ -168,6 +172,21 @@ options:
   - option_strings: ["-n", "--no-download"]
     help: "Don't download rules file from the repository"
 
+  - option_strings: ["-u", "--unverified"]
+    help: "Include unverified EC registers"
+
+  - option_strings: ["-b", "--bad"]
+    help: "List only bad configurations"
+
+  - option_strings: ["-q", "--quiet"]
+    help: "Do not print register ratings"
+    repeatable: true
+
+  - option_strings: ["-f", "--fan-count"]
+    metavar: "NUM"
+    help: "Limit configurations by fan count"
+    complete: ["range", 0, 255]
+
 positionals:
   - number: 1
     metavar: "FILE"
@@ -181,10 +200,18 @@ positionals:
 prog: "nbfc acpi-dump"
 help: "Dumps information of your ACPI DSDT"
 options:
-  - option_strings: ["-f", "--file"]
+  - option_strings: ["-d", "--dsdt"]
     metavar: "FILE"
     help: "Use an alternative DSDT file"
+    repeatable: true
+    groups: ["group1"]
     complete: ["file"]
+
+  - option_strings: ["-D", "--dsdt-dir"]
+    metavar: "DIRECTORY"
+    help: "Use an alternative DSDT directory"
+    groups: ["group1"]
+    complete: ["directory"]
 
   - option_strings: ["-j", "--json"]
     help: "Use JSON output"
@@ -194,18 +221,35 @@ help: "List all available registers"
 ---
 prog: "nbfc acpi-dump ec-registers"
 help: "List all available EC registers"
+options:
+  - option_strings: ["-u", "--unverified"]
+    help: "Include unverified EC registers"
+---
+prog: "nbfc acpi-dump map"
+help: "Generate a map file for ec_probe"
+options:
+  - option_strings: ["-u", "--unverified"]
+    help: "Include unverified EC registers"
 ---
 prog: "nbfc acpi-dump methods"
 help: "List all available ACPI methods"
 ---
 prog: "nbfc acpi-dump dsl"
-help: "Disassemble your DSDT"
+help: "Disassemble your ACPI tables"
 ---
 prog: "nbfc wait-for-hwmon"
 help: "Wait for /sys/class/hwmon/hwmon* files"
 ---
 prog: "nbfc get-model-name"
 help: "Print model name for notebook"
+---
+prog: "nbfc xml2json"
+help: "Convert an XML configuration to JSON"
+positionals:
+  - number: 1
+    metavar: "FILE"
+    help: "Specify configuration file"
+    complete: ["file"]
 ---
 prog: "nbfc warranty"
 help: "Show warranty"
@@ -214,10 +258,21 @@ prog: "nbfc support"
 help: "Show how to support the project"
 options:
   - option_strings: ["--upload-firmware"]
+    groups: ["group1"]
     help: "Upload your notebook firmware without prompting"
 
   - option_strings: ["--print-command"]
+    groups: ["group1"]
     help: "Print command for manual firmware upload"
+
+  - option_strings: ["--create-archive"]
+    groups: ["group1"]
+    help: "Create a support archive"
+    metavar: "FILE"
+    complete: ["file"]
+---
+prog: "nbfc faq"
+help: "Show NBFC FAQ manual"
 ---
 prog: "nbfc help"
 help: "Show help"

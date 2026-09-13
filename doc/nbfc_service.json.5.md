@@ -39,7 +39,7 @@ Main configuration file of nbfc_service (*/etc/nbfc/nbfc.json*).
 
 Configures which sensors are attached to a fan.
 
-**FanIndex**: *Integer \>= 0 && \<= 255*
+**FanIndex**: *Integer* \>= 0 && *Integer* \<= 255
 
 > Specify which fan should be configured.
 
@@ -53,7 +53,7 @@ Configures which sensors are attached to a fan.
 
 ## ServiceState
 
-State file of the service (*/var/run/nbfc/state.json*).
+State file of the service (*/var/lib/nbfc/state.json*).
 
 **TargetFanSpeeds**: *Array of Float*
 
@@ -85,8 +85,8 @@ State file of the service (*/var/run/nbfc/state.json*).
 
 > If the temperature exceeds this threshold, NBFC will ignore all
 > Temperature threshold elements and set the fan to 100% speed until the
-> temperature drops below
-> (**CriticalTemperature**-**CriticalTemperatureOffset**).
+> temperature drops below (**CriticalTemperature** minus
+> **CriticalTemperatureOffset**).
 
 **CriticalTemperatureOffset**: *Integer* \> 0
 
@@ -96,6 +96,36 @@ State file of the service (*/var/run/nbfc/state.json*).
 
 > If **true**, NBFC will combine two 8 bit registers to one 16-bit
 > register when reading from or writing to the EC registers.
+
+**LuaLibraries**: *Array of String*
+
+> Import additional Lua libaries.
+>
+> Example:
+>
+> > \"LuaLibraries\": \[\"math\"\]
+>
+> Available libraries:
+>
+> -   **base**: Provides core global functions.
+>
+> -   **math**: Provides standard mathematical functions and constants.
+>
+> -   **string**: Provides functions for pattern matching and basic
+>     string manipulation.
+>
+> -   **table**: Provides utilities for creating and manipulating tables
+>     (arrays and dictionaries).
+>
+> -   **io**: Provides file input/output facilities and stream-based I/O
+>     operations.
+>
+> -   **os**: Provides operating system interface functions such as
+>     time, environment, and process control.
+
+**FirmwareFingerprint**: *Array of String*
+
+> See **FIRMWARE FINGERPRINTING**.
 
 **FanConfigurations**: *Array of FanConfiguration*
 
@@ -111,15 +141,14 @@ Defines how NBFC controls a fan.
 
 **FanDisplayName**: *String*
 
-> Fan display name
+> Sets the fan display name.
 
 **ReadRegister**: *Integer* \>= 0 && *Integer* \<= 255
 
 > The register from which NBFC reads the fan speed.
-
-**WriteRegister**: *Integer* \>= 0 && *Integer* \<= 255
-
-> The register which NBFC uses to control the fan.
+>
+> This option is mutually exclusive to **ReadAcpiMethod** and
+> **ReadLuaCode**. Only one of them can be set at a time.
 
 **ReadAcpiMethod**: *String*
 
@@ -129,8 +158,28 @@ Defines how NBFC controls a fan.
 >
 > > \"ReadAcpiMethod\": \"\\\\\_SB.PCI0.LPCB.EC0.GFSD\"
 >
-> This option is mutually exclusive to **ReadRegister**. Only one of
-> them can be set at a time.
+> This option is mutually exclusive to **ReadRegister** and
+> **ReadLuaCode**. Only one of them can be set at a time.
+
+**ReadLuaCode**: *String* or *Array of String*
+
+> The Lua code to be executed for reading the fan speed. See** LUA
+> CODE**.
+>
+> Example:
+>
+> > \"ReadLuaCode\": \"return
+> > acpi_call(\\\"\\\\\\\\\_SB.PCI0.LPCB.EC0.GFSD\\\")\"
+>
+> This option is mutually exclusive to **ReadRegister** and
+> **ReadAcpiMethod**. Only one of them can be set at a time.
+
+**WriteRegister**: *Integer* \>= 0 && *Integer* \<= 255
+
+> The register which NBFC uses to control the fan.
+>
+> This option is mutually exclusive to **WriteAcpiMethod** and
+> **WriteLuaCode**. Only one of them can be set at a time.
 
 **WriteAcpiMethod**: *String*
 
@@ -141,26 +190,38 @@ Defines how NBFC controls a fan.
 >
 > > \"WriteAcpiMethod\": \"\\\\\_SB.PCI0.LPCB.EC0.SFSD \$\"
 >
-> This option is mutually exclusive to **WriteRegister**. Only one of
-> them can be set at a time.
+> This option is mutually exclusive to **WriteRegister** and
+> **WriteLuaCode**. Only one of them can be set at a time.
 
-**MinSpeedValue**: *Integer*
+**WriteLuaCode**: *String* or *Array of String*
+
+> The Lua code to execute for writing the fan speed. See** LUA CODE**.
+>
+> Example:
+>
+> > \"WriteLuaCode\": \"return
+> > acpi_call(\\\"\\\\\\\\\_SB.PCI0.LPCB.EC0.SFSD \\\" .. get_value())\"
+>
+> This option is mutually exclusive to **WriteRegister** and
+> **WriteAcpiMethod**. Only one of them can be set at a time.
+
+**MinSpeedValue**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The value which puts the fan to the lowest possible speed (usually
 > this stops the fan). Must be an integer between 0 and 255 or 0 and
 > 65535 if **ReadWriteWords** is **true**. Note: **MinSpeedValue** does
-> not necessarily have to be smaller than **MaxSpeedValue.**
+> not necessarily have to be smaller than **MaxSpeedValue**.
 
-**MaxSpeedValue**: *Integer*
+**MaxSpeedValue**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The value which puts the fan to the highest possible fan speed.
 
-**MinSpeedValueRead**: *Integer*
+**MinSpeedValueRead**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The value which corresponds to the lowest possible fan speed. Will be
 > ignored if **IndependentReadMinMaxValues** is **false**.
 
-**MaxSpeedValueRead**: *Integer*
+**MaxSpeedValueRead**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The value which corresponds to the highest possible fan speed. Will be
 > ignored if **IndependentReadMinMaxValues** is **false**.
@@ -169,22 +230,34 @@ Defines how NBFC controls a fan.
 
 > Defines if independent minimum/maximum values should be applied for
 > read operations.
+>
+> This enables **MinSpeedValueRead** and **MaxSpeedValueRead**.
 
 **ResetRequired**: *Boolean*
 
 > Defines if the EC should be reset before the service is shut down.
 
-**FanSpeedResetValue**: *Integer*
+**FanSpeedResetValue**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > Defines the value which will be written to **WriteRegister** to reset
 > the EC.
+>
+> This option is mutually exclusive to **ResetAcpiMethod** and
+> **ResetLuaCode**. Only one of them can be set at a time.
 
 **ResetAcpiMethod**: *String*
 
 > The ACPI method to call upon fan reset.
 >
-> This option is mutually exclusive to **FanSpeedResetValue**. Only one
-> of them can be set at a time.
+> This option is mutually exclusive to **FanSpeedResetValue** and
+> **ResetLuaCode**. Only one of them can be set at a time.
+
+**ResetLuaCode**: *String* or *Array of String*
+
+> The Lua code to be executed upon fan reset. See** LUA CODE**.
+>
+> This option is mutually exclusive to **FanSpeedResetValue** and
+> **ResetAcpiMethod**. Only one of them can be set at a time.
 
 **Sensors**: *Array of String*
 
@@ -214,7 +287,11 @@ Defines how NBFC controls a fan.
 
 **TemperatureThresholds**: *Array of TemperatureThreshold*
 
+> Defines how fast the fan runs at different temperatures.
+
 **FanSpeedPercentageOverrides**: *Array of FanSpeedPercentageOverride*
+
+> Overrides the default algorithm to calculate fan speeds.
 
 ## RegisterWriteConfiguration
 
@@ -235,48 +312,70 @@ Allows to write to any EC register.
 >
 > -   **Call**: calls the ACPI method stored in **AcpiMethod** or
 >     **ResetAcpiMethod**
+>
+> -   **Lua**: executes the Lua code stored in **LuaCode** or
+>     **ResetLuaCode**
 
 **WriteOccasion**: *String*
 
 > Defines when the value should be written:
 >
 > -   **OnInitialization**: writes the value once upon initialization
->     (everytimee the fan control service is enabled or a config is
->     applied)
+>     (everytime the fan control service starts).
 >
-> -   **OnWriteFanSpeed**: writes the value everytimee the fan speed is
+> -   **OnWriteFanSpeed**: writes the value everytime the fan speed is
 >     set.
 
 **Register**: *Integer* \>= 0 && *Integer* \<= 255
 
 > The register which will be manipulated.
 
-**Value**: *Integer*
+**Value**: *Integer* \>= 0 && *Integer* \<= 255
 
 > The value which will be written.
+>
+> This option is mutually exclusive to **AcpiMethod** and **LuaCode**.
+> Only one of them can be set at a time.
 
 **AcpiMethod**: *String*
 
 > The ACPI method to call.
 >
-> This option is mutually exclusive to **Value**. Only one of them can
-> be set at a time.
+> This option is mutually exclusive to **Value** and **LuaCode**. Only
+> one of them can be set at a time.
+
+**LuaCode**: *String* or *Array of String*
+
+> The Lua code to be executed. See** LUA CODE**.
+>
+> This option is mutually exclusive to **Value** and **AcpiMethod**.
+> Only one of them can be set at a time.
 
 **ResetRequired**: *Boolean*
 
 > Defines if the register should be reset before the service is shut
 > down.
 
-**ResetValue**: *Integer*
+**ResetValue**: *Integer* \>= 0 && *Integer* \<= 255
 
 > The value which will be written upon reset.
+>
+> This option is mutually exclusive to **ResetAcpiMethod** and
+> **ResetLuaCode**. Only one of them can be set at a time.
 
 **ResetAcpiMethod**: *String*
 
 > The ACPI method to call upon reset.
 >
-> This option is mutually exclusive to **ResetValue**. Only one of them
-> can be set at a time.
+> This option is mutually exclusive to **ResetValue** and
+> **ResetLuaCode**. Only one of them can be set at a time.
+
+**ResetLuaCode**: *String* or *Array of String*
+
+> The Lua code to be executed upon reset. See** LUA CODE**.
+>
+> This option is mutually exclusive to **ResetValue** and
+> **ResetAcpiMethod**. Only one of them can be set at a a time.
 
 **ResetWriteMode**: *String*
 
@@ -295,7 +394,7 @@ Overrides the default algorithm to calculate fan speeds.
 
 > The fan speed in percent.
 
-**FanSpeedValue**: *Integer*
+**FanSpeedValue**: *Integer* \>= 0 && *Integer* \<= 65535
 
 > The fan speed value which will be written to **WriteRegister**.
 
@@ -330,6 +429,188 @@ Defines how fast the fan runs at different temperatures.
 **FanSpeed**: *Float* \>= 0.0 && *Float* \<= 100.0
 
 > The fan speed in percent.
+
+# LUA CODE
+
+NBFC-Linux allows executing **Lua** code to implement more complex read
+or write operations.
+
+Lua code can be specified as either a *String* or an *Array of String*.
+
+## Return Values
+
+Every Lua code must return exactly to values: **Error**, **Result.**
+
+**Error** is either **nil** (on success) or a **string** describing the
+error (on failure).
+
+**Result** is an **integer** and is used for read operations. For write
+operations this value is ignored (returning **0** is recommended).
+
+## Availabe Lua Functions
+
+The following functions are exposed to Lua:
+
+**acpi_call**(**method**):
+
+> Executes an ACPI method. Returns **error**, **value** (integer).
+
+**acpi_call_raw**(**method**):
+
+> Executes an ACPI method and returns the raw result as a string.
+> Returns **error**, **value** (string).
+
+**acpi_get_int**(**acpi_result**, **path**):
+
+> Extracts the integer located at **path** from an ACPI result. Returns
+> **error**, **value** (integer).
+>
+> Example:
+>
+> > result = \"{\[0x0, 0x0\], \[0xFF, 0x0\]}\"\
+> > e, v = acpi_get_int(result, \"1 0\")\
+> > \-- v is 0xFF
+
+**ec_read**(**register**):
+
+> Reads a byte from the embedded controller. Returns **error**,
+> **value**.
+
+**ec_read_word**(**register**):
+
+> Reads two bytes and combines them into a single value. Returns
+> **error**, **value**.
+
+**ec_write**(**register**, **value**):
+
+> Writes a byte to the embedded controller. Returns **error**, **0**.
+
+**ec_write_word**(**register**, **value**):
+
+> Writes a 16-bit value to a two-byte register. Returns **error**,
+> **0**.
+
+## Lua Libraries
+
+To keep memory usage as low as possible, no Lua libraries are loaded by
+default. They must be explicitly loaded when needed. See
+**ModelConfig**-\>**LuaLibraries** for details.
+
+## Coding Conventions
+
+If possible, use the variables **e** (error) and **v** (value) for
+capturing the result of NBFC functions.
+
+## Testing Configuration
+
+If a configuration uses Lua code, ensure that it works correctly with
+**nbfc rate-config**. During rating, **nbfc rate-config** replaces all
+NBFC-specific Lua functions with dummy implementations that always
+return **nil**, **1**.
+
+# FIRMWARE FINGERPRINTING
+
+Firmware fingerprinting can be used to ensure that a configuration file
+matches a specific notebook firmware.
+
+This is especially important for configurations that invoke WMI methods.
+Many notebook vendors reuse the same WMI method names across different
+notebook models while changing the internal implementation and method
+arguments. As a result, matching method names alone is often
+insufficient to determine whether a configuration is compatible with a
+specific firmware.
+
+Fingerprinting allows AML methods to be analyzed for specific code
+patterns.
+
+## Fingerprint Syntax
+
+Fingerprints are written using AML syntax. A fingerprint always begins
+with a method definition, followed by AML code that is searched for
+within the method body.
+
+In addition to regular AML syntax, two wildcard operators are supported:
+
+**..**
+
+> Matches any code within the current block scope, but only at the
+> current scope level.
+
+**\...**
+
+> Matches any code within the current block scope, including code
+> contained in nested scopes.
+
+Example:
+
+> Given the following method:
+>
+> > Method (\FOO, 2, Serialized) {
+> >         SMTH()
+> >
+> >         Switch (Arg0) {
+> >             Case (0xDEAD) {
+> >                 If (Arg1 == 0xBEEF) {
+> >                     FMTH()
+> >                     Return (One)
+> >                 }
+> >             }
+> >         }
+> >     }
+>
+> The following patterns would **match**:
+>
+> > -   Method(\\FOO)
+> >
+> > -   Method(\\FOO) { \... 0xDEAD
+> >
+> > -   Method(\\FOO) { \... 0xBEEF
+> >
+> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD)
+> >
+> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \... If
+> >     (Arg1 == 0xBEEF)
+> >
+> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \... If
+> >     (Arg1 == 0xBEEF) { \... FMTH()
+> >
+> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \...
+> >     FMTH()
+>
+> The following patterns would **not match**:
+>
+> > -   Method(\\FOO) { .. 0xDEAD
+> >
+> > -   Method(\\FOO) { Switch (Arg0)
+
+## Matching Rules
+
+> -   Whitespace is ignored
+>
+> -   Comments are ignored
+>
+> -   Only the basename of the identifiers are matched
+>
+> -   Only scope hierarchy and ordering are considered
+>
+> -   Intermediate code between matched blocks is ignored
+
+## Recommendations
+
+When writing fingerprints:
+
+> -   Match magic numbers used by WMI method calls whenever possible
+>
+> -   Do not use fully qualified identifiers (use **FOO** instead of
+>     **\\\_SB.DEV0.FOO**)
+>
+> -   Avoid unnecessary parentheses, as they are ignored during matching
+>     (use **If (FOO == 0x0)** instead of **If ((Foo == 0x0))**)
+>
+> -   The **..** operator should only be used when matching a direct
+>     child block is required. A common example is matching **Case()**
+>     blocks within a **Switch()** statement, where only direct
+>     descendants should be considered.
 
 # FILES
 

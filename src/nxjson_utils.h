@@ -33,7 +33,7 @@ static inline Error nx_json_get_object(const nx_json* node) {
 }
 
 static inline Error nx_json_parse_file(const nx_json** out, char* buf, size_t bufsize, const char* file) {
-  file_op_result res = slurp_file(buf, bufsize, file);
+  FileResult res = File_Read(buf, bufsize, file);
   if (! res.ok)
     return err_stdlib(NULL);
 
@@ -44,36 +44,36 @@ static inline Error nx_json_parse_file(const nx_json** out, char* buf, size_t bu
   return err_success();
 }
 
-static inline nx_json *create_json_string(const char* key, nx_json* parent, const char* text) {
+static inline nx_json* create_json_string(const char* key, nx_json* parent, const char* text) {
   nx_json* json = create_json(NX_JSON_STRING, key, parent);
   json->val.text = text;
   return json;
 }
 
-static inline nx_json *create_json_integer(const char* key, nx_json* parent, nxjson_s64 integer) {
+static inline nx_json* create_json_integer(const char* key, nx_json* parent, nxjson_s64 integer) {
   nx_json* json = create_json(NX_JSON_INTEGER, key, parent);
   json->val.i = integer;
   return json;
 }
 
-static inline nx_json *create_json_double(const char* key, nx_json* parent, double val) {
+static inline nx_json* create_json_double(const char* key, nx_json* parent, double val) {
   nx_json* json = create_json(NX_JSON_DOUBLE, key, parent);
   json->val.dbl = val;
   return json;
 }
 
-static inline nx_json *create_json_bool(const char* key, nx_json* parent, bool val) {
+static inline nx_json* create_json_bool(const char* key, nx_json* parent, bool val) {
   nx_json* json = create_json(NX_JSON_BOOL, key, parent);
   json->val.i = val;
   return json;
 }
 
-static inline nx_json *create_json_object(const char* key, nx_json* parent) {
+static inline nx_json* create_json_object(const char* key, nx_json* parent) {
   nx_json* json = create_json(NX_JSON_OBJECT, key, parent);
   return json;
 }
 
-static inline nx_json *create_json_array(const char* key, nx_json* parent) {
+static inline nx_json* create_json_array(const char* key, nx_json* parent) {
   nx_json* json = create_json(NX_JSON_ARRAY, key, parent);
   return json;
 }

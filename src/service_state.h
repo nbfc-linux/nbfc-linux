@@ -3,10 +3,8 @@
 
 #include "model_config.h"
 
-extern ServiceState service_state;
-
-Error ServiceState_Init();
-Error ServiceState_Write();
-void  ServiceState_Free();
+Error ServiceState_FromFile(ServiceState*, const char*);
+Error ServiceState_Write(const ServiceState*, const char*);
+void  ServiceState_Free(ServiceState*);
 
 #endif

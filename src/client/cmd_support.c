@@ -6,54 +6,37 @@
 #include "../log.h"
 #include "../memory.h"
 #include "../nxjson_utils.h"
+#include "../acpi_analysis.h"
+#include "../str_functions.h"
 
 #include "check_root.h"
 #include "client_global.h"
 #include "curl_utils.h"
 
 #define SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL \
-  "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/firmware_upload_v1"
+  "https://raw.githubusercontent.com/nbfc-linux/nbfc-linux/main/endpoints/firmware_upload_v2"
 
-#define SUPPORT_PAYPAL_URL "https://paypal.me/BenjaminAbendroth"
-
-#define SUPPORT_GITHUB_URL "https://github.com/nbfc-linux/nbfc-linux"
-
-#define SUPPORT_ACPI_DSDT  "/sys/firmware/acpi/tables/DSDT"
-
-#define SUPPORT_TEXT                                                           \
-  "Thank you for using NBFC-Linux!\n"                                          \
-  "\n"                                                                         \
-  "If you'd like to support the project, you can:\n"                           \
-  "\n"                                                                         \
-  " - Send a donation via PayPal:\n"                                           \
-  "     " SUPPORT_PAYPAL_URL "\n"                                              \
-  "\n"                                                                         \
-  " - Simply star the project on GitHub:\n"                                    \
-  "     " SUPPORT_GITHUB_URL "\n"                                              \
-  "\n"                                                                         \
-  " - Upload your notebook firmware:\n"                                        \
-  "     $ sudo nbfc support --upload-firmware\n"                               \
-  "\n"                                                                         \
-  "   Run 'nbfc support -h' for more information on firmware uploads.\n"       \
-  ""
-
-const struct cli99_Option support_options[] = {
-  cli99_Options_Include(&main_options),
-  {"--upload-firmware", Option_Support_Upload_Firmware, cli99_NoArgument},
-  {"--print-command",   Option_Support_Print_Command,   cli99_NoArgument},
+const struct cli99_Option Support_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
+  {"--upload-firmware", Option_Support_UploadFirmware, cli99_NoArgument},
+  {"--print-command",   Option_Support_PrintCommand,   cli99_NoArgument},
+  {"--create-archive",  Option_Support_CreateArchive,  cli99_RequiredArgument},
   cli99_Options_End()
 };
 
 enum Support_Action {
   Support_Action_None = 0,
-  Support_Action_Upload_Firmware,
-  Support_Action_Print_Command
+  Support_Action_UploadFirmware,
+  Support_Action_PrintCommand,
+  Support_Action_CreateArchive,
 };
 
 struct {
   enum Support_Action action;
+  const char* archive_file;
 } Support_Options = {
-  Support_Action_None
+  Support_Action_None,
+  NULL
 };
 
 /**
@@ -62,7 +45,7 @@ struct {
  * The actual URL is retrieved from the official GitHub repository to
  * ensure compatibility in case the upload endpoint changes.
  */
-static char* Support_Get_Real_Firmware_Upload_Endpoint_URL() {
+static char* Support_GetRealFirmwareUploadURL(void) {
   CURL* curl = CurlWithMem_Create(SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL, NULL);
   CURLcode code;
   long http_code;
@@ -80,23 +63,18 @@ static char* Support_Get_Real_Firmware_Upload_Endpoint_URL() {
   }
 
   if (http_code != 200) {
-    Log_Error("Download failed: %s (server returned HTTP %ld)\n",
+    Log_Error("Download failed: %s (server returned HTTP %ld)",
       SUPPORT_FIRMWARE_UPLOAD_ENDPOINT_URL, http_code);
     exit(NBFC_EXIT_FAILURE);
   }
 
   char* real_endpoint = CurlWithMem_StealData(curl);
-
-  // Strip trailing whitespace
-  size_t len = strlen(real_endpoint);
-  while (len && real_endpoint[len] < 32)
-    real_endpoint[len--] = '\0';
-
+  str_rstrip_whitespace(real_endpoint, strlen(real_endpoint));
   CurlWithMem_Destroy(curl);
   return real_endpoint;
 }
 
-static char* Support_Do_Upload(const char* model, const char* firmware_file) {
+static char* Support_DoUpload(const char* model, array_of(str)* files) {
   char* endpoint_url = NULL;
   char* response = NULL;
   CURL* curl = NULL;
@@ -106,7 +84,7 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
   long http_code;
 
   // Get real endpoint URL
-  endpoint_url = Support_Get_Real_Firmware_Upload_Endpoint_URL();
+  endpoint_url = Support_GetRealFirmwareUploadURL();
 
   // Perform upload
   curl = CurlWithMem_Create(endpoint_url, NULL);
@@ -135,22 +113,28 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
     goto end;
   }
 
-  part = curl_mime_addpart(mime);
-  if (! part) {
-    Log_Error("curl_mime_addpart() failed");
-    goto end;
-  }
+  for_each_array(str*, file, *files) {
+    const char* name = strrchr(*file, '/');
+    if (! name)
+      continue;
 
-  code = curl_mime_name(part, "file");
-  if (code != CURLE_OK) {
-    Log_Error("curl_mime_name() failed");
-    goto end;
-  }
+    part = curl_mime_addpart(mime);
+    if (! part) {
+      Log_Error("curl_mime_addpart() failed");
+      goto end;
+    }
 
-  code = curl_mime_filedata(part, firmware_file);
-  if (code != CURLE_OK) {
-    Log_Error("curl_mime_filedata() failed");
-    goto end;
+    code = curl_mime_name(part, name + 1);
+    if (code != CURLE_OK) {
+      Log_Error("curl_mime_name() failed");
+      goto end;
+    }
+
+    code = curl_mime_filedata(part, *file);
+    if (code != CURLE_OK) {
+      Log_Error("curl_mime_filedata() failed");
+      goto end;
+    }
   }
 
   code = curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
@@ -172,7 +156,7 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
   }
 
   if (http_code != 200) {
-    Log_Error("Upload failed: %s (server returned HTTP %ld)\n",
+    Log_Error("Upload failed: %s (server returned HTTP %ld)",
       endpoint_url, http_code);
     goto end;
   }
@@ -181,12 +165,14 @@ static char* Support_Do_Upload(const char* model, const char* firmware_file) {
   response = CurlWithMem_StealData(curl);
 
 end:
+#if STRICT_CLEANUP
   Mem_Free(endpoint_url);
   CurlWithMem_Destroy(curl);
+#endif
   return response;
 }
 
-static int Support_Handle_Response(char* response) {
+static int Support_HandleResponse(char* response) {
   int ret = NBFC_EXIT_FAILURE;
   const nx_json* status = NULL;
   const nx_json* message = NULL;
@@ -249,46 +235,96 @@ static int Support_Handle_Response(char* response) {
   ret = NBFC_EXIT_SUCCESS;
 
 end:
+#if STRICT_CLEANUP
   nx_json_free(root);
+#endif
   return ret;
 }
 
-static int Support_Upload_Firmware() {
-  // Accessing `SUPPORT_ACPI_DSDT` requires root
+static int Support_UploadFirmware(void) {
+  Error e;
+  array_of(str) files;
+
+  // Accessing `ACPI_ANALYSIS_ACPI_DIR` requires root
   check_root();
 
+  e = AcpiAnalysis_GetAmlFiles(NULL, &files);
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
   // Do the upload
-  char* response = Support_Do_Upload(DMI_Get_Model_Name(), SUPPORT_ACPI_DSDT);
+  char* response = Support_DoUpload(DMI_GetModelName(), &files);
   if (! response)
     return NBFC_EXIT_FAILURE;
 
   // Handle response
-  int ret = Support_Handle_Response(response);
+  int ret = Support_HandleResponse(response);
+#if STRICT_CLEANUP
   Mem_Free(response);
+#endif
   return ret;
 }
 
-static int Support_Print_Command() {
-  char* endpoint_url = Support_Get_Real_Firmware_Upload_Endpoint_URL();
+static int Support_PrintCommand(void) {
+  Error e;
+  array_of(str) files;
+  char* endpoint_url = Support_GetRealFirmwareUploadURL();
+
+  e = AcpiAnalysis_GetAmlFiles(NULL, &files);
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
 
   printf(
     "Run the following command to upload your firmware:\n"
     "\n"
-    "sudo curl -X POST '%s' -F 'file=@" SUPPORT_ACPI_DSDT "' -F 'model=%s'\n",
+    "sudo curl -X POST '%s' \\\n"
+    " -F 'model=%s' \\\n",
     endpoint_url,
-    DMI_Get_Model_Name()
+    DMI_GetModelName()
   );
 
+  for_enumerate_array(array_size_t, i, files) {
+    const char* end = ((i + 1) == files.size) ? "\n" : " \\\n";
+    const char* file = files.data[i];
+    const char* name = strrchr(file, '/');
+    if (!name)
+      continue;
+
+    printf(" -F '%s=@%s'%s", name + 1, file, end);
+  }
+
+#if STRICT_CLEANUP
   Mem_Free(endpoint_url);
+#endif
+
   return NBFC_EXIT_SUCCESS;
 }
 
-int Support() {
+int Support_CreateArchive(const char* archive_file) {
+  check_root();
+
+  return execl(
+    NBFC_MAKE_ARCHIVE_SCRIPT_FILE,
+    NBFC_MAKE_ARCHIVE_SCRIPT,
+    Mem_Strdup(archive_file),
+    NULL
+  );
+}
+
+int Support(void) {
   int ret = NBFC_EXIT_FAILURE;
 
   if (Support_Options.action == Support_Action_None) {
-    puts(SUPPORT_TEXT);
+    puts(CLIENT_SUPPORT_HELP_TEXT);
     return NBFC_EXIT_SUCCESS;
+  }
+
+  if (Support_Options.action == Support_Action_CreateArchive) {
+    return Support_CreateArchive(Support_Options.archive_file);
   }
 
   if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {
@@ -296,10 +332,10 @@ int Support() {
     return NBFC_EXIT_FAILURE;
   }
 
-  if (Support_Options.action == Support_Action_Upload_Firmware)
-    ret = Support_Upload_Firmware();
-  else if (Support_Options.action == Support_Action_Print_Command)
-    ret = Support_Print_Command();
+  if (Support_Options.action == Support_Action_UploadFirmware)
+    ret = Support_UploadFirmware();
+  else if (Support_Options.action == Support_Action_PrintCommand)
+    ret = Support_PrintCommand();
 
 #if STRICT_CLEANUP
   curl_global_cleanup();

@@ -1,5 +1,43 @@
 # Changelog
 
+## nbfc-linux-0.5.3 (2026-06-02)
+
+- Added firmware fingerprinting support to improve automatic configuration
+  matching and compatibility verification.
+
+## nbfc-linux-0.5.2 (2026-05-10)
+
+- Added `nbfc xml2json` command
+- Support returning non-integer results in `ec_probe acpi_call`
+
+## nbfc-linux-0.5.1 (2026-04-26)
+
+- Added Lua helper functions for handling packages and buffers returned
+  from ACPI methods:
+
+  - `acpi_call_raw(method)`: Executes an ACPI method and returns the result as a string
+  - `acpi_get_int(result, path)`: Extracts an integer from `result` located at `path`
+
+## nbfc-linux-0.5.0 (2026-04-20)
+
+- Added support for executing Lua code.
+
+  In `FanConfiguration`:
+    - `ReadLuaCode`
+    - `WriteLuaCode`
+    - `ResetLuaCode`
+
+  In `RegisterWriteConfiguration`:
+    - `LuaCode` (requires `WriteMode` set to `Lua`)
+    - `ResetLuaCode` (requires `ResetWriteMode` set to `Lua`)
+
+  The following functions are exposed to Lua:
+    - `acpi_call(method)`: Executes an ACPI method.
+    - `ec_read(register)`: Reads a byte from the embedded controller.
+    - `ec_read_word(register)`: Reads two bytes and combines them into a single value.
+    - `ec_write(register, value)`: Writes a byte to the embedded controller.
+    - `ec_write_word(register, value)`: Writes a 16-bit value to a two-byte register.
+
 ## nbfc-linux-0.4.0 (2026-03-14)
 
 - Reduced memory usage of the service from ~280KB to ~230KB.

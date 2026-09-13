@@ -4,35 +4,42 @@ prefix      = @prefix@
 bindir      = @bindir@
 sysconfdir  = @sysconfdir@
 datadir     = @datadir@
+libdir      = @libdir@
 mandir      = @mandir@
 man1dir     = @mandir@/man1
 man5dir     = @mandir@/man5
+man7dir     = @mandir@/man7
 runstatedir = @runstatedir@
 sysddir     = @prefix@/lib/systemd/system
 orcdir      = @sysconfdir@/init.d
 systemvdir  = @sysconfdir@/init.d
 
+LUA_CFLAGS = $(shell pkg-config --cflags lua5.4 || pkg-config --cflags lua)
+LUA_LDLIBS = $(shell pkg-config --libs lua5.4 || pkg-config --libs lua)
+XML_CFLAGS = $(shell pkg-config --cflags libxml-2.0)
+XML_LDLIBS = $(shell pkg-config --libs libxml-2.0)
+
 ifeq ($(BUILD), debug)
-	CFLAGS   = -Og -g
+	CFLAGS   = $(LUA_CFLAGS) $(XML_CFLAGS) -Og -g
 else
 	CPPFLAGS = -DNDEBUG
-	CFLAGS   = -Wall -Os -flto -fno-unwind-tables -fno-asynchronous-unwind-tables -fomit-frame-pointer
+	CFLAGS   = $(LUA_CFLAGS) $(XML_CFLAGS) -Wall -Os -flto -fno-unwind-tables -fno-asynchronous-unwind-tables -fomit-frame-pointer
 	LDFLAGS  = -s
 endif
 
-LDLIBS_CLIENT = -lcurl -lcrypto
-LDLIBS_SERVICE = -lm -ldl
+LDLIBS_CLIENT = -lcurl -lcrypto $(LUA_LDLIBS) $(XML_LDLIBS) -ldl
+LDLIBS_SERVICE = -lm $(LUA_LDLIBS) -ldl
 LDLIBS_EC_PROBE =
-LDLIBS_TEST_MODEL_CONFIG = -lm
 
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(sysconfdir)\"    \
 	-DDATADIR=\"$(datadir)\"          \
+	-DLIBDIR=\"$(libdir)\"            \
 	-DRUNSTATEDIR=\"$(runstatedir)\"  \
 	-DVERSION=\"$(version)\"
 
-CORE  = src/nbfc_service src/nbfc src/ec_probe src/test_model_config
-DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
+CORE  = src/nbfc_service src/nbfc src/ec_probe
+DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5 doc/nbfc.faq.7
 SYSTEMD = etc/systemd/system/nbfc_service.service
 OPEN_RC = etc/init.d/nbfc_service.openrc
 SYSTEMV = etc/init.d/nbfc_service.systemv
@@ -43,6 +50,8 @@ ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_n
 all: $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(SYSTEMV) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
+	install -Dm 755 src/make_archive.sh $(DESTDIR)$(libdir)/nbfc/make_archive.sh
+	install -Dm 755 src/make_graph.py   $(DESTDIR)$(libdir)/nbfc/make_graph.py
 	install -Dm 755 src/nbfc_service    $(DESTDIR)$(bindir)/nbfc_service
 	install -Dm 755 src/ec_probe        $(DESTDIR)$(bindir)/ec_probe
 	install -Dm 755 src/nbfc            $(DESTDIR)$(bindir)/nbfc
@@ -50,6 +59,7 @@ install-core: $(CORE)
 REPLACE_VARS = sed \
 	-e 's|@BINDIR@|$(bindir)|g'           \
 	-e 's|@DATADIR@|$(datadir)|g'         \
+	-e 's|@LIBDIR@|$(libdir)|g'           \
 	-e 's|@SYSCONFDIR@|$(sysconfdir)|g'   \
 	-e 's|@RUNSTATEDIR@|$(runstatedir)|g' \
 	-e 's|@VERSION@|$(version)|g'
@@ -65,6 +75,9 @@ doc/nbfc_service.1: doc/nbfc_service.1.in
 	$(REPLACE_VARS) < $< > $@
 
 doc/nbfc_service.json.5: doc/nbfc_service.json.5.in
+	$(REPLACE_VARS) < $< > $@
+
+doc/nbfc.faq.7: doc/nbfc.faq.7.in
 	$(REPLACE_VARS) < $< > $@
 
 # BASH completion files #######################################################
@@ -135,6 +148,7 @@ install-docs: $(DOC)
 	install -Dm 644 doc/nbfc.1               $(DESTDIR)$(man1dir)/nbfc.1
 	install -Dm 644 doc/nbfc_service.1       $(DESTDIR)$(man1dir)/nbfc_service.1
 	install -Dm 644 doc/nbfc_service.json.5  $(DESTDIR)$(man5dir)/nbfc_service.json.5
+	install -Dm 644 doc/nbfc.faq.7           $(DESTDIR)$(man7dir)/nbfc.faq.7
 
 install-completion: $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 	# ZSH
@@ -155,7 +169,6 @@ install: install-core install-configs install-@INIT_SYSTEM@ install-docs install
 uninstall:
 	# Binaries
 	rm -f $(DESTDIR)$(bindir)/nbfc
-	rm -f $(DESTDIR)$(bindir)/nbfc_config
 	rm -f $(DESTDIR)$(bindir)/nbfc_service
 	rm -f $(DESTDIR)$(bindir)/ec_probe
 	
@@ -211,6 +224,7 @@ src/nbfc_service: \
 	src/acpi_call.h src/acpi_call.c \
 	src/build.c \
 	src/config.h \
+	src/ec.h \
 	src/ec_debug.h src/ec_debug.c \
 	src/ec_dummy.h src/ec_dummy.c \
 	src/ec_linux.c src/ec_linux.h \
@@ -223,9 +237,12 @@ src/nbfc_service: \
 	src/generated/model_config.generated.c \
 	src/generated/model_config.generated.h \
 	src/help/nbfc_service.help.h \
+	src/log.h src/log.c \
+	src/lua_bindings.h src/lua_bindings.c \
 	src/macros.h \
 	src/main.c \
 	src/memory.c src/memory.h \
+	src/mkdir_p.c src/mkdir_p.h \
 	src/model_config.c src/model_config.h \
 	src/nbfc.h \
 	src/nxjson.c src/nxjson.h \
@@ -246,7 +263,9 @@ src/ec_probe: \
 	src/acpi_call.h src/acpi_call.c \
 	src/cli99.h src/cli99.c \
 	src/config.h \
+	src/ec.h \
 	src/ec_probe.c \
+	src/ec_linux.c src/ec_linux.h \
 	src/ec_sys_linux.h src/ec_sys_linux.c \
 	src/error.h src/error.c \
 	src/help/ec_probe.help.h \
@@ -273,6 +292,7 @@ src/nbfc: \
 	src/client/cmd_support.c \
 	src/client/cmd_update.c \
 	src/client/cmd_warranty.c \
+	src/client/cmd_xml2json.c \
 	src/client/config_files.c \
 	src/client/config_files.h \
 	src/client/curl_utils.h \
@@ -281,50 +301,54 @@ src/nbfc: \
 	src/client/dmi.h \
 	src/client/service_control.c \
 	src/client/service_control.h \
-	src/client/str_functions.c \
-	src/client/str_functions.h \
 	src/acpi_analysis.h src/acpi_analysis.c \
+	src/aml_analysis.h src/aml_analysis.c \
+	src/aml_lexer.h src/aml_lexer.c \
+	src/aml_parser.h src/aml_parser.c \
+	src/config_analysis.h src/config_analysis.c \
 	src/config_rating.h src/config_rating.c \
 	src/config_rating_rules.h src/config_rating_rules.c \
 	src/error.h src/error.c \
 	src/help/ec_probe.help.h \
-	src/protocol.c src/protocol.h \
+	src/log.h src/log.c \
+	src/lua_bindings.h src/lua_bindings.c \
+	src/mkdir_p.c src/mkdir_p.h \
+	src/model_config_to_json.c src/model_config_to_json.h \
 	src/model_config_utils.c src/model_config_utils.h \
+	src/protocol.c src/protocol.h \
 	src/nxjson.c src/nxjson.h \
 	src/nbfc.h \
 	src/process.h src/process.c \
-	src/regex_utils.h src/regex_utils.c
+	src/regex_utils.h src/regex_utils.c \
+	src/str_functions.c \
+	src/str_functions.h \
+	src/xml2json.h src/xml2json.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
-
-src/test_model_config: \
-	src/config.h \
-	src/error.c \
-	src/generated/model_config.generated.h \
-	src/generated/model_config.generated.c \
-	src/memory.c \
-	src/nxjson.c \
-	src/program_name.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/test_model_config.c -o src/test_model_config $(LDLIBS_TEST_MODEL_CONFIG) $(LDFLAGS)
 
 src/generated/: .force
 	mkdir -p src/generated
 	./tools/config.py source > src/generated/model_config.generated.c
 	./tools/config.py header > src/generated/model_config.generated.h
+	./tools/config_rating_rules.py v1 > endpoints/config_rating_rules_v1.json
+	./tools/config_rating_rules.py v2 > endpoints/config_rating_rules_v2.json
+	./tools/config_rating_rules.py c_code > src/generated/config_rating_rules_default.h
 
 # =============================================================================
 # Documentation ===============================================================
 # =============================================================================
 
-doc: doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5
+doc: doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5 doc/nbfc.faq.7
 	pandoc -f man -t markdown doc/ec_probe.1 					> doc/ec_probe.1.md
 	pandoc -f man -t markdown doc/nbfc.1 							> doc/nbfc.1.md
 	pandoc -f man -t markdown doc/nbfc_service.1 			> doc/nbfc_service.1.md
 	pandoc -f man -t markdown doc/nbfc_service.json.5 > doc/nbfc_service.json.5.md
+	pandoc -f man -t markdown doc/nbfc.faq.7          > doc/nbfc.faq.7.md
 	
 	pandoc -f man -t html doc/ec_probe.1 					> doc/ec_probe.1.html
 	pandoc -f man -t html doc/nbfc.1 							> doc/nbfc.1.html
 	pandoc -f man -t html doc/nbfc_service.1 			> doc/nbfc_service.1.html
 	pandoc -f man -t html doc/nbfc_service.json.5 > doc/nbfc_service.json.5.html
+	pandoc -f man -t html doc/nbfc.faq.7          > doc/nbfc.faq.7.html
 
 .force:
 	# force building targets

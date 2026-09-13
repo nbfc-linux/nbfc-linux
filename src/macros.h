@@ -32,6 +32,12 @@
 #define for_each_array_reverse(TYPE, VAR, ARRAY) \
   for (TYPE VAR = (ARRAY).data + (ARRAY).size; --VAR != (ARRAY).data;)
 
+#define array_calloc(TYPE, ARRAY, SIZE) \
+  (ARRAY).data = (TYPE*) Mem_Calloc((SIZE), sizeof(TYPE))
+
+#define array_realloc(TYPE, ARRAY, SIZE) \
+  (ARRAY).data = (TYPE*) Mem_Realloc((ARRAY).data, sizeof(TYPE) * (SIZE))
+
 typedef size_t array_size_t;
 
 #define declare_array_of(T)                           \
@@ -47,6 +53,8 @@ typedef size_t array_size_t;
     array_size_t size;                                \
   }
 
+typedef const char* str;
+declare_array_of(str);
 declare_array_of(array_size_t);
 declare_array_of(float);
 declare_array_of(int);
@@ -63,12 +71,12 @@ declare_array_of(int);
 #define NBFC_PACKED_ENUM  __attribute__((packed))
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
-#define PRINTF_LIKE(fmt, args) __attribute__((format(printf, fmt, args)))
+#define NBFC_PRINTF_LIKE(fmt, args) __attribute__((format(printf, fmt, args)))
 #else
 #define NBFC_PACKED_ENUM
 #define likely(x) (x)
 #define unlikely(x) (x)
-#define PRINTF_LIKE(fmt, args)
+#define NBFC_PRINTF_LIKE(fmt, args)
 #endif
 
 #endif

@@ -19,14 +19,14 @@
  * nbfc sensors set -f <FAN_INDEX> [-s sensor...] [-a algorithm]
  */
 
-const struct cli99_Option sensors_options[] = {
-  cli99_Options_Include(&main_options),
+const struct cli99_Option Sensors_CommandLine[] = {
+  cli99_Options_Include(&Main_CommandLine),
   {"sensors_command", Option_Sensors_Command,   cli99_NormalPositional},
   cli99_Options_End()
 };
 
-const struct cli99_Option sensors_set_options[] = {
-  cli99_Options_Include(&sensors_options),
+const struct cli99_Option Sensors_Set_CommandLine[] = {
+  cli99_Options_Include(&Sensors_CommandLine),
   {"-f|--fan",        Option_Sensors_Fan,       cli99_RequiredArgument},
   {"-s|--sensor",     Option_Sensors_Sensor,    cli99_RequiredArgument},
   {"-a|--algorithm",  Option_Sensors_Algorithm, cli99_RequiredArgument},
@@ -76,7 +76,7 @@ static Error Sensors_IsValidSensor(const char* sensor) {
       return err_stringf("No such sensor group: %s", sensor);
 
     case '/':
-      if (file_exists(sensor))
+      if (File_Exists(sensor))
         return err_success();
 
       errno = ENOENT;
@@ -94,19 +94,20 @@ static Error Sensors_IsValidSensor(const char* sensor) {
   }
 }
 
-static FanTemperatureSourceConfig* Sensors_GetFTSCByFanIndex(array_size_t fanIndex) {
-  for_each_array(FanTemperatureSourceConfig*, ftsc, service_config.FanTemperatureSources)
+static FanTemperatureSourceConfig* Sensors_GetFTSCByFanIndex(ServiceConfig* service_config, array_size_t fanIndex) {
+  for_each_array(FanTemperatureSourceConfig*, ftsc, service_config->FanTemperatureSources)
     if (ftsc->FanIndex == fanIndex)
       return ftsc;
 
-  const array_size_t idx = service_config.FanTemperatureSources.size;
-  service_config.FanTemperatureSources.data = Mem_Realloc(service_config.FanTemperatureSources.data, (idx + 1) * sizeof(FanTemperatureSourceConfig));
-  service_config.FanTemperatureSources.size = (idx + 1);
-  return &service_config.FanTemperatureSources.data[idx];
+  const array_size_t idx = service_config->FanTemperatureSources.size;
+  array_realloc(FanTemperatureSourceConfig, service_config->FanTemperatureSources, (idx + 1));
+  service_config->FanTemperatureSources.size = (idx + 1);
+  return &service_config->FanTemperatureSources.data[idx];
 }
 
-static int Sensors_Set() {
+static int Sensors_Set(void) {
   Error e;
+  ServiceConfig service_config = {0};
   ModelConfig model_config = {0};
 
   check_root();
@@ -117,7 +118,7 @@ static int Sensors_Set() {
   }
 
   FS_Sensors_Init();
-  Service_LoadAllConfigFiles(&model_config);
+  Service_LoadAllConfigFiles(&service_config, &model_config);
 
   if (Sensors_Options.fan >= model_config.FanConfigurations.size) {
     Log_Error("%s: No such fan: %zu", "-f|--fan", Sensors_Options.fan);
@@ -135,38 +136,39 @@ static int Sensors_Set() {
     }
   }
 
-  FanTemperatureSourceConfig* ftsc = Sensors_GetFTSCByFanIndex(Sensors_Options.fan);
+  FanTemperatureSourceConfig* ftsc = Sensors_GetFTSCByFanIndex(&service_config, Sensors_Options.fan);
 
-  FanTemperatureSourceConfig_Set_FanIndex(ftsc);
+  ftsc->isset.FanIndex = true;
   ftsc->FanIndex = Sensors_Options.fan;
 
   if (Sensors_Options.sensors.size) {
-    FanTemperatureSourceConfig_Set_Sensors(ftsc);
+    ftsc->isset.Sensors = true;
     ftsc->Sensors = Sensors_Options.sensors;
   }
   else {
-    FanTemperatureSourceConfig_UnSet_Sensors(ftsc);
+    ftsc->isset.Sensors = false;
     ftsc->Sensors.size = 0;
   }
 
   if (Sensors_Options.algorithm != TemperatureAlgorithmType_Unset) {
-    FanTemperatureSourceConfig_Set_TemperatureAlgorithmType(ftsc);
+    ftsc->isset.TemperatureAlgorithmType = true;
     ftsc->TemperatureAlgorithmType = Sensors_Options.algorithm;
   }
   else {
-    FanTemperatureSourceConfig_UnSet_TemperatureAlgorithmType(ftsc);
+    ftsc->isset.TemperatureAlgorithmType = false;
   }
 
-  e = ServiceConfig_Write(NBFC_SERVICE_CONFIG);
+  e = ServiceConfig_Write(&service_config, NBFC_SERVICE_CONFIG);
   e_die();
 
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Sensors_Show() {
+static int Sensors_Show(void) {
+  ServiceConfig service_config = {0};
   ModelConfig model_config = {0};
 
-  Service_LoadAllConfigFiles(&model_config);
+  Service_LoadAllConfigFiles(&service_config, &model_config);
 
   struct FanWithTrace {
     const char*              FanName;
@@ -176,7 +178,7 @@ static int Sensors_Show() {
     const char*              TemperatureAlgorithmType_Source;
   };
 
-  struct FanWithTrace *fans = Mem_Calloc(model_config.FanConfigurations.size, sizeof(struct FanWithTrace));
+  struct FanWithTrace* fans = Mem_Calloc(model_config.FanConfigurations.size, sizeof(struct FanWithTrace));
 
   // ==========================================================================
   // Set the defaults
@@ -201,12 +203,12 @@ static int Sensors_Show() {
 
     fans[i].FanName = fc->FanDisplayName;
 
-    if (FanConfiguration_IsSet_Sensors(fc)) {
+    if (fc->isset.Sensors) {
       fans[i].Sensors = fc->Sensors;
       fans[i].Sensors_Source = "model config";
     }
 
-    if (FanConfiguration_IsSet_TemperatureAlgorithmType(fc)) {
+    if (fc->isset.TemperatureAlgorithmType) {
       fans[i].TemperatureAlgorithmType = fc->TemperatureAlgorithmType;
       fans[i].TemperatureAlgorithmType_Source = "model config";
     }
@@ -220,12 +222,12 @@ static int Sensors_Show() {
     if (ftsc->FanIndex >= model_config.FanConfigurations.size)
       continue;
 
-    if (FanTemperatureSourceConfig_IsSet_Sensors(ftsc)) {
+    if (ftsc->isset.Sensors) {
       fans[ftsc->FanIndex].Sensors = ftsc->Sensors;
       fans[ftsc->FanIndex].Sensors_Source = "service config";
     }
 
-    if (FanTemperatureSourceConfig_IsSet_TemperatureAlgorithmType(ftsc)) {
+    if (ftsc->isset.TemperatureAlgorithmType) {
       fans[ftsc->FanIndex].TemperatureAlgorithmType = ftsc->TemperatureAlgorithmType;
       fans[ftsc->FanIndex].TemperatureAlgorithmType_Source = "service config";
     }
@@ -250,7 +252,7 @@ static int Sensors_Show() {
   return NBFC_EXIT_SUCCESS;
 }
 
-static int Sensors_List() {
+static int Sensors_List(void) {
   FS_Sensors_Init();
 
   const char* having[4096];
@@ -282,7 +284,7 @@ static int Sensors_List() {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Sensors() {
+int Sensors(void) {
   switch (Sensors_Options.command) {
     case Sensors_Command_Set:    return Sensors_Set();
     case Sensors_Command_List:   return Sensors_List();

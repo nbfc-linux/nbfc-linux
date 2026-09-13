@@ -3,10 +3,8 @@
 
 #include "model_config.h"
 
-extern ServiceConfig service_config;
-
-Error ServiceConfig_Init(const char*);
+Error ServiceConfig_FromFile(ServiceConfig*, const char*);
+Error ServiceConfig_Write(const ServiceConfig*, const char*);
 void  ServiceConfig_Free(ServiceConfig*);
-Error ServiceConfig_Write(const char*);
 
 #endif
