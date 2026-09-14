@@ -179,12 +179,12 @@ Error Service_Init(void) {
   }
 
   // Initialize fans with sensors and temperature filter ======================
-  e = FanTemperatureControl_Init(&Service_Fans, &Service_ServiceConfig, &Service_ModelConfig);
+  e = FanTemperatureControls_Init(&Service_Fans, &Service_ServiceConfig, &Service_ModelConfig);
   if (e)
     goto error;
   Service_State = Initialized_6_Temperature_Filter;
 
-  FanTemperatureControl_Log(&Service_Fans, &Service_ModelConfig);
+  FanTemperatureControls_Log(&Service_Fans, &Service_ModelConfig);
 
 error:
 
@@ -308,7 +308,7 @@ void Service_Cleanup(void) {
       ec->Close();
       /* fall through */
     case Initialized_4_Fans:
-      Mem_Free(Service_Fans.data);
+      FanTemperatureControls_Free(&Service_Fans);
       /* fall through */
     case Initialized_3_Sensors:
       FS_Sensors_Cleanup();

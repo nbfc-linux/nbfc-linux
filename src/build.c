@@ -56,5 +56,6 @@
 #include "temperature_filter.c"
 #include "temperature_threshold_manager.c"
 #include "mkdir_p.c"
+#include "vfio.c"
 
 #include "main.c"

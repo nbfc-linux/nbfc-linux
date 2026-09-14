@@ -250,13 +250,15 @@ src/nbfc_service: \
 	src/pidfile.c src/pidfile.h \
 	src/process.h src/process.c \
 	src/protocol.c src/protocol.h \
+	src/register_write_configuration_utils.c src/register_write_configuration_utils.h \
 	src/server.c src/server.h \
 	src/service.c src/service.h \
 	src/service_config.c src/service_config.h \
 	src/service_state.c src/service_state.h \
 	src/sponsor.c src/sponsor.h \
 	src/temperature_filter.c src/temperature_filter.h \
-	src/temperature_threshold_manager.c src/temperature_threshold_manager.h
+	src/temperature_threshold_manager.c src/temperature_threshold_manager.h \
+	src/vfio.c src/vfio.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDLIBS_SERVICE) $(LDFLAGS)
 
 src/ec_probe: \
@@ -320,8 +322,10 @@ src/nbfc: \
 	src/nbfc.h \
 	src/process.h src/process.c \
 	src/regex_utils.h src/regex_utils.c \
+	src/register_write_configuration_utils.c src/register_write_configuration_utils.h \
 	src/str_functions.c \
 	src/str_functions.h \
+	src/vfio.c src/vfio.h \
 	src/xml2json.h src/xml2json.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)
 

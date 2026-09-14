@@ -57,6 +57,7 @@
 #include "register_write_configuration_utils.c"
 #include "str_functions.c"
 #include "temperature_threshold_manager.c"
+#include "vfio.c"
 #include "xml2json.c"
 #include "client/dmi.c"
 #include "client/curl_utils.c"

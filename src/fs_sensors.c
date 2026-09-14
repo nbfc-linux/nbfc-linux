@@ -7,13 +7,30 @@
 #include "sleep.h"
 #include "nvidia.h"
 #include "str_functions.h"
+#include "vfio.h"
 
-#include <dirent.h>  // DIR, opendir, readdir, closedir
+#include <float.h>   // FLT_MAX
 #include <errno.h>   // ENODATA, EINVAL
 #include <stdio.h>   // snprintf
 #include <stdlib.h>  // strtod
 #include <string.h>  // strstr
 #include <linux/limits.h> // PATH_MAX
+
+static inline bool IsCPUSensorName(const char* s) {
+  return
+    !strcmp(s, "coretemp") ||
+    !strcmp(s, "k10temp")  ||
+    !strcmp(s, "zenpower");
+}
+
+static inline bool IsGPUSensorName(const char* s) {
+  return
+    !strcmp(s, "amdgpu")    ||
+    !strcmp(s, "nvidia")    ||
+    !strcmp(s, "nvidia-ml") ||
+    !strcmp(s, "nouveau")   ||
+    !strcmp(s, "radeon");
+}
 
 static const char* const LinuxHwmonDirs[] = {
   "/sys/class/hwmon/hwmon%d",
@@ -145,84 +162,6 @@ void FS_Sensors_Log(void) {
 }
 
 // ============================================================================
-// VFIO passthrough detection helpers
-// ============================================================================
-
-// Check /proc/cmdline for vfio-pci.ids or vfio_pci.ids (fast path).
-static bool FS_Sensors_VFIO_CheckProcCmdline(void) {
-  char cmdline[4096];
-  FileResult res = File_Read(cmdline, sizeof(cmdline), "/proc/cmdline");
-  if (!res.ok)
-    return false;
-
-  return strstr(cmdline, "vfio-pci.ids") || strstr(cmdline, "vfio_pci.ids");
-}
-
-#define FS_SENSORS_PCI_DEVICES_PATH "/sys/bus/pci/devices"
-
-// Scan /sys/bus/pci/devices/ for NVIDIA GPUs bound to vfio-pci or pci-stub.
-static bool FS_Sensors_VFIO_CheckSysBusPciDevices(void) {
-  DIR* dir = opendir(FS_SENSORS_PCI_DEVICES_PATH);
-  if (!dir) {
-    Log_Debug("Could not open " FS_SENSORS_PCI_DEVICES_PATH
-              " — cannot check PCI device bindings");
-    return false;
-  }
-
-  struct dirent* entry;
-  while ((entry = readdir(dir)) != NULL) {
-    if (entry->d_name[0] == '.')
-      continue;
-
-    // Read the vendor file for this PCI device
-    char vendor_path[PATH_MAX];
-    snprintf(vendor_path, sizeof(vendor_path),
-             "%s/%s/vendor", FS_SENSORS_PCI_DEVICES_PATH, entry->d_name);
-
-    char vendor[8];
-    FileResult res = File_Read(vendor, sizeof(vendor), vendor_path);
-    if (!res.ok)
-      continue;
-
-    str_rstrip_whitespace(vendor, res.len);
-
-    // NVIDIA PCI vendor ID is 0x10de / 10de
-    if (!strstr(vendor, "10de"))
-      continue;
-
-    // Check if this NVIDIA device is bound to vfio-pci or pci-stub
-    char driver_path[PATH_MAX];
-    snprintf(driver_path, sizeof(driver_path),
-             "%s/%s/driver", FS_SENSORS_PCI_DEVICES_PATH, entry->d_name);
-
-    char driver_target[PATH_MAX];
-    ssize_t linklen = readlink(driver_path, driver_target, sizeof(driver_target) - 1);
-    if (linklen <= 0)
-      continue;
-
-    driver_target[linklen] = '\0';
-
-    // Extract driver name (basename of the target path)
-    const char* driver_name = strrchr(driver_target, '/');
-    if (driver_name)
-      driver_name++;
-    else
-      driver_name = driver_target;
-
-    if (!strcmp(driver_name, "vfio-pci") || !strcmp(driver_name, "pci-stub")) {
-      Log_Info("NVIDIA GPU at %s bound to '%s' —"
-               " VFIO passthrough detected, skipping nvidia-ml sensor",
-               entry->d_name, driver_name);
-      closedir(dir);
-      return true;
-    }
-  }
-
-  closedir(dir);
-  return false;
-}
-
-// ============================================================================
 // FS_Sensors_Init / FS_Sensors_Cleanup
 // ============================================================================
 
@@ -243,8 +182,7 @@ Error FS_Sensors_Init(void) {
   // If VFIO passthrough is active, skip nvidia-ml entirely.
   // Checking /proc/cmdline alone is not enough because users may
   // configure passthrough via /etc/modprobe.d/, driverctl, etc.
-  if (!FS_Sensors_VFIO_CheckProcCmdline() &&
-      !FS_Sensors_VFIO_CheckSysBusPciDevices()) {
+  if (!VFIO_CheckProcCmdline() && !VFIO_CheckSysBusPciDevices()) {
     // Wait for nvidia module
     for (; slept < sleep_time; ++slept) {
       Nvidia_Error ne = Nvidia_Init();
@@ -284,4 +222,152 @@ void FS_Sensors_Cleanup(void) {
   Mem_Free(FS_Sensors_Sources.data);
   FS_Sensors_Sources.size = 0;
   FS_Sensors_Sources.data = NULL;
+}
+
+Error FS_TemperatureSources_GetTemperature(
+  FS_TemperatureSource_References* sources,
+  TemperatureAlgorithmType algorithm,
+  float* out)
+{
+  float tmp;
+  float sum = 0;
+  float min = FLT_MAX;
+  float max = FLT_MIN;
+  int   total = 0;
+
+  for_each_array(array_size_t*, ts_idx, *sources) {
+    const FS_TemperatureSource* ts = FS_Sensors_Sources_UnRef(*ts_idx);
+    Error e = FS_TemperatureSource_GetTemperature(ts, &tmp);
+    e_warn();
+    if (! e) {
+      min = MIN(min, tmp);
+      max = MAX(max, tmp);
+      sum += tmp;
+      ++total;
+    }
+  }
+
+  if (! total)
+    return err_string("No temperatures available");
+
+  switch (algorithm) {
+    case TemperatureAlgorithmType_Average:
+      *out = sum / (float) total;
+      return err_success();
+    case TemperatureAlgorithmType_Min:
+      *out = min;
+      return err_success();
+    case TemperatureAlgorithmType_Max:
+      *out = max;
+      return err_success();
+    default:
+      return err_string("ERR-03");
+  }
+}
+
+void FS_TemperatureSources_AddTemperatureSource(
+  FS_TemperatureSource_References* out,
+  size_t ref_idx)
+{
+  const size_t idx = out->size;
+  array_realloc(array_size_t, *out, (idx + 1));
+  out->data[idx] = ref_idx;
+  out->size++;
+}
+
+// Adds one or more FS_TemperatureSource_Ptr to an array.
+//
+// If `sensor` is not found in `FS_Sensors_Sources` by its name or its path,
+// this function assumes that `sensor` is a user defined file path to a file
+// containing the temperature.
+//
+// Return error if `sensor` is not found in available temperature sources
+// or `sensor` is not a valid file path to a temperature file.
+Error FS_TemperatureSources_AddTemperatureSources(
+  FS_TemperatureSource_References* out,
+  const char* sensor)
+{
+  Error e;
+  bool found_sensors = false;
+
+  // ==========================================================================
+  // Sensor group "@CPU": Add all sensors found in `IsCPUSensorName`
+  // ==========================================================================
+  if (!strcmp(sensor, "@CPU")) {
+    for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
+      if (IsCPUSensorName(ts->name)) {
+        FS_TemperatureSources_AddTemperatureSource(out, FS_Sensors_Sources_Ref(ts));
+        found_sensors = true;
+      }
+    }
+
+    return found_sensors
+      ? err_success()
+      : err_stringf("%s: No sensors found", "@CPU");
+  }
+
+  // ==========================================================================
+  // Sensor group "@GPU": Add all sensors found in `IsGPUSensorName`
+  // ==========================================================================
+  if (!strcmp(sensor, "@GPU")) {
+    for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
+      if (IsGPUSensorName(ts->name)) {
+        FS_TemperatureSources_AddTemperatureSource(out, FS_Sensors_Sources_Ref(ts));
+        found_sensors = true;
+      }
+    }
+
+    return found_sensors
+      ? err_success()
+      : err_stringf("%s: No sensors found", "@GPU");
+  }
+
+  // ==========================================================================
+  // Add sensors by name or path (for available sensors)
+  // ==========================================================================
+  for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
+    if (!strcmp(sensor, ts->name) || !strcmp(sensor, ts->file)) {
+      FS_TemperatureSources_AddTemperatureSource(out, FS_Sensors_Sources_Ref(ts));
+      found_sensors = true;
+    }
+  }
+
+  if (found_sensors)
+    return err_success();
+
+  // ==========================================================================
+  // Create a new TemperatureSource (a user defined file or command)
+  // ==========================================================================
+  FS_TemperatureSource source;
+
+  if (sensor[0] == '$') {
+    // Sensor is a command
+    source.name = "command";
+    source.file = (char*) sensor + 1;
+    source.type = FS_TemperatureSource_Command;
+    source.multiplier = 1;
+  }
+  else {
+    // Sensor is a user defined file
+    source.name = "anonymous";
+    source.file = (char*) sensor;
+    source.type = FS_TemperatureSource_File;
+    source.multiplier = 0.001f;
+  }
+
+  float t; // NOLINT
+  e = FS_TemperatureSource_GetTemperature(&source, &t);
+  if (e)
+    return e;
+
+  const array_size_t idx = FS_Sensors_Sources.size;
+  array_realloc(FS_TemperatureSource, FS_Sensors_Sources, (idx + 1));
+  FS_Sensors_Sources.data[idx].name = Mem_Strdup(source.name);
+  FS_Sensors_Sources.data[idx].file = Mem_Strdup(source.file);
+  FS_Sensors_Sources.data[idx].multiplier = source.multiplier;
+  FS_Sensors_Sources.data[idx].type = source.type;
+  FS_Sensors_Sources.size = idx + 1;
+  FS_TemperatureSources_AddTemperatureSource(out, idx);
+
+  return err_success();
 }

@@ -6,12 +6,9 @@
 #include "model_config.h"
 #include "temperature_filter.h"
 
-#define FAN_TEMPERATURE_CONTROL_MAX_SOURCES 32
-
 struct FanTemperatureControl {
   Fan                      Fan;
-  FS_TemperatureSource*    TemperatureSources[FAN_TEMPERATURE_CONTROL_MAX_SOURCES];
-  int                      TemperatureSourcesSize;
+  FS_TemperatureSource_References TemperatureSources;
   TemperatureAlgorithmType TemperatureAlgorithmType;
   TemperatureFilter        TemperatureFilter;
   float                    Temperature;
@@ -19,8 +16,9 @@ struct FanTemperatureControl {
 typedef struct FanTemperatureControl FanTemperatureControl;
 declare_array_of(FanTemperatureControl);
 
-Error FanTemperatureControl_Init(array_of(FanTemperatureControl)*, ServiceConfig*, ModelConfig*);
+Error FanTemperatureControls_Init(array_of(FanTemperatureControl)*, ServiceConfig*, ModelConfig*);
+void  FanTemperatureControls_Free(array_of(FanTemperatureControl)*);
+void  FanTemperatureControls_Log(const array_of(FanTemperatureControl)*, ModelConfig*);
 Error FanTemperatureControl_UpdateFanTemperature(FanTemperatureControl*);
-void  FanTemperatureControl_Log(const array_of(FanTemperatureControl)*, ModelConfig*);
 
 #endif
