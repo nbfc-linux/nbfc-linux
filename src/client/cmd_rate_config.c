@@ -237,6 +237,26 @@ static void PrintFullHelp(void) {
   );
 }
 
+static inline void PrintFullHelpNotice(void) {
+  if (RateConfig_Options.style != RateConfig_PrintFull)
+    return;
+
+  fprintf(stderr,
+    "Please run `nbfc rate-config --full-help` for a full explanation of how "
+    "to interpret these results.\n");
+}
+
+static inline void PrintMinScoreIsDefaultNotice(void) {
+  if (RateConfig_Options.style != RateConfig_PrintFull)
+    return;
+
+  fprintf(stderr,
+    "Only configurations with the minimum recommended score of %.2f are shown.\n"
+    "You can change this threshold by using -m|--min-score, but doing so can lead\n"
+    "to unsafe configurations being displayed.\n\n", RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE
+  );
+}
+
 /*
  * Rate all config files found in `files`.
  *
@@ -563,12 +583,6 @@ static Error RateConfig_RateFiles(
   return err_success();
 }
 
-static inline void PrintFullHelpNotice(void) {
-  printf(
-    "Please run `nbfc rate-config --full-help` for a full explanation of how "
-    "to interpret these results.\n");
-}
-
 /*
  * Rate many configuration files.
  *
@@ -587,11 +601,7 @@ static Error RateConfig_RateMany(
   e = RateConfig_RateFiles(config_rating, files, json, min_score, bad_filter);
   if (!json) {
     if (! RateConfig_Options.min_score_set) {
-      printf(
-        "Only configurations with the minimum recommended score of %.2f are shown.\n"
-        "You can change this threshold by using -m|--min-score, but doing so can lead\n"
-        "to unsafe configurations being displayed.\n\n", RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE
-      );
+      PrintMinScoreIsDefaultNotice();
     }
     PrintFullHelpNotice();
   }
