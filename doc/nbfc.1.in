@@ -16,7 +16,7 @@ This program is used to control the NoteBook FanControl service.
 .RI [ OPTIONS ]
 .SS MISCELLANEOUS COMMANDS
 .B nbfc
-.RB { update " | " rate\-config " | " acpi\-dump " | " get\-model\-name " | " xml2json " | " support " | " warranty " | " faq " | " help }
+.RB { update " | " rate\-config " | " test\-config " | " acpi\-dump " | " get\-model\-name " | " xml2json " | " support " | " warranty " | " faq " | " help }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -304,6 +304,105 @@ Do not print register ratings.
 .B \-\-print\-rules
 .RS
 Print configuration rating rules.
+.RE
+.RE
+
+.B test\-config
+.RB { run " | " evaluate }
+.RI [ OPTIONS ]
+.RS
+Test configurations automatically.
+
+This command should only be used in conjunction with
+.BR "nbfc rate-config" .
+
+For example:
+.RS
+.B sudo nbfc rate-config -aqq | sudo nbfc test-config run
+.RE
+
+It should
+.B not
+be used to test arbitrary configurations.
+
+.B run
+.RI [ OPTIONS ]
+.RS
+Reads a list of configuration files from an input file (default:
+.BR stdin ).
+
+Configurations will be loaded in read\-only mode.
+
+The notebook's fans will be spinned up by stressing the CPU/GPU while reading
+back the fan speed for each configuration.
+
+The result will be written to
+.BR nbfc.test-config.result.json .
+
+.BR \-i ", " \-\-input
+.I FILE
+.RS
+Specify input file.
+.RE
+
+.BR \-o ", " \-\-output
+.I FILE
+.RS
+Specify output file.
+.RE
+
+.BR \-c ", " \-\-cpu
+.I NUMBER
+.RS
+Specify number of CPU workers.
+.RE
+
+.BR \-g ", " \-\-gpu
+.I NUMBER
+.RS
+Specify number of GPU workers (default:
+.BR "no workers" ).
+.RE
+
+.BR \-I ", " \-\-interval
+.I SECONDS
+.RS
+Set sample interval (default:
+.BR 0.5 ).
+.RE
+
+.BR \-t ", " \-\-threshold
+.I DELTA
+.RS
+Stop when temperature difference falls below
+.I DELTA
+(default:
+.BR 2.0 ).
+.RE
+
+.BR \-b ", " \-\-break
+.I SECONDS
+.RS
+Stop after the temperature difference has remained below
+.I DELTA
+for
+.I SECONDS
+consecutive seconds (default:
+.BR 10.0 ).
+.RE
+.RE
+
+.B evaluate
+.RI [ OPTIONS ]
+.RS
+Evaluates a previously generated result file. Default:
+.BR nbfc.test-config.result.json .
+
+.BR \-i ", " \-\-input
+.I FILE
+.RS
+Specify input file.
+.RE
 .RE
 .RE
 

@@ -15,9 +15,9 @@ This program is used to control the NoteBook FanControl service.
 
 ## MISCELLANEOUS COMMANDS
 
-**nbfc** {**update** \| **rate-config** \| **acpi-dump** \|
-**get-model-name** \| **xml2json** \| **support** \| **warranty** \|
-**faq** \| **help**} \[*OPTIONS*\]
+**nbfc** {**update** \| **rate-config** \| **test-config** \|
+**acpi-dump** \| **get-model-name** \| **xml2json** \| **support** \|
+**warranty** \| **faq** \| **help**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -227,6 +227,70 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Print configuration rating rules.
 
+**test-config** {**run** \| **evaluate**} \[*OPTIONS*\]
+
+> Test configurations automatically.
+>
+> This command should only be used in conjunction with **nbfc
+> rate-config**.
+>
+> For example:
+>
+> > **sudo nbfc rate-config -aqq \| sudo nbfc test-config run**
+>
+> It should **not** be used to test arbitrary configurations.
+>
+> **run** \[*OPTIONS*\]
+>
+> > Reads a list of configuration files from an input file (default:
+> > **stdin**).
+> >
+> > Configurations will be loaded in read-only mode.
+> >
+> > The notebook\'s fans will be spinned up by stressing the CPU/GPU
+> > while reading back the fan speed for each configuration.
+> >
+> > The result will be written to **nbfc.test-config.result.json**.
+> >
+> > **-i**, **\--input** *FILE*
+> >
+> > > Specify input file.
+> >
+> > **-o**, **\--output** *FILE*
+> >
+> > > Specify output file.
+> >
+> > **-c**, **\--cpu** *NUMBER*
+> >
+> > > Specify number of CPU workers.
+> >
+> > **-g**, **\--gpu** *NUMBER*
+> >
+> > > Specify number of GPU workers (default: **no workers**).
+> >
+> > **-I**, **\--interval** *SECONDS*
+> >
+> > > Set sample interval (default: **0.5**).
+> >
+> > **-t**, **\--threshold** *DELTA*
+> >
+> > > Stop when temperature difference falls below *DELTA* (default:
+> > > **2.0**).
+> >
+> > **-b**, **\--break** *SECONDS*
+> >
+> > > Stop after the temperature difference has remained below *DELTA*
+> > > for *SECONDS* consecutive seconds (default: **10.0**).
+>
+> **evaluate** \[*OPTIONS*\]
+>
+> > Evaluates a previously generated result file. Default:
+> > **nbfc.test-config.result.json**.
+> >
+> > **-i**, **\--input** *FILE*
+> >
+> > > Specify input file.
+
 **acpi-dump** {**registers** \| **ec-registers** \| **methods** \|
 **dsl** \| **map**} \[*OPTIONS*\]
 
@@ -302,13 +366,13 @@ This program is used to control the NoteBook FanControl service.
 > >
 > > The archive includes:
 > >
-> > -   The output of **nbfc get-model-name**
+> > - The output of **nbfc get-model-name**
 > >
-> > -   The output of **nbfc sensors list**
+> > - The output of **nbfc sensors list**
 > >
-> > -   Firmware DSDT (*/sys/firmware/acpi/tables/DSDT*)
+> > - Firmware DSDT (*/sys/firmware/acpi/tables/DSDT*)
 > >
-> > -   Firmware SSDTs (*/sys/firmare/acpi/tables/SSDT\**)
+> > - Firmware SSDTs (*/sys/firmare/acpi/tables/SSDT\**)
 
 **get-model-name**
 

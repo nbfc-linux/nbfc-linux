@@ -12,6 +12,7 @@ function _nbfc__query_init
   set -l definitions $argv
   set -l positionals
   set -l having_options
+  set -l leading_stacked_short_options
   set -l option_values
   set -l last_arg_is_option_argument false
 
@@ -51,6 +52,7 @@ function _nbfc__query_init
   while test $argi -le $cmdline_count
     set -l arg "$cmdline[$argi]"
     set -l have_trailing_arg (test $argi -lt $cmdline_count && echo true || echo false)
+    set leading_stacked_short_options
 
     switch $arg
       case '-'
@@ -89,6 +91,7 @@ function _nbfc__query_init
           if test "$option_type" = '0'
             set -a having_options $option
             set -a option_values ''
+            test $i -lt $arg_length && set -a leading_stacked_short_options $option
           else if test "$option_type" = '1'
             set end_of_parsing true
 
@@ -120,6 +123,7 @@ function _nbfc__query_init
   set -g __QUERY_CACHE_POSITIONALS    $positionals
   set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
   set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+  set -g __QUERY_CACHE_LEADING_STACKED_OPTIONS $leading_stacked_short_options
 
   set -l cmdline_last_arg (commandline -ct | string unescape)
   set -g __QUERY_CACHE_CURRENT_ARG $cmdline_last_arg
@@ -147,6 +151,10 @@ end
 
 function _nbfc__has_option
   set -l option
+  for option in $__QUERY_CACHE_LEADING_STACKED_OPTIONS
+    contains -- $option $argv && return 1
+  end
+
   for option in $__QUERY_CACHE_HAVING_OPTIONS
     contains -- $option $argv && return 0
   end
@@ -214,6 +222,8 @@ function _nbfc__prepare
     '(sensors)>(set)=>-f= --fan= -a= --algorithm= -s= --sensor= --force' \
     '(update)=>-p= --parallel= -q --quiet' \
     '(rate\-config)=>-H --full-help -a --all -d= --dsdt= -D= --dsdt-dir= -m= --min-score= -i= --input= -j --json --print-rules -r= --rules= -n --no-download -u --unverified -b --bad -q --quiet -f= --fan-count=' \
+    '(test\-config)>(run)=>-i= --input= -o= --output= -g= --gpu= -c= --cpu= -I= --interval= -t= --threshold= -b= --break=' \
+    '(test\-config)>(evaluate)=>-i= --input=' \
     '(acpi\-dump)=>-d= --dsdt= -D= --dsdt-dir= -j --json' \
     '(acpi\-dump)>(ec\-registers)=>-u --unverified' \
     '(acpi\-dump)>(map)=>-u --unverified' \
@@ -226,6 +236,12 @@ function _nbfc_sensors__command
     list 'List available sensors and temperature files' \
     show 'Show all available fans with their configuration' \
     set 'Configure sensors and algorithm type for a fan'
+end
+
+function _nbfc_test_config__command
+  printf '%s\t%s\n' \
+    run 'Test configurations and write a result file' \
+    evaluate 'Evaluate previously generated result file'
 end
 
 function _nbfc_acpi_dump__command
@@ -248,6 +264,7 @@ function _nbfc__command
     sensors 'Configure fan sensors' \
     update 'Download new configuration files' \
     rate-config 'Rate a configuration file' \
+    test-config 'Test configurations automatically' \
     acpi-dump 'Dumps information of your ACPI DSDT' \
     wait-for-hwmon 'Wait for /sys/class/hwmon/hwmon* files' \
     get-model-name 'Print model name for notebook' \
@@ -371,6 +388,35 @@ complete -c $prog -n $P -n $C000 -n $C012 -s b -l bad -d 'List only bad configur
 complete -c $prog -n $P -n $C000 -s q -l quiet -d 'Do not print register ratings' -f
 complete -c $prog -n $P -n $C000 -n $C013 -s f -l fan-count -d 'Limit configurations by fan count' -x -a '(seq 0 255)'
 complete -c $prog -n $P -n $C014 -n $C000 -d 'Specify configuration file' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
+
+# command nbfc test-config
+set -l C000 "$num_of_positionals -eq 1"
+set -l C001 "$positional_contains 1 test-config"
+complete -c $prog -n $P -n $C000 -n $C001 -d Commands -f -a '(_nbfc_test_config__command)'
+
+# command nbfc test-config run
+set -l C000 "$positional_contains 1 test-config"
+set -l C001 "$positional_contains 2 run"
+set -l C002 "not $has_option -i --input"
+set -l C003 "not $has_option -o --output"
+set -l C004 "not $has_option -g --gpu"
+set -l C005 "not $has_option -c --cpu"
+set -l C006 "not $has_option -I --interval"
+set -l C007 "not $has_option -t --threshold"
+set -l C008 "not $has_option -b --break"
+complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s i -l input -d 'Specify input file' -Fr
+complete -c $prog -n $P -n $C000 -n $C001 -n $C003 -s o -l output -d 'Specify output file' -Fr
+complete -c $prog -n $P -n $C000 -n $C001 -n $C004 -s g -l gpu -d 'Specify number of GPU workers' -x -a '(seq 1 255)'
+complete -c $prog -n $P -n $C000 -n $C001 -n $C005 -s c -l cpu -d 'Specify number of CPU workers' -x -a '(seq 1 255)'
+complete -c $prog -n $P -n $C000 -n $C001 -n $C006 -s I -l interval -d 'Set sample interval (default: 0.5)' -x
+complete -c $prog -n $P -n $C000 -n $C001 -n $C007 -s t -l threshold -d 'Stop when temperature difference falls below DELTA (default: 2.0)' -x
+complete -c $prog -n $P -n $C000 -n $C001 -n $C008 -s b -l break -d 'Stop after SECONDS of stable temperature' -x
+
+# command nbfc test-config evaluate
+set -l C000 "$positional_contains 1 test-config"
+set -l C001 "$positional_contains 2 evaluate"
+set -l C002 "not $has_option -i --input"
+complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s i -l input -d 'Specify input file' -Fr
 
 # command nbfc acpi-dump
 set -l C000 "$positional_contains 1 acpi-dump"

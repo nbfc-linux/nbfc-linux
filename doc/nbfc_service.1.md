@@ -41,13 +41,13 @@ NoteBook FanControl service
 
 > Select the implementation used to access the embedded controller.
 >
-> -   **ec_sys**: Use the ec_sys kernel module.
+> - **ec_sys**: Use the ec_sys kernel module.
 >
-> -   **acpi_ec**: Use the acpi_ec kernel module.
+> - **acpi_ec**: Use the acpi_ec kernel module.
 >
-> -   **dev_port**: Access the embedded controller via /dev/port.
+> - **dev_port**: Access the embedded controller via /dev/port.
 >
-> -   **dummy**: Do not access the embedded controller at all.
+> - **dummy**: Do not access the embedded controller at all.
 
 # FILES
 

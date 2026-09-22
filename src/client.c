@@ -28,6 +28,7 @@
 #include "ec_linux.c"
 #include "ec_sys_linux.c"
 #include "ec_dummy.c"
+#include "ec_cache.c"
 #include "fan.c"
 #include "file_utils.c"
 #include "model_config.c"
@@ -56,6 +57,7 @@
 #include "model_config_to_json.c"
 #include "register_write_configuration_utils.c"
 #include "str_functions.c"
+#include "stress.c"
 #include "temperature_threshold_manager.c"
 #include "vfio.c"
 #include "xml2json.c"
@@ -63,6 +65,7 @@
 #include "client/curl_utils.c"
 #include "client/config_files.c"
 #include "client/service_control.c"
+#include "client/spearman.c"
 
 const EC_VTable* ec = NULL;
 
@@ -90,6 +93,7 @@ const struct cli99_Option Main_CommandLine[] = {
 #include "client/cmd_acpi_dump.c"
 #include "client/cmd_rate_config.c"
 #include "client/cmd_reset_ec.c"
+#include "client/cmd_test_config.c"
 #include "client/cmd_xml2json.c"
 
 #define NBFC_CLIENT_COMMANDS \
@@ -101,6 +105,7 @@ const struct cli99_Option Main_CommandLine[] = {
   o("sensors",          Sensors,          SENSORS,          Sensors)       \
   o("config",           Config,           CONFIG,           Config)        \
   o("rate-config",      RateConfig,       RATE_CONFIG,      RateConfig)    \
+  o("test-config",      TestConfig,       TEST_CONFIG,      TestConfig)    \
   o("acpi-dump",        AcpiDump,         ACPI_DUMP,        AcpiDump)      \
   o("update",           Update,           UPDATE,           Update)        \
   o("wait-for-hwmon",   Wait_For_Hwmon,   WAIT_FOR_HWMON,   Main)          \
@@ -486,6 +491,69 @@ int main(int argc, char* const argv[]) {
       break;
 
     // ========================================================================
+    // Test-Config options
+    // ========================================================================
+
+    case Option_TestConfig_Action:
+      TestConfig_Options.action = TestConfig_Action_FromString(p.optarg);
+      if (TestConfig_Options.action == TestConfig_Action_None) {
+        Log_Error("Invalid command: %s", p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Option_TestConfig_Input:
+      TestConfig_Options.input = p.optarg;
+      break;
+
+    case Option_TestConfig_Output:
+      TestConfig_Options.output = p.optarg;
+      break;
+
+    case Option_TestConfig_Cpu:
+      TestConfig_Options.cpu_workers = (size_t) parse_number(p.optarg, 1, 255, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Option_TestConfig_Gpu:
+      TestConfig_Options.gpu_workers = (size_t) parse_number(p.optarg, 1, 255, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Option_TestConfig_Interval:
+      TestConfig_Options.interval = (float) parse_double(
+          p.optarg, TEST_CONFIG_MIN_INTERVAL, TEST_CONFIG_MAX_INTERVAL, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Option_TestConfig_Threshold:
+      TestConfig_Options.threshold = (float) parse_double(
+          p.optarg, TEST_CONFIG_MIN_THRESHOLD, TEST_CONFIG_MAX_THRESHOLD, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    case Option_TestConfig_Break:
+      TestConfig_Options.break_ = (float) parse_double(
+          p.optarg, TEST_CONFIG_MIN_BREAK, TEST_CONFIG_MAX_BREAK, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
+    // ========================================================================
     // Acpi-Dump options
     // ========================================================================
 
@@ -550,6 +618,7 @@ int main(int argc, char* const argv[]) {
   case Command_Restart:           return Restart();
   case Command_Config:            return Config();
   case Command_RateConfig:        return RateConfig();
+  case Command_TestConfig:        return TestConfig();
   case Command_AcpiDump:          return AcpiDump();
   case Command_Set:               return Set();
   case Command_Status:            return Status();

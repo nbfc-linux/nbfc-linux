@@ -66,6 +66,7 @@
 #include "file_utils.c"        // src
 #include "process.c"           // src
 #include "str_functions.c"     // src
+#include "lua_bindings.c"      // src
 
 #define             REGISTERS_SIZE 256
 typedef uint8_t     RegisterBuf[REGISTERS_SIZE];
@@ -84,7 +85,7 @@ static void         Handle_Signal(int);
 static Error        Map_Load(const char*);
 static bool         Map_LookupRegister(const char*, uint8_t*);
 
-static const EC_VTable* ec;
+const EC_VTable* ec;
 static volatile int quit;
 
 static int Read(void);

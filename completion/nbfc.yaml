@@ -197,6 +197,55 @@ positionals:
       ["file"]
     ]]
 ---
+prog: "nbfc test-config"
+help: "Test configurations automatically"
+---
+prog: "nbfc test-config run"
+help: "Test configurations and write a result file"
+options:
+  - option_strings: ["-i", "--input"]
+    metavar: "FILE"
+    help: "Specify input file"
+    complete: ["file"]
+
+  - option_strings: ["-o", "--output"]
+    metavar: "FILE"
+    help: "Specify output file"
+    complete: ["file"]
+
+  - option_strings: ["-g", "--gpu"]
+    metavar: "NUM"
+    help: "Specify number of GPU workers"
+    complete: ["range", 1, 255]
+
+  - option_strings: ["-c", "--cpu"]
+    metavar: "NUM"
+    help: "Specify number of CPU workers"
+    complete: ["range", 1, 255]
+
+  - option_strings: ["-I", "--interval"]
+    metavar: "SECONDS"
+    help: "Set sample interval (default: 0.5)"
+    complete: ["float"]
+
+  - option_strings: ["-t", "--threshold"]
+    metavar: "DELTA"
+    help: "Stop when temperature difference falls below DELTA (default: 2.0)"
+    complete: ["float"]
+
+  - option_strings: ["-b", "--break"]
+    metavar: "SECONDS"
+    help: "Stop after SECONDS of stable temperature"
+    complete: ["float"]
+---
+prog: "nbfc test-config evaluate"
+help: "Evaluate previously generated result file"
+options:
+  - option_strings: ["-i", "--input"]
+    metavar: "FILE"
+    help: "Specify input file"
+    complete: ["file"]
+---
 prog: "nbfc acpi-dump"
 help: "Dumps information of your ACPI DSDT"
 options:

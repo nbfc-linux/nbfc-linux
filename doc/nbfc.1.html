@@ -1,20 +1,21 @@
-<h1>NAME</h1>
+<h1 id="name">NAME</h1>
 <p>nbfc - Notebook FanControl client</p>
-<h1>DESCRIPTION</h1>
+<h1 id="description">DESCRIPTION</h1>
 <p>This program is used to control the NoteBook FanControl service.</p>
-<h1>SYNOPSIS</h1>
-<h2>SERVICE CONTROL COMMANDS</h2>
+<h1 id="synopsis">SYNOPSIS</h1>
+<h2 id="service-control-commands">SERVICE CONTROL COMMANDS</h2>
 <p><strong>nbfc</strong> {<strong>start</strong> | <strong>stop</strong>
 | <strong>restart</strong> | <strong>status</strong> |
 <strong>config</strong> | <strong>set</strong> |
 <strong>sensors</strong>} [<em>OPTIONS</em>]</p>
-<h2>MISCELLANEOUS COMMANDS</h2>
+<h2 id="miscellaneous-commands">MISCELLANEOUS COMMANDS</h2>
 <p><strong>nbfc</strong> {<strong>update</strong> |
-<strong>rate-config</strong> | <strong>acpi-dump</strong> |
-<strong>get-model-name</strong> | <strong>xml2json</strong> |
-<strong>support</strong> | <strong>warranty</strong> |
-<strong>faq</strong> | <strong>help</strong>} [<em>OPTIONS</em>]</p>
-<h1>OPTIONS</h1>
+<strong>rate-config</strong> | <strong>test-config</strong> |
+<strong>acpi-dump</strong> | <strong>get-model-name</strong> |
+<strong>xml2json</strong> | <strong>support</strong> |
+<strong>warranty</strong> | <strong>faq</strong> |
+<strong>help</strong>} [<em>OPTIONS</em>]</p>
+<h1 id="options">OPTIONS</h1>
 <p><strong>-h</strong>, <strong>--help</strong></p>
 <blockquote>
 <p>Show help message and exit.</p>
@@ -23,7 +24,7 @@
 <blockquote>
 <p>Show program's version number and exit.</p>
 </blockquote>
-<h1>COMMANDS</h1>
+<h1 id="commands">COMMANDS</h1>
 <p><strong>start</strong> [<em>OPTIONS</em>]</p>
 <blockquote>
 <p>Start the service.</p>
@@ -221,6 +222,71 @@ through the embedded controller cannot be guaranteed.</p>
 <p>Print configuration rating rules.</p>
 </blockquote>
 </blockquote>
+<p><strong>test-config</strong> {<strong>run</strong> |
+<strong>evaluate</strong>} [<em>OPTIONS</em>]</p>
+<blockquote>
+<p>Test configurations automatically.</p>
+<p>This command should only be used in conjunction with <strong>nbfc
+rate-config</strong>.</p>
+<p>For example:</p>
+<blockquote>
+<p><strong>sudo nbfc rate-config -aqq | sudo nbfc test-config
+run</strong></p>
+</blockquote>
+<p>It should <strong>not</strong> be used to test arbitrary
+configurations.</p>
+<p><strong>run</strong> [<em>OPTIONS</em>]</p>
+<blockquote>
+<p>Reads a list of configuration files from an input file (default:
+<strong>stdin</strong>).</p>
+<p>Configurations will be loaded in read-only mode.</p>
+<p>The notebook's fans will be spinned up by stressing the CPU/GPU while
+reading back the fan speed for each configuration.</p>
+<p>The result will be written to
+<strong>nbfc.test-config.result.json</strong>.</p>
+<p><strong>-i</strong>, <strong>--input</strong> <em>FILE</em></p>
+<blockquote>
+<p>Specify input file.</p>
+</blockquote>
+<p><strong>-o</strong>, <strong>--output</strong> <em>FILE</em></p>
+<blockquote>
+<p>Specify output file.</p>
+</blockquote>
+<p><strong>-c</strong>, <strong>--cpu</strong> <em>NUMBER</em></p>
+<blockquote>
+<p>Specify number of CPU workers.</p>
+</blockquote>
+<p><strong>-g</strong>, <strong>--gpu</strong> <em>NUMBER</em></p>
+<blockquote>
+<p>Specify number of GPU workers (default: <strong>no
+workers</strong>).</p>
+</blockquote>
+<p><strong>-I</strong>, <strong>--interval</strong> <em>SECONDS</em></p>
+<blockquote>
+<p>Set sample interval (default: <strong>0.5</strong>).</p>
+</blockquote>
+<p><strong>-t</strong>, <strong>--threshold</strong> <em>DELTA</em></p>
+<blockquote>
+<p>Stop when temperature difference falls below <em>DELTA</em> (default:
+<strong>2.0</strong>).</p>
+</blockquote>
+<p><strong>-b</strong>, <strong>--break</strong> <em>SECONDS</em></p>
+<blockquote>
+<p>Stop after the temperature difference has remained below
+<em>DELTA</em> for <em>SECONDS</em> consecutive seconds (default:
+<strong>10.0</strong>).</p>
+</blockquote>
+</blockquote>
+<p><strong>evaluate</strong> [<em>OPTIONS</em>]</p>
+<blockquote>
+<p>Evaluates a previously generated result file. Default:
+<strong>nbfc.test-config.result.json</strong>.</p>
+<p><strong>-i</strong>, <strong>--input</strong> <em>FILE</em></p>
+<blockquote>
+<p>Specify input file.</p>
+</blockquote>
+</blockquote>
+</blockquote>
 <p><strong>acpi-dump</strong> {<strong>registers</strong> |
 <strong>ec-registers</strong> | <strong>methods</strong> |
 <strong>dsl</strong> | <strong>map</strong>} [<em>OPTIONS</em>]</p>
@@ -324,7 +390,7 @@ NBFC project into the NBFC-Linux format.</p>
 <blockquote>
 <p>Show help.</p>
 </blockquote>
-<h1>FILES</h1>
+<h1 id="files">FILES</h1>
 <p><em>/etc/nbfc/nbfc.json</em></p>
 <blockquote>
 <p>The main configuration file for nbfc_service. See
@@ -364,7 +430,7 @@ directory take precedence over those in
 <blockquote>
 <p>State file of nbfc_service. This holds the current fan speeds.</p>
 </blockquote>
-<h1>EXIT STATUS</h1>
+<h1 id="exit-status">EXIT STATUS</h1>
 <blockquote>
 <ol start="0" type="1">
 <li><p>Everything fine</p></li>
@@ -374,11 +440,11 @@ directory take precedence over those in
 <li><p>Fatal error (memory allocation failure)</p></li>
 </ol>
 </blockquote>
-<h1>BUGS</h1>
+<h1 id="bugs">BUGS</h1>
 <p>Report bugs to https://github.com/nbfc-linux/nbfc-linux</p>
-<h1>AUTHOR</h1>
+<h1 id="author">AUTHOR</h1>
 <p>Benjamin Abendroth (braph93@gmx.de)</p>
-<h1>SEE ALSO</h1>
+<h1 id="see-also">SEE ALSO</h1>
 <p><strong>nbfc_service</strong>(1),
 <strong>nbfc_service.json</strong>(5), <strong>ec_probe</strong>(1),
 <strong>fancontrol</strong>(1)</p>

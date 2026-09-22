@@ -13,6 +13,8 @@ declare_array_of(ConfigFile);
 array_of(ConfigFile) List_All_Configs(void);
 array_of(ConfigFile) List_Recommended_Configs(void);
 
+Error ConfigFiles_FromFile(array_of(ConfigFile)*, const char*);
+
 char* Get_Supported_Config(array_of(ConfigFile)*, const char*);
 ConfigFile* ConfigFiles_Find(array_of(ConfigFile)*, const char*);
 ConfigFile* ConfigFiles_FindIgnoreCase(array_of(ConfigFile)*, const char*);

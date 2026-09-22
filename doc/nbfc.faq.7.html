@@ -1,10 +1,11 @@
-<h1>GENERAL</h1>
-<h2>What is NBFC-Linux?</h2>
+<h1 id="general">GENERAL</h1>
+<h2 id="what-is-nbfc-linux">What is NBFC-Linux?</h2>
 <p>NBFC-Linux is a C port of the original but unmaintained C# software
 NBFC (NoteBook FanControl). It allows to control the notebook's fans by
 accessing the embedded controller (EC) or invoking ACPI methods. It
 shares the same utilities and interfaces as the original NBFC.</p>
-<h2>What is the difference between NBFC and NBFC-Linux?</h2>
+<h2 id="what-is-the-difference-between-nbfc-and-nbfc-linux">What is the
+difference between NBFC and NBFC-Linux?</h2>
 <p>NBFC-Linux is specifically designed and optimized for the Linux
 ecosystem.</p>
 <p>It also comes with features that the original NBFC does not have,
@@ -19,14 +20,15 @@ such as:</p>
 <li><p>Shell autocompletion for Bash, Fish and Zsh.</p></li>
 </ul>
 </blockquote>
-<h1>INSTALLATION</h1>
-<h2>Where to get NBFC-Linux from?</h2>
+<h1 id="installation">INSTALLATION</h1>
+<h2 id="where-to-get-nbfc-linux-from">Where to get NBFC-Linux from?</h2>
 <p>NBFC-Linux can be downloaded from
 <em>https://github.com/nbfc-linux/nbfc-linux</em>.</p>
 <p>Packages are available for <strong>Ubuntu</strong>, <strong>Linux
 Mint</strong>, <strong>Debian</strong>, <strong>Fedora</strong>,
 <strong>OpenSuse</strong> and <strong>Arch Linux</strong>.</p>
-<h2>Which kernel modules are required?</h2>
+<h2 id="which-kernel-modules-are-required">Which kernel modules are
+required?</h2>
 <p>For accessing the embedded controller:</p>
 <blockquote>
 <ul>
@@ -44,21 +46,21 @@ Mint</strong>, <strong>Debian</strong>, <strong>Fedora</strong>,
 for some distributions)</p></li>
 </ul>
 </blockquote>
-<h1>CONFIGURATION</h1>
-<h2>Updating configurations</h2>
+<h1 id="configuration">CONFIGURATION</h1>
+<h2 id="updating-configurations">Updating configurations</h2>
 <p>To fetch the latest configuration files from the project repository,
 run:</p>
 <blockquote>
 <p><strong>sudo nbfc update</strong></p>
 </blockquote>
-<h2>Setting a configuration</h2>
+<h2 id="setting-a-configuration">Setting a configuration</h2>
 <p>To set a configuration, run:</p>
 <blockquote>
 <p><strong>sudo nbfc config --set</strong> <em>CONFIG</em></p>
 </blockquote>
 <p>Where <em>CONFIG</em> is the base filename of a configuration
 (without <strong>.json</strong> file extension).</p>
-<h2>Testing a configuration</h2>
+<h2 id="testing-a-configuration">Testing a configuration</h2>
 <p>When trying out configuration files, it is recommended to follow
 these steps:</p>
 <blockquote>
@@ -77,7 +79,8 @@ speed using <strong>nbfc status</strong></p></li>
 <strong>USAGE</strong></p></li>
 </ul>
 </blockquote>
-<h2>Finding a suitable configuration</h2>
+<h2 id="finding-a-suitable-configuration">Finding a suitable
+configuration</h2>
 <p><strong>Automatic detection</strong></p>
 <blockquote>
 <p>To automatically select a configuration that matches your notebook
@@ -108,7 +111,9 @@ configuration can be safely used on the device. <strong>It can actually
 be dangerous.</strong> Please only use configurations from this output
 if you are absolutely sure it is appropriate for your device.</p>
 </blockquote>
-<h2>Converting an XML model configuration from the original NBFC</h2>
+<h2
+id="converting-an-xml-model-configuration-from-the-original-nbfc">Converting
+an XML model configuration from the original NBFC</h2>
 <p>If you found a configuration that was made for the original NBFC
 project, you can convert it using:</p>
 <blockquote>
@@ -120,8 +125,9 @@ project, you can convert it using:</p>
 <p>Such configurations may be available in the
 <strong>NBFC-Revive</strong> project, see
 <em>https://github.com/UraniumDonut/nbfc-revive</em>.</p>
-<h1>ADVANCED CONFIGURATION</h1>
-<h2>Changing temperature sensors attached to a fan</h2>
+<h1 id="advanced-configuration">ADVANCED CONFIGURATION</h1>
+<h2 id="changing-temperature-sensors-attached-to-a-fan">Changing
+temperature sensors attached to a fan</h2>
 <p>If a model configuration does not configure sensors for a fan, then
 the default will be used, which is <strong>@CPU</strong>, meaning all
 CPU-associated sensors.</p>
@@ -158,24 +164,26 @@ temperature files)</p></li>
 use the <strong>Sensors</strong> field. It is recommended to use sensor
 groups, so that the configuration works on many systems regardless of
 the hardware.</p>
-<h2>Showing sensors attached to a fan</h2>
+<h2 id="showing-sensors-attached-to-a-fan">Showing sensors attached to a
+fan</h2>
 <p>To show all fans with their configured sensors, run:</p>
 <blockquote>
 <p><strong>nbfc sensors show</strong></p>
 </blockquote>
-<h2>Finding all available sensors</h2>
+<h2 id="finding-all-available-sensors">Finding all available
+sensors</h2>
 <p>To get a list of all available sensors, run:</p>
 <blockquote>
 <p><strong>nbfc sensors list</strong></p>
 </blockquote>
-<h1>USAGE</h1>
-<h2>Getting the service status</h2>
+<h1 id="usage">USAGE</h1>
+<h2 id="getting-the-service-status">Getting the service status</h2>
 <p>To get information about the service, including the notebook's fans,
 run:</p>
 <blockquote>
 <p><strong>nbfc status</strong></p>
 </blockquote>
-<h2>Setting the fan speed</h2>
+<h2 id="setting-the-fan-speed">Setting the fan speed</h2>
 <p>To set the speed of all available fans, run:</p>
 <blockquote>
 <p><strong>nbfc set -s</strong> <em>PERCENT</em></p>
@@ -192,14 +200,16 @@ run:</p>
 </blockquote>
 <p><strong>NOTE:</strong> <em>FAN</em> is a number starting from
 zero.</p>
-<h1>MISCELLANEOUS</h1>
-<h2>Starting NBFC-Linux automatically at boot time</h2>
+<h1 id="miscellaneous">MISCELLANEOUS</h1>
+<h2 id="starting-nbfc-linux-automatically-at-boot-time">Starting
+NBFC-Linux automatically at boot time</h2>
 <p>NBFC-Linux comes with a <strong>systemd</strong> service file.</p>
 <p>To enable NBFC-Linux to start on boot, run:</p>
 <blockquote>
 <p><strong>sudo systemctl enable nbfc_service.service</strong></p>
 </blockquote>
-<h2>Resetting the notebook's fans to the default behaviour</h2>
+<h2 id="resetting-the-notebooks-fans-to-the-default-behaviour">Resetting
+the notebook's fans to the default behaviour</h2>
 <p>If the model configuration file for the notebook has been written
 properly, then</p>
 <blockquote>
@@ -210,17 +220,21 @@ properly, then</p>
 <p>should reset the notebook's fans to their default behaviour.</p>
 <p>In 99% of cases, a reboot will also reset the embedded
 controller.</p>
-<h1>TROUBLESHOOTING</h1>
-<h2>Error: No such configuration available</h2>
+<h1 id="troubleshooting">TROUBLESHOOTING</h1>
+<h2 id="error-no-such-configuration-available">Error: No such
+configuration available</h2>
 <p>The selected config file (as referenced by
 <strong>SelectedConfigId</strong> in <em>/etc/nbfc/nbfc.json)</em> does
 not exist.</p>
-<h2>Error: No working implementation found for accessing the embedded
+<h2
+id="error-no-working-implementation-found-for-accessing-the-embedded-controller">Error:
+No working implementation found for accessing the embedded
 controller</h2>
 <p>Neither <strong>ec_sys</strong> nor <strong>acpi_ec</strong> kernel
 modules are available. Access through <em>/dev/port</em> is also not
 possible.</p>
-<h2>Error: /sys/kernel/debug/ec/ec0/io: Invalid argument</h2>
+<h2 id="error-syskerneldebugecec0io-invalid-argument">Error:
+/sys/kernel/debug/ec/ec0/io: Invalid argument</h2>
 <p>The <strong>ec_sys</strong> kernel module is loaded, but
 <strong>write_support</strong> is disabled.</p>
 <p>Edit <em>/etc/default/grub</em> and find the line
@@ -231,32 +245,35 @@ possible.</p>
 ec_sys.write_support=1"</strong></p>
 <p>Then run <strong>sudo update-grub</strong> and reboot your
 system.</p>
-<h2>Error: Could not load kernel module "acpi_call"</h2>
+<h2 id="error-could-not-load-kernel-module-acpi_call">Error: Could not
+load kernel module "acpi_call"</h2>
 <p>The <strong>acpi_call</strong> kernel module is missing. Install or
 build it as needed.</p>
-<h2>Error: /proc/acpi/call: AE_NOT_FOUND</h2>
+<h2 id="error-procacpicall-ae_not_found">Error: /proc/acpi/call:
+AE_NOT_FOUND</h2>
 <p>An unknown ACPI method was invoked. It usually indicates an incorrect
 or incompatible configuration.</p>
-<h1>NOTEBOOK FIRMWARE BACKGROUND</h1>
-<h2>What is an embedded controller (EC)?</h2>
+<h1 id="notebook-firmware-background">NOTEBOOK FIRMWARE BACKGROUND</h1>
+<h2 id="what-is-an-embedded-controller-ec">What is an embedded
+controller (EC)?</h2>
 <p>The embedded controller is a microcontroller within modern notebook
 computers. It manages system hardware functions such as fan speed,
 battery charging, keyboard control, LCD backlight and many more.</p>
-<h2>What is ACPI?</h2>
+<h2 id="what-is-acpi">What is ACPI?</h2>
 <p>The Advanced Configuration and Power Interface (ACPI) is an open
 industry standard for device configuration and power management. ACPI
 methods allow the operating system to control various hardware
 components.</p>
-<h1>CONFIGURATION DEVELOPMENT</h1>
-<h2>Safety Considerations</h2>
+<h1 id="configuration-development">CONFIGURATION DEVELOPMENT</h1>
+<h2 id="safety-considerations">Safety Considerations</h2>
 <p>Only interact with EC registers or ACPI methods you fully understand.
 Misuse can damage hardware. If possible, remove the battery while
 creating a configuration, as accidental modification to battery
 registers may brick the battery permanently.</p>
-<h2>Naming configuration files</h2>
+<h2 id="naming-configuration-files">Naming configuration files</h2>
 <p>Use the output of <strong>nbfc get-model-name</strong> as the
 configuration's filename.</p>
-<h2>How to analyze the firmware?</h2>
+<h2 id="how-to-analyze-the-firmware">How to analyze the firmware?</h2>
 <p>To get a list of all registers that are accessible through the
 embedded controller, run:</p>
 <blockquote>
@@ -278,17 +295,19 @@ embedded controller. Only write to registers that are listed by
 <blockquote>
 <p><strong>sudo nbfc acpi-dump dsl</strong></p>
 </blockquote>
-<h2>How to identify fan registers?</h2>
+<h2 id="how-to-identify-fan-registers">How to identify fan
+registers?</h2>
 <p>Search for registers named like <strong>FAN</strong>,
 <strong>RPM</strong>, <strong>PWM</strong>, etc.</p>
 <p>Examples: <strong>SFAN CFAN PFAN FAN1 FSW1 FRDC FTGC RPM1
 RPM2</strong></p>
-<h2>How to identify ACPI methods?</h2>
+<h2 id="how-to-identify-acpi-methods">How to identify ACPI methods?</h2>
 <p>Search for methods named like <strong>FAN</strong>,
 <strong>RPM</strong>, <strong>PWM</strong>, etc.</p>
 <p>Examples: <strong>FANG FANW GFSD SFSD SFNV FRSP STMM
 GFRM</strong></p>
-<h2>Accessing the embedded controller</h2>
+<h2 id="accessing-the-embedded-controller">Accessing the embedded
+controller</h2>
 <p>For reading a register:</p>
 <blockquote>
 <p><strong>sudo ec_probe read</strong> <em>REGISTER</em></p>
@@ -317,12 +336,13 @@ GFRM</strong></p>
 <p><strong>sudo ec_probe write_bit</strong> <em>REGISTER</em>
 <em>OFFSET</em> <em>VALUE</em></p>
 </blockquote>
-<h2>Invoking ACPI methods</h2>
+<h2 id="invoking-acpi-methods">Invoking ACPI methods</h2>
 <p>To call an ACPI method, run:</p>
 <blockquote>
 <p><strong>sudo ec_probe acpi_call '\METHOD ARGS...'</strong></p>
 </blockquote>
-<h2>Tracing embedded controller changes</h2>
+<h2 id="tracing-embedded-controller-changes">Tracing embedded controller
+changes</h2>
 <p>It may be useful to trace the registers of the embedded controller as
 the fan spins up and down.</p>
 <p>To do so, make sure the fan is at its lowest speed, then run:</p>
@@ -342,28 +362,30 @@ inspect the <em>OUTFILE.csv</em> for register changes.</p>
 <blockquote>
 <p><strong>ec_probe graph</strong> <em>OUTFILE.csv</em></p>
 </blockquote>
-<h2>Writing complex configurations with Lua</h2>
+<h2 id="writing-complex-configurations-with-lua">Writing complex
+configurations with Lua</h2>
 <p>Sometimes a firmware must be accessed in a more complex way than the
 NBFC software supports. For example, ACPI commands have to be
 constructed or the readings of the embedded controller have to be
 modified.</p>
 <p>See <strong>nbfc_service.json</strong>(5) for details.</p>
-<h2>Firmware Fingerprinting</h2>
+<h2 id="firmware-fingerprinting">Firmware Fingerprinting</h2>
 <p>Firmware fingerprinting is especially useful if a model configuration
 file uses <strong>ACPI WMI</strong> methods. Since these methods often
 have the same names but not the same implementation it is necessary to
 look for characteristics in the firmware that confirm it is the intended
 firmware.</p>
 <p>See <strong>nbfc_service.json</strong>(5) for details.</p>
-<h2>Getting Help</h2>
+<h2 id="getting-help">Getting Help</h2>
 <p>See <strong>nbfc_service.json</strong>(5) for details.</p>
 <p>For more information, see the <strong>Creating Model Configuration
 HowTo</strong>:
 <em>https://nbfc-linux.github.io/creating-config/</em>.</p>
 <p>For further assistance, visit the project at GitHub:
 <em>https://github.com/nbfc-linux/nbfc-linux</em>.</p>
-<h1>CONTRIBUTING</h1>
-<h2>Contributing a configuration file</h2>
+<h1 id="contributing">CONTRIBUTING</h1>
+<h2 id="contributing-a-configuration-file">Contributing a configuration
+file</h2>
 <p>When contributing a configuration file, please also attach your
 firmware. You can create an archive containing your firmware by
 running:</p>
@@ -373,11 +395,11 @@ running:</p>
 </blockquote>
 <p>This helps the developer validate your configuration and keep the
 register-name database up to date.</p>
-<h2>Contributing code</h2>
+<h2 id="contributing-code">Contributing code</h2>
 <p>Before contributing code, please open an issue and ask if the
 contribution is wanted. This helps avoid frustration and prevents
 unnecessary work.</p>
-<h2>Uploading your firmware</h2>
+<h2 id="uploading-your-firmware">Uploading your firmware</h2>
 <p>Uploading your notebook firmware helps the developer to understand
 existing configuration files.</p>
 <p>The following data will be transmitted:</p>
@@ -403,8 +425,8 @@ use:</p>
 <blockquote>
 <p><strong>nbfc support --print-command</strong></p>
 </blockquote>
-<h1>AUTHOR</h1>
+<h1 id="author">AUTHOR</h1>
 <p>Benjamin Abendroth (braph93@gmx.de)</p>
-<h1>SEE ALSO</h1>
+<h1 id="see-also">SEE ALSO</h1>
 <p><strong>nbfc</strong>(1), <strong>nbfc_service</strong>(1),
 <strong>nbfc_service.json</strong>(5), <strong>ec_probe</strong>(1)</p>

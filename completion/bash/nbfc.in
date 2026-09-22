@@ -84,6 +84,22 @@ _nbfc__parse_commandline() {
         -j|--json) VAR=OPT_json; ARGS=0; return;;
       esac
     esac
+    case "$1" in root:test-config:evaluate*)
+      case "$2" in
+        -i|--input) VAR=OPT_input; ARGS=1; return;;
+      esac
+    esac
+    case "$1" in root:test-config:run*)
+      case "$2" in
+        -i|--input) VAR=OPT_input; ARGS=1; return;;
+        -o|--output) VAR=OPT_output; ARGS=1; return;;
+        -g|--gpu) VAR=OPT_gpu; ARGS=1; return;;
+        -c|--cpu) VAR=OPT_cpu; ARGS=1; return;;
+        -I|--interval) VAR=OPT_interval; ARGS=1; return;;
+        -t|--threshold) VAR=OPT_threshold; ARGS=1; return;;
+        -b|--break) VAR=OPT_break; ARGS=1; return;;
+      esac
+    esac
     case "$1" in root:rate-config*)
       case "$2" in
         -H|--full-help) VAR=OPT_full_help; ARGS=0; return;;
@@ -205,6 +221,7 @@ _nbfc__parse_commandline() {
         case "$cmd|${#POSITIONALS[@]}" in
           'root|1') cmd+=":$arg";;
           'root:sensors|2') cmd+=":$arg";;
+          'root:test-config|2') cmd+=":$arg";;
           'root:acpi-dump|2') cmd+=":$arg";;
         esac
         ;;
@@ -250,8 +267,8 @@ _nbfc() {
   local -a OPT_algorithm OPT_sensor OPT_force OPT_parallel OPT_quiet
   local -a OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_input OPT_json
   local -a OPT_print_rules OPT_rules OPT_no_download OPT_unverified OPT_bad
-  local -a OPT_fan_count OPT_upload_firmware OPT_print_command
-  local -a OPT_create_archive
+  local -a OPT_fan_count OPT_output OPT_gpu OPT_cpu OPT_interval OPT_threshold
+  local -a OPT_break OPT_upload_firmware OPT_print_command OPT_create_archive
   _nbfc__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -265,6 +282,7 @@ _nbfc() {
       sensors) _nbfc_sensors && return 0;;
       update) _nbfc_update && return 0;;
       rate-config) _nbfc_rate_config && return 0;;
+      test-config) _nbfc_test_config && return 0;;
       acpi-dump) _nbfc_acpi_dump && return 0;;
       wait-for-hwmon);;
       get-model-name);;
@@ -286,7 +304,7 @@ _nbfc() {
   fi
 
   (( ${#POSITIONALS[@]} == 1 )) && {
-    COMPREPLY=($(compgen -W 'start stop restart status config set sensors update rate-config acpi-dump wait-for-hwmon get-model-name xml2json warranty support faq help' -- "$cur"))
+    COMPREPLY=($(compgen -W 'start stop restart status config set sensors update rate-config test-config acpi-dump wait-for-hwmon get-model-name xml2json warranty support faq help' -- "$cur"))
     return 0;
   }
 
@@ -659,6 +677,121 @@ _nbfc_rate_config() {
     COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}")
     return 0;
   }
+
+  return 1
+}
+
+_nbfc_test_config() {
+  if (( 1 < ${#POSITIONALS[@]} )); then
+    case "${POSITIONALS[1]}" in
+      run) _nbfc_test_config_run && return 0;;
+      evaluate) _nbfc_test_config_evaluate && return 0;;
+    esac
+  fi
+
+  (( ${#POSITIONALS[@]} == 2 )) && {
+    COMPREPLY=($(compgen -W 'run evaluate' -- "$cur"))
+    return 0;
+  }
+
+  return 1
+}
+
+_nbfc_test_config_run() {
+  __complete_option() {
+    local opt="$1" cur="$2" ret=0
+
+    case "$opt" in
+      -i|--input|-o|--output)
+        _filedir;;
+      -g|--gpu|-c|--cpu)
+        COMPREPLY=($(compgen -W '{1..255}' -- "$cur"));;
+      -@(-@(break|interval|threshold)|I|b|t));;
+      *) ret=1;;
+    esac
+
+    return $ret
+  }
+
+  case "$prev" in
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([h])[iogcItb])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
+    --*);;
+    -*([h])[iogcItb]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _nbfc__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
+  esac
+
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_input[@]} )) && opts+=(-i --input=)
+    (( ! ${#OPT_output[@]} )) && opts+=(-o --output=)
+    (( ! ${#OPT_gpu[@]} )) && opts+=(-g --gpu=)
+    (( ! ${#OPT_cpu[@]} )) && opts+=(-c --cpu=)
+    (( ! ${#OPT_interval[@]} )) && opts+=(-I --interval=)
+    (( ! ${#OPT_threshold[@]} )) && opts+=(-t --threshold=)
+    (( ! ${#OPT_break[@]} )) && opts+=(-b --break=)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  return 1
+}
+
+_nbfc_test_config_evaluate() {
+  __complete_option() {
+    local opt="$1" cur="$2" ret=0
+
+    case "$opt" in
+      -i|--input)
+        _filedir;;
+      *) ret=1;;
+    esac
+
+    return $ret
+  }
+
+  case "$prev" in
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([h])[i])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
+    --*);;
+    -*([h])[i]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _nbfc__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
+  esac
+
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_input[@]} )) && opts+=(-i --input=)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
 
   return 1
 }

@@ -27,9 +27,9 @@ else
 	LDFLAGS  = -s
 endif
 
-LDLIBS_CLIENT = -lcurl -lcrypto $(LUA_LDLIBS) $(XML_LDLIBS) -ldl
+LDLIBS_CLIENT = -lm -lcurl -lcrypto $(LUA_LDLIBS) $(XML_LDLIBS) -ldl
 LDLIBS_SERVICE = -lm $(LUA_LDLIBS) -ldl
-LDLIBS_EC_PROBE =
+LDLIBS_EC_PROBE = $(LUA_LDLIBS) -ldl
 
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(sysconfdir)\"    \
@@ -292,6 +292,7 @@ src/nbfc: \
 	src/client/cmd_start_stop.c \
 	src/client/cmd_status.c \
 	src/client/cmd_support.c \
+	src/client/cmd_test_config.c \
 	src/client/cmd_update.c \
 	src/client/cmd_warranty.c \
 	src/client/cmd_xml2json.c \
@@ -303,6 +304,8 @@ src/nbfc: \
 	src/client/dmi.h \
 	src/client/service_control.c \
 	src/client/service_control.h \
+	src/client/spearman.c \
+	src/client/spearman.h \
 	src/acpi_analysis.h src/acpi_analysis.c \
 	src/aml_analysis.h src/aml_analysis.c \
 	src/aml_lexer.h src/aml_lexer.c \
@@ -310,6 +313,10 @@ src/nbfc: \
 	src/config_analysis.h src/config_analysis.c \
 	src/config_rating.h src/config_rating.c \
 	src/config_rating_rules.h src/config_rating_rules.c \
+	src/ec.h src/ec.c \
+	src/ec_cache.h src/ec_cache.c \
+	src/ec_linux.h src/ec_linux.c \
+	src/ec_sys_linux.h src/ec_sys_linux.c \
 	src/error.h src/error.c \
 	src/help/ec_probe.help.h \
 	src/log.h src/log.c \
@@ -325,6 +332,7 @@ src/nbfc: \
 	src/register_write_configuration_utils.c src/register_write_configuration_utils.h \
 	src/str_functions.c \
 	src/str_functions.h \
+	src/stress.c src/stress.h \
 	src/vfio.c src/vfio.h \
 	src/xml2json.h src/xml2json.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/client.c -o src/nbfc $(LDLIBS_CLIENT) $(LDFLAGS)

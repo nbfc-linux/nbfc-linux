@@ -20,6 +20,7 @@
  "    get-model-name      Print out model name\n"                              \
  "    acpi-dump           Dumps information of your ACPI DSDT\n"               \
  "    rate-config         Rate a configuration file\n"                         \
+ "    test-config         Test configuration files automatically\n"            \
  "    xml2json            Convert an XML configuration to JSON\n"              \
  "    help                Show help\n"                                         \
  "    support             Show how to support the project\n"                   \
@@ -95,6 +96,45 @@
  "  -q, --quiet           Do not print register ratings\n"                     \
  "  --print-rules         Print configuration rating rules\n"                  \
  ""
+
+#define CLIENT_TEST_CONFIG_HELP_TEXT                                           \
+ "Usage: nbfc test-config (run | evaluate) [OPTIONS]\n"                        \
+ "\n"                                                                          \
+ "Test configurations automatically.\n"                                        \
+ "\n"                                                                          \
+ "This command should only be used in conjunction with `nbfc rate-config`.\n"  \
+ "\n"                                                                          \
+ "For example:\n"                                                              \
+ "\n"                                                                          \
+ "    sudo nbfc rate-config -aqq | sudo nbfc test-config run\n"                \
+ "\n"                                                                          \
+ "It should NOT be used to test arbitrary configurations.\n"                   \
+ "\n"                                                                          \
+ "Commands:\n"                                                                 \
+ "  run [-i|--input INPUT] [-o|--output OUTPUT] [OPTION]\n"                    \
+ "    Reads a list of configuration files from INPUT (default: STDIN)\n"       \
+ "    Configurations will be loaded in read-only mode.\n"                      \
+ "    The notebook's fans will be spinned up by stressing the CPU/GPU while\n" \
+ "    reading back the fan speed for each configuration.\n"                    \
+ "    A report will be written to OUTPUT (default: nbfc.test-config.result.json)\n"\
+ "\n"                                                                          \
+ "      -c, --cpu NUMBER\n"                                                    \
+ "                        Set number of CPU workers\n"                         \
+ "      -g, --gpu NUMBER\n"                                                    \
+ "                        Set number of GPU workers (default: no workers)\n"   \
+ "      -I, --interval SECONDS\n"                                              \
+ "                        Set sample interval (default: 0.5)\n"                \
+ "      -t, --threshold DELTA\n"                                               \
+ "                        Stop when temperature difference falls below DELTA\n"\
+ "                        (default: 2.0)\n"                                    \
+ "      -b, --break SECONDS\n"                                                 \
+ "                        Stop after the temperature difference has remained\n"\
+ "                        below DELTA for SECONDS consecutive seconds\n"       \
+ "                        (default: 10.0)\n"                                   \
+ "\n"                                                                          \
+ "  evaluate [-i|--input INPUT]\n"                                             \
+ "    Evaluates a previously generated report file (default: nbfc.test-config.result.json)\n"\
+ ""                                                                            \
 
 #define CLIENT_ACPI_DUMP_HELP_TEXT                                             \
  "Usage: nbfc acpi-dump [-h] [-j|--json] [-d|--dsdt=FILE] <COMMAND>\n"         \

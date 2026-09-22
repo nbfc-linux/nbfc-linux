@@ -125,6 +125,44 @@ array_of(ConfigFile) List_All_Configs(void) {
   return c;
 }
 
+/*
+ * Fill an array (`out`) with all non-empty lines found in `file`.
+ */
+Error ConfigFiles_FromFile(array_of(ConfigFile)* out, const char* file) {
+  char* content;
+  FileResult res;
+
+  out->size = 0;
+  out->data = NULL;
+
+  // Read the file
+  res = File_ReadDynamic(&content, file);
+  if (! res.ok)
+    return err_stdlib(NULL);
+
+  // Allocate space
+  array_calloc(ConfigFile, *out, (str_count_newlines(content) + 2));
+
+  // Populate files array with lines
+  char* line = content;
+  for (char* p = content; *p; ++p) {
+    if (*p == '\n') {
+      *p = '\0';
+
+      if (strlen(line))
+        out->data[out->size++].config_name = Mem_Strdup(line);
+
+      line = p + 1;
+    }
+  }
+
+  if (strlen(line))
+    out->data[out->size++].config_name = Mem_Strdup(line);
+
+  Mem_Free(content);
+  return err_success();
+}
+
 // List all configs (in the static config directory as well as in the mutable config directory).
 // The `diff` field of the ConfigFile structure will also be set.
 array_of(ConfigFile) List_Recommended_Configs(void) {

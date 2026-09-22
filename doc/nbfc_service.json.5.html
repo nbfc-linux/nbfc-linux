@@ -1,9 +1,9 @@
-<h1>NAME</h1>
+<h1 id="name">NAME</h1>
 <p>nbfc_service.json - Notebook FanControl service configuration</p>
-<h1>CONFIGURATION</h1>
+<h1 id="configuration">CONFIGURATION</h1>
 <p><strong>NOTE</strong>: Comments can be added in any JSON object by
 using the <strong>Comment</strong> or the <strong>#</strong> field.</p>
-<h2>ServiceConfig</h2>
+<h2 id="serviceconfig">ServiceConfig</h2>
 <p>Main configuration file of nbfc_service
 (<em>/etc/nbfc/nbfc.json</em>).</p>
 <p><strong>SelectedConfigId</strong>: <em>String</em></p>
@@ -33,7 +33,7 @@ FanTemperatureSourceConfig</em></p>
 <blockquote>
 <p>Used for configuring which sensors are attached to a fan.</p>
 </blockquote>
-<h2>FanTemperatureSourceConfig</h2>
+<h2 id="fantemperaturesourceconfig">FanTemperatureSourceConfig</h2>
 <p>Configures which sensors are attached to a fan.</p>
 <p><strong>FanIndex</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
 <em>Integer</em> &lt;= 255</p>
@@ -50,14 +50,14 @@ FanTemperatureSourceConfig</em></p>
 <p>See
 <strong>FanConfiguration</strong>-&gt;<strong>Sensors</strong>.</p>
 </blockquote>
-<h2>ServiceState</h2>
+<h2 id="servicestate">ServiceState</h2>
 <p>State file of the service (<em>/var/lib/nbfc/state.json</em>).</p>
 <p><strong>TargetFanSpeeds</strong>: <em>Array of Float</em></p>
 <blockquote>
 <p>This holds the fixed speed of the fans. A value of
 <strong>-1</strong> means the fan should be left in auto mode.</p>
 </blockquote>
-<h2>ModelConfig</h2>
+<h2 id="modelconfig">ModelConfig</h2>
 <p><strong>NotebookModel</strong>: <em>String</em></p>
 <blockquote>
 <p>The Notebook Model as described in your BIOS. See <strong>nbfc
@@ -134,7 +134,7 @@ RegisterWriteConfiguration</em></p>
 <blockquote>
 <p>Array of RegisterWriteConfiguration</p>
 </blockquote>
-<h2>FanConfiguration</h2>
+<h2 id="fanconfiguration">FanConfiguration</h2>
 <p>Defines how NBFC controls a fan.</p>
 <p><strong>FanDisplayName</strong>: <em>String</em></p>
 <blockquote>
@@ -309,7 +309,7 @@ FanSpeedPercentageOverride</em></p>
 <blockquote>
 <p>Overrides the default algorithm to calculate fan speeds.</p>
 </blockquote>
-<h2>RegisterWriteConfiguration</h2>
+<h2 id="registerwriteconfiguration">RegisterWriteConfiguration</h2>
 <p>Allows to write to any EC register.</p>
 <p><strong>WriteMode</strong>: <em>String</em></p>
 <blockquote>
@@ -400,7 +400,7 @@ time.</p>
 <p>A short description of what effect the
 <strong>RegisterWriteConfiguration</strong> will have.</p>
 </blockquote>
-<h2>FanSpeedPercentageOverride</h2>
+<h2 id="fanspeedpercentageoverride">FanSpeedPercentageOverride</h2>
 <p>Overrides the default algorithm to calculate fan speeds.</p>
 <p><strong>FanSpeedPercentage</strong>: <em>Float</em> &gt;= 0.0
 &amp;&amp; <em>Float</em> &lt;= 100.0</p>
@@ -431,7 +431,7 @@ operations.</p></li>
 </ul>
 </blockquote>
 </blockquote>
-<h2>TemperatureThreshold</h2>
+<h2 id="temperaturethreshold">TemperatureThreshold</h2>
 <p>Defines how fast the fan runs at different temperatures.</p>
 <p><strong>UpThreshold</strong>: <em>Integer</em></p>
 <blockquote>
@@ -448,12 +448,12 @@ falls below the <em>DownThreshold</em> (in celsius).</p>
 <blockquote>
 <p>The fan speed in percent.</p>
 </blockquote>
-<h1>LUA CODE</h1>
+<h1 id="lua-code">LUA CODE</h1>
 <p>NBFC-Linux allows executing <strong>Lua</strong> code to implement
 more complex read or write operations.</p>
 <p>Lua code can be specified as either a <em>String</em> or an <em>Array
 of String</em>.</p>
-<h2>Return Values</h2>
+<h2 id="return-values">Return Values</h2>
 <p>Every Lua code must return exactly to values: <strong>Error</strong>,
 <strong>Result.</strong></p>
 <p><strong>Error</strong> is either <strong>nil</strong> (on success) or
@@ -461,7 +461,7 @@ a <strong>string</strong> describing the error (on failure).</p>
 <p><strong>Result</strong> is an <strong>integer</strong> and is used
 for read operations. For write operations this value is ignored
 (returning <strong>0</strong> is recommended).</p>
-<h2>Availabe Lua Functions</h2>
+<h2 id="availabe-lua-functions">Availabe Lua Functions</h2>
 <p>The following functions are exposed to Lua:</p>
 <p><strong>acpi_call</strong>(<strong>method</strong>):</p>
 <blockquote>
@@ -508,22 +508,22 @@ e, v = acpi_get_int(result, "1 0")<br />
 <p>Writes a 16-bit value to a two-byte register. Returns
 <strong>error</strong>, <strong>0</strong>.</p>
 </blockquote>
-<h2>Lua Libraries</h2>
+<h2 id="lua-libraries">Lua Libraries</h2>
 <p>To keep memory usage as low as possible, no Lua libraries are loaded
 by default. They must be explicitly loaded when needed. See
 <strong>ModelConfig</strong>-&gt;<strong>LuaLibraries</strong> for
 details.</p>
-<h2>Coding Conventions</h2>
+<h2 id="coding-conventions">Coding Conventions</h2>
 <p>If possible, use the variables <strong>e</strong> (error) and
 <strong>v</strong> (value) for capturing the result of NBFC
 functions.</p>
-<h2>Testing Configuration</h2>
+<h2 id="testing-configuration">Testing Configuration</h2>
 <p>If a configuration uses Lua code, ensure that it works correctly with
 <strong>nbfc rate-config</strong>. During rating, <strong>nbfc
 rate-config</strong> replaces all NBFC-specific Lua functions with dummy
 implementations that always return <strong>nil</strong>,
 <strong>1</strong>.</p>
-<h1>FIRMWARE FINGERPRINTING</h1>
+<h1 id="firmware-fingerprinting">FIRMWARE FINGERPRINTING</h1>
 <p>Firmware fingerprinting can be used to ensure that a configuration
 file matches a specific notebook firmware.</p>
 <p>This is especially important for configurations that invoke WMI
@@ -534,7 +534,7 @@ insufficient to determine whether a configuration is compatible with a
 specific firmware.</p>
 <p>Fingerprinting allows AML methods to be analyzed for specific code
 patterns.</p>
-<h2>Fingerprint Syntax</h2>
+<h2 id="fingerprint-syntax">Fingerprint Syntax</h2>
 <p>Fingerprints are written using AML syntax. A fingerprint always
 begins with a method definition, followed by AML code that is searched
 for within the method body.</p>
@@ -590,7 +590,7 @@ FMTH()</p></li>
 </ul>
 </blockquote>
 </blockquote>
-<h2>Matching Rules</h2>
+<h2 id="matching-rules">Matching Rules</h2>
 <blockquote>
 <ul>
 <li><p>Whitespace is ignored</p></li>
@@ -600,7 +600,7 @@ FMTH()</p></li>
 <li><p>Intermediate code between matched blocks is ignored</p></li>
 </ul>
 </blockquote>
-<h2>Recommendations</h2>
+<h2 id="recommendations">Recommendations</h2>
 <p>When writing fingerprints:</p>
 <blockquote>
 <ul>
@@ -617,7 +617,7 @@ matching a direct child block is required. A common example is matching
 statement, where only direct descendants should be considered.</p></li>
 </ul>
 </blockquote>
-<h1>FILES</h1>
+<h1 id="files">FILES</h1>
 <p><em>/etc/nbfc/nbfc.json</em></p>
 <blockquote>
 <p>The main configuration file for nbfc_service.</p>
@@ -655,9 +655,9 @@ directory take precedence over those in
 <blockquote>
 <p>State file of nbfc_service. This holds the current fan speeds.</p>
 </blockquote>
-<h1>AUTHOR</h1>
+<h1 id="author">AUTHOR</h1>
 <p>Benjamin Abendroth (braph93@gmx.de)</p>
-<h1>SEE ALSO</h1>
+<h1 id="see-also">SEE ALSO</h1>
 <p><strong>nbfc</strong>(1), <strong>nbfc_service</strong>(1),
 <strong>ec_probe</strong>(1), <strong>fancontrol</strong>(1),
 <strong>sensors</strong>(1)</p>

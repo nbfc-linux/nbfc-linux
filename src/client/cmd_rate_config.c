@@ -649,46 +649,23 @@ static Error RateConfig_RateFromFile(
   enum RateConfig_Filter bad_filter
 ) {
   Error e;
-  char* content;
-  FileResult res;
-  array_of(ConfigFile) files;
+  array_of(ConfigFile) files = {0};
 
   // Check for '-'
   if (! strcmp(file, "-"))
     file = "/dev/stdin";
 
-  // Read the file
-  res = File_ReadDynamic(&content, file);
-  if (! res.ok)
-    return err_stdlib(file);
-
-  // Allocate space
-  files.size = 0;
-  array_calloc(ConfigFile, files, (str_count_newlines(content) + 1));
-
-  // Populate files array with lines
-  char* line = content;
-  for (char* p = content; *p; ++p) {
-    if (*p == '\n') {
-      *p = '\0';
-
-      if (strlen(line))
-        files.data[files.size++].config_name = line;
-
-      line = p + 1;
-    }
-  }
-
-  if (strlen(line))
-    files.data[files.size++].config_name = line;
+  // Read config files from file
+  e = ConfigFiles_FromFile(&files, file);
+  if (e)
+    return err_chain_string(e, file);
 
   // Do the rating
   e = RateConfig_RateMany(config_rating, &files, json, min_score, bad_filter);
 
   // Free
 #if STRICT_CLEANUP
-  Mem_Free(content);
-  Mem_Free(files.data);
+  ConfigFiles_Free(&files);
 #endif
 
   return e;

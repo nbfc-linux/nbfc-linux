@@ -15,17 +15,17 @@ ecosystem.
 It also comes with features that the original NBFC does not have, such
 as:
 
-> -   Configuration rating (**nbfc rate-config**)
+> - Configuration rating (**nbfc rate-config**)
 >
-> -   Support for calling ACPI methods
+> - Support for calling ACPI methods
 >
-> -   Lua scripting
+> - Lua scripting
 >
-> -   Online configuration fetching
+> - Online configuration fetching
 >
-> -   Firmware fingerprinting
+> - Firmware fingerprinting
 >
-> -   Shell autocompletion for Bash, Fish and Zsh.
+> - Shell autocompletion for Bash, Fish and Zsh.
 
 # INSTALLATION
 
@@ -41,18 +41,18 @@ Packages are available for **Ubuntu**, **Linux Mint**, **Debian**,
 
 For accessing the embedded controller:
 
-> -   **ec_sys** (most preferred)
+> - **ec_sys** (most preferred)
 >
-> -   **acpi_ec** (needs to be manually installed, see
->     *https://github.com/saidsay-so/acpi_ec*).
+> - **acpi_ec** (needs to be manually installed, see
+>   *https://github.com/saidsay-so/acpi_ec*).
 >
 > The embedded controller can also be accessed through */dev/port*
 > (without any kernel module).
 
 For invoking ACPI methods:
 
-> -   **acpi_call** (manual compilation may be required for some
->     distributions)
+> - **acpi_call** (manual compilation may be required for some
+>   distributions)
 
 # CONFIGURATION
 
@@ -77,21 +77,21 @@ Where *CONFIG* is the base filename of a configuration (without
 When trying out configuration files, it is recommended to follow these
 steps:
 
-> -   Set the configuration using **sudo nbfc config \--set** *CONFIG*
+> - Set the configuration using **sudo nbfc config \--set** *CONFIG*
 >
-> -   Start the service in read-only mode using **sudo nbfc restart
->     \--read-only**
+> - Start the service in read-only mode using **sudo nbfc restart
+>   \--read-only**
 >
-> -   Let the fan spin up and down by stressing the CPU (using **stress
->     -c 8**)
+> - Let the fan spin up and down by stressing the CPU (using **stress -c
+>   8**)
 >
-> -   Check if the reported fan speed matches the real (physical) fan
->     speed using **nbfc status**
+> - Check if the reported fan speed matches the real (physical) fan
+>   speed using **nbfc status**
 >
-> -   If this is the case, restart the service in write-mode using
->     **sudo nbfc restart**
+> - If this is the case, restart the service in write-mode using **sudo
+>   nbfc restart**
 >
-> -   Now you can change the fan speed. See **USAGE**
+> - Now you can change the fan speed. See **USAGE**
 
 ## Finding a suitable configuration
 
@@ -155,21 +155,20 @@ To override the default sensors, use this command:
 
 *ALGORITHM* is one of:
 
-> -   **Min** (take the minimum temperature among all specified sensors)
+> - **Min** (take the minimum temperature among all specified sensors)
 >
-> -   **Max** (take the maximum temperature among all specified sensors)
+> - **Max** (take the maximum temperature among all specified sensors)
 >
-> -   **Average** (calculate the average temperature among all specified
->     sensors; default)
+> - **Average** (calculate the average temperature among all specified
+>   sensors; default)
 
 *SENSOR* may either be a:
 
-> -   **temperature file**
+> - **temperature file**
 >
-> -   **sensor name** (which will result in one or more temperature
->     files)
+> - **sensor name** (which will result in one or more temperature files)
 >
-> -   **sensor group **(**\@CPU**, **\@GPU**)
+> - **sensor group** (**\@CPU**, **\@GPU**)
 
 **NOTE:** If you are writing model configuration files, use the
 **Sensors** field. It is recommended to use sensor groups, so that the
@@ -445,16 +444,15 @@ existing configuration files.
 
 The following data will be transmitted:
 
-> -   The **laptop manufacturer**
->     (*/sys/devices/virtual/dmi/id/sys_vendor*)
+> - The **laptop manufacturer**
+>   (*/sys/devices/virtual/dmi/id/sys_vendor*)
 >
-> -   The **laptop model** (*/sys/devices/virtual/dmi/id/product_name*)
+> - The **laptop model** (*/sys/devices/virtual/dmi/id/product_name*)
 >
-> -   The **ACPI DSDT** firmware table
->     (*/sys/firmware/acpi/tables/DSDT*)
+> - The **ACPI DSDT** firmware table (*/sys/firmware/acpi/tables/DSDT*)
 >
-> -   The **ACPI SSDT** firmware tables
->     (*/sys/firmware/acpi/tables/SSDT\**)
+> - The **ACPI SSDT** firmware tables
+>   (*/sys/firmware/acpi/tables/SSDT\**)
 
 The preferred method for uploading your notebook firmware is to use:
 

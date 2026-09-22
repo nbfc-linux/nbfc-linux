@@ -20,13 +20,13 @@ Main configuration file of nbfc_service (*/etc/nbfc/nbfc.json*).
 
 > Selects the implementation used to access the embedded controller.
 >
-> > -   **ec_sys**: Use the ec_sys kernel module.
+> > - **ec_sys**: Use the ec_sys kernel module.
 > >
-> > -   **acpi_ec**: Use the acpi_ec kernel module.
+> > - **acpi_ec**: Use the acpi_ec kernel module.
 > >
-> > -   **dev_port**: Access the embedded controller via /dev/port.
+> > - **dev_port**: Access the embedded controller via /dev/port.
 > >
-> > -   **dummy**: Do not access the embedded controller at all.
+> > - **dummy**: Do not access the embedded controller at all.
 >
 > If not given, the embedded controller type will be automatically
 > selected.
@@ -107,21 +107,21 @@ State file of the service (*/var/lib/nbfc/state.json*).
 >
 > Available libraries:
 >
-> -   **base**: Provides core global functions.
+> - **base**: Provides core global functions.
 >
-> -   **math**: Provides standard mathematical functions and constants.
+> - **math**: Provides standard mathematical functions and constants.
 >
-> -   **string**: Provides functions for pattern matching and basic
->     string manipulation.
+> - **string**: Provides functions for pattern matching and basic string
+>   manipulation.
 >
-> -   **table**: Provides utilities for creating and manipulating tables
->     (arrays and dictionaries).
+> - **table**: Provides utilities for creating and manipulating tables
+>   (arrays and dictionaries).
 >
-> -   **io**: Provides file input/output facilities and stream-based I/O
->     operations.
+> - **io**: Provides file input/output facilities and stream-based I/O
+>   operations.
 >
-> -   **os**: Provides operating system interface functions such as
->     time, environment, and process control.
+> - **os**: Provides operating system interface functions such as time,
+>   environment, and process control.
 
 **FirmwareFingerprint**: *Array of String*
 
@@ -163,7 +163,7 @@ Defines how NBFC controls a fan.
 
 **ReadLuaCode**: *String* or *Array of String*
 
-> The Lua code to be executed for reading the fan speed. See** LUA
+> The Lua code to be executed for reading the fan speed. See **LUA
 > CODE**.
 >
 > Example:
@@ -195,7 +195,7 @@ Defines how NBFC controls a fan.
 
 **WriteLuaCode**: *String* or *Array of String*
 
-> The Lua code to execute for writing the fan speed. See** LUA CODE**.
+> The Lua code to execute for writing the fan speed. See **LUA CODE**.
 >
 > Example:
 >
@@ -254,7 +254,7 @@ Defines how NBFC controls a fan.
 
 **ResetLuaCode**: *String* or *Array of String*
 
-> The Lua code to be executed upon fan reset. See** LUA CODE**.
+> The Lua code to be executed upon fan reset. See **LUA CODE**.
 >
 > This option is mutually exclusive to **FanSpeedResetValue** and
 > **ResetAcpiMethod**. Only one of them can be set at a time.
@@ -266,24 +266,22 @@ Defines how NBFC controls a fan.
 >
 > Available groups:
 >
-> -   **\@CPU**: Uses all sensors named **coretemp**, **k10temp** or
->     **zenpower**
+> - **\@CPU**: Uses all sensors named **coretemp**, **k10temp** or
+>   **zenpower**
 >
-> -   **\@GPU**: Uses all sensors named **amdgpu**, **nvidia**,
->     **nvidia-ml**, **nouveau** or **radeon**
+> - **\@GPU**: Uses all sensors named **amdgpu**, **nvidia**,
+>   **nvidia-ml**, **nouveau** or **radeon**
 
 **TemperatureAlgorithmType**: *String*
 
 > Specify the algorithm type to compute the temperature.
 >
-> -   **Average**: Computes the average temperature from all specified
->     sensors (default)
+> - **Average**: Computes the average temperature from all specified
+>   sensors (default)
 >
-> -   **Min**: Selects the lowest temperature among all specified
->     sensors
+> - **Min**: Selects the lowest temperature among all specified sensors
 >
-> -   **Max**: Selects the highest temperature among all specified
->     sensors
+> - **Max**: Selects the highest temperature among all specified sensors
 
 **TemperatureThresholds**: *Array of TemperatureThreshold*
 
@@ -301,30 +299,30 @@ Allows to write to any EC register.
 
 > Defines how the value will be written:
 >
-> -   **Set**: overwrites the register with the specified value
->     (register = value)
+> - **Set**: overwrites the register with the specified value (register
+>   = value)
 >
-> -   **And**: performs a binary AND operation (register = register &
->     value)
+> - **And**: performs a binary AND operation (register = register &
+>   value)
 >
-> -   **Or**: performs a binary OR operation (register = register \|
->     value)
+> - **Or**: performs a binary OR operation (register = register \|
+>   value)
 >
-> -   **Call**: calls the ACPI method stored in **AcpiMethod** or
->     **ResetAcpiMethod**
+> - **Call**: calls the ACPI method stored in **AcpiMethod** or
+>   **ResetAcpiMethod**
 >
-> -   **Lua**: executes the Lua code stored in **LuaCode** or
->     **ResetLuaCode**
+> - **Lua**: executes the Lua code stored in **LuaCode** or
+>   **ResetLuaCode**
 
 **WriteOccasion**: *String*
 
 > Defines when the value should be written:
 >
-> -   **OnInitialization**: writes the value once upon initialization
->     (everytime the fan control service starts).
+> - **OnInitialization**: writes the value once upon initialization
+>   (everytime the fan control service starts).
 >
-> -   **OnWriteFanSpeed**: writes the value everytime the fan speed is
->     set.
+> - **OnWriteFanSpeed**: writes the value everytime the fan speed is
+>   set.
 
 **Register**: *Integer* \>= 0 && *Integer* \<= 255
 
@@ -346,7 +344,7 @@ Allows to write to any EC register.
 
 **LuaCode**: *String* or *Array of String*
 
-> The Lua code to be executed. See** LUA CODE**.
+> The Lua code to be executed. See **LUA CODE**.
 >
 > This option is mutually exclusive to **Value** and **AcpiMethod**.
 > Only one of them can be set at a time.
@@ -372,7 +370,7 @@ Allows to write to any EC register.
 
 **ResetLuaCode**: *String* or *Array of String*
 
-> The Lua code to be executed upon reset. See** LUA CODE**.
+> The Lua code to be executed upon reset. See **LUA CODE**.
 >
 > This option is mutually exclusive to **ResetValue** and
 > **ResetAcpiMethod**. Only one of them can be set at a a time.
@@ -402,15 +400,15 @@ Overrides the default algorithm to calculate fan speeds.
 
 > Defines for which operations the speeds should be overridden:
 >
-> > -   **Read**: if the value in the EC\'s ReadRegister is equal to
-> >     **FanSpeedValue**, the corresponding percentage will not be
-> >     calculated, but instead be set to **FanSpeedPercentage**.
+> > - **Read**: if the value in the EC\'s ReadRegister is equal to
+> >   **FanSpeedValue**, the corresponding percentage will not be
+> >   calculated, but instead be set to **FanSpeedPercentage**.
 > >
-> > -   **Write**: if the target fan speed percentage is equal to
-> >     **FanSpeedPercentage**, the corresponding value will not be
-> >     calculated, but instead be set to **FanSpeedValue**.
+> > - **Write**: if the target fan speed percentage is equal to
+> >   **FanSpeedPercentage**, the corresponding value will not be
+> >   calculated, but instead be set to **FanSpeedValue**.
 > >
-> > -   **ReadWrite**: applies to both, read and write operations.
+> > - **ReadWrite**: applies to both, read and write operations.
 
 ## TemperatureThreshold
 
@@ -545,7 +543,7 @@ Example:
 
 > Given the following method:
 >
-> > Method (\FOO, 2, Serialized) {
+> >     Method (\FOO, 2, Serialized) {
 > >         SMTH()
 > >
 > >         Switch (Arg0) {
@@ -560,57 +558,57 @@ Example:
 >
 > The following patterns would **match**:
 >
-> > -   Method(\\FOO)
+> > - Method(\\FOO)
 > >
-> > -   Method(\\FOO) { \... 0xDEAD
+> > - Method(\\FOO) { \... 0xDEAD
 > >
-> > -   Method(\\FOO) { \... 0xBEEF
+> > - Method(\\FOO) { \... 0xBEEF
 > >
-> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD)
+> > - Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD)
 > >
-> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \... If
-> >     (Arg1 == 0xBEEF)
+> > - Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \... If
+> >   (Arg1 == 0xBEEF)
 > >
-> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \... If
-> >     (Arg1 == 0xBEEF) { \... FMTH()
+> > - Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \... If
+> >   (Arg1 == 0xBEEF) { \... FMTH()
 > >
-> > -   Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \...
-> >     FMTH()
+> > - Method(\\FOO) { \... Switch (Arg0) { .. Case (0xDEAD) { \...
+> >   FMTH()
 >
 > The following patterns would **not match**:
 >
-> > -   Method(\\FOO) { .. 0xDEAD
+> > - Method(\\FOO) { .. 0xDEAD
 > >
-> > -   Method(\\FOO) { Switch (Arg0)
+> > - Method(\\FOO) { Switch (Arg0)
 
 ## Matching Rules
 
-> -   Whitespace is ignored
+> - Whitespace is ignored
 >
-> -   Comments are ignored
+> - Comments are ignored
 >
-> -   Only the basename of the identifiers are matched
+> - Only the basename of the identifiers are matched
 >
-> -   Only scope hierarchy and ordering are considered
+> - Only scope hierarchy and ordering are considered
 >
-> -   Intermediate code between matched blocks is ignored
+> - Intermediate code between matched blocks is ignored
 
 ## Recommendations
 
 When writing fingerprints:
 
-> -   Match magic numbers used by WMI method calls whenever possible
+> - Match magic numbers used by WMI method calls whenever possible
 >
-> -   Do not use fully qualified identifiers (use **FOO** instead of
->     **\\\_SB.DEV0.FOO**)
+> - Do not use fully qualified identifiers (use **FOO** instead of
+>   **\\\_SB.DEV0.FOO**)
 >
-> -   Avoid unnecessary parentheses, as they are ignored during matching
->     (use **If (FOO == 0x0)** instead of **If ((Foo == 0x0))**)
+> - Avoid unnecessary parentheses, as they are ignored during matching
+>   (use **If (FOO == 0x0)** instead of **If ((Foo == 0x0))**)
 >
-> -   The **..** operator should only be used when matching a direct
->     child block is required. A common example is matching **Case()**
->     blocks within a **Switch()** statement, where only direct
->     descendants should be considered.
+> - The **..** operator should only be used when matching a direct child
+>   block is required. A common example is matching **Case()** blocks
+>   within a **Switch()** statement, where only direct descendants
+>   should be considered.
 
 # FILES
 

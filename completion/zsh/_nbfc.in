@@ -128,6 +128,7 @@ _nbfc__command() {
     sensors:'Configure fan sensors'
     update:'Download new configuration files'
     rate-config:'Rate a configuration file'
+    test-config:'Test configurations automatically'
     acpi-dump:'Dumps information of your ACPI DSDT'
     wait-for-hwmon:'Wait for /sys/class/hwmon/hwmon* files'
     get-model-name:'Print model name for notebook'
@@ -153,6 +154,15 @@ _nbfc_sensors__command() {
     list:'List available sensors and temperature files'
     show:'Show all available fans with their configuration'
     set:'Configure sensors and algorithm type for a fan'
+  )
+
+  _describe -- command items
+}
+
+_nbfc_test_config__command() {
+  local items=(
+    run:'Test configurations and write a result file'
+    evaluate:'Evaluate previously generated result file'
   )
 
   _describe -- command items
@@ -185,6 +195,7 @@ _nbfc() {
     sensors) _nbfc_sensors; return $?;;
     update) _nbfc_update; return $?;;
     rate-config) _nbfc_rate_config; return $?;;
+    test-config) _nbfc_test_config; return $?;;
     acpi-dump) _nbfc_acpi_dump; return $?;;
     wait-for-hwmon) _nbfc_wait_for_hwmon; return $?;;
     get-model-name) _nbfc_get_model_name; return $?;;
@@ -354,6 +365,53 @@ _nbfc_rate_config() {
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
     2:'Specify configuration file':'{_nbfc_config__-s}'
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_test_config() {
+  local opts='-h --help --version'
+  local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
+  _nbfc__query init "$opts" "${words[@]}"
+
+  case "$(_nbfc__query get_positional 2)" in
+    run) _nbfc_test_config_run; return $?;;
+    evaluate) _nbfc_test_config_evaluate; return $?;;
+  esac
+
+  local -a args=(
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+    2:command2:_nbfc_test_config__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_test_config_run() {
+  local -a args=(
+    '(--input -i)'{-i+,--input=}'[Specify input file]':FILE:_files
+    '(--output -o)'{-o+,--output=}'[Specify output file]':FILE:_files
+    '(--gpu -g)'{-g+,--gpu=}'[Specify number of GPU workers]':NUM:'({1..255})'
+    '(--cpu -c)'{-c+,--cpu=}'[Specify number of CPU workers]':NUM:'({1..255})'
+    '(--interval -I)'{-I+,--interval=}'[Set sample interval (default\: 0.5)]':SECONDS:"_numbers -f 'Set sample interval (default\\: 0.5)'"
+    '(--threshold -t)'{-t+,--threshold=}'[Stop when temperature difference falls below DELTA (default\: 2.0)]':DELTA:"_numbers -f 'Stop when temperature difference falls below DELTA (default\\: 2.0)'"
+    '(--break -b)'{-b+,--break=}'[Stop after SECONDS of stable temperature]':SECONDS:"_numbers -f 'Stop after SECONDS of stable temperature'"
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+    2:command2:_nbfc_test_config__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_test_config_evaluate() {
+  local -a args=(
+    '(--input -i)'{-i+,--input=}'[Specify input file]':FILE:_files
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+    2:command2:_nbfc_test_config__command
   )
   _arguments -S -s -w "${args[@]}"
 }

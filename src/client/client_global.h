@@ -50,6 +50,16 @@ enum Option {
   Option_RateConfig_Quiet,
   Option_RateConfig_FanCount,
 
+  // Test-Config options
+  Option_TestConfig_Action,
+  Option_TestConfig_Input,
+  Option_TestConfig_Output,
+  Option_TestConfig_Cpu,
+  Option_TestConfig_Gpu,
+  Option_TestConfig_Interval,
+  Option_TestConfig_Break,
+  Option_TestConfig_Threshold,
+
   // Acpi-Dump options
   Option_AcpiDump_Command,
   Option_AcpiDump_DSDT_File,
