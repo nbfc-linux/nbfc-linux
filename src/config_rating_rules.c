@@ -2,8 +2,39 @@
 #include "nxjson_utils.h"
 #include "memory.h"
 
-#include <stdio.h>  // printf, snprintf
-#include <string.h> // memset, strcmp, strlen
+#include <stdio.h>  // printf
+#include <string.h> // memcpy, memset, strcmp, strlen
+
+static enum RegisterRuleFanMode RegisterRuleFanMode_FromString(const char*);
+
+/*
+ * Parse a register name.
+ */
+static Error RegisterName_FromJson(char* out, const nx_json* json) {
+  if (json->type != NX_JSON_STRING)
+    return err_string("Not a string");
+
+  const size_t len = strlen(json->val.text);
+  if (len == 0 || len > sizeof(AcpiRegisterName) - 1)
+    return err_stringf("\"%s\": Invalid length", json->val.text);
+
+  memcpy(out, json->val.text, len + 1);
+  return err_success();
+}
+
+/*
+ * Parse a register rule priority (0 - 100).
+ */
+static Error RegisterRulePriority_FromJson(uint8_t* out, const nx_json* json) {
+  if (json->type != NX_JSON_INTEGER)
+    return err_string("Not an integer");
+
+  if (json->val.i < 0 || json->val.i > 100)
+    return err_stringf("Value not in range (%d - %d): %ld", 0, 100, json->val.i);
+
+  *out = (uint8_t) json->val.i;
+  return err_success();
+}
 
 /*
  * Parse an array of register names.
@@ -11,31 +42,19 @@
  * Example input:
  *   ["CFAN", "PFAN", "XFAN"]
  */
-static Error ParseRegisterNamesArray(array_of(AcpiRegisterName)* out, const nx_json* json) {
+static Error ArrayOfRegisterNames_FromJson(array_of(AcpiRegisterName)* out, const nx_json* json) {
   Error e;
 
-  if (json->type != NX_JSON_ARRAY) {
-    e = err_stringf("%s: Not a JSON array", json->key);
-    return e;
-  }
+  if (json->type != NX_JSON_ARRAY)
+    return err_string("Not an array");
 
   out->size = 0;
   array_realloc(AcpiRegisterName, *out, json->val.children.length);
 
   nx_json_for_each(child, json) {
-    if (child->type != NX_JSON_STRING) {
-      e = err_stringf("%s[%zd]: Not a string", json->key, out->size);
-      return e;
-    }
-
-    const size_t slen = strlen(child->val.text);
-    if (slen == 0 || slen > sizeof(AcpiRegisterName) - 1) {
-      e = err_stringf("%s[%zd]: \"%s\": Invalid length",
-        json->key, out->size, child->val.text);
-      return e;
-    }
-
-    snprintf(out->data[out->size], sizeof(AcpiRegisterName), "%s", child->val.text);
+    e = RegisterName_FromJson(out->data[out->size], child);
+    if (e)
+      return err_chain_stringf(e, "[%zd]", out->size);
 
     out->size++;
   }
@@ -55,13 +74,11 @@ static Error ParseRegisterNamesArray(array_of(AcpiRegisterName)* out, const nx_j
  *     "Notice": "Foo bar"
  *   }
  */
-static Error ParseRegisterRule(RegisterRule* out, const nx_json* json) {
+static Error RegisterRule_FromJson(RegisterRule* out, const nx_json* json) {
   Error e;
 
-  if (json->type != NX_JSON_OBJECT) {
-    e = err_string("Not an object");
-    return e;
-  }
+  if (json->type != NX_JSON_OBJECT)
+    return err_string("Not an object");
 
   out->Mode = RegisterRuleFanMode_None;
   out->Name[0] = '\0';
@@ -70,92 +87,45 @@ static Error ParseRegisterRule(RegisterRule* out, const nx_json* json) {
   out->Notice = NULL;
 
   nx_json_for_each(child, json) {
+    e = err_success();
+
     if (! strcmp(child->key, "Name")) {
-      if (child->type != NX_JSON_STRING) {
-        e = err_string("Name: Not a string");
-        return e;
-      }
-
-      const size_t slen = strlen(child->val.text);
-      if (slen == 0 || slen > sizeof(AcpiRegisterName) - 1) {
-        e = err_stringf("Name: \"%s\": Invalid length", child->val.text);
-        return e;
-      }
-
-      snprintf(out->Name, sizeof(AcpiRegisterName), "%s", child->val.text);
+      e = RegisterName_FromJson(out->Name, child);
     }
     else if (! strcmp(child->key, "Mode")) {
-      if (child->type != NX_JSON_STRING) {
-        e = err_string("Mode: Not a string");
-        return e;
-      }
-
-      const size_t slen = strlen(child->val.text);
-      if (slen == 0 || slen > 2) {
-        e = err_stringf("Mode: \"%s\": Invalid length", child->val.text);
-        return e;
-      }
-
-      for (const char* s = child->val.text; *s; ++s) {
-        if (*s == 'r')
-          out->Mode |= RegisterRuleFanMode_Read;
-        else if (*s == 'w')
-          out->Mode |= RegisterRuleFanMode_Write;
-        else {
-          e = err_stringf("Mode: Invalid char: '%c'", *s);
-          return e;
-        }
+      if (child->type != NX_JSON_STRING)
+        e = err_string("Not a string");
+      else {
+        out->Mode = RegisterRuleFanMode_FromString(child->val.text);
+        if (out->Mode == RegisterRuleFanMode_None)
+          e = err_string("Invalid mode");
       }
     }
     else if (! strcmp(child->key, "ReadPriority")) {
-      if (child->type != NX_JSON_INTEGER) {
-        e = err_string("ReadPriority: Not an integer");
-        return e;
-      }
-
-      if (child->val.i < 0 || child->val.i > 100) {
-        e = err_string("ReadPriority: Not in range (0 - 100)");
-        return e;
-      }
-
-      out->ReadPriority = child->val.i;
+      e = RegisterRulePriority_FromJson(&out->ReadPriority, child);
     }
     else if (! strcmp(child->key, "WritePriority")) {
-      if (child->type != NX_JSON_INTEGER) {
-        e = err_string("WritePriority: Not an integer");
-        return e;
-      }
-
-      if (child->val.i < 0 || child->val.i > 100) {
-        e = err_string("WritePriority: Not in range (0 - 100)");
-        return e;
-      }
-
-      out->WritePriority = child->val.i;
+      e = RegisterRulePriority_FromJson(&out->WritePriority, child);
     }
     else if (! strcmp(child->key, "Notice")) {
-      if (child->type != NX_JSON_STRING) {
-        e = err_string("Notice: Not a string");
-        return e;
-      }
-
-      out->Notice = Mem_Strdup(child->val.text);
+      if (child->type != NX_JSON_STRING)
+        e = err_string("Not a string");
+      else
+        out->Notice = Mem_Strdup(child->val.text);
     }
     else {
-      e = err_stringf("Unknown key: %s", child->key);
-      return e;
+      e = err_string("Unknown key");
     }
+
+    if (e)
+      return err_chain_string(e, child->key);
   }
 
-  if (! out->Name[0]) {
-    e = err_string("Missing key: Name");
-    return e;
-  }
+  if (! out->Name[0])
+    return err_stringf("Missing key: %s", "Name");
 
-  if (out->Mode == RegisterRuleFanMode_None) {
-    e = err_string("Missing key: Mode");
-    return e;
-  }
+  if (out->Mode == RegisterRuleFanMode_None)
+    return err_stringf("Missing key: %s", "Mode");
 
   return err_success();
 }
@@ -166,23 +136,20 @@ static Error ParseRegisterRule(RegisterRule* out, const nx_json* json) {
  * Example input:
  *   [ {"XFAN": "rw"}, {"FRDC": "r"} ]
  */
-static Error ParseRegisterRuleArray(array_of(RegisterRule)* out, const nx_json* json) {
+static Error ArrayOfRegisterRules_FromJson(array_of(RegisterRule)* out, const nx_json* json) {
   Error e;
 
-  if (json->type != NX_JSON_ARRAY) {
-    e = err_stringf("%s: Not a JSON array", json->key);
-    return e;
-  }
+  if (json->type != NX_JSON_ARRAY)
+    return err_string("Not an array");
 
   out->size = 0;
   array_realloc(RegisterRule, *out, json->val.children.length);
 
   nx_json_for_each(object, json) {
-    e = ParseRegisterRule(&out->data[out->size], object);
-    if (e) {
-      e = err_chain_stringf(e, "%s[%zd]", json->key, out->size);
-      return e;
-    }
+    e = RegisterRule_FromJson(&out->data[out->size], object);
+    if (e)
+      return err_chain_stringf(e, "[%zd]", out->size);
+
     out->size++;
   }
 
@@ -211,43 +178,28 @@ Error ConfigRatingRules_FromJson(ConfigRatingRules* rules, const char* rules_jso
   }
 
   if (root->type != NX_JSON_OBJECT) {
-    e = err_string("Not a JSON object");
+    e = err_string("Not an object");
     goto end;
   }
 
   nx_json_for_each(child, root) {
-    if (! strcmp(child->key, "FanRegisterFullMatch")) {
-      e = ParseRegisterRuleArray(&rules->FanRegisterFullMatch, child);
-      if (e)
-        goto end;
-    }
-    else if (! strcmp(child->key, "FanRegisterPartialMatch")) {
-      e = ParseRegisterNamesArray(&rules->FanRegisterPartialMatch, child);
-      if (e)
-        goto end;
-    }
-    else if (! strcmp(child->key, "RegisterWriteFullMatch")) {
-      e = ParseRegisterNamesArray(&rules->RegisterWriteFullMatch, child);
-      if (e)
-        goto end;
-    }
-    else if (! strcmp(child->key, "RegisterWritePartialMatch")) {
-      e = ParseRegisterNamesArray(&rules->RegisterWritePartialMatch, child);
-      if (e)
-        goto end;
-    }
-    else if (! strcmp(child->key, "BadRegisterFullMatch")) {
-      e = ParseRegisterNamesArray(&rules->BadRegisterFullMatch, child);
-      if (e)
-        goto end;
-    }
-    else if (! strcmp(child->key, "BadRegisterPartialMatch")) {
-      e = ParseRegisterNamesArray(&rules->BadRegisterPartialMatch, child);
-      if (e)
-        goto end;
-    }
-    else {
-      e = err_stringf("Unknown key: %s", child->key);
+    if (! strcmp(child->key, "FanRegisterFullMatch"))
+      e = ArrayOfRegisterRules_FromJson(&rules->FanRegisterFullMatch, child);
+    else if (! strcmp(child->key, "FanRegisterPartialMatch"))
+      e = ArrayOfRegisterNames_FromJson(&rules->FanRegisterPartialMatch, child);
+    else if (! strcmp(child->key, "RegisterWriteFullMatch"))
+      e = ArrayOfRegisterNames_FromJson(&rules->RegisterWriteFullMatch, child);
+    else if (! strcmp(child->key, "RegisterWritePartialMatch"))
+      e = ArrayOfRegisterNames_FromJson(&rules->RegisterWritePartialMatch, child);
+    else if (! strcmp(child->key, "BadRegisterFullMatch"))
+      e = ArrayOfRegisterNames_FromJson(&rules->BadRegisterFullMatch, child);
+    else if (! strcmp(child->key, "BadRegisterPartialMatch"))
+      e = ArrayOfRegisterNames_FromJson(&rules->BadRegisterPartialMatch, child);
+    else
+      e = err_string("Unknown key");
+
+    if (e) {
+      e = err_chain_string(e, child->key);
       goto end;
     }
   }
@@ -260,6 +212,14 @@ end:
     ConfigRatingRules_Free(rules);
 
   return e;
+}
+
+static enum RegisterRuleFanMode RegisterRuleFanMode_FromString(const char* s) {
+  if (! strcmp(s, "r")) return RegisterRuleFanMode_Read;
+  if (! strcmp(s, "w")) return RegisterRuleFanMode_Write;
+  if (! strcmp(s, "rw")) return RegisterRuleFanMode_Read | RegisterRuleFanMode_Write;
+  if (! strcmp(s, "wr")) return RegisterRuleFanMode_Read | RegisterRuleFanMode_Write;
+  return RegisterRuleFanMode_None;
 }
 
 static const char* RegisterRuleFanMode_ToStr(enum RegisterRuleFanMode mode) {

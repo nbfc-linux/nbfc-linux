@@ -45,7 +45,7 @@ static Error Xml2Json_ParseInt(const xmlNode* node, const char* key, nx_json* pa
 static Error Xml2Json_ParseFloat(const xmlNode* node, const char* key, nx_json* parent) {
   xmlChar* content = xmlNodeGetContent(node);
   if (! content)
-    return err_string("xmlNodeGetContent() return NULL");
+    return err_string("xmlNodeGetContent() returned NULL");
 
   const char* err;
   double val = parse_double((const char*) content, -FLT_MAX, FLT_MAX, &err);

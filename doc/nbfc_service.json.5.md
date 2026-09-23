@@ -73,7 +73,7 @@ State file of the service (*/var/lib/nbfc/state.json*).
 
 **LegacyTemperatureThresholdsBehaviour**: *Boolean*
 
-> This option was introduced for beeing backwards compatible with
+> This option was introduced for being backwards compatible with
 > configuration files from the original NBFC project. The default is
 > **false**. Do not use this option for new configuration files.
 
@@ -99,7 +99,7 @@ State file of the service (*/var/lib/nbfc/state.json*).
 
 **LuaLibraries**: *Array of String*
 
-> Import additional Lua libaries.
+> Import additional Lua libraries.
 >
 > Example:
 >
@@ -319,9 +319,9 @@ Allows to write to any EC register.
 > Defines when the value should be written:
 >
 > - **OnInitialization**: writes the value once upon initialization
->   (everytime the fan control service starts).
+>   (every time the fan control service starts).
 >
-> - **OnWriteFanSpeed**: writes the value everytime the fan speed is
+> - **OnWriteFanSpeed**: writes the value every time the fan speed is
 >   set.
 
 **Register**: *Integer* \>= 0 && *Integer* \<= 255
@@ -373,7 +373,7 @@ Allows to write to any EC register.
 > The Lua code to be executed upon reset. See **LUA CODE**.
 >
 > This option is mutually exclusive to **ResetValue** and
-> **ResetAcpiMethod**. Only one of them can be set at a a time.
+> **ResetAcpiMethod**. Only one of them can be set at a time.
 
 **ResetWriteMode**: *String*
 
@@ -445,7 +445,7 @@ error (on failure).
 **Result** is an **integer** and is used for read operations. For write
 operations this value is ignored (returning **0** is recommended).
 
-## Availabe Lua Functions
+## Available Lua Functions
 
 The following functions are exposed to Lua:
 

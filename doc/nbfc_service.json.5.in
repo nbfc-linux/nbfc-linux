@@ -115,7 +115,7 @@ The Author of the config file. Enter whatever you want.
 .BR LegacyTemperatureThresholdsBehaviour :
 .I Boolean
 .RS
-This option was introduced for beeing backwards compatible with configuration files from the original NBFC project.
+This option was introduced for being backwards compatible with configuration files from the original NBFC project.
 The default is
 .BR false .
 Do not use this option for new configuration files.
@@ -157,7 +157,7 @@ NBFC will combine two 8 bit registers to one 16\-bit register when reading from 
 .BR LuaLibraries :
 .I Array of String
 .RS
-Import additional Lua libaries.
+Import additional Lua libraries.
 
 Example:
 .RS
@@ -484,10 +484,10 @@ Defines when the value should be written:
 
 .IP \(bu 2
 .BR OnInitialization :
-writes the value once upon initialization (everytime the fan control service starts).
+writes the value once upon initialization (every time the fan control service starts).
 .IP \(bu 2
 .BR OnWriteFanSpeed :
-writes the value everytime the fan speed is set.
+writes the value every time the fan speed is set.
 .RE
 
 .PP
@@ -569,7 +569,7 @@ The Lua code to be executed upon reset.
 
 This option is mutually exclusive to
 .BR ResetValue " and " ResetAcpiMethod .
-Only one of them can be set at a a time.
+Only one of them can be set at a time.
 .RE
 
 .PP
@@ -688,7 +688,7 @@ and is used for read operations. For write operations this value is ignored (ret
 .B 0
 is recommended).
 
-.SS Availabe Lua Functions
+.SS Available Lua Functions
 The following functions are exposed to Lua:
 
 .BR acpi_call ( method ):

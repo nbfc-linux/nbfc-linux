@@ -22,7 +22,7 @@ enum NBFC_PACKED_ENUM RegisterRuleFanMode {
 };
 
 /*
- * Defines a rule for matching a EC register by name and mode.
+ * Defines a rule for matching an EC register by name and mode.
  *
  * Name:
  *   The name of the EC register.

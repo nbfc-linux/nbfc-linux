@@ -487,7 +487,7 @@ Use JSON output.
 .RS
 Show how to support the project.
 
-.B \-\-upload\-firmare
+.B \-\-upload\-firmware
 .RS
 Upload your notebook firmware without prompting.
 .RE
@@ -517,7 +517,7 @@ Firmware DSDT
 .RI ( /sys/firmware/acpi/tables/DSDT )
 .IP \(bu 2
 Firmware SSDTs
-.RI ( /sys/firmare/acpi/tables/SSDT* )
+.RI ( /sys/firmware/acpi/tables/SSDT* )
 .RE
 .RE
 

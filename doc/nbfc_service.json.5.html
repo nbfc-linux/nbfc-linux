@@ -70,7 +70,7 @@ get-model-name.</strong></p>
 <p><strong>LegacyTemperatureThresholdsBehaviour</strong>:
 <em>Boolean</em></p>
 <blockquote>
-<p>This option was introduced for beeing backwards compatible with
+<p>This option was introduced for being backwards compatible with
 configuration files from the original NBFC project. The default is
 <strong>false</strong>. Do not use this option for new configuration
 files.</p>
@@ -100,7 +100,7 @@ registers.</p>
 </blockquote>
 <p><strong>LuaLibraries</strong>: <em>Array of String</em></p>
 <blockquote>
-<p>Import additional Lua libaries.</p>
+<p>Import additional Lua libraries.</p>
 <p>Example:</p>
 <blockquote>
 <p>"LuaLibraries": ["math"]</p>
@@ -332,8 +332,8 @@ register | value)</p></li>
 <p>Defines when the value should be written:</p>
 <ul>
 <li><p><strong>OnInitialization</strong>: writes the value once upon
-initialization (everytime the fan control service starts).</p></li>
-<li><p><strong>OnWriteFanSpeed</strong>: writes the value everytime the
+initialization (every time the fan control service starts).</p></li>
+<li><p><strong>OnWriteFanSpeed</strong>: writes the value every time the
 fan speed is set.</p></li>
 </ul>
 </blockquote>
@@ -388,7 +388,7 @@ String</em></p>
 <p>The Lua code to be executed upon reset. See<strong> LUA
 CODE</strong>.</p>
 <p>This option is mutually exclusive to <strong>ResetValue</strong> and
-<strong>ResetAcpiMethod</strong>. Only one of them can be set at a a
+<strong>ResetAcpiMethod</strong>. Only one of them can be set at a
 time.</p>
 </blockquote>
 <p><strong>ResetWriteMode</strong>: <em>String</em></p>
@@ -461,7 +461,7 @@ a <strong>string</strong> describing the error (on failure).</p>
 <p><strong>Result</strong> is an <strong>integer</strong> and is used
 for read operations. For write operations this value is ignored
 (returning <strong>0</strong> is recommended).</p>
-<h2 id="availabe-lua-functions">Availabe Lua Functions</h2>
+<h2 id="available-lua-functions">Available Lua Functions</h2>
 <p>The following functions are exposed to Lua:</p>
 <p><strong>acpi_call</strong>(<strong>method</strong>):</p>
 <blockquote>

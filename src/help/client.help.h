@@ -37,7 +37,7 @@
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -r, --read-only       Start in read-only mode\n"                           \
- "  -h, --help            Shows this message\n"                                \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define CLIENT_RESTART_HELP_TEXT                                               \
@@ -47,7 +47,7 @@
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -r, --read-only       Restart in read-only mode\n"                         \
- "  -h, --help            Shows this message\n"                                \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define CLIENT_CONFIG_HELP_TEXT                                                \
@@ -225,7 +225,7 @@
  "Stop the NBFC service.\n"                                                    \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define CLIENT_UPDATE_HELP_TEXT                                                \
@@ -247,7 +247,7 @@
  "Wait until files in /sys/class/hwmon are populated.\n"                       \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define CLIENT_GET_MODEL_HELP_TEXT                                             \
@@ -256,7 +256,7 @@
  "Print out model name.\n"                                                     \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define CLIENT_SHOW_VARIABLE_HELP_TEXT                                         \
@@ -271,7 +271,7 @@
  "  - model_configs_dir\n"                                                     \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define CLIENT_COMPLETE_FANS_HELP_TEXT                                         \
@@ -280,7 +280,7 @@
  "Used for completing shell command lines.\n"                                  \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define CLIENT_COMPLETE_SENSORS_HELP_TEXT                                      \
@@ -289,7 +289,7 @@
  "Used for completing shell command lines.\n"                                  \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define CLIENT_WARRANTY_HELP_TEXT                                              \
@@ -298,7 +298,7 @@
  "Print legal disclaimer and warranty info.\n"                                 \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""
 
 #define SUPPORT_PAYPAL_URL "https://paypal.me/BenjaminAbendroth"
@@ -315,7 +315,7 @@
  "  --upload-firmware     Upload your notebook firmware without prompting\n"   \
  "  --print-command       Print command for manual firmware upload\n"          \
  "  --create-archive      Create a tar.gz archive containing your firmware\n"  \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  "\n"                                                                          \
  "Thank you for using NBFC-Linux!\n"                                           \
  "\n"                                                                          \
@@ -364,7 +364,7 @@
  "Show the NBFC FAQ man page.\n"                                               \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  "\n"                                                                          \
  ""
 
@@ -380,5 +380,5 @@
  "INTERNAL COMMAND ONLY\n"                                                     \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help            Shows this message and exit\n"                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""

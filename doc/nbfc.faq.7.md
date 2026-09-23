@@ -35,7 +35,7 @@ NBFC-Linux can be downloaded from
 *https://github.com/nbfc-linux/nbfc-linux*.
 
 Packages are available for **Ubuntu**, **Linux Mint**, **Debian**,
-**Fedora**, **OpenSuse** and **Arch Linux**.
+**Fedora**, **OpenSUSE** and **Arch Linux**.
 
 ## Which kernel modules are required?
 

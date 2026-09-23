@@ -351,7 +351,7 @@ This program is used to control the NoteBook FanControl service.
 
 > Show how to support the project.
 >
-> **\--upload-firmare**
+> **\--upload-firmware**
 >
 > > Upload your notebook firmware without prompting.
 >
@@ -372,7 +372,7 @@ This program is used to control the NoteBook FanControl service.
 > >
 > > - Firmware DSDT (*/sys/firmware/acpi/tables/DSDT*)
 > >
-> > - Firmware SSDTs (*/sys/firmare/acpi/tables/SSDT\**)
+> > - Firmware SSDTs (*/sys/firmware/acpi/tables/SSDT\**)
 
 **get-model-name**
 

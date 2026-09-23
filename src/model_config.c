@@ -38,7 +38,7 @@ static inline Error int8_t_FromJson(int8_t* out, const nx_json* node) {
   Error e = int_FromJson(&val, node);
   e_check();
   if (val < INT8_MIN || val > INT8_MAX)
-    return err_stringf("Value not in range (%d - %d): %d", INT8_MIN, INT8_MAX, val);
+    return err_stringf("Value not in range (%d - %d): %ld", INT8_MIN, INT8_MAX, (long) val);
   *out = (int8_t) val;
   return err_success();
 }
@@ -48,7 +48,7 @@ static inline Error uint8_t_FromJson(uint8_t* out, const nx_json* node) {
   Error e = int_FromJson(&val, node);
   e_check();
   if (val < 0 || val > UINT8_MAX)
-    return err_stringf("Value not in range (%d - %d): %d", 0, UINT8_MAX, val);
+    return err_stringf("Value not in range (%d - %d): %ld", 0, UINT8_MAX, (long) val);
   *out = (uint8_t) val;
   return err_success();
 }
@@ -58,7 +58,7 @@ static inline Error int16_t_FromJson(int16_t* out, const nx_json* node) {
   Error e = int_FromJson(&val, node);
   e_check();
   if (val < INT16_MIN || val > INT16_MAX)
-    return err_stringf("Value not in range (%d - %d): %d", INT16_MIN, INT16_MAX, val);
+    return err_stringf("Value not in range (%d - %d): %ld", INT16_MIN, INT16_MAX, (long) val);
   *out = (int16_t) val;
   return err_success();
 }
@@ -68,7 +68,7 @@ static inline Error uint16_t_FromJson(uint16_t* out, const nx_json* node) {
   Error e = int_FromJson(&val, node);
   e_check();
   if (val < 0 || val > UINT16_MAX)
-    return err_stringf("Value not in range (%d - %d): %d", 0, UINT16_MAX, val);
+    return err_stringf("Value not in range (%d - %d): %ld", 0, UINT16_MAX, (long) val);
   *out = (uint16_t) val;
   return err_success();
 }
@@ -489,6 +489,9 @@ Error TemperatureThresholds_Validate(
   return err_success();
 }
 
+#define ERR_KEY_CANNOT_BE_USED_WITH(KEY1, KEY2, VALUE) \
+  err_stringf("%s: Cannot be used with %s == %s", KEY1, KEY2, VALUE)
+
 static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguration* r) {
   const bool AcpiMethod                  = r->isset.AcpiMethod;
   const bool ResetAcpiMethod             = r->isset.ResetAcpiMethod;
@@ -506,20 +509,20 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
       return err_stringf("%s: %s", "AcpiMethod", "Missing option");
 
     if (LuaCode)
-      return err_string("LuaCode: Cannot be used with WriteMode == Call");
+      return ERR_KEY_CANNOT_BE_USED_WITH("LuaCode", "WriteMode", "Call");
 
     if (Value)
-      return err_string("Value: Cannot be used with WriteMode == Call");
+      return ERR_KEY_CANNOT_BE_USED_WITH("Value", "WriteMode", "Call");
   }
   else if (WriteMode == RegisterWriteMode_Lua) {
     if (! LuaCode)
       return err_stringf("%s: %s", "LuaCode", "Missing option");
 
     if (AcpiMethod)
-      return err_string("AcpiMethod: Cannot be used with WriteMode == Lua");
+      return ERR_KEY_CANNOT_BE_USED_WITH("AcpiMethod", "WriteMode", "Lua");
 
     if (Value)
-      return err_string("Value: Cannot be used with WriteMode == Lua");
+      return ERR_KEY_CANNOT_BE_USED_WITH("Value", "WriteMode", "Lua");
   }
   else {
     if (! Register)
@@ -529,10 +532,10 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
       return err_stringf("%s: %s", "Value", "Missing option");
 
     if (AcpiMethod)
-      return err_string("AcpiMethod: Cannot be used with WriteMode == Set/And/Or");
+      return ERR_KEY_CANNOT_BE_USED_WITH("AcpiMethod", "WriteMode", "Set/And/Or");
 
     if (LuaCode)
-      return err_string("LuaCode: Cannot be used with WriteMode == Set/And/Or");
+      return ERR_KEY_CANNOT_BE_USED_WITH("LuaCode", "WriteMode", "Set/And/Or");
   }
 
   if (ResetRequired) {
@@ -541,20 +544,20 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
         return err_stringf("%s: %s", "ResetAcpiMethod", "Missing option");
 
       if (ResetLuaCode)
-        return err_string("ResetLuaCode: Cannot be used with ResetWriteMode == Call");
+        return ERR_KEY_CANNOT_BE_USED_WITH("ResetLuaCode", "ResetWriteMode", "Call");
 
       if (ResetValue)
-        return err_string("ResetValue: Cannot be used with ResetWriteMode == Call");
+        return ERR_KEY_CANNOT_BE_USED_WITH("ResetValue", "ResetWriteMode", "Call");
     }
     else if (ResetWriteMode == RegisterWriteMode_Lua) {
       if (! ResetLuaCode)
         return err_stringf("%s: %s", "ResetLuaCode", "Missing option");
 
       if (ResetAcpiMethod)
-        return err_string("ResetAcpiMethod: Cannot be used with ResetWriteMode == Lua");
+        return ERR_KEY_CANNOT_BE_USED_WITH("ResetAcpiMethod", "ResetWriteMode", "Lua");
 
       if (ResetValue)
-        return err_string("ResetValue: Cannot be used with ResetWriteMode == Lua");
+        return ERR_KEY_CANNOT_BE_USED_WITH("ResetValue", "ResetWriteMode", "Lua");
     }
     else {
       if (! Register)
@@ -564,10 +567,10 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
         return err_stringf("%s: %s", "ResetValue", "Missing option");
 
       if (ResetAcpiMethod)
-        return err_string("ResetAcpiMethod: Cannot be used with ResetWriteMode == Set/And/Or");
+        return ERR_KEY_CANNOT_BE_USED_WITH("ResetAcpiMethod", "ResetWriteMode", "Set/And/Or");
 
       if (ResetLuaCode)
-        return err_string("ResetLuaCode: Cannot be used with ResetWriteMode == Set/And/Or");
+        return ERR_KEY_CANNOT_BE_USED_WITH("ResetLuaCode", "ResetWriteMode", "Set/And/Or");
     }
   }
   else {
@@ -579,10 +582,10 @@ static Error RegisterWriteConfiguration_Validate(const RegisterWriteConfiguratio
     */
 
     if (ResetLuaCode)
-      return err_string("ResetLuaCode: Cannot be used with ResetRequired == false");
+      return ERR_KEY_CANNOT_BE_USED_WITH("ResetLuaCode", "ResetRequired", "false");
 
     if (ResetAcpiMethod)
-      return err_string("ResetAcpiMethod: Cannot be used with ResetRequired == false");
+      return ERR_KEY_CANNOT_BE_USED_WITH("ResetAcpiMethod", "ResetRequired", "false");
   }
 
   const bool WriteMode_Needs_Register = (

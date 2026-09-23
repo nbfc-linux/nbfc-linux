@@ -12,10 +12,10 @@
  "Commands:\n"                                                                 \
  "  dump                  Dump all EC registers\n"                             \
  "  load                  Load a previously made dump\n"                       \
- "  read                  Read a byte from a EC register\n"                    \
- "  write                 Write a byte to a EC register\n"                     \
- "  read_bit              Read a bit from a EC register\n"                     \
- "  write_bit             Write a bit to a EC register\n"                      \
+ "  read                  Read a byte from an EC register\n"                   \
+ "  write                 Write a byte to an EC register\n"                    \
+ "  read_bit              Read a bit from an EC register\n"                    \
+ "  write_bit             Write a bit to an EC register\n"                     \
  "  monitor               Monitor all EC registers for changes\n"              \
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
  "  acpi_call             Call an ACPI method\n"                               \
@@ -42,16 +42,16 @@
  "Load a dump and write it to the EC registers.\n"                             \
  "\n"                                                                          \
  "Positional arguments:\n"                                                     \
- "  FILE        Dump file\n"                                                   \
+ "  FILE    Dump file\n"                                                       \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  -h, --help  Show this help message and exit\n"                             \
+ "  -h, --help      Show this help message and exit\n"                         \
  ""
 
 #define EC_PROBE_READ_HELP_TEXT                                                \
  "Usage: %s read [-h] [-w] [-f FORMAT] [-m FILE] REGISTER\n"                   \
  "\n"                                                                          \
- "Read a byte from a EC register.\n"                                           \
+ "Read a byte from an EC register.\n"                                          \
  "\n"                                                                          \
  "Positional arguments:\n"                                                     \
  "  REGISTER    Register source\n"                                             \
@@ -74,7 +74,7 @@
 #define EC_PROBE_WRITE_HELP_TEXT                                               \
  "Usage: %s write [-h] [-w] [-m FILE] REGISTER VALUE\n"                        \
  "\n"                                                                          \
- "Write a byte to a EC register.\n"                                            \
+ "Write a byte to an EC register.\n"                                           \
  "\n"                                                                          \
  "Positional arguments:\n"                                                     \
  "  REGISTER    Register destination\n"                                        \
@@ -92,7 +92,7 @@
 #define EC_PROBE_READ_BIT_HELP_TEXT                                            \
  "Usage: %s read_bit [-h] [-m FILE] REGISTER BIT-OFFSET\n"                     \
  "\n"                                                                          \
- "Read a bit from a EC register.\n"                                            \
+ "Read a bit from an EC register.\n"                                           \
  "\n"                                                                          \
  "Positional arguments:\n"                                                     \
  "  REGISTER    Register source\n"                                             \
@@ -109,7 +109,7 @@
 #define EC_PROBE_WRITE_BIT_HELP_TEXT                                           \
  "Usage: %s write_bit [-h] [-m FILE] REGISTER BIT-OFFSET VALUE\n"              \
  "\n"                                                                          \
- "Write a bit to a EC register.\n"                                             \
+ "Write a bit to an EC register.\n"                                            \
  "\n"                                                                          \
  "Positional arguments:\n"                                                     \
  "  REGISTER    Register destination\n"                                        \

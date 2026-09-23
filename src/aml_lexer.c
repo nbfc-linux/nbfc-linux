@@ -221,7 +221,7 @@ static bool AML_Lexer_ParseOperator(AML_Lexer* l, AML_Token* t) {
  *   - "Zero"
  *
  * This function returns true if an integer could be found, false otherwise.
- * If an error (like overflow) occured, the token will be set to AML_TOK_Error.
+ * If an error (like overflow) occurred, the token will be set to AML_TOK_Error.
  */
 static bool AML_Lexer_ParseInteger(AML_Lexer* l, AML_Token* t) {
   const char* const cur = AML_Lexer_CurText(l);
@@ -311,7 +311,7 @@ static void AML_Lexer_ParseKeywordOrIdentifier(AML_Lexer* l, AML_Token* t) {
  * Get the next token from lexer and advance the stream.
  *
  * Returns an AML_TOK_EOF token if no more tokens can be parsed.
- * Returns an AML_TOK_Error token if an error occured.
+ * Returns an AML_TOK_Error token if an error occurred.
  */
 AML_Token AML_Lexer_GetToken(AML_Lexer* l) {
   AML_Token t;

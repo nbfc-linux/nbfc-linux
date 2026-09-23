@@ -76,7 +76,7 @@ void  nx_json_free(const nx_json *js);
   _(INVALID_CODEPOINT,          "Invalid codepoint")          \
   _(MISSING_DOUBLE_EQUOTE,      "Missing double quote")       \
   _(ENDLESS_COMMENT,            "Endless comment")            \
-  _(UNEXPECTED_CHARS,           "Unexpected charaters")       \
+  _(UNEXPECTED_CHARS,           "Unexpected characters")      \
   _(UNEXPECTED_EOT,             "Unexpected end of text")     \
   _(INVALID_NUMBER,             "Invalid number")
 

@@ -25,7 +25,7 @@ static void ResetEc_ResetFans(ModelConfig* model_config) {
 
     e = Fan_ECReset(&fan);
     if (e) {
-      Log_Warn("Fan \"%s\": %s ", fan_config->FanDisplayName, err_print_all(e));
+      Log_Warn("Fan \"%s\": %s", fan_config->FanDisplayName, err_print_all(e));
     }
   }
 }

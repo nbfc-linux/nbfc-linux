@@ -26,7 +26,7 @@ NoteBook FanControl service
 
 **-f**, **\--fork**
 
-> Switch process to background after sucessfully started.
+> Switch process to background after successfully started.
 
 **-d**, **\--debug**
 

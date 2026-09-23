@@ -7,7 +7,7 @@
  "  -h, --help            Show this help message and exit\n"                   \
  "  --version             Show program's version number and exit\n"            \
  "  -r, --read-only       Start in read-only mode\n"                           \
- "  -f, --fork            Switch process to background after sucessfully started\n"\
+ "  -f, --fork            Switch process to background after successfully started\n"\
  "  -d, --debug           Enable tracing of reads and writes of the embedded controller\n"\
  "  -c CONFIG, --config-file CONFIG\n"                                         \
  "                        Use alternative config file (default " SYSCONFDIR "/nbfc/nbfc.json)\n"\
