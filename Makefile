@@ -175,6 +175,10 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/nbfc_service
 	rm -f $(DESTDIR)$(bindir)/ec_probe
 	
+	# Helper programs
+	rm -f $(DESTDIR)$(libdir)/nbfc/make_archive.sh
+	rm -f $(DESTDIR)$(libdir)/nbfc/make_graph.py
+	
 	# /usr/local/lib/systemd/system
 	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service
 	
