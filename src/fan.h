@@ -33,6 +33,7 @@ struct Fan {
   float currentSpeed;
   Fan_Mode mode;
   bool isCritical;
+  uint8_t num_read_warnings;
 };
 
 Error    Fan_Init(Fan*, FanConfiguration*, ModelConfig*);

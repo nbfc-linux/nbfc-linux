@@ -8,6 +8,8 @@
 #include <errno.h>   // EINVAL
 #include <stdbool.h>
 
+#define FAN_MAX_READ_WARNINGS 30
+
 extern const EC_VTable* ec;
 
 Error Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
@@ -24,6 +26,7 @@ Error Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.minSpeedValueReadAbs = MIN(my.minSpeedValueRead, my.maxSpeedValueRead);
   my.maxSpeedValueReadAbs = MAX(my.minSpeedValueRead, my.maxSpeedValueRead);
   my.fanSpeedSteps        = my.maxSpeedValueReadAbs - my.minSpeedValueReadAbs;
+  my.num_read_warnings    = 0;
 
   return ThresholdManager_Init(&my.threshMan, &cfg->TemperatureThresholds);
 }
@@ -217,11 +220,16 @@ Error Fan_UpdateCurrentSpeed(Fan* self) {
     }
   }
 
-  Log_Warn("%s: Fan speed value (%d) not range of %s/%s",
-    my.fanConfig->FanDisplayName,
-    speed,
-    "MinSpeedValueRead",
-    "MaxSpeedValueRead");
+  // Do not pollute the log with warnings
+  if (my.num_read_warnings < FAN_MAX_READ_WARNINGS) {
+    my.num_read_warnings++;
+
+    Log_Warn("%s: Fan speed value (%d) not range of %s/%s",
+      my.fanConfig->FanDisplayName,
+      speed,
+      "MinSpeedValueRead",
+      "MaxSpeedValueRead");
+  }
 
   if (speed < my.minSpeedValueReadAbs)
     speed = my.minSpeedValueReadAbs;
