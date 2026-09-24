@@ -135,15 +135,15 @@ static const char* HelpTexts[] = {
 #undef o
 };
 
-static enum Command Command_FromString(const char* s) {
-  const char* commands[] = {
+static const char* CommandNames[] = {
 #define o(COMMAND, ENUM, HELP, OPTIONS)  COMMAND,
-    NBFC_CLIENT_COMMANDS
+  NBFC_CLIENT_COMMANDS
 #undef o
-  };
+};
 
-  for (int i = 0; i < ARRAY_SSIZE(commands); ++i)
-    if (!strcmp(commands[i], s))
+static enum Command Command_FromString(const char* s) {
+  for (int i = 0; i < ARRAY_SSIZE(CommandNames); ++i)
+    if (!strcmp(CommandNames[i], s))
       return (enum Command) i;
 
   return Command_End;
@@ -265,7 +265,7 @@ int main(int argc, char* const argv[]) {
     case Option_Sensors_Command:
       Sensors_Options.command = Sensors_Command_FromString(p.optarg);
       if (Sensors_Options.command == Sensors_Command_None) {
-        Log_Error("Invalid command: sensors %s", p.optarg);
+        Log_Error("%s: Invalid command: %s", "sensors", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
 
@@ -497,7 +497,7 @@ int main(int argc, char* const argv[]) {
     case Option_TestConfig_Action:
       TestConfig_Options.action = TestConfig_Action_FromString(p.optarg);
       if (TestConfig_Options.action == TestConfig_Action_None) {
-        Log_Error("Invalid command: %s", p.optarg);
+        Log_Error("%s: Invalid command: %s", "test-config", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
@@ -581,7 +581,7 @@ int main(int argc, char* const argv[]) {
     case Option_AcpiDump_Command:
       AcpiDump_Options.action = AcpiDump_CommandFromString(p.optarg);
       if (AcpiDump_Options.action == AcpiDump_Action_None) {
-        Log_Error("Invalid command: %s", p.optarg);
+        Log_Error("%s: Invalid command: %s", "acpi-dump", p.optarg);
         return NBFC_EXIT_CMDLINE;
       }
       break;
