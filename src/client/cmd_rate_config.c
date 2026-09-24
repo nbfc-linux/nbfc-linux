@@ -272,6 +272,7 @@ static array_of(ConfigWithData) RateConfig_RateConfigs(
   Error e;
   char path[PATH_MAX];
   array_of(ConfigWithData) result;
+  const LogLevel old_log_level = Log_LogLevel;
 
   // Allocate memory for result
   result.size = 0;
@@ -290,10 +291,9 @@ static array_of(ConfigWithData) RateConfig_RateConfigs(
 
     // Validate the configuration data (and silence warnings)
     Trace_Push(&trace, "%s", path);
-    LogLevel old = Log_LogLevel;
     Log_LogLevel = LogLevel_Quiet;
     e = ModelConfig_Validate(&trace, &config_with_data->model_config);
-    Log_LogLevel = old;
+    Log_LogLevel = old_log_level;
     if (e) {
       Log_Warn("%s", err_print_all(e));
       ModelConfig_Free(&config_with_data->model_config);
@@ -552,10 +552,17 @@ static Error RateConfig_RateFiles(
   float min_score,
   enum RateConfig_Filter bad_filter
 ) {
+  Error e = err_success();
   array_of(ConfigWithData) ratings;
 
   // Load model configuration and rate them
   ratings = RateConfig_RateConfigs(config_rating, files);
+
+  // Check if `RateConfig_RateConfigs()` rated any files
+  if (ratings.size == 0) {
+    e = err_string("Could not rate any configurations");
+    goto error;
+  }
 
   // Sort ratings by priority
   RateConfig_SortResultByPriority(&ratings);
@@ -572,6 +579,8 @@ static Error RateConfig_RateFiles(
   else
     RateConfig_PrintResults(&ratings, num_groups, min_score, bad_filter);
 
+error:
+
   // Free
 #if STRICT_CLEANUP
   for_each_array(ConfigWithData*, rating, ratings) {
@@ -580,7 +589,7 @@ static Error RateConfig_RateFiles(
   Mem_Free(ratings.data);
 #endif
 
-  return err_success();
+  return e;
 }
 
 /*
@@ -657,11 +666,21 @@ static Error RateConfig_RateFromFile(
 
   // Read config files from file
   e = ConfigFiles_FromFile(&files, file);
-  if (e)
-    return err_chain_string(e, file);
+  if (e) {
+    e = err_chain_string(e, file);
+    goto error;
+  }
+
+  // Check if input file contains any filenames
+  if (files.size == 0) {
+    e = err_stringf("%s: File does not contain any lines", file);
+    goto error;
+  }
 
   // Do the rating
   e = RateConfig_RateMany(config_rating, &files, json, min_score, bad_filter);
+
+error:
 
   // Free
 #if STRICT_CLEANUP
