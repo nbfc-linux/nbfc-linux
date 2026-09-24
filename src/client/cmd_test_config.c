@@ -791,6 +791,12 @@ static int TestConfig_Run(void) {
     goto error;
   }
 
+  // Check if input file contains any filenames
+  if (files.size == 0) {
+    e = err_stringf("%s: File does not contain any lines", infile);
+    goto error;
+  }
+
   // Initialize Embedded Controller
   e = EC_FindWorking(&ec);
   if (e)
@@ -818,6 +824,12 @@ static int TestConfig_Run(void) {
   e = ConfigTester_Init(&tester, &files, (TestConfig_Options.gpu_workers > 0));
   if (e)
     goto error;
+
+  // Check if `ConfigTester_Init()` loaded any files
+  if (tester.configs_with_readings.size == 0) {
+    e = err_string("Could not load any configurations");
+    goto error;
+  }
 
   // Take first sample
   e = ConfigTester_TakeSamples(&tester);
