@@ -135,6 +135,18 @@
         "required": false
       },
       {
+        "name": "CriticalTemperature",
+        "type": "int16_t",
+        "help": "",
+        "required": false
+      },
+      {
+        "name": "CriticalTemperatureOffset",
+        "type": "uint16_t",
+        "help": "",
+        "required": false
+      },
+      {
         "name": "ReadRegister",
         "type": "uint8_t",
         "help": "The register from which NBFC reads the fan speed.",

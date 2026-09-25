@@ -134,6 +134,9 @@ Defines how often NBFC polls the EC for changes (in milliseconds).
 .RS
 If the temperature exceeds this threshold, NBFC will ignore all Temperature threshold elements and set the fan to 100% speed until the temperature drops below
 .RB ( CriticalTemperature " minus " CriticalTemperatureOffset ).
+
+Can be overwritten by
+.BR FanConfiguration "'s " CriticalTemperature .
 .RE
 
 .PP
@@ -142,6 +145,9 @@ If the temperature exceeds this threshold, NBFC will ignore all Temperature thre
 .RS
 See
 .BR CriticalTemperature .
+
+Can be overwritten by
+.BR FanConfiguration "'s " CriticalTemperatureOffset .
 .RE
 
 .PP
@@ -216,6 +222,22 @@ Defines how NBFC controls a fan.
 .I String
 .RS
 Sets the fan display name.
+.RE
+
+.PP
+.BR CriticalTemperature :
+.I Integer
+.RS
+If the temperature exceeds this threshold, NBFC will ignore all Temperature threshold elements and set the fan to 100% speed until the temperature drops below
+.RB ( CriticalTemperature " minus " CriticalTemperatureOffset ).
+.RE
+
+.PP
+.BR CriticalTemperatureOffset :
+.IR Integer " > 0"
+.RS
+See
+.BR CriticalTemperature .
 .RE
 
 .PP

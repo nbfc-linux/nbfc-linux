@@ -15,8 +15,6 @@ extern const EC_VTable* ec;
 Error Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.fanConfig            = cfg;
   my.mode                 = Fan_ModeAuto;
-  my.criticalTemperature  = modelCfg->CriticalTemperature;
-  my.criticalTemperatureOffset = modelCfg->CriticalTemperatureOffset;
   my.readWriteWords       = modelCfg->ReadWriteWords;
   my.minSpeedValueWrite   = cfg->MinSpeedValue;
   my.maxSpeedValueWrite   = cfg->MaxSpeedValue;
@@ -27,6 +25,16 @@ Error Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.maxSpeedValueReadAbs = MAX(my.minSpeedValueRead, my.maxSpeedValueRead);
   my.fanSpeedSteps        = my.maxSpeedValueReadAbs - my.minSpeedValueReadAbs;
   my.num_read_warnings    = 0;
+
+  if (cfg->isset.CriticalTemperature)
+    my.criticalTemperature = cfg->CriticalTemperature;
+  else
+    my.criticalTemperature = modelCfg->CriticalTemperature;
+
+  if (cfg->isset.CriticalTemperatureOffset)
+    my.criticalTemperatureOffset = cfg->CriticalTemperatureOffset;
+  else
+    my.criticalTemperatureOffset = modelCfg->CriticalTemperatureOffset;
 
   return ThresholdManager_Init(&my.threshMan, &cfg->TemperatureThresholds);
 }

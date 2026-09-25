@@ -68,6 +68,8 @@ Error RegisterWriteConfiguration_ValidateFields(RegisterWriteConfiguration*);
 
 struct FanConfiguration {
 	const char*     FanDisplayName;
+	int16_t         CriticalTemperature;
+	uint16_t        CriticalTemperatureOffset;
 	uint8_t         ReadRegister;
 	const char*     ReadAcpiMethod;
 	LuaCode         ReadLuaCode;
@@ -89,6 +91,8 @@ struct FanConfiguration {
 	array_of(FanSpeedPercentageOverride) FanSpeedPercentageOverrides;
 	struct {
 		bool FanDisplayName  : 1;
+		bool CriticalTemperature : 1;
+		bool CriticalTemperatureOffset : 1;
 		bool ReadRegister    : 1;
 		bool ReadAcpiMethod  : 1;
 		bool ReadLuaCode     : 1;

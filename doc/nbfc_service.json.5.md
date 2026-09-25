@@ -87,10 +87,15 @@ State file of the service (*/var/lib/nbfc/state.json*).
 > Temperature threshold elements and set the fan to 100% speed until the
 > temperature drops below (**CriticalTemperature** minus
 > **CriticalTemperatureOffset**).
+>
+> Can be overwritten by **FanConfiguration**\'s **CriticalTemperature**.
 
 **CriticalTemperatureOffset**: *Integer* \> 0
 
 > See **CriticalTemperature**.
+>
+> Can be overwritten by **FanConfiguration**\'s
+> **CriticalTemperatureOffset**.
 
 **ReadWriteWords**: *Boolean*
 
@@ -142,6 +147,17 @@ Defines how NBFC controls a fan.
 **FanDisplayName**: *String*
 
 > Sets the fan display name.
+
+**CriticalTemperature**: *Integer*
+
+> If the temperature exceeds this threshold, NBFC will ignore all
+> Temperature threshold elements and set the fan to 100% speed until the
+> temperature drops below (**CriticalTemperature** minus
+> **CriticalTemperatureOffset**).
+
+**CriticalTemperatureOffset**: *Integer* \> 0
+
+> See **CriticalTemperature**.
 
 **ReadRegister**: *Integer* \>= 0 && *Integer* \<= 255
 

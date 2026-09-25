@@ -86,11 +86,15 @@ milliseconds).</p>
 Temperature threshold elements and set the fan to 100% speed until the
 temperature drops below (<strong>CriticalTemperature</strong> minus
 <strong>CriticalTemperatureOffset</strong>).</p>
+<p>Can be overwritten by <strong>FanConfiguration</strong>'s
+<strong>CriticalTemperature</strong>.</p>
 </blockquote>
 <p><strong>CriticalTemperatureOffset</strong>: <em>Integer</em> &gt;
 0</p>
 <blockquote>
 <p>See <strong>CriticalTemperature</strong>.</p>
+<p>Can be overwritten by <strong>FanConfiguration</strong>'s
+<strong>CriticalTemperatureOffset</strong>.</p>
 </blockquote>
 <p><strong>ReadWriteWords</strong>: <em>Boolean</em></p>
 <blockquote>
@@ -139,6 +143,18 @@ RegisterWriteConfiguration</em></p>
 <p><strong>FanDisplayName</strong>: <em>String</em></p>
 <blockquote>
 <p>Sets the fan display name.</p>
+</blockquote>
+<p><strong>CriticalTemperature</strong>: <em>Integer</em></p>
+<blockquote>
+<p>If the temperature exceeds this threshold, NBFC will ignore all
+Temperature threshold elements and set the fan to 100% speed until the
+temperature drops below (<strong>CriticalTemperature</strong> minus
+<strong>CriticalTemperatureOffset</strong>).</p>
+</blockquote>
+<p><strong>CriticalTemperatureOffset</strong>: <em>Integer</em> &gt;
+0</p>
+<blockquote>
+<p>See <strong>CriticalTemperature</strong>.</p>
 </blockquote>
 <p><strong>ReadRegister</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
 <em>Integer</em> &lt;= 255</p>

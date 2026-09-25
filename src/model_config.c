@@ -754,7 +754,12 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
         );
     }
 
-    e = TemperatureThresholds_Validate(trace, &f->TemperatureThresholds, c->CriticalTemperature);
+    // FanConfiguration.CriticalTemperature overrides ModelConfig.CriticalTemperature
+    int criticalTemperature = c->CriticalTemperature;
+    if (f->isset.CriticalTemperature)
+      criticalTemperature = f->CriticalTemperature;
+
+    e = TemperatureThresholds_Validate(trace, &f->TemperatureThresholds, criticalTemperature);
     e_goto(err);
 
     Trace_Pop(trace);

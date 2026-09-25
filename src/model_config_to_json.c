@@ -155,6 +155,14 @@ static void FanConfiguration_ToJson(const FanConfiguration* cfg, nx_json* parent
     create_json_string("FanDisplayName", obj, cfg->FanDisplayName);
   }
 
+  if (cfg->isset.CriticalTemperature) {
+    create_json_integer("CriticalTemperature", obj, cfg->CriticalTemperature);
+  }
+
+  if (cfg->isset.CriticalTemperatureOffset) {
+    create_json_integer("CriticalTemperatureOffset", obj, cfg->CriticalTemperatureOffset);
+  }
+
   if (cfg->isset.ReadRegister) {
     create_json_integer("ReadRegister", obj, cfg->ReadRegister);
   }
