@@ -4,6 +4,7 @@
 #include "server.h"
 #include "error.h"
 #include "file_utils.h"
+#include "hardware_check.h"
 #include "log.h"
 #include "ec.h"
 #include "model_config.h"
@@ -136,6 +137,9 @@ int main(int argc, char* const argv[])
   Log_Info("DATADIR is \"%s\"", DATADIR);
   Log_Info("RUNSTATEDIR is \"%s\"", RUNSTATEDIR);
   Log_Info("Available Embedded Controllers: " EC_AVAILABLE_STR);
+
+  // Check if hardware has changed
+  HardwareCheck();
 
   // Sets the OOM (Out-Of-Memory) score adjustment for this process to -1000,
   // which tells the Linux kernel to never kill this process, even under

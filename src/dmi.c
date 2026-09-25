@@ -2,14 +2,12 @@
 
 #include <stdio.h>  // snprintf
 #include <string.h> // strerror, strcmp, strncmp, strcspn
-#include <stdlib.h> // exit
 #include <errno.h>  // errno, ENODATA
 
-#include "../nbfc.h"
-#include "../log.h"
-#include "../memory.h"
-#include "../file_utils.h"
-#include "../str_functions.h"
+#include "nbfc.h"
+#include "memory.h"
+#include "file_utils.h"
+#include "str_functions.h"
 
 #define DMI_BASE_DIRECTORY    "/sys/devices/virtual/dmi/id"
 #define DMI_PRODUCT_NAME_FILE DMI_BASE_DIRECTORY "/product_name"
@@ -35,7 +33,7 @@ static const char* DMI_FindVendorAlias(const char* vendor) {
   return NULL;
 }
 
-static char* DMI_ReplaceVendorAlias(const char* model_name) {
+char* DMI_ReplaceVendorAlias(const char* model_name) {
   for (const struct DMI_VendorAlias* a = DMI_VendorAliases; a->vendor; ++a) {
     if (! strncmp(model_name, a->vendor, strlen(a->vendor))) {
       return str_replace_prefix(model_name, a->vendor, a->alias);
@@ -54,60 +52,69 @@ bool DMI_ModelNameEquals(const char* a, const char* b) {
   return equals;
 }
 
-const char* DMI_GetSystemProduct(void) {
-  static char buf[128];
-
-  if (! File_Read(buf, sizeof(buf), DMI_PRODUCT_NAME_FILE).ok)
+Error DMI_GetSystemProduct(char* out, size_t len) {
+  if (! File_Read(out, len, DMI_PRODUCT_NAME_FILE).ok)
     goto error;
 
-  buf[strcspn(buf, "\n")] = '\0';
+  out[strcspn(out, "\n")] = '\0';
 
-  if (!*buf) {
+  if (*out == '\0') {
     errno = ENODATA;
     goto error;
   }
 
-  return buf;
+  return err_success();
 
 error:
-  Log_Error("Could not get product name. Failed to read " DMI_PRODUCT_NAME_FILE ": %s", strerror(errno));
-  exit(NBFC_EXIT_FAILURE);
+  return err_stdlib(DMI_PRODUCT_NAME_FILE);
 }
 
-const char* DMI_GetSystemVendor(void) {
-  static char buf[128];
-
-  if (! File_Read(buf, sizeof(buf), DMI_SYS_VENDOR_FILE).ok)
+Error DMI_GetSystemVendor(char* out, size_t len) {
+  if (! File_Read(out, len, DMI_SYS_VENDOR_FILE).ok)
     goto error;
 
-  buf[strcspn(buf, "\n")] = '\0';
+  out[strcspn(out, "\n")] = '\0';
 
-  if (!*buf) {
+  if (*out == '\0') {
     errno = ENODATA;
     goto error;
   }
 
-  return buf;
+  return err_success();
 
 error:
-  Log_Error("Could not get system vendor. Failed to read " DMI_SYS_VENDOR_FILE": %s", strerror(errno));
-  exit(NBFC_EXIT_FAILURE);
+  return err_stdlib(DMI_SYS_VENDOR_FILE);
 }
 
-const char* DMI_GetModelName(void) {
-  static char model_name[256];
+Error DMI_GetModelName(char* out, size_t len) {
+  Error e;
+  char vendor[DMI_MAX_VENDOR_LEN];
+  char product[DMI_MAX_PRODUCT_LEN];
 
-  const char* product = DMI_GetSystemProduct();
-  const char* vendor  = DMI_GetSystemVendor();
+  e = DMI_GetSystemVendor(vendor, sizeof(vendor));
+  if (e)
+    return e;
+
+  e = DMI_GetSystemProduct(product, sizeof(product));
+  if (e)
+    return e;
+
+  if (str_starts_with_ignorecase(product, vendor)) {
+    snprintf(out, len, "%s", product);
+    return err_success();
+  }
+
   const char* vendor_alias = DMI_FindVendorAlias(vendor);
+  if (! vendor_alias) {
+    snprintf(out, len, "%s %s", vendor, product);
+    return err_success();
+  }
 
-  if (vendor_alias)
-    vendor = vendor_alias;
+  if (str_starts_with_ignorecase(product, vendor_alias)) {
+    snprintf(out, len, "%s", product);
+    return err_success();
+  }
 
-  if (str_starts_with_ignorecase(product, vendor))
-    snprintf(model_name, sizeof(model_name), "%s", product);
-  else
-    snprintf(model_name, sizeof(model_name), "%s %s", vendor, product);
-
-  return model_name;
+  snprintf(out, len, "%s %s", vendor_alias, product);
+  return err_success();
 }

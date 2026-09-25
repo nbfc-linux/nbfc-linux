@@ -28,6 +28,7 @@
 
 #include "acpi_call.c"
 #include "buffer.c"
+#include "dmi.c"
 #include "log.c"
 #include "lua_bindings.c"
 #include "error.c"
@@ -36,6 +37,7 @@
 #include "fan_temperature_control.c"
 #include "fs_sensors.c"
 #include "file_utils.c"
+#include "hardware_check.c"
 #include "memory.c"
 #include "nxjson_memory.c"
 #include "model_config.c"

@@ -244,9 +244,16 @@ end:
 static int Support_UploadFirmware(void) {
   Error e;
   array_of(str) files;
+  char model_name[DMI_MAX_MODEL_NAME_LEN];
 
   // Accessing `ACPI_ANALYSIS_ACPI_DIR` requires root
   check_root();
+
+  e = DMI_GetModelName(model_name, sizeof(model_name));
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
 
   e = AcpiAnalysis_GetAmlFiles(NULL, &files);
   if (e) {
@@ -255,7 +262,7 @@ static int Support_UploadFirmware(void) {
   }
 
   // Do the upload
-  char* response = Support_DoUpload(DMI_GetModelName(), &files);
+  char* response = Support_DoUpload(model_name, &files);
   if (! response)
     return NBFC_EXIT_FAILURE;
 
@@ -270,7 +277,14 @@ static int Support_UploadFirmware(void) {
 static int Support_PrintCommand(void) {
   Error e;
   array_of(str) files;
+  char model_name[DMI_MAX_MODEL_NAME_LEN];
   char* endpoint_url = Support_GetRealFirmwareUploadURL();
+
+  e = DMI_GetModelName(model_name, sizeof(model_name));
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
 
   e = AcpiAnalysis_GetAmlFiles(NULL, &files);
   if (e) {
@@ -284,7 +298,7 @@ static int Support_PrintCommand(void) {
     "sudo curl -X POST '%s' \\\n"
     " -F 'model=%s' \\\n",
     endpoint_url,
-    DMI_GetModelName()
+    model_name
   );
 
   for_enumerate_array(array_size_t, i, files) {

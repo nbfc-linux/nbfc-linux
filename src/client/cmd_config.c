@@ -5,13 +5,13 @@
 #include <unistd.h>       // isatty
 #include <linux/limits.h> // PATH_MAX
 
+#include "../dmi.h"
 #include "../nbfc.h"
 #include "../log.h"
 #include "../macros.h"
 #include "../service_config.h"
 #include "../help/client.help.h"
 
-#include "dmi.h"
 #include "check_root.h"
 #include "config_files.h"
 #include "client_global.h"
@@ -113,12 +113,20 @@ static int Config_List(void) {
 }
 
 static int Config_Recommend(void) {
+  Error e;
+  char model_name[DMI_MAX_MODEL_NAME_LEN];
+
   if (isatty(STDOUT_FILENO) && !Config_Options.yes) {
     fprintf(stderr, "%s", RECOMMENDED_WARNING);
     return NBFC_EXIT_FAILURE;
   }
 
-  const char* model_name = DMI_GetModelName();
+  e = DMI_GetModelName(model_name, sizeof(model_name));
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
   array_of(ConfigFile) files = List_Recommended_Configs();
   char* config = Get_Supported_Config(&files, model_name);
 
@@ -145,13 +153,23 @@ static int Config_Recommend(void) {
 
 static int Config_Set(void) {
   check_root();
+
+  Error e;
   char* config;
   array_of(ConfigFile) files = List_All_Configs();
   ServiceConfig service_config = {0};
 
   // "auto" ===================================================================
   if (! str_cmp_ignorecase(Config_Options.config, "auto")) {
-    config = Get_Supported_Config(&files, DMI_GetModelName());
+    char model_name[DMI_MAX_MODEL_NAME_LEN];
+
+    e = DMI_GetModelName(model_name, sizeof(model_name));
+    if (e) {
+      Log_Error("%s", err_print_all(e));
+      return NBFC_EXIT_FAILURE;
+    }
+
+    config = Get_Supported_Config(&files, model_name);
 
     if (! config) {
       Log_Error("No config found to apply automatically");
@@ -191,7 +209,7 @@ static int Config_Set(void) {
   service_config.SelectedConfigId = config;
   service_config.isset.SelectedConfigId = true;
 
-  Error e = ServiceConfig_Write(&service_config, NBFC_SERVICE_CONFIG);
+  e = ServiceConfig_Write(&service_config, NBFC_SERVICE_CONFIG);
   Mem_Free(config);
 
   if (e) {

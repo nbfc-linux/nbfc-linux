@@ -12,6 +12,7 @@
 #define NBFC_STATE_FILE                  NBFC_MUTABLE_DIR "/state.json"
 #define NBFC_MODEL_CONFIGS_DIR_MUTABLE   NBFC_MUTABLE_DIR "/configs"
 #define NBFC_MODEL_SUPPORT_FILE_MUTABLE  NBFC_MUTABLE_DIR "/model_support.json"
+#define NBFC_CURRENT_MODEL_NAME_FILE     NBFC_MUTABLE_DIR "/current_model.txt"
 #define NBFC_CONFIG_DIR                  SYSCONFDIR "/nbfc"
 #define NBFC_SERVICE_CONFIG              SYSCONFDIR "/nbfc/nbfc.json"
 #define NBFC_PID_FILE                    RUNSTATEDIR "/nbfc_service.pid"

@@ -11,7 +11,7 @@
 #include "../nxjson_utils.h"
 #include "../file_utils.h"
 #include "../str_functions.h"
-#include "dmi.h"
+#include "../dmi.h"
 
 // Find a ConfigFile by config_name (case-sensitive)
 ConfigFile* ConfigFiles_Find(array_of(ConfigFile)* files, const char* name) {
@@ -166,13 +166,23 @@ Error ConfigFiles_FromFile(array_of(ConfigFile)* out, const char* file) {
 // List all configs (in the static config directory as well as in the mutable config directory).
 // The `diff` field of the ConfigFile structure will also be set.
 array_of(ConfigFile) List_Recommended_Configs(void) {
-  const char* model_name = DMI_GetModelName();
+  Error e;
+  char model_name[DMI_MAX_MODEL_NAME_LEN];
+
+  e = DMI_GetModelName(model_name, sizeof(model_name));
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
   array_of(ConfigFile) files = List_All_Configs();
+
   for_each_array(ConfigFile*, file, files) {
     char* config_name = DMI_ReplaceVendorAlias(file->config_name);
     file->diff = str_similarity(model_name, config_name);
     Mem_Free(config_name);
   }
+
   qsort(files.data, files.size, sizeof(struct ConfigFile), ConfigFile_CompareByDiff);
   return files;
 }

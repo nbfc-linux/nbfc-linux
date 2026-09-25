@@ -2,13 +2,13 @@
 #include <string.h> // strcmp, strcspn
 #include <unistd.h> // close
 
+#include "../dmi.h"
 #include "../nbfc.h"
 #include "../macros.h"
 #include "../sleep.h"
 #include "../file_utils.h"
 #include "../fs_sensors.h"
 
-#include "dmi.h"
 #include "service_control.h"
 
 static int WaitForHwmon(void) {
@@ -48,7 +48,16 @@ static int WaitForHwmon(void) {
 }
 
 static int GetModelName(void) {
-  printf("%s\n", DMI_GetModelName());
+  Error e;
+  char model_name[DMI_MAX_MODEL_NAME_LEN];
+
+  e = DMI_GetModelName(model_name, sizeof(model_name));
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
+  printf("%s\n", model_name);
   return NBFC_EXIT_SUCCESS;
 }
 

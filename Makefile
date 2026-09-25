@@ -228,6 +228,7 @@ src/nbfc_service: \
 	src/acpi_call.h src/acpi_call.c \
 	src/build.c \
 	src/config.h \
+	src/dmi.h src/dmi.c \
 	src/ec.h \
 	src/ec_debug.h src/ec_debug.c \
 	src/ec_dummy.h src/ec_dummy.c \
@@ -237,9 +238,11 @@ src/nbfc_service: \
 	src/fan.c src/fan.h \
 	src/fan_temperature_control.h \
 	src/fan_temperature_control.c \
+	src/file_utils.c src/file_utils.h \
 	src/fs_sensors.c src/fs_sensors.h \
 	src/generated/model_config.generated.c \
 	src/generated/model_config.generated.h \
+	src/hardware_check.h src/hardware_check.c \
 	src/help/nbfc_service.help.h \
 	src/log.h src/log.c \
 	src/lua_bindings.h src/lua_bindings.c \
@@ -251,8 +254,10 @@ src/nbfc_service: \
 	src/nbfc.h \
 	src/nxjson.c src/nxjson.h \
 	src/nxjson_utils.h \
+	src/nxjson_write.c src/nxjson_write.h \
 	src/pidfile.c src/pidfile.h \
 	src/process.h src/process.c \
+	src/program_name.h src/program_name.c \
 	src/protocol.c src/protocol.h \
 	src/register_write_configuration_utils.c src/register_write_configuration_utils.h \
 	src/server.c src/server.h \
@@ -260,6 +265,7 @@ src/nbfc_service: \
 	src/service_config.c src/service_config.h \
 	src/service_state.c src/service_state.h \
 	src/sponsor.c src/sponsor.h \
+	src/str_functions.c src/str_functions.h \
 	src/temperature_filter.c src/temperature_filter.h \
 	src/temperature_threshold_manager.c src/temperature_threshold_manager.h \
 	src/vfio.c src/vfio.h
@@ -277,7 +283,8 @@ src/ec_probe: \
 	src/help/ec_probe.help.h \
 	src/nbfc.h \
 	src/memory.h src/memory.c \
-	src/process.h src/process.c
+	src/process.h src/process.c \
+	src/program_name.h src/program_name.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDLIBS_EC_PROBE) $(LDFLAGS)
 
 src/nbfc: \
@@ -304,8 +311,6 @@ src/nbfc: \
 	src/client/config_files.h \
 	src/client/curl_utils.h \
 	src/client/curl_utils.c \
-	src/client/dmi.c \
-	src/client/dmi.h \
 	src/client/service_control.c \
 	src/client/service_control.h \
 	src/client/spearman.c \
@@ -317,11 +322,13 @@ src/nbfc: \
 	src/config_analysis.h src/config_analysis.c \
 	src/config_rating.h src/config_rating.c \
 	src/config_rating_rules.h src/config_rating_rules.c \
+	src/dmi.h src/dmi.c \
 	src/ec.h src/ec.c \
 	src/ec_cache.h src/ec_cache.c \
 	src/ec_linux.h src/ec_linux.c \
 	src/ec_sys_linux.h src/ec_sys_linux.c \
 	src/error.h src/error.c \
+	src/file_utils.c src/file_utils.h \
 	src/help/ec_probe.help.h \
 	src/log.h src/log.c \
 	src/lua_bindings.h src/lua_bindings.c \
@@ -329,9 +336,12 @@ src/nbfc: \
 	src/model_config_to_json.c src/model_config_to_json.h \
 	src/model_config_utils.c src/model_config_utils.h \
 	src/protocol.c src/protocol.h \
-	src/nxjson.c src/nxjson_write.c src/nxjson.h \
+	src/nxjson.c src/nxjson.h \
+	src/nxjson_utils.h \
+	src/nxjson_write.c src/nxjson_write.h \
 	src/nbfc.h \
 	src/process.h src/process.c \
+	src/program_name.h src/program_name.c \
 	src/regex_utils.h src/regex_utils.c \
 	src/register_write_configuration_utils.c src/register_write_configuration_utils.h \
 	src/str_functions.c \

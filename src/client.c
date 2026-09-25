@@ -61,7 +61,7 @@
 #include "temperature_threshold_manager.c"
 #include "vfio.c"
 #include "xml2json.c"
-#include "client/dmi.c"
+#include "dmi.c"
 #include "client/curl_utils.c"
 #include "client/config_files.c"
 #include "client/service_control.c"
