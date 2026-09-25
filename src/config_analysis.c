@@ -244,10 +244,14 @@ Error ConfigAnalysis_AnalyzeFanConfiguration(
 
   // Read operations
   if (fan_config->isset.ReadRegister) {
+    bool readWords = model_config->ReadWriteWords;
+    if (fan_config->isset.ReadWords)
+      readWords = fan_config->ReadWords;
+
     e = ConfigAnalysis_PushRegister(
       fan_config->ReadRegister,
       RegisterType_FanReadRegister,
-      model_config->ReadWriteWords);
+      readWords);
     if (e) return e;
   }
 
@@ -263,10 +267,14 @@ Error ConfigAnalysis_AnalyzeFanConfiguration(
 
   // Write operations
   if (fan_config->isset.WriteRegister) {
+    bool writeWords = model_config->ReadWriteWords;
+    if (fan_config->isset.WriteWords)
+      writeWords = fan_config->WriteWords;
+
     e = ConfigAnalysis_PushRegister(
       fan_config->WriteRegister,
       RegisterType_FanWriteRegister,
-      model_config->ReadWriteWords);
+      writeWords);
     if (e) return e;
   }
 

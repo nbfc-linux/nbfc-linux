@@ -157,6 +157,10 @@ Can be overwritten by
 If
 .BR true ,
 NBFC will combine two 8 bit registers to one 16\-bit register when reading from or writing to the EC registers.
+
+.B DEPRECATED.
+Use
+.BR FanConfiguration "->" ReadWords " and " FanConfiguration "->" WriteWords " instead."
 .RE
 
 .PP
@@ -238,6 +242,30 @@ If the temperature exceeds this threshold, NBFC will ignore all Temperature thre
 .RS
 See
 .BR CriticalTemperature .
+.RE
+
+.PP
+.BR ReadWords :
+.I Boolean
+.RS
+If
+.BR true ,
+NBFC will combine two 8 bit registers to one 16\-bit register when reading from the EC.
+
+Overrides
+.BR ModelConfig "->" ReadWriteWords "."
+.RE
+
+.PP
+.BR WriteWords :
+.I Boolean
+.RS
+If
+.BR true ,
+NBFC will combine two 8 bit registers to one 16\-bit register when writing to the EC.
+
+Overrides
+.BR ModelConfig "->" ReadWriteWords "."
 .RE
 
 .PP

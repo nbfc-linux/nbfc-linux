@@ -101,6 +101,9 @@ State file of the service (*/var/lib/nbfc/state.json*).
 
 > If **true**, NBFC will combine two 8 bit registers to one 16-bit
 > register when reading from or writing to the EC registers.
+>
+> **DEPRECATED.** Use **FanConfiguration**-\>**ReadWords** and
+> **FanConfiguration**-\>**WriteWords** instead.
 
 **LuaLibraries**: *Array of String*
 
@@ -158,6 +161,20 @@ Defines how NBFC controls a fan.
 **CriticalTemperatureOffset**: *Integer* \> 0
 
 > See **CriticalTemperature**.
+
+**ReadWords**: *Boolean*
+
+> If **true**, NBFC will combine two 8 bit registers to one 16-bit
+> register when reading from the EC.
+>
+> Overrides **ModelConfig**-\>**ReadWriteWords**.
+
+**WriteWords**: *Boolean*
+
+> If **true**, NBFC will combine two 8 bit registers to one 16-bit
+> register when writing to the EC.
+>
+> Overrides **ModelConfig**-\>**ReadWriteWords**.
 
 **ReadRegister**: *Integer* \>= 0 && *Integer* \<= 255
 

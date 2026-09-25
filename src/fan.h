@@ -16,7 +16,8 @@ typedef enum NBFC_PACKED_ENUM {
 typedef struct Fan Fan;
 struct Fan {
   FanConfiguration* fanConfig;        /*const*/
-  bool     readWriteWords;            /*const*/
+  bool     readWords;                 /*const*/
+  bool     writeWords;                /*const*/
   int      criticalTemperature;       /*const*/
   int      criticalTemperatureOffset; /*const*/
   uint16_t minSpeedValueWrite;        /*const*/

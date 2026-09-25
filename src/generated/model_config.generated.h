@@ -70,6 +70,8 @@ struct FanConfiguration {
 	const char*     FanDisplayName;
 	int16_t         CriticalTemperature;
 	uint16_t        CriticalTemperatureOffset;
+	bool            ReadWords;
+	bool            WriteWords;
 	uint8_t         ReadRegister;
 	const char*     ReadAcpiMethod;
 	LuaCode         ReadLuaCode;
@@ -93,6 +95,8 @@ struct FanConfiguration {
 		bool FanDisplayName  : 1;
 		bool CriticalTemperature : 1;
 		bool CriticalTemperatureOffset : 1;
+		bool ReadWords       : 1;
+		bool WriteWords      : 1;
 		bool ReadRegister    : 1;
 		bool ReadAcpiMethod  : 1;
 		bool ReadLuaCode     : 1;

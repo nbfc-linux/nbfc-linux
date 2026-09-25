@@ -15,7 +15,6 @@ extern const EC_VTable* ec;
 Error Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.fanConfig            = cfg;
   my.mode                 = Fan_ModeAuto;
-  my.readWriteWords       = modelCfg->ReadWriteWords;
   my.minSpeedValueWrite   = cfg->MinSpeedValue;
   my.maxSpeedValueWrite   = cfg->MaxSpeedValue;
   const bool same = ! cfg->IndependentReadMinMaxValues;
@@ -25,6 +24,15 @@ Error Fan_Init(Fan* self, FanConfiguration* cfg, ModelConfig* modelCfg) {
   my.maxSpeedValueReadAbs = MAX(my.minSpeedValueRead, my.maxSpeedValueRead);
   my.fanSpeedSteps        = my.maxSpeedValueReadAbs - my.minSpeedValueReadAbs;
   my.num_read_warnings    = 0;
+
+  my.readWords = modelCfg->ReadWriteWords;
+  my.writeWords = modelCfg->ReadWriteWords;
+
+  if (cfg->isset.ReadWords)
+    my.readWords = cfg->ReadWords;
+
+  if (cfg->isset.WriteWords)
+    my.writeWords = cfg->WriteWords;
 
   if (cfg->isset.CriticalTemperature)
     my.criticalTemperature = cfg->CriticalTemperature;
@@ -114,7 +122,7 @@ static Error Fan_ECWriteValue(Fan* self, uint16_t value) {
       return err_success();
   }
 
-  if (my.readWriteWords)
+  if (my.writeWords)
     return ec->WriteWord(my.fanConfig->WriteRegister, value);
   else
     return ec->WriteByte(my.fanConfig->WriteRegister, (uint8_t) value);
@@ -143,7 +151,7 @@ static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {
     return e;
   }
 
-  if (my.readWriteWords) {
+  if (my.readWords) {
     uint16_t word;
     e = ec->ReadWord(my.fanConfig->ReadRegister, &word);
     if (!e)

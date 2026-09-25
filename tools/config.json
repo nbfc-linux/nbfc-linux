@@ -147,6 +147,18 @@
         "required": false
       },
       {
+        "name": "ReadWords",
+        "type": "bool",
+        "help": "",
+        "required": false
+      },
+      {
+        "name": "WriteWords",
+        "type": "bool",
+        "help": "",
+        "required": false
+      },
+      {
         "name": "ReadRegister",
         "type": "uint8_t",
         "help": "The register from which NBFC reads the fan speed.",

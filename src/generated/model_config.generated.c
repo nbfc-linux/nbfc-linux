@@ -227,6 +227,12 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 		return err_stringf("%s: %s", "CriticalTemperatureOffset", "Missing option");
 
 	if (false)
+		return err_stringf("%s: %s", "ReadWords", "Missing option");
+
+	if (false)
+		return err_stringf("%s: %s", "WriteWords", "Missing option");
+
+	if (false)
 		return err_stringf("%s: %s", "ReadRegister", "Missing option");
 
 	if (false)
@@ -309,6 +315,16 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 			e = uint16_t_FromJson(&obj->CriticalTemperatureOffset, c);
 			if (!e)
 				obj->isset.CriticalTemperatureOffset = true;
+		}
+		else if (!strcmp(c->key, "ReadWords")) {
+			e = bool_FromJson(&obj->ReadWords, c);
+			if (!e)
+				obj->isset.ReadWords = true;
+		}
+		else if (!strcmp(c->key, "WriteWords")) {
+			e = bool_FromJson(&obj->WriteWords, c);
+			if (!e)
+				obj->isset.WriteWords = true;
 		}
 		else if (!strcmp(c->key, "ReadRegister")) {
 			e = uint8_t_FromJson(&obj->ReadRegister, c);

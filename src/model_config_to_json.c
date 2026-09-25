@@ -163,6 +163,14 @@ static void FanConfiguration_ToJson(const FanConfiguration* cfg, nx_json* parent
     create_json_integer("CriticalTemperatureOffset", obj, cfg->CriticalTemperatureOffset);
   }
 
+  if (cfg->isset.ReadWords) {
+    create_json_bool("ReadWords", obj, cfg->ReadWords);
+  }
+
+  if (cfg->isset.WriteWords) {
+    create_json_bool("WriteWords", obj, cfg->WriteWords);
+  }
+
   if (cfg->isset.ReadRegister) {
     create_json_integer("ReadRegister", obj, cfg->ReadRegister);
   }

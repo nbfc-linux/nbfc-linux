@@ -101,6 +101,10 @@ temperature drops below (<strong>CriticalTemperature</strong> minus
 <p>If <strong>true</strong>, NBFC will combine two 8 bit registers to
 one 16-bit register when reading from or writing to the EC
 registers.</p>
+<p><strong>DEPRECATED.</strong> Use
+<strong>FanConfiguration</strong>-&gt;<strong>ReadWords</strong> and
+<strong>FanConfiguration</strong>-&gt;<strong>WriteWords</strong>
+instead.</p>
 </blockquote>
 <p><strong>LuaLibraries</strong>: <em>Array of String</em></p>
 <blockquote>
@@ -155,6 +159,20 @@ temperature drops below (<strong>CriticalTemperature</strong> minus
 0</p>
 <blockquote>
 <p>See <strong>CriticalTemperature</strong>.</p>
+</blockquote>
+<p><strong>ReadWords</strong>: <em>Boolean</em></p>
+<blockquote>
+<p>If <strong>true</strong>, NBFC will combine two 8 bit registers to
+one 16-bit register when reading from the EC.</p>
+<p>Overrides
+<strong>ModelConfig</strong>-&gt;<strong>ReadWriteWords</strong>.</p>
+</blockquote>
+<p><strong>WriteWords</strong>: <em>Boolean</em></p>
+<blockquote>
+<p>If <strong>true</strong>, NBFC will combine two 8 bit registers to
+one 16-bit register when writing to the EC.</p>
+<p>Overrides
+<strong>ModelConfig</strong>-&gt;<strong>ReadWriteWords</strong>.</p>
 </blockquote>
 <p><strong>ReadRegister</strong>: <em>Integer</em> &gt;= 0 &amp;&amp;
 <em>Integer</em> &lt;= 255</p>
