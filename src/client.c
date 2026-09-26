@@ -437,12 +437,9 @@ int main(int argc, char* const argv[]) {
       break;
 
     case Option_RateConfig_DSDT_File:
-      if (RateConfig_Options.dsdt_files_size >= ACPI_ANALYSIS_MAX_AML_FILES) {
-        Log_Error("%s: Too many files given", p.option->optstring);
-        return NBFC_EXIT_CMDLINE;
-      }
-
-      RateConfig_Options.dsdt_files[RateConfig_Options.dsdt_files_size++] = p.optarg;
+      array_realloc(str, RateConfig_Options.dsdt_files, (RateConfig_Options.dsdt_files.size + 1));
+      RateConfig_Options.dsdt_files.data[RateConfig_Options.dsdt_files.size] = Mem_Strdup(p.optarg);
+      RateConfig_Options.dsdt_files.size++;
       break;
 
    case Option_RateConfig_DSDT_Dir:
@@ -559,12 +556,9 @@ int main(int argc, char* const argv[]) {
     // ========================================================================
 
     case Option_AcpiDump_DSDT_File:
-      if (AcpiDump_Options.files_size >= ACPI_ANALYSIS_MAX_AML_FILES) {
-        Log_Error("%s: Too many files given", p.option->optstring);
-        return NBFC_EXIT_CMDLINE;
-      }
-
-      AcpiDump_Options.files[AcpiDump_Options.files_size++] = p.optarg;
+      array_realloc(str, AcpiDump_Options.files, (AcpiDump_Options.files.size + 1));
+      AcpiDump_Options.files.data[AcpiDump_Options.files.size] = Mem_Strdup(p.optarg);
+      AcpiDump_Options.files.size++;
       break;
 
     case Option_AcpiDump_DSDT_Dir:

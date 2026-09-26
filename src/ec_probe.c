@@ -1151,12 +1151,12 @@ error:
   return NBFC_EXIT_FAILURE;
 }
 
-struct Args {
+struct ShellArgs {
   const char* args[64];
   ssize_t count;
 };
 
-static void ShellRead(const struct Args* args) {
+static void ShellRead(const struct ShellArgs* args) {
   Initialize_EC();
 
   int word = 0;
@@ -1215,7 +1215,7 @@ static void ShellRead(const struct Args* args) {
   }
 }
 
-static void ShellWrite(const struct Args* args) {
+static void ShellWrite(const struct ShellArgs* args) {
   Initialize_EC();
 
   int word = 0;
@@ -1284,7 +1284,7 @@ static void ShellWrite(const struct Args* args) {
   printf("OK\n");
 }
 
-static void ShellReadAll(struct Args*) {
+static void ShellReadAll(struct ShellArgs*) {
   Initialize_EC();
 
   uint8_t values[256];
@@ -1335,7 +1335,7 @@ static const char* read_arg(char** line) {
   return arg;
 }
 
-static void read_args(struct Args* args, char** line) {
+static void read_args(struct ShellArgs* args, char** line) {
   args->count = 0;
 
   while (args->count < ARRAY_SSIZE(args->args)) {
@@ -1349,9 +1349,9 @@ static void read_args(struct Args* args, char** line) {
 static int Shell(void) {
   check_root();
 
-  char buffer[16384];
+  char buffer[8192];
   char* line;
-  struct Args args;
+  struct ShellArgs args;
 
   signal(SIGINT, SIG_DFL);
   signal(SIGTERM, SIG_DFL);

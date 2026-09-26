@@ -691,39 +691,36 @@ bool AcpiAnalysis_IsEmbeddedControllerRegion(const AcpiInfo* info, const char* n
 }
 
 /**
- * Get a list of all relevant AML files inside a directroy.
- *
- * The array must not be free'd.
+ * Get a list of all relevant AML files inside a directory.
  */
 Error AcpiAnalysis_GetAmlFiles(const char* dir, array_of(str)* out) {
-  static char data[ACPI_ANALYSIS_MAX_AML_FILES][PATH_MAX];
-  static const char* files[ACPI_ANALYSIS_MAX_AML_FILES];
-  array_size_t files_size = 0;
+  char path[PATH_MAX];
 
   if (! dir)
     dir = ACPI_ANALYSIS_ACPI_DIR;
 
-  snprintf(data[0], PATH_MAX, "%s/%s", dir, "DSDT");
-  if (File_Exists(data[0])) {
-    files[0] = data[0];
-    files_size = 1;
+  out->size = 0;
+  out->data = NULL;
+
+  snprintf(path, PATH_MAX, "%s/%s", dir, "DSDT");
+  if (File_Exists(path)) {
+    array_realloc(str, *out, (out->size + 1));
+    out->data[out->size] = Mem_Strdup(path);
+    out->size++;
   }
 
-  for (size_t i = 1; i < ACPI_ANALYSIS_MAX_SSDT_FILES; ++i) {
-    snprintf(data[i], PATH_MAX, "%s/SSDT%zu", dir, i);
-    if (File_Exists(data[i])) {
-      if (files_size >= ACPI_ANALYSIS_MAX_AML_FILES)
-        return err_stringf("Too many SSDT files found in %s", ACPI_ANALYSIS_ACPI_DIR);
+  for (size_t i = 0; i < ACPI_ANALYSIS_MAX_SSDT_FILES; ++i) {
+    snprintf(path, PATH_MAX, "%s/SSDT%zu", dir, i);
+    if (! File_Exists(path))
+      continue;
 
-      files[files_size++] = data[i];
-    }
+    array_realloc(str, *out, (out->size + 1));
+    out->data[out->size] = Mem_Strdup(path);
+    out->size++;
   }
 
-  if (! files_size)
+  if (out->size == 0)
     return err_stringf("%s: No AML files found", dir);
-
-  out->data = files;
-  out->size = files_size;
 
   return err_success();
 }

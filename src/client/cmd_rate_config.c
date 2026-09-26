@@ -7,6 +7,7 @@
 #include "../model_config_utils.h"
 #include "../nxjson_utils.h"
 
+#include <errno.h>  // errno
 #include <string.h> // memset, strerror
 #include <linux/limits.h>
 
@@ -41,32 +42,32 @@ const struct cli99_Option RateConfig_CommandLine[] = {
   cli99_Options_End()
 };
 
-enum NBFC_PACKED_ENUM RateConfig_Action {
+typedef enum NBFC_PACKED_ENUM {
   RateConfig_Action_None,
   RateConfig_Action_RateAll,
   RateConfig_Action_RateFromFile,
   RateConfig_Action_RateFile,
   RateConfig_Action_PrintRules,
   RateConfig_Action_PrintFullHelp,
-};
+} RateConfig_Action;
 
-enum NBFC_PACKED_ENUM RateConfig_PrintStyle {
+typedef enum NBFC_PACKED_ENUM {
   RateConfig_PrintName,
   RateConfig_PrintNameAndScore,
   RateConfig_PrintFull,
-};
+} RateConfig_PrintStyle;
 
-enum NBFC_PACKED_ENUM RateConfig_Filter {
+typedef enum NBFC_PACKED_ENUM {
   RateConfig_FilterBadOnly,
   RateConfig_FilterGoodOnly,
   RateConfig_FilterAll,
-};
+} RateConfig_Filter;
 
 struct {
   const char* action_option_string;
-  enum RateConfig_Action action;
-  enum RateConfig_PrintStyle style;
-  enum RateConfig_Filter filter;
+  RateConfig_Action action;
+  RateConfig_PrintStyle style;
+  RateConfig_Filter filter;
   bool        json;
   bool        no_download;
   bool        min_score_set;
@@ -74,8 +75,7 @@ struct {
   uint8_t     fan_count;
   float       min_score;
   const char* file;
-  const char* dsdt_files[ACPI_ANALYSIS_MAX_AML_FILES];
-  size_t      dsdt_files_size;
+  array_of(str) dsdt_files;
   const char* dsdt_dir;
   const char* rules_file;
   const char* input_file;
@@ -92,13 +92,12 @@ struct {
   RATE_CONFIG_RECOMMENDED_MINIMUM_SCORE,
   NULL,
   {0},
-  0,
   NULL,
   NULL,
   NULL,
 };
 
-void RateConfig_SetAction(enum RateConfig_Action action, const char* option) {
+void RateConfig_SetAction(RateConfig_Action action, const char* option) {
   if (RateConfig_Options.action != RateConfig_Action_None) {
     Log_Error("%s cannot be used with %s", RateConfig_Options.action_option_string, option);
     exit(NBFC_EXIT_CMDLINE);
@@ -428,7 +427,7 @@ static bool RateConfig_GroupHasFanCount(
 static bool RateConfig_GroupFilterBad(
   const array_of(ConfigWithData)* results,
   array_size_t group_id,
-  enum RateConfig_Filter filter
+  RateConfig_Filter filter
 ) {
   for_each_array(ConfigWithData*, result, *results) {
     if (result->group_id == group_id) {
@@ -474,7 +473,7 @@ static void RateConfig_PrintResults(
   const array_of(ConfigWithData)* results,
   array_size_t num_groups,
   float min_score,
-  enum RateConfig_Filter bad_filter
+  RateConfig_Filter bad_filter
 ) {
   for (array_size_t group_id = 0; group_id < num_groups; ++group_id) {
     if (! RateConfig_GroupHasMinScore(results, group_id, min_score))
@@ -515,7 +514,7 @@ static void RateConfig_PrintResultsJson(
   const array_of(ConfigWithData)* results,
   array_size_t num_groups,
   float min_score,
-  enum RateConfig_Filter bad_filter
+  RateConfig_Filter bad_filter
 ) {
   nx_json root = {0};
   nx_json* array = create_json_array(NULL, &root);
@@ -550,7 +549,7 @@ static Error RateConfig_RateFiles(
   const array_of(ConfigFile)* files,
   bool json,
   float min_score,
-  enum RateConfig_Filter bad_filter
+  RateConfig_Filter bad_filter
 ) {
   Error e = err_success();
   array_of(ConfigWithData) ratings;
@@ -602,7 +601,7 @@ static Error RateConfig_RateMany(
   const array_of(ConfigFile)* files,
   bool json,
   float min_score,
-  enum RateConfig_Filter bad_filter
+  RateConfig_Filter bad_filter
 ) {
   Error e;
 
@@ -627,7 +626,7 @@ static Error RateConfig_RateAll(
   const ConfigRating* config_rating,
   bool json,
   float min_score,
-  enum RateConfig_Filter bad_filter
+  RateConfig_Filter bad_filter
 ) {
   Error e;
 
@@ -655,7 +654,7 @@ static Error RateConfig_RateFromFile(
   const char* file,
   bool json,
   float min_score,
-  enum RateConfig_Filter bad_filter
+  RateConfig_Filter bad_filter
 ) {
   Error e;
   array_of(ConfigFile) files = {0};
@@ -746,25 +745,19 @@ static int RateConfig_PrintRules(const char* rules_json, bool json) {
   return NBFC_EXIT_SUCCESS;
 }
 
-static Error RateConfig_MakeAMLFilesArray(array_of(str)* out) {
-  if (RateConfig_Options.dsdt_files_size) {
-    out->data = RateConfig_Options.dsdt_files;
-    out->size = RateConfig_Options.dsdt_files_size;
+static Error RateConfig_MakeAMLFilesArray(void) {
+  if (RateConfig_Options.dsdt_files.size)
     return err_success();
-  }
-  else if (RateConfig_Options.dsdt_dir) {
-    return AcpiAnalysis_GetAmlFiles(RateConfig_Options.dsdt_dir, out);
-  }
-  else {
-    return AcpiAnalysis_GetAmlFiles(NULL, out);
-  }
+
+  // RateConfig_Options.dsdt_dir may be NULL.
+  // In this case `AcpiAnalysis_GetAmlFiles()` uses the a default directory.
+  return AcpiAnalysis_GetAmlFiles(RateConfig_Options.dsdt_dir, &RateConfig_Options.dsdt_files);
 }
 
 int RateConfig(void) {
   Error e;
   char* rules;
   ConfigRating config_rating = {0};
-  array_of(str) dsdt_files = {0};
 
   // ==========================================================================
   // Check command line arguments
@@ -813,18 +806,18 @@ int RateConfig(void) {
   // Check if AML files are readable
   // ==========================================================================
 
-  if (! RateConfig_Options.dsdt_files_size && ! RateConfig_Options.dsdt_dir) {
+  if (! RateConfig_Options.dsdt_files.size && ! RateConfig_Options.dsdt_dir) {
     check_root();
   }
 
-  for (size_t i = 0; i < RateConfig_Options.dsdt_files_size; ++i) {
-    if (! File_IsReadable(RateConfig_Options.dsdt_files[i])) {
-      Log_Error("%s: %s", RateConfig_Options.dsdt_files[i], strerror(errno));
+  for_each_array(str*, file, RateConfig_Options.dsdt_files) {
+    if (! File_IsReadable(*file)) {
+      Log_Error("%s: %s", *file, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
 
-  e = RateConfig_MakeAMLFilesArray(&dsdt_files);
+  e = RateConfig_MakeAMLFilesArray();
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
@@ -848,7 +841,7 @@ int RateConfig(void) {
   if (! rules)
     return NBFC_EXIT_FAILURE;
 
-  e = ConfigRating_Init(&config_rating, &dsdt_files, rules);
+  e = ConfigRating_Init(&config_rating, &RateConfig_Options.dsdt_files, rules);
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;

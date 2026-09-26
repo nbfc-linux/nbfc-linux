@@ -8,8 +8,9 @@
 #include "check_root.h"
 #include "client_global.h"
 
+#include <errno.h>  // errno
 #include <stdio.h>  // printf
-#include <string.h> // strcmp
+#include <string.h> // strcmp, strerror
 
 const struct cli99_Option AcpiDump_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),
@@ -21,32 +22,30 @@ const struct cli99_Option AcpiDump_CommandLine[] = {
   cli99_Options_End()
 };
 
-enum NBFC_PACKED_ENUM AcpiDump_Action {
+typedef enum NBFC_PACKED_ENUM {
   AcpiDump_Action_None,
   AcpiDump_Action_Registers,
   AcpiDump_Action_ECRegisters,
   AcpiDump_Action_Methods,
   AcpiDump_Action_DSL,
   AcpiDump_Action_Map,
-};
+} AcpiDump_Action;
 
 struct {
-  enum AcpiDump_Action action;
+  AcpiDump_Action action;
   bool json;
   bool unverified;
-  const char* files[ACPI_ANALYSIS_MAX_AML_FILES];
-  size_t files_size;
+  array_of(str) files;
   const char* dir;
 } AcpiDump_Options = {
   AcpiDump_Action_None,
   false,
   false,
   {0},
-  0,
   NULL,
 };
 
-enum AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
+AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
   if (! strcmp(s, "registers"))    return AcpiDump_Action_Registers;
   if (! strcmp(s, "ec-registers")) return AcpiDump_Action_ECRegisters;
   if (! strcmp(s, "methods"))      return AcpiDump_Action_Methods;
@@ -280,23 +279,17 @@ static int AcpiDump_Map(array_of(str)* aml_files, bool unverified) {
   return NBFC_EXIT_SUCCESS;
 }
 
-static Error AcpiDump_MakeAMLFilesArray(array_of(str)* out) {
-  if (AcpiDump_Options.files_size) {
-    out->data = AcpiDump_Options.files;
-    out->size = AcpiDump_Options.files_size;
+static Error AcpiDump_MakeAMLFilesArray(void) {
+  if (AcpiDump_Options.files.size)
     return err_success();
-  }
-  else if (AcpiDump_Options.dir) {
-    return AcpiAnalysis_GetAmlFiles(AcpiDump_Options.dir, out);
-  }
-  else {
-    return AcpiAnalysis_GetAmlFiles(NULL, out);
-  }
+
+  // AcpiDump_Options.dir may be NULL.
+  // In this case `AcpiAnalysis_GetAmlFiles()` uses the a default directory.
+  return AcpiAnalysis_GetAmlFiles(AcpiDump_Options.dir, &AcpiDump_Options.files);
 }
 
 int AcpiDump(void) {
   Error e;
-  array_of(str) aml_files = {0};
   const bool json = AcpiDump_Options.json;
   const bool unverified = AcpiDump_Options.unverified;
 
@@ -305,29 +298,30 @@ int AcpiDump(void) {
     return NBFC_EXIT_CMDLINE;
   }
 
-  if (! AcpiDump_Options.files_size && ! AcpiDump_Options.dir) {
+  if (! AcpiDump_Options.files.size && ! AcpiDump_Options.dir) {
     check_root();
   }
 
-  for (size_t i = 0; i < AcpiDump_Options.files_size; ++i) {
-    if (! File_IsReadable(AcpiDump_Options.files[i])) {
-      Log_Error("%s: %s", AcpiDump_Options.files[i], strerror(errno));
+  for_each_array(str*, file, AcpiDump_Options.files) {
+    if (! File_IsReadable(*file)) {
+      Log_Error("%s: %s", *file, strerror(errno));
       return NBFC_EXIT_FAILURE;
     }
   }
 
-  e = AcpiDump_MakeAMLFilesArray(&aml_files);
+  e = AcpiDump_MakeAMLFilesArray();
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 
+  array_of(str)* const aml_files = &AcpiDump_Options.files;
   switch (AcpiDump_Options.action) {
-    case AcpiDump_Action_DSL:         return AcpiDump_DSL(&aml_files);
-    case AcpiDump_Action_Methods:     return AcpiDump_Methods(&aml_files, json);
-    case AcpiDump_Action_Registers:   return AcpiDump_Registers(&aml_files, json, false, unverified);
-    case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(&aml_files, json, true, unverified);
-    case AcpiDump_Action_Map:         return AcpiDump_Map(&aml_files, unverified);
+    case AcpiDump_Action_DSL:         return AcpiDump_DSL(aml_files);
+    case AcpiDump_Action_Methods:     return AcpiDump_Methods(aml_files, json);
+    case AcpiDump_Action_Registers:   return AcpiDump_Registers(aml_files, json, false, unverified);
+    case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(aml_files, json, true, unverified);
+    case AcpiDump_Action_Map:         return AcpiDump_Map(aml_files, unverified);
     default:                          return NBFC_EXIT_FAILURE;
   }
 }
