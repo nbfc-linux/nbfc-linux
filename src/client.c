@@ -33,6 +33,7 @@
 #include "file_utils.c"
 #include "model_config.c"
 #include "fs_sensors.c"
+#include "io_utils.c"
 #include "nvidia.c"
 #include "memory.c"
 #include "nxjson_memory.c"

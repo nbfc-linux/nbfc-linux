@@ -3,7 +3,7 @@
 
 #include "error.h"
 #include "nxjson.h"
-#include "send.h"
+#include "io_utils.h"
 
 #define PROTOCOL_END_MARKER     "\nEND"
 #define PROTOCOL_END_MARKER_LEN 4
@@ -14,7 +14,7 @@ Error Protocol_SendError(int, const char*);
 Error Protocol_ReceiveJson(int, char**, const nx_json**);
 
 static inline Error Protocol_Send(int socket, const char* s, size_t len) {
-  if (! Send(socket, s, len))
+  if (! IO_SendAll(socket, s, len))
     return err_stdlib("send()");
   return err_success();
 }

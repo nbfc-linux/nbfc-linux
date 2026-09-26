@@ -38,6 +38,7 @@
 #include "fs_sensors.c"
 #include "file_utils.c"
 #include "hardware_check.c"
+#include "io_utils.c"
 #include "memory.c"
 #include "nxjson_memory.c"
 #include "model_config.c"

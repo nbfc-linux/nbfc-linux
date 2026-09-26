@@ -244,6 +244,7 @@ src/nbfc_service: \
 	src/generated/model_config.generated.h \
 	src/hardware_check.h src/hardware_check.c \
 	src/help/nbfc_service.help.h \
+	src/io_utils.c src/io_utils.h \
 	src/log.h src/log.c \
 	src/lua_bindings.h src/lua_bindings.c \
 	src/macros.h \
@@ -330,6 +331,7 @@ src/nbfc: \
 	src/error.h src/error.c \
 	src/file_utils.c src/file_utils.h \
 	src/help/ec_probe.help.h \
+	src/io_utils.c src/io_utils.h \
 	src/log.h src/log.c \
 	src/lua_bindings.h src/lua_bindings.c \
 	src/mkdir_p.c src/mkdir_p.h \

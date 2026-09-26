@@ -1,7 +1,7 @@
 #include "nxjson_write.h"
 
 #include "macros.h"
-#include "send.h"
+#include "io_utils.h"
 
 #include <string.h> // strlen
 #include <unistd.h> // write
@@ -23,10 +23,10 @@ static void NxJson_WriteRaw(NxJson_Writer* obj, const char* s) {
   const size_t len = strlen(s);
 
   if (obj->mode == NxJson_WriteModeWrite) {
-    write(obj->fd, s, len);
+    obj->success &= IO_WriteAll(obj->fd, s, len);
   }
   else {
-    obj->success &= Send(obj->fd, s, len);
+    obj->success &= IO_SendAll(obj->fd, s, len);
   }
 }
 
