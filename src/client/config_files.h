@@ -17,7 +17,7 @@ Error ConfigFiles_FromFile(array_of(ConfigFile)*, const char*);
 
 char* Get_Supported_Config(array_of(ConfigFile)*, const char*);
 ConfigFile* ConfigFiles_Find(array_of(ConfigFile)*, const char*);
-ConfigFile* ConfigFiles_FindIgnoreCase(array_of(ConfigFile)*, const char*);
+ConfigFile* ConfigFiles_FindLoose(array_of(ConfigFile)*, const char*);
 void  ConfigFiles_Free(array_of(ConfigFile)*);
 
 int ConfigFile_CompareByName(const void*, const void*);

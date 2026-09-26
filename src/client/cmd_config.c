@@ -15,6 +15,7 @@
 #include "check_root.h"
 #include "config_files.h"
 #include "client_global.h"
+#include "service_control.h"
 
 #define RECOMMENDED_CONFIG_MATCH_THRESHOLD 0.7f
 
@@ -64,16 +65,25 @@
   "  $ sudo nbfc restart --read-only\n"                                        \
   "\n"                                                                         \
   "Once you verified the configuration, start the service in write-mode:\n"    \
-  "  $ sudo nbfc restart\n"                                                    \
+  "  $ sudo nbfc restart"                                                      \
   ""
 
-enum Config_Action {
+#define CONFIG_ADVANCED_NOTICE \
+  "This configuration contains more than one fan configuration without a\n"    \
+  "configured temperature sensor. The default temperature sensor (@CPU) will\n"\
+  "be used for these fans.\n"                                                  \
+  "\n"                                                                         \
+  "If this configuration contains a GPU fan, you may want to change its\n"     \
+  "temperature sensor to @GPU using `nbfc sensors`."                           \
+  ""
+
+typedef enum NBFC_PACKED_ENUM {
   Config_Action_None = 0,
   Config_Action_Apply,
   Config_Action_Set,
   Config_Action_List,
   Config_Action_Recommend
-};
+} Config_Action;
 
 const struct cli99_Option Config_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),
@@ -86,12 +96,12 @@ const struct cli99_Option Config_CommandLine[] = {
 };
 
 struct {
-  enum Config_Action action;
+  Config_Action action;
   const char* config;
   bool yes;
 } Config_Options = {0};
 
-void Set_Config_Action(enum Config_Action action) {
+void Set_Config_Action(Config_Action action) {
   if (Config_Options.action && Config_Options.action != action) {
     Log_Error("Options --apply, --set, --list and --recommend are mutually exclusive");
     exit(NBFC_EXIT_CMDLINE);
@@ -151,12 +161,50 @@ static int Config_Recommend(void) {
   return NBFC_EXIT_SUCCESS;
 }
 
+static void Config_LoadAndValidateModelConfig(ModelConfig* model_config, const char* config) {
+  Error e;
+  Trace trace = {0};
+  char path[PATH_MAX];
+  const LogLevel old_log_level = Log_LogLevel;
+
+  e = ModelConfig_FindAndLoad(model_config, path, config);
+  if (e) {
+    Log_Error("%s: %s", path, err_print_all(e));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  Trace_Push(&trace, "%s", path);
+  Log_LogLevel = LogLevel_Quiet;
+  e = ModelConfig_Validate(&trace, model_config);
+  Log_LogLevel = old_log_level;
+  if (e) {
+    Log_Error("%s: %s", path, err_print_all(e));
+    exit(NBFC_EXIT_FAILURE);
+  }
+}
+
+static bool Config_ModelConfigNeedsAdvancedConfiguration(ModelConfig* model_config) {
+  if (model_config->FanConfigurations.size == 1)
+    return false;
+
+  for_each_array(FanConfiguration*, fan_config, model_config->FanConfigurations) {
+    if (! fan_config->isset.Sensors)
+      return true;
+
+    if (fan_config->Sensors.size == 0)
+      return true;
+  }
+
+  return false;
+}
+
 static int Config_Set(void) {
   check_root();
 
   Error e;
   char* config;
   array_of(ConfigFile) files = List_All_Configs();
+  ModelConfig model_config = {0};
   ServiceConfig service_config = {0};
 
   // "auto" ===================================================================
@@ -204,20 +252,24 @@ static int Config_Set(void) {
     }
   }
 
-  ServiceConfig_Load(&service_config);
+  // Before setting the config, load and validate it ==========================
+  Config_LoadAndValidateModelConfig(&model_config, config);
 
+  // Update the service config ================================================
+  ServiceConfig_Load(&service_config);
   service_config.SelectedConfigId = config;
   service_config.isset.SelectedConfigId = true;
-
   e = ServiceConfig_Write(&service_config, NBFC_SERVICE_CONFIG);
-  Mem_Free(config);
-
   if (e) {
     Log_Error("%s", err_print_all(e));
     return NBFC_EXIT_FAILURE;
   }
 
+  // Print notices ============================================================
   printf("%s\n", CONFIG_SET_NOTICE);
+  if (Config_ModelConfigNeedsAdvancedConfiguration(&model_config))
+    printf("\n%s\n", CONFIG_ADVANCED_NOTICE);
+
   return NBFC_EXIT_SUCCESS;
 }
 
