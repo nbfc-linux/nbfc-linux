@@ -1,4 +1,4 @@
-#define EC_PROBE_HELP_TEXT                                                     \
+#define EC_PROBE_HELP_HELP_TEXT                                                \
  "Usage: %s [-h] [-e EC] COMMAND [...]\n"                                      \
  "\n"                                                                          \
  "Probing tool for the embedded controller\n"                                  \
@@ -17,6 +17,7 @@
  "  read_bit              Read a bit from an EC register\n"                    \
  "  write_bit             Write a bit to an EC register\n"                     \
  "  monitor               Monitor all EC registers for changes\n"              \
+ "  evaluate              Evaluate a report written by monitor command\n"      \
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
  "  acpi_call             Call an ACPI method\n"                               \
  "  graph                 Visualize recordings made by `ec_probe monitor -r`\n"\
@@ -139,7 +140,9 @@
  "  -r FILE, --report FILE\n"                                                  \
  "                        Save all readings as a CSV file\n"                   \
  "  -c, --clearly         Blanks out consecutive duplicate readings\n"         \
- "  -d, --decimal         Output readings in decimal format instead of hexadecimal format\n"\
+ "  -d, --decimal         Output register readings in decimal format\n"        \
+ "  -C, --cpu             Record CPU temperatures\n"                           \
+ "  -G, --gpu             Record GPU temperatures\n"                           \
  ""
 
 #define EC_PROBE_WATCH_HELP_TEXT                                               \
@@ -164,6 +167,8 @@
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
+ "  -d, --dry             Print the ACPI command without executing it\n"       \
+ "  -m, --map FILE        Resolve method abbreviations from FILE\n"            \
  ""
 
 #define EC_PROBE_SHELL_HELP_TEXT                                               \
@@ -176,9 +181,31 @@
  ""
 
 #define EC_PROBE_GRAPH_HELP_TEXT                                               \
- "Usage: %s graph [-d] FILE\n"                                                 \
+ "Usage: %s graph FILE [OPTIONS]\n"                                            \
  "\n"                                                                          \
  "Visualize recordings made by `ec_probe monitor -r`.\n"                       \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help              Show this help message and exit\n"                 \
+ "  -d, --decimal           Read register values as decimal numbers\n"         \
+ "  --register-color COLOR  Specify color for drawing register line\n"         \
+ "                          (default: blue)\n"                                 \
+ "  --cpu-color COLOR       Specify color for drawing CPU temperature line\n"  \
+ "                          (default: red)\n"                                  \
+ "  --gpu-color COLOR       Specify color for drawing GPU temperature line\n"  \
+ "                          (default: magenta)\n"                              \
+ ""
+
+#define EC_PROBE_EVALUATE_HELP_TEXT                                            \
+ "Usage: %s evaluate [-d] FILE\n"                                              \
+ "\n"                                                                          \
+ "Evaluate a report made with `ec_probe monitor --report FILE`\n"              \
+ "\n"                                                                          \
+ "This command calculates the correlation between register readings\n"         \
+ "and CPU/GPU temperature.\n"                                                  \
+ "\n"                                                                          \
+ "Note that the correlation may be reversed, meaning that higher register\n"   \
+ "values can correspond to lower temperatures, and vice versa.\n"              \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \

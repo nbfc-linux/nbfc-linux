@@ -57,6 +57,7 @@
 #include "model_config_utils.c"
 #include "model_config_to_json.c"
 #include "register_write_configuration_utils.c"
+#include "spearman.c"
 #include "str_functions.c"
 #include "stress.c"
 #include "temperature_threshold_manager.c"
@@ -66,7 +67,6 @@
 #include "client/curl_utils.c"
 #include "client/config_files.c"
 #include "client/service_control.c"
-#include "client/spearman.c"
 
 const EC_VTable* ec = NULL;
 

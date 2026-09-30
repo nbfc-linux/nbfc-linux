@@ -35,12 +35,16 @@ options:
     metavar: "FILE"
     help: "Specify map file for resolving register names"
     complete: ["file"]
+    capture: '_EC_PROBE_MAP_FILE'
 
 positionals:
   - number: 1
     metavar: "REGISTER"
     help: "Register source"
-    complete: ["range", 0, 255]
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
 ---
 prog: "ec_probe write"
 help: "Write a byte to a EC register"
@@ -52,12 +56,16 @@ options:
     metavar: "FILE"
     help: "Specify map file for resolving register names"
     complete: ["file"]
+    capture: '_EC_PROBE_MAP_FILE'
 
 positionals:
   - number: 1
     metavar: "REGISTER"
     help: "Register destination"
-    complete: ["range", 0, 255]
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
 
   - number: 2
     metavar: "VALUE"
@@ -71,12 +79,16 @@ options:
     metavar: "FILE"
     help: "Specify map file for resolving register names"
     complete: ["file"]
+    capture: '_EC_PROBE_MAP_FILE'
 
 positionals:
   - number: 1
     metavar: "REGISTER"
     help: "Register source"
-    complete: ["range", 0, 255]
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
 
   - number: 2
     metavar: "BIT-OFFSET"
@@ -93,11 +105,16 @@ options:
     metavar: "FILE"
     help: "Specify map file for resolving register names"
     complete: ["file"]
+    capture: '_EC_PROBE_MAP_FILE'
+
 positionals:
   - number: 1
     metavar: "REGISTER"
     help: "Register destination"
-    complete: ["range", 0, 255]
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
 
   - number: 2
     metavar: "BIT-OFFSET"
@@ -131,7 +148,13 @@ options:
     help: "Blanks out consecutive duplicate readings"
 
   - option_strings: ["-d", "--decimal"]
-    help: "Output readings in decimal format instead of hexadecimal format"
+    help: "Output register readings in decimal format"
+
+  - option_strings: ['-C', '--cpu']
+    help: "Record CPU temperatures"
+
+  - option_strings: ['-G', '--gpu']
+    help: "Record GPU temperatures"
 ---
 prog: "ec_probe watch"
 help: "Monitor all EC registers for changes (alternative version)"
@@ -148,11 +171,21 @@ options:
 ---
 prog: "ec_probe acpi_call"
 help: "Call an ACPI method"
+options:
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving methods"
+    complete: ["file"]
+    capture: '_EC_PROBE_MAP_FILE'
+
+  - option_strings: ["-d", "--dry"]
+    help: "Print the ACPI command without executing it"
+
 positionals:
   - number: 1
     metavar: "METHOD"
     help: "Method to call"
-    complete: ["none"]
+    complete: ["exec", "_ec_probe_complete_map_method"]
 
   - number: 2
     metavar: "ARG1"
@@ -196,6 +229,33 @@ positionals:
 ---
 prog: "ec_probe graph"
 help: "Visualize recordings made by `ec_probe monitor -r`"
+options:
+  - option_strings: ["-d", "--decimal"]
+    help: "Read register values as decimal numbers"
+
+  - option_strings: ["--register-color"]
+    metavar: "COLOR"
+    help: "Specify color for drawing register line"
+    complete: ["none"]
+
+  - option_strings: ["--cpu-color"]
+    metavar: "COLOR"
+    help: "Specify color for drawing CPU temperature line"
+    complete: ["none"]
+
+  - option_strings: ["--gpu-color"]
+    metavar: "COLOR"
+    help: "Specify color for drawing GPU temperature line"
+    complete: ["none"]
+
+positionals:
+  - number: 1
+    metavar: "FILE"
+    help: "CSV file containing the recordings"
+    complete: ["file"]
+---
+prog: "ec_probe evaluate"
+help: "Calculate correlation between registers and CPU/GPU temperature"
 options:
   - option_strings: ["-d", "--decimal"]
     help: "Read register values as decimal numbers"

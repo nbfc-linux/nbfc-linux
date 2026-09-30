@@ -72,7 +72,29 @@ To set a configuration, run:
 Where *CONFIG* is the base filename of a configuration (without
 **.json** file extension).
 
-## Testing a configuration
+## Testing configurations automatically
+
+Configurations can be tested automatically by calculating a correlation
+score between CPU/GPU temperature and the fan speed reported by each
+configuration.
+
+First, collect the data by running:
+
+> **sudo nbfc rate-config \--all -q -q \| sudo nbfc test-config run
+> \--cpu 8**
+>
+> \- With a dedicated GPU (this may require proprietary GPU drivers) -
+>
+> **sudo nbfc rate-config \--all -q -q \| sudo nbfc test-config run
+> \--cpu 8 \--gpu 8**
+
+These commands write the **nbfc.test-config.result.json** file.
+
+The results can be evaluated by running:
+
+> **nbfc test-config evaluate**
+
+## Testing a configuration manually
 
 When trying out configuration files, it is recommended to follow these
 steps:
@@ -101,9 +123,6 @@ steps:
 > model name, run:
 >
 > > **sudo nbfc config \--set auto**
->
-> If this command does not print out an error message, the service has
-> been configured successfully.
 
 **Configuration rating**
 
@@ -271,6 +290,11 @@ needed.
 An unknown ACPI method was invoked. It usually indicates an incorrect or
 incompatible configuration.
 
+## Error: \@GPU: No sensors found
+
+The notebook either doesn\'t have a dedicated GPU or requires
+proprietary (NVIDIA) drivers.
+
 # NOTEBOOK FIRMWARE BACKGROUND
 
 ## What is an embedded controller (EC)?
@@ -374,21 +398,32 @@ the fan spins up and down.
 
 To do so, make sure the fan is at its lowest speed, then run:
 
-> **sudo ec_probe monitor -r** *OUTFILE.csv*
+> **sudo ec_probe monitor \--cpu \--report** *OUTFILE.csv*
+>
+> \- With a dedicated GPU (this may require proprietary GPU drivers) -
+>
+> **sudo ec_probe monitor \--cpu \--gpu \--report** *OUTFILE.csv*
 
-While recording, stress the CPU, run:
+While recording, first stress the CPU and then after a while the GPU:
 
-> **stress -c 8**
+> **stress-ng \--cpu 8**
 
-When the fan reached its maximum speed, stop the **stress** command and
-wait until the fan is at its lowest speed.
+> **stress-ng \--gpu 8**
 
-You now can kill the **ec_probe monitor** command and inspect the
-*OUTFILE.csv* for register changes.
+If the fans reached their highest speeds, stop the **stress-ng** command
+and wait until the fans are at their lowest speed again.
+
+You now can kill the **ec_probe monitor** command (CTRL+C) and inspect
+the *OUTFILE.csv* for register changes.
 
 You can also visualize the *OUTFILE.csv* by running:
 
 > **ec_probe graph** *OUTFILE.csv*
+
+For finding correlations between register values and CPU/GPU
+temperatures automatically, run:
+
+> **ec_probe evaluate** *OUTFILE.csv*
 
 ## Writing complex configurations with Lua
 

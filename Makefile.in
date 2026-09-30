@@ -29,7 +29,7 @@ endif
 
 LDLIBS_CLIENT = -lm -lcurl -lcrypto $(LUA_LDLIBS) $(XML_LDLIBS) -ldl
 LDLIBS_SERVICE = -lm $(LUA_LDLIBS) -ldl
-LDLIBS_EC_PROBE = $(LUA_LDLIBS) -ldl
+LDLIBS_EC_PROBE = -lm $(LUA_LDLIBS) -ldl
 
 override CPPFLAGS += \
 	-DSYSCONFDIR=\"$(sysconfdir)\"    \
@@ -274,18 +274,46 @@ src/nbfc_service: \
 
 src/ec_probe: \
 	src/acpi_call.h src/acpi_call.c \
+	src/buffer.h src/buffer.c \
 	src/cli99.h src/cli99.c \
+	src/client/check_root.h \
 	src/config.h \
-	src/ec.h \
+	src/console.h \
+	src/ec.c src/ec.h \
+	src/ec_dummy.c src/ec_dummy.h \
 	src/ec_probe.c \
 	src/ec_linux.c src/ec_linux.h \
 	src/ec_sys_linux.h src/ec_sys_linux.c \
 	src/error.h src/error.c \
+	src/file_utils.h src/file_utils.c \
+	src/fs_sensors.h src/fs_sensors.c \
 	src/help/ec_probe.help.h \
-	src/nbfc.h \
+	src/log.h src/log.c \
+	src/lua_bindings.h src/lua_bindings.c \
+	src/macros.h \
 	src/memory.h src/memory.c \
+	src/model_config.h src/model_config.c \
+	src/nbfc.h \
+	src/nvidia.h src/nvidia.c \
+	src/nxjson.h src/nxjson.c \
+	src/nxjson_memory.h src/nxjson_memory.c \
+	src/parse_double.h \
+	src/parse_number.h \
+	src/parse_unumber.h \
+	src/probe/cmd_acpi_call.c \
+	src/probe/cmd_dump_load.c \
+	src/probe/cmd_monitor.c \
+	src/probe/cmd_read_write.c \
+	src/probe/cmd_shell.c \
+	src/probe/map.c \
 	src/process.h src/process.c \
-	src/program_name.h src/program_name.c
+	src/program_name.h src/program_name.c \
+	src/spearman.h src/spearman.c \
+	src/sleep.h \
+	src/str_functions.h src/str_functions.c \
+	src/to_binary.h \
+	src/trace.h src/trace.c \
+	src/vfio.h src/vfio.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/ec_probe.c -o src/ec_probe $(LDLIBS_EC_PROBE) $(LDFLAGS)
 
 src/nbfc: \
@@ -314,8 +342,6 @@ src/nbfc: \
 	src/client/curl_utils.c \
 	src/client/service_control.c \
 	src/client/service_control.h \
-	src/client/spearman.c \
-	src/client/spearman.h \
 	src/acpi_analysis.h src/acpi_analysis.c \
 	src/aml_analysis.h src/aml_analysis.c \
 	src/aml_lexer.h src/aml_lexer.c \
@@ -346,6 +372,7 @@ src/nbfc: \
 	src/program_name.h src/program_name.c \
 	src/regex_utils.h src/regex_utils.c \
 	src/register_write_configuration_utils.c src/register_write_configuration_utils.h \
+	src/spearman.c src/spearman.h \
 	src/str_functions.c \
 	src/str_functions.h \
 	src/stress.c src/stress.h \

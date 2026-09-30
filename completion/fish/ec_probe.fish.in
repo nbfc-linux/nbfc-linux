@@ -2,6 +2,14 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
+function _ec_probe_complete_map_register
+  grep '=' "$_EC_PROBE_MAP_FILE[-1]" 2>/dev/null | cut -d= -f1
+end
+
+function _ec_probe_complete_map_method
+  grep -v '=' "$_EC_PROBE_MAP_FILE[-1]" 2>/dev/null
+end
+
 function _ec_probe__positional_contains
   set -l positional_num $argv[1]
   set -e argv[1]
@@ -171,6 +179,23 @@ function _ec_probe__num_of_positionals
   end
 end
 
+function _ec_probe__capture_option
+  set -l variable $argv[1]
+  set -l options $argv[2..]
+  set -l values
+  set -l i 1
+
+  while test $i -le (count $__QUERY_CACHE_HAVING_OPTIONS)
+    if contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options
+      set -a values $__QUERY_CACHE_OPTION_VALUES[$i]
+    end
+
+    set i (math $i + 1)
+  end
+
+  set -g $variable $values
+end
+
 function _ec_probe__prepare
   _ec_probe__query_init \
     '=>-h --help -e= --embedded-controller=' \
@@ -179,9 +204,16 @@ function _ec_probe__prepare
     '(write)=>-w --word -m= --map=' \
     '(read_bit)=>-m= --map=' \
     '(write_bit)=>-d --dry -m= --map=' \
-    '(monitor)=>-i= --interval= -t= --timespan= -r= --report= -c --clearly -d --decimal' \
+    '(monitor)=>-i= --interval= -t= --timespan= -r= --report= -c --clearly -d --decimal -C --cpu -G --gpu' \
     '(watch)=>-i= --interval= -t= --timespan=' \
-    '(graph)=>-d --decimal'
+    '(acpi_call)=>-m= --map= -d --dry' \
+    '(graph)=>-d --decimal --register-color= --cpu-color= --gpu-color=' \
+    '(evaluate)=>-d --decimal'
+  _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
+  _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
+  _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
+  _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
+  _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
   return 0
 end
 
@@ -197,6 +229,7 @@ function _ec_probe__command
     watch 'Monitor all EC registers for changes (alternative version)' \
     acpi_call 'Call an ACPI method' \
     graph 'Visualize recordings made by `ec_probe monitor -r`' \
+    evaluate 'Calculate correlation between registers and CPU/GPU temperature' \
     shell 'Read commands from STDIN'
 end
 
@@ -239,7 +272,7 @@ set -l C002 "not $has_option -m --map"
 set -l C003 "$num_of_positionals -eq 1"
 complete -c $prog -n $P -n $C000 -n $C001 -s w -l word -d 'Combine two registers into one' -f
 complete -c $prog -n $P -n $C000 -n $C002 -s m -l map -d 'Specify map file for resolving register names' -Fr
-complete -c $prog -n $P -n $C003 -n $C000 -d 'Register source' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Register source' -x -a '(seq 0 255; _ec_probe_complete_map_register)'
 
 # command ec_probe write
 set -l C000 "$positional_contains 1 write"
@@ -249,7 +282,7 @@ set -l C003 "$num_of_positionals -eq 1"
 set -l C004 "$num_of_positionals -eq 2"
 complete -c $prog -n $P -n $C000 -n $C001 -s w -l word -d 'Combine two registers into one' -f
 complete -c $prog -n $P -n $C000 -n $C002 -s m -l map -d 'Specify map file for resolving register names' -Fr
-complete -c $prog -n $P -n $C003 -n $C000 -d 'Register destination' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Register destination' -x -a '(seq 0 255; _ec_probe_complete_map_register)'
 complete -c $prog -n $P -n $C004 -n $C000 -d 'Value to write' -x
 
 # command ec_probe read_bit
@@ -258,7 +291,7 @@ set -l C001 "not $has_option -m --map"
 set -l C002 "$num_of_positionals -eq 1"
 set -l C003 "$num_of_positionals -eq 2"
 complete -c $prog -n $P -n $C000 -n $C001 -s m -l map -d 'Specify map file for resolving register names' -Fr
-complete -c $prog -n $P -n $C002 -n $C000 -d 'Register source' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C002 -n $C000 -d 'Register source' -x -a '(seq 0 255; _ec_probe_complete_map_register)'
 complete -c $prog -n $P -n $C003 -n $C000 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
 
 # command ec_probe write_bit
@@ -270,7 +303,7 @@ set -l C004 "$num_of_positionals -eq 2"
 set -l C005 "$num_of_positionals -eq 3"
 complete -c $prog -n $P -n $C000 -n $C001 -s d -l dry -d 'Print the resulting value without writing it' -f
 complete -c $prog -n $P -n $C000 -n $C002 -s m -l map -d 'Specify map file for resolving register names' -Fr
-complete -c $prog -n $P -n $C003 -n $C000 -d 'Register destination' -x -a '(seq 0 255)'
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Register destination' -x -a '(seq 0 255; _ec_probe_complete_map_register)'
 complete -c $prog -n $P -n $C004 -n $C000 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
 complete -c $prog -n $P -n $C005 -n $C000 -d 'Value to write' -x -a '0 1'
 
@@ -281,11 +314,15 @@ set -l C002 "not $has_option -t --timespan"
 set -l C003 "not $has_option -r --report"
 set -l C004 "not $has_option -c --clearly"
 set -l C005 "not $has_option -d --decimal"
+set -l C006 "not $has_option -C --cpu"
+set -l C007 "not $has_option -G --gpu"
 complete -c $prog -n $P -n $C000 -n $C001 -s i -l interval -d 'Monitored timespan' -x
 complete -c $prog -n $P -n $C000 -n $C002 -s t -l timespan -d 'Set poll intervall' -x
 complete -c $prog -n $P -n $C000 -n $C003 -s r -l report -d 'Save all readings as a CSV file' -Fr
 complete -c $prog -n $P -n $C000 -n $C004 -s c -l clearly -d 'Blanks out consecutive duplicate readings' -f
-complete -c $prog -n $P -n $C000 -n $C005 -s d -l decimal -d 'Output readings in decimal format instead of hexadecimal format' -f
+complete -c $prog -n $P -n $C000 -n $C005 -s d -l decimal -d 'Output register readings in decimal format' -f
+complete -c $prog -n $P -n $C000 -n $C006 -s C -l cpu -d 'Record CPU temperatures' -f
+complete -c $prog -n $P -n $C000 -n $C007 -s G -l gpu -d 'Record GPU temperatures' -f
 
 # command ec_probe watch
 set -l C000 "$positional_contains 1 watch"
@@ -295,28 +332,45 @@ complete -c $prog -n $P -n $C000 -n $C001 -s i -l interval -d 'Sets the update i
 complete -c $prog -n $P -n $C000 -n $C002 -s t -l timespan -d 'Sets how many seconds the program will run' -x
 
 # command ec_probe acpi_call
-set -l C000 "$num_of_positionals -eq 1"
-set -l C001 "$positional_contains 1 acpi_call"
-set -l C002 "$num_of_positionals -eq 2"
-set -l C003 "$num_of_positionals -eq 3"
-set -l C004 "$num_of_positionals -eq 4"
-set -l C005 "$num_of_positionals -eq 5"
-set -l C006 "$num_of_positionals -eq 6"
-set -l C007 "$num_of_positionals -eq 7"
-set -l C008 "$num_of_positionals -eq 8"
-set -l C009 "$num_of_positionals -eq 9"
-complete -c $prog -n $P -n $C000 -n $C001 -d 'Method to call' -x
-complete -c $prog -n $P -n $C002 -n $C001 -d 'First argument' -x
-complete -c $prog -n $P -n $C003 -n $C001 -d 'Second argument' -x
-complete -c $prog -n $P -n $C004 -n $C001 -d 'Third argument' -x
-complete -c $prog -n $P -n $C005 -n $C001 -d 'Fourth argument' -x
-complete -c $prog -n $P -n $C006 -n $C001 -d 'Fifth argument' -x
-complete -c $prog -n $P -n $C007 -n $C001 -d 'Sixth argument' -x
-complete -c $prog -n $P -n $C008 -n $C001 -d 'Seventh argument' -x
-complete -c $prog -n $P -n $C009 -n $C001 -d 'Eighth argument' -x
+set -l C000 "$positional_contains 1 acpi_call"
+set -l C001 "not $has_option -m --map"
+set -l C002 "not $has_option -d --dry"
+set -l C003 "$num_of_positionals -eq 1"
+set -l C004 "$num_of_positionals -eq 2"
+set -l C005 "$num_of_positionals -eq 3"
+set -l C006 "$num_of_positionals -eq 4"
+set -l C007 "$num_of_positionals -eq 5"
+set -l C008 "$num_of_positionals -eq 6"
+set -l C009 "$num_of_positionals -eq 7"
+set -l C010 "$num_of_positionals -eq 8"
+set -l C011 "$num_of_positionals -eq 9"
+complete -c $prog -n $P -n $C000 -n $C001 -s m -l map -d 'Specify map file for resolving methods' -Fr
+complete -c $prog -n $P -n $C000 -n $C002 -s d -l dry -d 'Print the ACPI command without executing it' -f
+complete -c $prog -n $P -n $C003 -n $C000 -d 'Method to call' -x -a '(_ec_probe_complete_map_method)'
+complete -c $prog -n $P -n $C004 -n $C000 -d 'First argument' -x
+complete -c $prog -n $P -n $C005 -n $C000 -d 'Second argument' -x
+complete -c $prog -n $P -n $C006 -n $C000 -d 'Third argument' -x
+complete -c $prog -n $P -n $C007 -n $C000 -d 'Fourth argument' -x
+complete -c $prog -n $P -n $C008 -n $C000 -d 'Fifth argument' -x
+complete -c $prog -n $P -n $C009 -n $C000 -d 'Sixth argument' -x
+complete -c $prog -n $P -n $C010 -n $C000 -d 'Seventh argument' -x
+complete -c $prog -n $P -n $C011 -n $C000 -d 'Eighth argument' -x
 
 # command ec_probe graph
 set -l C000 "$positional_contains 1 graph"
+set -l C001 "not $has_option -d --decimal"
+set -l C002 "not $has_option --register-color"
+set -l C003 "not $has_option --cpu-color"
+set -l C004 "not $has_option --gpu-color"
+set -l C005 "$num_of_positionals -eq 1"
+complete -c $prog -n $P -n $C000 -n $C001 -s d -l decimal -d 'Read register values as decimal numbers' -f
+complete -c $prog -n $P -n $C000 -n $C002 -l register-color -d 'Specify color for drawing register line' -x
+complete -c $prog -n $P -n $C000 -n $C003 -l cpu-color -d 'Specify color for drawing CPU temperature line' -x
+complete -c $prog -n $P -n $C000 -n $C004 -l gpu-color -d 'Specify color for drawing GPU temperature line' -x
+complete -c $prog -n $P -n $C005 -n $C000 -d 'CSV file containing the recordings' -Fr
+
+# command ec_probe evaluate
+set -l C000 "$positional_contains 1 evaluate"
 set -l C001 "not $has_option -d --decimal"
 set -l C002 "$num_of_positionals -eq 1"
 complete -c $prog -n $P -n $C000 -n $C001 -s d -l decimal -d 'Read register values as decimal numbers' -f

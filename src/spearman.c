@@ -1,6 +1,6 @@
 #include "spearman.h"
 
-#include "../memory.h"
+#include "memory.h"
 
 #include <math.h>   // sqrt
 #include <stdlib.h> // qsort

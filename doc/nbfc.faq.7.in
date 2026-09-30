@@ -86,7 +86,30 @@ Where
 is the base filename of a configuration (without
 .BR .json " file extension)."
 
-.SS "Testing a configuration"
+.SS "Testing configurations automatically"
+
+Configurations can be tested automatically by calculating a correlation score
+between CPU/GPU temperature and the fan speed reported by each configuration.
+
+First, collect the data by running:
+.RS
+.B sudo nbfc rate-config \-\-all \-q \-q | sudo nbfc test\-config run \-\-cpu 8
+
+\- With a dedicated GPU (this may require proprietary GPU drivers) \-
+
+.B sudo nbfc rate-config \-\-all \-q \-q | sudo nbfc test\-config run \-\-cpu 8 \-\-gpu 8
+.RE
+
+These commands write the
+.B nbfc.test\-config.result.json
+file.
+
+The results can be evaluated by running:
+.RS
+.B nbfc test\-config evaluate
+.RE
+
+.SS "Testing a configuration manually"
 
 When trying out configuration files, it is recommended to follow these steps:
 
@@ -120,8 +143,6 @@ To automatically select a configuration that matches your notebook model name, r
 .RS
 .B sudo nbfc config --set auto
 .RE
-
-If this command does not print out an error message, the service has been configured successfully.
 .RE
 
 .B Configuration rating
@@ -344,6 +365,10 @@ kernel module is missing. Install or build it as needed.
 
 An unknown ACPI method was invoked. It usually indicates an incorrect or incompatible configuration.
 
+.SS "Error: @GPU: No sensors found"
+
+The notebook either doesn't have a dedicated GPU or requires proprietary (NVIDIA) drivers.
+
 .SH "NOTEBOOK FIRMWARE BACKGROUND"
 
 .SS "What is an embedded controller (EC)?"
@@ -469,23 +494,32 @@ It may be useful to trace the registers of the embedded controller as the fan sp
 To do so, make sure the fan is at its lowest speed, then run:
 
 .RS
-.B sudo ec_probe monitor -r
+.B sudo ec_probe monitor \-\-cpu \-\-report
+.I OUTFILE.csv
+
+\- With a dedicated GPU (this may require proprietary GPU drivers) \-
+
+.B sudo ec_probe monitor \-\-cpu \-\-gpu \-\-report
 .I OUTFILE.csv
 .RE
 
-While recording, stress the CPU, run:
+While recording, first stress the CPU and then after a while the GPU:
 
 .RS
-.B stress -c 8
+.B stress\-ng \-\-cpu 8
 .RE
 
-When the fan reached its maximum speed, stop the
-.B stress
-command and wait until the fan is at its lowest speed.
+.RS
+.B stress\-ng \-\-gpu 8
+.RE
+
+If the fans reached their highest speeds, stop the
+.B stress\-ng
+command and wait until the fans are at their lowest speed again.
 
 You now can kill the
 .B ec_probe monitor
-command and inspect the
+command (CTRL+C) and inspect the
 .I OUTFILE.csv
 for register changes.
 
@@ -495,6 +529,14 @@ by running:
 
 .RS
 .B ec_probe graph
+.I OUTFILE.csv
+.RE
+
+For finding correlations between register values and CPU/GPU temperatures
+automatically, run:
+
+.RS
+.B ec_probe evaluate
 .I OUTFILE.csv
 .RE
 

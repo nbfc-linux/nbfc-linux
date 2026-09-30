@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <sys/types.h> // ssize_t
 
 #define STRINGIFY_(S)     #S
@@ -59,6 +60,7 @@ declare_array_of(array_size_t);
 declare_array_of(double);
 declare_array_of(float);
 declare_array_of(int);
+declare_array_of(uint8_t);
 
 #ifndef NDEBUG
 #define debug(...) fprintf(stderr, __VA_ARGS__)

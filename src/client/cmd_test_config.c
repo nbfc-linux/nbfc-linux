@@ -8,7 +8,6 @@
 #include "check_root.h"
 #include "client_global.h"
 #include "config_files.h"
-#include "spearman.h"
 
 #include "../acpi_call.h"
 #include "../ec.h"
@@ -26,6 +25,7 @@
 #include "../fan.h"
 #include "../model_config.h"
 #include "../sleep.h"
+#include "../spearman.h"
 #include "../stress.h"
 
 #define TEST_CONFIG_MIN_INTERVAL      0.05f

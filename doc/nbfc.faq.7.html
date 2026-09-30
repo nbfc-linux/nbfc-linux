@@ -60,7 +60,28 @@ run:</p>
 </blockquote>
 <p>Where <em>CONFIG</em> is the base filename of a configuration
 (without <strong>.json</strong> file extension).</p>
-<h2 id="testing-a-configuration">Testing a configuration</h2>
+<h2 id="testing-configurations-automatically">Testing configurations
+automatically</h2>
+<p>Configurations can be tested automatically by calculating a
+correlation score between CPU/GPU temperature and the fan speed reported
+by each configuration.</p>
+<p>First, collect the data by running:</p>
+<blockquote>
+<p><strong>sudo nbfc rate-config --all -q -q | sudo nbfc test-config run
+--cpu 8</strong></p>
+<p>- With a dedicated GPU (this may require proprietary GPU drivers)
+-</p>
+<p><strong>sudo nbfc rate-config --all -q -q | sudo nbfc test-config run
+--cpu 8 --gpu 8</strong></p>
+</blockquote>
+<p>These commands write the
+<strong>nbfc.test-config.result.json</strong> file.</p>
+<p>The results can be evaluated by running:</p>
+<blockquote>
+<p><strong>nbfc test-config evaluate</strong></p>
+</blockquote>
+<h2 id="testing-a-configuration-manually">Testing a configuration
+manually</h2>
 <p>When trying out configuration files, it is recommended to follow
 these steps:</p>
 <blockquote>
@@ -88,8 +109,6 @@ model name, run:</p>
 <blockquote>
 <p><strong>sudo nbfc config --set auto</strong></p>
 </blockquote>
-<p>If this command does not print out an error message, the service has
-been configured successfully.</p>
 </blockquote>
 <p><strong>Configuration rating</strong></p>
 <blockquote>
@@ -253,6 +272,9 @@ build it as needed.</p>
 AE_NOT_FOUND</h2>
 <p>An unknown ACPI method was invoked. It usually indicates an incorrect
 or incompatible configuration.</p>
+<h2 id="error-gpu-no-sensors-found">Error: @GPU: No sensors found</h2>
+<p>The notebook either doesn't have a dedicated GPU or requires
+proprietary (NVIDIA) drivers.</p>
 <h1 id="notebook-firmware-background">NOTEBOOK FIRMWARE BACKGROUND</h1>
 <h2 id="what-is-an-embedded-controller-ec">What is an embedded
 controller (EC)?</h2>
@@ -347,20 +369,34 @@ changes</h2>
 the fan spins up and down.</p>
 <p>To do so, make sure the fan is at its lowest speed, then run:</p>
 <blockquote>
-<p><strong>sudo ec_probe monitor -r</strong> <em>OUTFILE.csv</em></p>
+<p><strong>sudo ec_probe monitor --cpu --report</strong>
+<em>OUTFILE.csv</em></p>
+<p>- With a dedicated GPU (this may require proprietary GPU drivers)
+-</p>
+<p><strong>sudo ec_probe monitor --cpu --gpu --report</strong>
+<em>OUTFILE.csv</em></p>
 </blockquote>
-<p>While recording, stress the CPU, run:</p>
+<p>While recording, first stress the CPU and then after a while the
+GPU:</p>
 <blockquote>
-<p><strong>stress -c 8</strong></p>
+<p><strong>stress-ng --cpu 8</strong></p>
 </blockquote>
-<p>When the fan reached its maximum speed, stop the
-<strong>stress</strong> command and wait until the fan is at its lowest
-speed.</p>
-<p>You now can kill the <strong>ec_probe monitor</strong> command and
-inspect the <em>OUTFILE.csv</em> for register changes.</p>
+<blockquote>
+<p><strong>stress-ng --gpu 8</strong></p>
+</blockquote>
+<p>If the fans reached their highest speeds, stop the
+<strong>stress-ng</strong> command and wait until the fans are at their
+lowest speed again.</p>
+<p>You now can kill the <strong>ec_probe monitor</strong> command
+(CTRL+C) and inspect the <em>OUTFILE.csv</em> for register changes.</p>
 <p>You can also visualize the <em>OUTFILE.csv</em> by running:</p>
 <blockquote>
 <p><strong>ec_probe graph</strong> <em>OUTFILE.csv</em></p>
+</blockquote>
+<p>For finding correlations between register values and CPU/GPU
+temperatures automatically, run:</p>
+<blockquote>
+<p><strong>ec_probe evaluate</strong> <em>OUTFILE.csv</em></p>
 </blockquote>
 <h2 id="writing-complex-configurations-with-lua">Writing complex
 configurations with Lua</h2>

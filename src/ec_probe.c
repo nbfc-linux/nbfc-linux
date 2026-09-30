@@ -4,158 +4,84 @@
 #define NX_JSON_FREE(JSON)   (NXJSON_Memory_Free((void*) (JSON)))
 
 #define _XOPEN_SOURCE  500 // unistd.h: export pwrite()/pread()
-#define _DEFAULT_SOURCE    // endian.h:
+#define _DEFAULT_SOURCE    // endian.h: export htole16()/le16toh()
 #define _GNU_SOURCE
 
 #include "nbfc.h"
 #include "macros.h"
-#include "sleep.h"
 #include "ec_linux.h"
 #include "ec_sys_linux.h"
-#include "acpi_call.h"
 #include "model_config.h"
 #include "cli99.h"
 #include "parse_number.h"
 #include "parse_unumber.h"
 #include "parse_double.h"
-#include "to_binary.h"
 #include "help/ec_probe.help.h"
-#include "program_name.c"
 #include "log.h"
-#include "memory.h"
-#include "file_utils.h"
-#include "console.h"
-#include "client/check_root.h"
 
 #include <float.h>   // FLT_MAX
 #include <stdbool.h> // bool
-#include <stdio.h>   // printf, fprintf, fopen, fread, fclose
-#include <stdint.h>  // uint8_t, uint16_t
-#include <stdlib.h>  // strtoll
-#include <string.h>  // strcmp, strlen, strerror, strrchr
-#include <limits.h>  // INT_MAX
-#include <errno.h>   // errno
+#include <stdio.h>   // printf
+#include <stdint.h>  // uint8_t, uint16_t, uint64_t
+#include <string.h>  // strcmp, strlen, strrchr
+#include <limits.h>  // INT_MAX, UINT64_MAX
 #include <locale.h>  // setlocale, LC_NUMERIC
 #include <signal.h>  // signal, SIGINT, SIGTERM
-#include <unistd.h>  // geteuid, STDOUT_FILENO
 
-#include "error.c"             // src
-#include "ec.c"                // src
+#include "error.c"          // src
+#include "ec.c"             // src
 
 #if ENABLE_EC_DEV_PORT
-#include "ec_linux.c"          // src
+#include "ec_linux.c"       // src
 #endif
 
 #if ENABLE_EC_SYS || ENABLE_EC_ACPI
-#include "ec_sys_linux.c"      // src
+#include "ec_sys_linux.c"   // src
 #endif
 
 #if ENABLE_EC_DUMMY
-#include "ec_dummy.c"          // src
+#include "ec_dummy.c"       // src
 #endif
 
-#include "acpi_call.c"         // src
-#include "buffer.c"            // src
-#include "log.c"               // src
-#include "cli99.c"             // src
-#include "memory.c"            // src
-#include "nxjson_memory.c"     // src
-#include "nxjson.c"            // src
-#include "model_config.c"      // src
-#include "trace.c"             // src
-#include "file_utils.c"        // src
-#include "process.c"           // src
-#include "str_functions.c"     // src
-#include "lua_bindings.c"      // src
+#include "acpi_call.c"      // src
+#include "buffer.c"         // src
+#include "cli99.c"          // src
+#include "file_utils.c"     // src
+#include "fs_sensors.c"     // src
+#include "log.c"            // src
+#include "lua_bindings.c"   // src
+#include "memory.c"         // src
+#include "model_config.c"   // src
+#include "nvidia.c"         // src
+#include "nxjson_memory.c"  // src
+#include "nxjson.c"         // src
+#include "program_name.c"   // src
+#include "process.c"        // src
+#include "spearman.c"       // src
+#include "str_functions.c"  // src
+#include "trace.c"          // src
+#include "vfio.c"           // src
 
-#define             REGISTERS_SIZE 256
-typedef uint8_t     RegisterBuf[REGISTERS_SIZE];
+#define REGISTERS_SIZE 256
+
+typedef struct RegisterReadings RegisterReadings;
+struct RegisterReadings {
+  uint8_t readings[REGISTERS_SIZE];
+  float cpu_temp;
+  float gpu_temp;
+};
+
 typedef const char* RegisterColors[REGISTERS_SIZE];
-static RegisterBuf  Registers_Log[32768];
 
-static void         Register_PrintRegister(RegisterBuf*, RegisterColors);
-static inline void  Register_FromEC(RegisterBuf*);
-static inline void  Register_ToEC(RegisterBuf*);
-static void         Register_PrintWatch(RegisterBuf*, RegisterBuf*, RegisterBuf*);
-static void         Register_PrintMonitor(RegisterBuf*, int);
-static void         Register_WriteMonitorReport(RegisterBuf*, int, FILE*);
-static void         Register_PrintDump(RegisterBuf*, bool);
-static int          Register_LoadDump(RegisterBuf*, FILE*);
-static void         Handle_Signal(int);
-static Error        Map_Load(const char*);
-static bool         Map_LookupRegister(const char*, uint8_t*);
+// Allocate enough space for register entries. This simplifies
+// the code and avoids the need for dynamic reallocation.
+static RegisterReadings Registers_Log[32768];
 
 const EC_VTable* ec;
 static volatile int quit;
 
-static int Read(void);
-static int Write(void);
-static int Read_Bit(void);
-static int Write_Bit(void);
-static int Dump(void);
-static int Load(void);
-static int Monitor(void);
-static int Watch(void);
-static int AcpiCall(void);
-static int Shell(void);
-static int Graph(void);
-
-enum Command {
-  Command_Read,
-  Command_Write,
-  Command_Read_Bit,
-  Command_Write_Bit,
-  Command_Dump,
-  Command_Load,
-  Command_Monitor,
-  Command_Watch,
-  Command_AcpiCall,
-  Command_Shell,
-  Command_Graph,
-  Command_Help,
-  Command_End
-};
-
-static enum Command Command_FromString(const char* s) {
-  const char* cmds[] = {
-    "read",
-    "write",
-    "read_bit",
-    "write_bit",
-    "dump",
-    "load",
-    "monitor",
-    "watch",
-    "acpi_call",
-    "shell",
-    "graph",
-    "help"
-  };
-
-  for (int i = 0; i < ARRAY_SSIZE(cmds); ++i)
-    if (!strcmp(cmds[i], s))
-      return (enum Command) i;
-
-  return Command_End;
-}
-
-static const char* HelpTexts[] = {
-  EC_PROBE_READ_HELP_TEXT,
-  EC_PROBE_WRITE_HELP_TEXT,
-  EC_PROBE_READ_BIT_HELP_TEXT,
-  EC_PROBE_WRITE_BIT_HELP_TEXT,
-  EC_PROBE_DUMP_HELP_TEXT,
-  EC_PROBE_LOAD_HELP_TEXT,
-  EC_PROBE_MONITOR_HELP_TEXT,
-  EC_PROBE_WATCH_HELP_TEXT,
-  EC_PROBE_ACPI_CALL_HELP_TEXT,
-  EC_PROBE_SHELL_HELP_TEXT,
-  EC_PROBE_GRAPH_HELP_TEXT,
-  EC_PROBE_HELP_TEXT,
-};
-
-enum Option {
-  Option_None,
+typedef enum NBFC_PACKED_ENUM {
+  Option_None = 0,
   Option_Help,
   Option_Version,
   Option_EmbeddedController,
@@ -178,299 +104,150 @@ enum Option {
   Option_AcpiCallMethod,
   Option_AcpiCallArgument,
   Option_Map,
-};
+  Option_Cpu,
+  Option_Gpu,
+  Option_RegisterColor,
+  Option_CpuColor,
+  Option_GpuColor,
+} Option;
 
-static const struct cli99_Option main_options[] = {
-  {"-e|--embedded-controller", Option_EmbeddedController,  cli99_RequiredArgument},
-  {"-h|--help",                Option_Help,                cli99_NoArgument      },
-  {"--version",                Option_Version,             cli99_NoArgument      },
-  {"command",                  Option_Command,             cli99_NormalPositional},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option read_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"-m|--map",                 Option_Map,                 cli99_RequiredArgument},
-  {"-w|--word",                Option_Word,                cli99_NoArgument      },
-  {"-f|--format",              Option_Format,              cli99_RequiredArgument},
-  {"register",                 Option_Register,            cli99_NormalPositional},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option write_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"-m|--map",                 Option_Map,                 cli99_RequiredArgument},
-  {"-w|--word",                Option_Word,                cli99_NoArgument      },
-  {"register",                 Option_Register,            cli99_NormalPositional},
-  {"value",                    Option_Value,               cli99_NormalPositional},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option read_bit_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"-m|--map",                 Option_Map,                 cli99_RequiredArgument},
-  {"register",                 Option_Register,            cli99_NormalPositional},
-  {"bit_offset",               Option_BitOffset,           cli99_NormalPositional},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option write_bit_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"-m|--map",                 Option_Map,                 cli99_RequiredArgument},
-  {"-d|--dry",                 Option_Dry,                 cli99_NoArgument      },
-  {"register",                 Option_Register,            cli99_NormalPositional},
-  {"bit_offset",               Option_BitOffset,           cli99_NormalPositional},
-  {"value",                    Option_BitValue,            cli99_NormalPositional},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option dump_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"-c|--color",               Option_Color,               cli99_NoArgument      },
-  {"-C|--no-color",            Option_NoColor,             cli99_NoArgument      },
-  cli99_Options_End()
-};
-
-static const struct cli99_Option load_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"file",                     Option_File,                cli99_NormalPositional},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option monitor_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"-r|--report",              Option_Report,              cli99_RequiredArgument},
-  {"-c|--clearly",             Option_Clearly,             cli99_NoArgument      },
-  {"-d|--decimal",             Option_Decimal,             cli99_NoArgument      },
-  {"-t|--timespan",            Option_Timespan,            cli99_RequiredArgument},
-  {"-i|--interval",            Option_Interval,            cli99_RequiredArgument},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option watch_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"-t|--timespan",            Option_Timespan,            cli99_RequiredArgument},
-  {"-i|--interval",            Option_Interval,            cli99_RequiredArgument},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option acpi_call_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"method",                   Option_AcpiCallMethod,      cli99_NormalPositional},
-  {"arg1",                     Option_AcpiCallArgument,    cli99_NormalPositional},
-  {"arg2",                     Option_AcpiCallArgument,    cli99_NormalPositional},
-  {"arg3",                     Option_AcpiCallArgument,    cli99_NormalPositional},
-  {"arg4",                     Option_AcpiCallArgument,    cli99_NormalPositional},
-  {"arg5",                     Option_AcpiCallArgument,    cli99_NormalPositional},
-  {"arg6",                     Option_AcpiCallArgument,    cli99_NormalPositional},
-  {"arg7",                     Option_AcpiCallArgument,    cli99_NormalPositional},
-  {"arg8",                     Option_AcpiCallArgument,    cli99_NormalPositional},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option graph_command_options[] = {
-  cli99_Options_Include(&main_options),
-  {"-d|--decimal",             Option_Decimal,             cli99_NoArgument      },
-  {"file",                     Option_File,                cli99_NormalPositional},
-  cli99_Options_End()
-};
-
-static const struct cli99_Option* Options[] = {
-  read_command_options,
-  write_command_options,
-  read_bit_command_options,
-  write_bit_command_options,
-  dump_command_options,
-  load_command_options,
-  monitor_command_options,
-  watch_command_options,
-  acpi_call_command_options,
-  main_options, // shell
-  graph_command_options,
-  main_options, // help
-};
-
-enum UseColor {
-  ColorAuto,
-  ColorEnable,
-  ColorDisable,
-};
+typedef enum NBFC_PACKED_ENUM {
+  ColorModeAuto = 0,
+  ColorModeEnable,
+  ColorModeDisable,
+} ColorMode;
 
 static struct {
-  int           timespan;
-  float         interval;
-  const char*   report;
-  const char*   file;
-  const char*   map;
-  bool          clearly;
-  bool          decimal;
-  bool          dry;
-  const char*   register_ref;
-  uint8_t       register_;
-  uint16_t      value;
-  uint8_t       bit_offset;
-  uint8_t       bit_value;
-  bool          use_word;
-  enum UseColor use_color;
-  char          format;
-  const char*   acpi_call_method;
-  uint64_t      acpi_call_args[8];
-  int           acpi_call_args_size;
-  uint64_t      _set;
+  int         timespan;
+  float       interval;
+  const char* report;
+  const char* file;
+  const char* map;
+  bool        clearly;
+  bool        decimal;
+  bool        dry;
+  const char* register_ref;
+  uint8_t     register_;
+  uint16_t    value;
+  uint8_t     bit_offset;
+  uint8_t     bit_value;
+  bool        use_word;
+  ColorMode   color_mode;
+  char        format;
+  const char* acpi_call_method;
+  uint64_t    acpi_call_args[8];
+  int         acpi_call_args_size;
+  bool        cpu;
+  bool        gpu;
+  const char* register_color;
+  const char* cpu_color;
+  const char* gpu_color;
+  uint64_t    _set;
 } options = {0};
 
-// ============================================================================
-// Map file code
-// ============================================================================
+static void Initialize_EC(void) {
+  static bool initialized = false;
+  if (initialized)
+    return;
 
-typedef struct {
-  char    name[5];
-  uint8_t addr;
-} Map_Entry;
-declare_array_of(Map_Entry);
-
-static struct {
-  array_of(Map_Entry) registers;
-  array_size_t        registers_capacity;
-  array_of(str)       methods;
-  array_size_t        methods_capacity;
-  bool                loaded;
-} Map;
-
-static Error Map_AddRegister(const char* name, uint8_t addr) {
-  for_each_array(const Map_Entry*, entry, Map.registers) {
-    if (! strcmp(entry->name, name))
-      return err_stringf("Duplicate register name: %s", name);
+  if (ec == NULL) {
+    Error e = EC_FindWorking(&ec);
+    e_die();
   }
 
-  if (Map.registers.size + 1 > Map.registers_capacity) {
-    Map.registers_capacity += 256;
-    array_realloc(Map_Entry, Map.registers, Map.registers_capacity);
-  }
+  Error e = ec->Open();
+  e_die();
 
-  snprintf(Map.registers.data[Map.registers.size].name, sizeof(Map.registers.data[0].name), "%s", name);
-  Map.registers.data[Map.registers.size].addr = addr;
-  Map.registers.size++;
-  return err_success();
+  initialized = true;
 }
 
-static Error Map_ParseMethodLine(const char* line) {
-  if (Map.methods.size + 1 > Map.methods_capacity) {
-    Map.methods_capacity += 1024;
-    array_realloc(str, Map.methods, Map.methods_capacity);
-  }
-
-  Map.methods.data[Map.methods.size++] = Mem_Strdup(line);
-  return err_success();
-}
-
-static Error Map_ParseRegisterLine(const char* line) {
-  char register_name[5] = {0};
-  const char* p = line;
-  size_t n = 0;
-
-  for (; n < 4; ++n, ++p) {
-    const int ch = (unsigned char) *p;
-    if (*p == '=' || ! *p)
-      break;
-    if ((ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z') && (ch < '0' || ch > '9') && ch != '_')
-      return err_stringf("Invalid register name: %s", line);
-    register_name[n] = *p;
-  }
-
-  if (n == 4 && *p != '=')
-    return err_stringf("Name too long (max. 4 chars): %s", line);
-  if (! n)
-    return err_stringf("Empty register name: %s", line);
-  if (*p != '=')
-    return err_stringf("Expected NAME=ADDR: %s", line);
-
-  ++p;
-
-  const char* err;
-  const int64_t a = parse_number(p, 0, 255, &err);
-  if (err)
-    return err_stringf("%s: %s", err, line);
-  return Map_AddRegister(register_name, (uint8_t) a);
-}
-
-static Error Map_Load(const char* file) {
+static inline Error Registers_FromEC(RegisterReadings* readings) {
   Error e;
-  char* content;
 
-  if (Map.loaded)
-    return err_success();
-
-  const FileResult res = File_ReadDynamic(&content, file);
-  if (! res.ok)
-    return err_stdlib(NULL);
-
-  for (char* p = content; p < content + res.len; ++p) {
-    bool has_equal = false;
-    char* line = p;
-    for (;;) {
-      switch (*p) {
-        case '=':
-          has_equal = true;
-          break;
-        case '\n':
-          *p = '\0'; /* fall-through */
-        case '\0':
-          if (p > line) {
-            e = has_equal ? Map_ParseRegisterLine(line) : Map_ParseMethodLine(line);
-            if (e)
-              return e;
-          }
-      }
-      if (*p == '\0')
-        break;
-      ++p;
-    }
+  for (size_t i = 0; i < REGISTERS_SIZE; i++) {
+    e = ec->ReadByte((uint8_t) i, &readings->readings[i]);
+    if (e)
+      return e;
   }
 
-  Map.loaded = true;
   return err_success();
 }
 
-static bool Map_LookupRegister(const char* name, uint8_t* out) {
-  for_each_array(const Map_Entry*, entry, Map.registers) {
-    if (! strcmp(entry->name, name)) {
-      *out = entry->addr;
-      return true;
-    }
-  }
-  return false;
-}
+static inline Error Registers_ToEC(RegisterReadings* readings) {
+  Error e;
 
-static const char* FormatValue(char* buf, size_t bufsz, char fmt, uint16_t val, bool word) {
-  switch (fmt) {
-    case 'b': /* fall-through */
-    case 'B':
-      snprintf(buf, bufsz, "0b%s", to_binary(val, (word ? 16U : 8U)));
-      break;
-
-    case 'd': /* fall-through */
-    case 'D':
-      snprintf(buf, bufsz, "%d", val);
-      break;
-
-    case 'x':
-      snprintf(buf, bufsz, "0x%.*x", (word ? 4 : 2), val);
-      break;
-
-    case 'X':
-      snprintf(buf, bufsz, "0x%.*X", (word ? 4 : 2), val);
-      break;
-
-    default:
-      if (word)
-        snprintf(buf, bufsz, "%d (0x%.4X 0b%s)", val, val, to_binary(val, 16U));
-      else
-        snprintf(buf, bufsz, "%d (0x%.2X 0b%s)", val, val, to_binary(val, 8U));
+  for (size_t i = 0; i < REGISTERS_SIZE; ++i) {
+    e = ec->WriteByte((uint8_t) i, readings->readings[i]);
+    if (e)
+      return e;
   }
 
-  return buf;
+  return err_success();
 }
+
+static const struct cli99_Option Main_CommandLine[] = {
+  {"-e|--embedded-controller", Option_EmbeddedController, cli99_RequiredArgument},
+  {"-h|--help",                Option_Help,               cli99_NoArgument      },
+  {"--version",                Option_Version,            cli99_NoArgument      },
+  {"command",                  Option_Command,            cli99_NormalPositional},
+  cli99_Options_End()
+};
+
+#include "probe/map.c"
+#include "probe/cmd_acpi_call.c"
+#include "probe/cmd_dump_load.c"
+#include "probe/cmd_monitor.c"
+#include "probe/cmd_read_write.c"
+#include "probe/cmd_shell.c"
+
+#define NBFC_EC_PROBE_COMMANDS \
+  o("read",         Read,         READ,         Read)          \
+  o("write",        Write,        WRITE,        Write)         \
+  o("read_bit",     ReadBit,      READ_BIT,     ReadBit)       \
+  o("write_bit",    WriteBit,     WRITE_BIT,    WriteBit)      \
+  o("acpi_call",    AcpiCall,     ACPI_CALL,    AcpiCall)      \
+  o("dump",         Dump,         DUMP,         Dump)          \
+  o("load",         Load,         LOAD,         Load)          \
+  o("watch",        Watch,        WATCH,        Watch)         \
+  o("monitor",      Monitor,      MONITOR,      Monitor)       \
+  o("graph",        Graph,        GRAPH,        Graph)         \
+  o("evaluate",     Evaluate,     EVALUATE,     Evaluate)      \
+  o("shell",        Shell,        SHELL,        Main)          \
+  o("help",         Help,         HELP,         Main)          \
+//  COMMAND         ENUM          HELP TEXT     COMMANDLINE
+
+enum Command {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  Command_ ## ENUM,
+  NBFC_EC_PROBE_COMMANDS
+  Command_End
+#undef o
+};
+
+static const char* HelpTexts[] = {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  EC_PROBE_ ## HELP ## _HELP_TEXT,
+  NBFC_EC_PROBE_COMMANDS
+#undef o
+};
+
+static const char* CommandNames[] = {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  COMMAND,
+  NBFC_EC_PROBE_COMMANDS
+#undef o
+};
+
+static enum Command Command_FromString(const char* s) {
+  for (int i = 0; i < ARRAY_SSIZE(CommandNames); ++i)
+    if (!strcmp(CommandNames[i], s))
+      return (enum Command) i;
+
+  return Command_End;
+}
+
+static const struct cli99_Option* Options[] = {
+#define o(COMMAND, ENUM, HELP, OPTIONS)  OPTIONS ## _CommandLine,
+  NBFC_EC_PROBE_COMMANDS
+#undef o
+};
 
 static void RegisterResolve(void) {
   Error e;
@@ -504,14 +281,13 @@ static void RegisterResolve(void) {
   }
 }
 
-const char RegisterHeader[] =
-  "---|------------------------------------------------\n"
-  "   | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"
-  "---|------------------------------------------------\n";
+static void Handle_Signal(int sig) {
+  quit = sig;
+}
 
 int main(int argc, char* const argv[]) {
   if (argc == 1) {
-    printf(EC_PROBE_HELP_TEXT, argv[0]);
+    printf(EC_PROBE_HELP_HELP_TEXT, argv[0]);
     return NBFC_EXIT_CMDLINE;
   }
 
@@ -523,7 +299,7 @@ int main(int argc, char* const argv[]) {
   enum Command cmd = Command_Help;
 
   struct cli99 p;
-  cli99_Init(&p, main_options, argv, argc);
+  cli99_Init(&p, Main_CommandLine, argv, argc);
 
   int64_t o;
   const char* err;
@@ -545,8 +321,8 @@ int main(int argc, char* const argv[]) {
       }
 
       if (cmd == Command_Help) {
-        printf(EC_PROBE_HELP_TEXT, argv[0]);
-        return 0;
+        printf(EC_PROBE_HELP_HELP_TEXT, argv[0]);
+        return NBFC_EXIT_SUCCESS;
       }
 
       p.options = Options[cmd];
@@ -569,8 +345,8 @@ int main(int argc, char* const argv[]) {
     case Option_Dry:      options.dry = true;                      break;
     case Option_Map:      options.map = p.optarg;                  break;
     case Option_Report:   options.report   = p.optarg;             break;
-    case Option_Color:    options.use_color = ColorEnable;         break;
-    case Option_NoColor:  options.use_color = ColorDisable;        break;
+    case Option_Color:    options.color_mode = ColorModeEnable;    break;
+    case Option_NoColor:  options.color_mode = ColorModeDisable;   break;
     case Option_File:     options.file = p.optarg;                 break;
     case Option_EmbeddedController:
       switch (EmbeddedControllerType_FromString(p.optarg)) {
@@ -634,82 +410,74 @@ int main(int argc, char* const argv[]) {
 
       options.format = p.optarg[0];
       break;
+    case Option_Cpu:
+      options.cpu = true;
+      break;
+    case Option_Gpu:
+      options.gpu = true;
+      break;
+    case Option_CpuColor:
+      options.cpu_color = p.optarg;
+      break;
+    case Option_GpuColor:
+      options.gpu_color = p.optarg;
+      break;
+    case Option_RegisterColor:
+      options.register_color = p.optarg;
+      break;
     }
   }
 
+#define CHECK_REQUIRED_ARGUMENT(ENUM, HUMAN_READABLE)                         \
+  do {                                                                        \
+    if (! (options._set & (1ULL << ENUM))) {                                  \
+      Log_Error("Argument required: %s", HUMAN_READABLE);                     \
+      return NBFC_EXIT_CMDLINE;                                               \
+    }                                                                         \
+  } while (0)
+
   switch (cmd) {
-    case Command_Load:
-      if (! (options._set & (1ULL << Option_File))) {
-        Log_Error("Argument required: %s", "file");
-        return NBFC_EXIT_CMDLINE;
-      }
-      break;
+  case Command_Load:
+    CHECK_REQUIRED_ARGUMENT(Option_File, "file");
+    break;
 
-    case Command_Read:
-      if (! (options._set & (1ULL << Option_Register))) {
-        Log_Error("Argument required: %s", "register");
-        return NBFC_EXIT_CMDLINE;
-      }
-      break;
+  case Command_Read:
+    CHECK_REQUIRED_ARGUMENT(Option_Register, "register");
+    break;
 
-    case Command_Write:
-      if (! (options._set & (1ULL << Option_Register))) {
-        Log_Error("Argument required: %s", "register");
-        return NBFC_EXIT_CMDLINE;
-      }
+  case Command_Write:
+    CHECK_REQUIRED_ARGUMENT(Option_Register, "register");
+    CHECK_REQUIRED_ARGUMENT(Option_Value, "value");
+    break;
 
-      if (! (options._set & (1ULL << Option_Value))) {
-        Log_Error("Argument required: %s", "value");
-        return NBFC_EXIT_CMDLINE;
-      }
-      break;
+  case Command_ReadBit:
+    CHECK_REQUIRED_ARGUMENT(Option_Register, "register");
+    CHECK_REQUIRED_ARGUMENT(Option_BitOffset, "bit_offset");
+    break;
 
-    case Command_Read_Bit:
-      if (! (options._set & (1ULL << Option_Register))) {
-        Log_Error("Argument required: %s", "register");
-        return NBFC_EXIT_CMDLINE;
-      }
+  case Command_WriteBit:
+    CHECK_REQUIRED_ARGUMENT(Option_Register, "register");
+    CHECK_REQUIRED_ARGUMENT(Option_BitOffset, "bit_offset");
+    CHECK_REQUIRED_ARGUMENT(Option_BitValue, "bit_value");
+    break;
 
-      if (! (options._set & (1ULL << Option_BitOffset))) {
-        Log_Error("Argument required: %s", "bit_offset");
-        return NBFC_EXIT_CMDLINE;
-      }
-      break;
+  case Command_AcpiCall:
+    CHECK_REQUIRED_ARGUMENT(Option_AcpiCallMethod, "method");
+    break;
 
-    case Command_Write_Bit:
-      if (! (options._set & (1ULL << Option_Register))) {
-        Log_Error("Argument required: %s", "register");
-        return NBFC_EXIT_CMDLINE;
-      }
+  case Command_Graph:
+    CHECK_REQUIRED_ARGUMENT(Option_File, "file");
+    break;
 
-      if (! (options._set & (1ULL << Option_BitOffset))) {
-        Log_Error("Argument required: %s", "bit_offset");
-        return NBFC_EXIT_CMDLINE;
-      }
+  case Command_Evaluate:
+    CHECK_REQUIRED_ARGUMENT(Option_File, "file");
+    break;
 
-      if (! (options._set & (1ULL << Option_BitValue))) {
-        Log_Error("Argument required: %s", "bit_value");
-        return NBFC_EXIT_CMDLINE;
-      }
-      break;
-
-    case Command_AcpiCall:
-      if (! (options._set & (1ULL << Option_AcpiCallMethod))) {
-        Log_Error("Argument required: %s", "method");
-        return NBFC_EXIT_CMDLINE;
-      }
-      break;
-
-    case Command_Graph:
-      if (! (options._set & (1ULL << Option_File))) {
-        Log_Error("Argument required: %s", "file");
-        return NBFC_EXIT_CMDLINE;
-      }
-      break;
-
-    default:
-      break;
+  default:
+    break;
   }
+
+#undef CHECK_REQUIRED_ARGUMENT
 
   if (options.register_ref)
     RegisterResolve();
@@ -718,669 +486,18 @@ int main(int argc, char* const argv[]) {
   signal(SIGTERM, Handle_Signal);
 
   switch (cmd) {
-  case Command_Dump:      return Dump();
-  case Command_Load:      return Load();
-  case Command_Read:      return Read();
-  case Command_Write:     return Write();
-  case Command_Read_Bit:  return Read_Bit();
-  case Command_Write_Bit: return Write_Bit();
-  case Command_Monitor:   return Monitor();
-  case Command_Watch:     return Watch();
-  case Command_AcpiCall:  return AcpiCall();
-  case Command_Shell:     return Shell();
-  case Command_Graph:     return Graph();
-  default:                return NBFC_EXIT_FAILURE;
+  case Command_AcpiCall: return AcpiCall();
+  case Command_Read:     return Read();
+  case Command_Write:    return Write();
+  case Command_ReadBit:  return ReadBit();
+  case Command_WriteBit: return WriteBit();
+  case Command_Dump:     return Dump();
+  case Command_Load:     return Load();
+  case Command_Watch:    return Watch();
+  case Command_Monitor:  return Monitor();
+  case Command_Graph:    return Graph();
+  case Command_Evaluate: return Evaluate();
+  case Command_Shell:    return Shell();
+  default:               return NBFC_EXIT_FAILURE;
   }
-}
-
-static void Initialize_EC(void) {
-  static bool initialized = false;
-
-  if (! initialized) {
-    initialized = true;
-
-    if (ec == NULL) {
-      Error e = EC_FindWorking(&ec);
-      e_die();
-    }
-
-    Error e = ec->Open();
-    e_die();
-  }
-}
-
-static int Read(void) {
-  check_root();
-  Initialize_EC();
-
-  char buf[128];
-
-  if (options.use_word) {
-    uint16_t word;
-    Error e = ec->ReadWord(options.register_, &word);
-    e_die();
-    printf("%s\n", FormatValue(buf, sizeof(buf), options.format, word, true));
-  }
-  else {
-    uint8_t byte;
-    Error e = ec->ReadByte(options.register_, &byte);
-    e_die();
-    printf("%s\n", FormatValue(buf, sizeof(buf), options.format, byte, false));
-  }
-
-  return 0;
-}
-
-static int Write(void) {
-  check_root();
-  Initialize_EC();
-
-  if (options.use_word) {
-    Error e = ec->WriteWord(options.register_, options.value);
-    e_die();
-  }
-  else {
-    if (options.value > 255) {
-      Log_Error("write: Value too big: %d", options.value);
-      return NBFC_EXIT_CMDLINE;
-    }
-    Error e = ec->WriteByte(options.register_, (uint8_t) options.value);
-    e_die();
-  }
-
-  return 0;
-}
-
-static int Read_Bit(void) {
-  check_root();
-  Initialize_EC();
-
-  uint8_t byte;
-  Error e = ec->ReadByte(options.register_, &byte);
-  e_die();
-
-  uint8_t bit = (byte >> (options.bit_offset)) & 1;
-  printf("%d\n", bit);
-  return 0;
-}
-
-static int Write_Bit(void) {
-  Error e;
-  check_root();
-  Initialize_EC();
-
-  uint8_t byte;
-  e = ec->ReadByte(options.register_, &byte);
-  e_die();
-
-  uint8_t mask = 1U << (options.bit_offset);
-  uint8_t new_byte = options.bit_value ? (byte | mask) : (byte & ~mask);
-
-  if (options.dry) {
-    Log_Info("Dry run: Write %d (0x%.2X 0b%s)", new_byte, new_byte, to_binary(new_byte, 8U));
-  }
-  else {
-    e = ec->WriteByte(options.register_, new_byte);
-    e_die();
-  }
-
-  return 0;
-}
-
-static int Dump(void) {
-  check_root();
-  Initialize_EC();
-
-  bool use_color = false;
-  RegisterBuf register_buf;
-
-  Register_FromEC(&register_buf);
-
-  switch (options.use_color) {
-  case ColorAuto:     use_color = isatty(STDOUT_FILENO); break;
-  case ColorEnable:   use_color = true;                  break;
-  case ColorDisable:  use_color = false;                 break;
-  }
-
-  Register_PrintDump(&register_buf, use_color);
-  return 0;
-}
-
-static int Load(void) {
-  check_root();
-  Initialize_EC();
-
-  FILE* infile;
-
-  if (! strcmp(options.file, "-"))
-    infile = stdin;
-  else {
-    infile = fopen(options.file, "r");
-    if (! infile) {
-      Log_Error("Error opening file: %s: %s", options.file, strerror(errno));
-      return NBFC_EXIT_FAILURE;
-    }
-  }
-
-  RegisterBuf register_buf;
-  int ret = Register_LoadDump(&register_buf, infile);
-  fclose(infile);
-
-  if (ret == 0) {
-    Register_ToEC(&register_buf);
-  }
-
-  return ret;
-}
-
-static int Monitor(void) {
-  check_root();
-  Initialize_EC();
-
-  int max_loops = INT_MAX;
-
-  if (options.timespan)
-    max_loops = (int) ((float) options.timespan / options.interval);
-
-  RegisterBuf* regs = Registers_Log;
-  int size = ARRAY_SSIZE(Registers_Log);
-  int loops;
-  for (loops = 0; !quit && loops < max_loops && --size; ++loops) {
-    Register_FromEC(regs + loops);
-    Register_PrintMonitor(regs, loops);
-    sleep_ms((unsigned) (options.interval * 1000.0f));
-  }
-
-  if (options.report) {
-    FILE* fh = fopen(options.report, "w");
-    if (! fh) {
-      Log_Error("%s: %s", options.report, strerror(errno));
-      return NBFC_EXIT_FAILURE;
-    }
-    Register_WriteMonitorReport(regs, loops, fh);
-    fclose(fh);
-  }
-
-  return 0;
-}
-
-static int Watch(void) {
-  check_root();
-  Initialize_EC();
-
-  int max_loops = INT_MAX;
-
-  if (options.timespan)
-    max_loops = (int) ((float) options.timespan / options.interval);
-
-  int size = ARRAY_SSIZE(Registers_Log);
-  RegisterBuf* regs = Registers_Log;
-  Register_FromEC(regs);
-  for (int loops = 1; !quit && loops < max_loops && --size; ++loops) {
-    Register_FromEC(regs + loops);
-    Register_PrintWatch(regs , regs + loops, regs + loops - 1);
-    sleep_ms((unsigned int) (options.interval * 1000.0f));
-  }
-
-  return 0;
-}
-
-static int AcpiCall(void) {
-  check_root();
-
-  Error e;
-  char cmd[1024];
-
-  e = AcpiCall_Open();
-  e_die();
-
-  char fmt[] = "%s 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX 0x%lX";
-  fmt[2 + options.acpi_call_args_size * 6] = '\0';
-
-  int cmd_len = snprintf(cmd, sizeof(cmd), fmt,
-    options.acpi_call_method,
-    options.acpi_call_args[0],
-    options.acpi_call_args[1],
-    options.acpi_call_args[2],
-    options.acpi_call_args[3],
-    options.acpi_call_args[4],
-    options.acpi_call_args[5],
-    options.acpi_call_args[6],
-    options.acpi_call_args[7]
-  );
-
-  if (cmd_len == -1 || cmd_len >= (int) sizeof(cmd)) {
-    Log_Error("Method (including arguments) is too long");
-    return NBFC_EXIT_FAILURE;
-  }
-
-  char* out;
-  e = AcpiCall_CallRaw(cmd, cmd_len, &out);
-  e_die();
-  printf("%s\n", out);
-
-  return NBFC_EXIT_SUCCESS;
-}
-
-static int Graph(void) {
-  char* argv[8] = {0};
-  argv[0] = Mem_Strdup(NBFC_MAKE_GRAPH_SCRIPT);
-  argv[1] = Mem_Strdup(options.file);
-
-  if (options.decimal)
-    argv[2] = Mem_Strdup("-d");
-
-  return execv(NBFC_MAKE_GRAPH_SCRIPT_FILE, argv);
-}
-
-static void Handle_Signal(int sig) {
-  quit = sig;
-}
-
-// ============================================================================
-// Registers code
-// ============================================================================
-
-static void Register_PrintRegister(RegisterBuf* self, RegisterColors color) {
-  if (color)
-    printf(CONSOLE_RESET);
-
-  printf("%s", RegisterHeader);
-
-  for (int i = 0; i <= 0xF0; i += 0x10) {
-    if (color)
-      printf(CONSOLE_RESET);
-
-    printf("%.2X |", i);
-
-    if (color) {
-      for (int j = 0; j <= 0xF; ++j)
-        printf("%s %.2X", color[i + j], my[i + j]);
-    }
-    else {
-      for (int j = 0; j <= 0xF; ++j)
-        printf(" %.2X", my[i + j]);
-    }
-
-    printf("\n");
-  }
-}
-
-static inline void Register_FromEC(RegisterBuf* self) {
-  for (int i = 0; i < REGISTERS_SIZE; i++)
-    ec->ReadByte((uint8_t) i, &my[i]);
-}
-
-static inline void Register_ToEC(RegisterBuf* self) {
-  for (int i = 0; i < REGISTERS_SIZE; ++i)
-    ec->WriteByte((uint8_t) i, my[i]);
-}
-
-static void Register_PrintWatch(RegisterBuf* all_readings, RegisterBuf* current, RegisterBuf* previous) {
-  RegisterColors colors;
-
-  for (int register_ = 0; register_ < REGISTERS_SIZE; ++register_) {
-    const uint8_t byte = (*current)[register_];
-    const uint8_t diff = byte - (*previous)[register_];
-    bool has_changed = false;
-
-    uint8_t save = byte;
-    for (range(RegisterBuf*, r, all_readings, previous)) {
-      if (save != (*r)[register_]) {
-        has_changed = true;
-        break;
-      }
-    }
-
-    /**/ if (diff)          colors[register_] = CONSOLE_YELLOW;
-    else if (has_changed)   colors[register_] = CONSOLE_BOLD_BLUE;
-    else if (byte == 0xFF)  colors[register_] = CONSOLE_WHITE;
-    else if (byte)          colors[register_] = CONSOLE_BOLD_WHITE;
-    else                    colors[register_] = CONSOLE_BOLD_BLACK;
-  }
-
-  Register_PrintRegister(current, colors);
-}
-
-static void Register_PrintMonitor(RegisterBuf* readings, int size) {
-  printf(CONSOLE_CLEAR);
-
-  for (int register_ = 0; register_ < REGISTERS_SIZE; ++register_) {
-    bool register_has_changed = false;
-    for (range(int, i, 0, size)) {
-      if (readings[0][register_] != readings[i][register_]) {
-        register_has_changed = true;
-        break;
-      }
-    }
-
-    if (! register_has_changed)
-      continue;
-
-    printf(CONSOLE_GREEN "0x%.2X:", register_);
-    uint8_t byte = readings[0][register_];
-    for (range(int, i, MAX(size - 24, 0), size)) {
-      const uint8_t diff = byte - readings[i][register_];
-      byte = readings[i][register_];
-      if (diff)
-        printf(CONSOLE_BOLD_BLUE " %.2X", byte);
-      else
-        printf(CONSOLE_BOLD_WHITE " %.2X", byte);
-    }
-    printf("\n");
-  }
-}
-
-static void Register_WriteMonitorReport(RegisterBuf* readings, int size, FILE* fh) {
-  for (int register_ = 0; register_ < REGISTERS_SIZE; ++register_) {
-    bool register_has_changed = false;
-    for (range(int, i, 0, size)) {
-      if (readings[0][register_] != readings[i][register_]) {
-        register_has_changed = true;
-        break;
-      }
-    }
-
-    if (! register_has_changed)
-      continue;
-
-    fprintf(fh, "%.2X", register_);
-    for (range(int, i, 0, size)) {
-      if (options.clearly && i > 0 && readings[i][register_] == readings[i - 1][register_])
-        continue;
-
-      if (options.decimal)
-        fprintf(fh, ",%d", readings[i][register_]);
-      else
-        fprintf(fh, ",%.2X", readings[i][register_]);
-    }
-    fprintf(fh, "\n");
-  }
-}
-
-static void Register_PrintDump(RegisterBuf* self, bool use_color) {
-  RegisterColors colors;
-
-  if (use_color) {
-    for (int i = 0; i < REGISTERS_SIZE; ++i)
-      colors[i] = (my[i] == 0x00 ? CONSOLE_BOLD_BLACK :
-                   my[i] == 0xFF ? CONSOLE_BOLD_GREEN :
-                                   CONSOLE_BOLD_BLUE);
-
-    Register_PrintRegister(self, colors);
-    printf("%s", CONSOLE_RESET);
-  }
-  else {
-    Register_PrintRegister(self, NULL);
-  }
-}
-
-static int Register_LoadDump(RegisterBuf* self, FILE* fh) {
-  char header[sizeof(RegisterHeader)] = {0};
-  fread(header, 1, sizeof(RegisterHeader) - 1, fh);
-  if (strcmp(header, RegisterHeader))
-    goto error;
-
-  for (int line_no = 0; line_no < 16; ++line_no) {
-    char prefix[6] = {0};
-    if (fread(prefix, 1, 5, fh) != 5) {
-      goto error;
-    }
-
-    for (int column_no = 0; column_no < 16; ++column_no) {
-      char hex[3] = {0};
-      if (fread(hex, 1, 2, fh) != 2)
-        goto error;
-
-      char* end;
-      const uint8_t value = (uint8_t) strtoll(hex, &end, 16);
-      if (*end != '\0')
-        goto error;
-
-      fread(hex, 1, 1, fh);
-
-      const int register_no = (line_no * 16) + column_no;
-      my[register_no] = value;
-    }
-  }
-
-  return NBFC_EXIT_SUCCESS;
-
-error:
-  Log_Error("File is not a valid register dump");
-  return NBFC_EXIT_FAILURE;
-}
-
-struct ShellArgs {
-  const char* args[64];
-  ssize_t count;
-};
-
-static void ShellRead(const struct ShellArgs* args) {
-  Initialize_EC();
-
-  int word = 0;
-  const char* register_arg = NULL;
-  const char* err;
-
-  for (int i = 1; i < args->count; ++i) {
-    const char* arg = args->args[i];
-
-    if (arg[0] == '-') {
-      if (!strcmp(arg, "-w") || !strcmp(arg, "--word"))
-        word = 1;
-      else {
-        printf("ERR: Invalid option: %s\n", arg);
-        return;
-      }
-    }
-    else if (! register_arg)
-      register_arg = arg;
-    else {
-      printf("ERR: Too much arguments\n");
-      return;
-    }
-  }
-
-  if (! register_arg) {
-    printf("ERR: Missing argument (REGISTER)\n");
-    return;
-  }
-
-  uint8_t register_ = (uint8_t) parse_number(register_arg, 0, word ? 254 : 255, &err);
-  if (err) {
-    printf("ERR: Argument (REGISTER): %s\n", err);
-    return;
-  }
-
-  if (word) {
-    uint16_t value;
-    Error e = ec->ReadWord(register_, &value);
-    if (e) {
-      printf("ERR: %s\n", err_print_all(e));
-      return;
-    }
-
-    printf("%d\n", value);
-  }
-  else {
-    uint8_t value;
-    Error e = ec->ReadByte(register_, &value);
-    if (e) {
-      printf("ERR: %s\n", err_print_all(e));
-      return;
-    }
-
-    printf("%d\n", value);
-  }
-}
-
-static void ShellWrite(const struct ShellArgs* args) {
-  Initialize_EC();
-
-  int word = 0;
-  const char* register_arg = NULL;
-  const char* value_arg = NULL;
-  const char* err;
-
-  for (int i = 1; i < args->count; ++i) {
-    const char* arg = args->args[i];
-
-    if (arg[0] == '-') {
-      if (!strcmp(arg, "-w") || !strcmp(arg, "--word"))
-        word = 1;
-      else {
-        printf("ERR: Invalid option: %s\n", arg);
-        return;
-      }
-    }
-    else if (! register_arg)
-      register_arg = arg;
-    else if (! value_arg)
-      value_arg = arg;
-    else {
-      printf("ERR: Too much arguments\n");
-      return;
-    }
-  }
-
-  if (! register_arg) {
-    printf("ERR: Missing argument (REGISTER)\n");
-    return;
-  }
-
-  if (! value_arg) {
-    printf("ERR: Missing argument (VALUE)\n");
-    return;
-  }
-
-  uint8_t register_ = (uint8_t) parse_number(register_arg, 0, word ? 254 : 255, &err);
-  if (err) {
-    printf("ERR: Argument (REGISTER): %s\n", err);
-    return;
-  }
-
-  uint16_t value = (uint16_t) parse_number(value_arg, 0, word ? UINT16_MAX : UINT8_MAX, &err);
-  if (err) {
-    printf("ERR: Argument (VALUE): %s\n", err);
-    return;
-  }
-
-  if (word) {
-    Error e = ec->WriteWord(register_, value);
-    if (e) {
-      printf("ERR: %s\n", err_print_all(e));
-      return;
-    }
-  }
-  else {
-    Error e = ec->WriteByte(register_, (uint8_t) value);
-    if (e) {
-      printf("ERR: %s\n", err_print_all(e));
-      return;
-    }
-  }
-
-  printf("OK\n");
-}
-
-static void ShellReadAll(struct ShellArgs*) {
-  Initialize_EC();
-
-  uint8_t values[256];
-
-  for (int register_ = 0; register_ <= 255; ++register_) {
-    Error e = ec->ReadByte((uint8_t) register_, &values[register_]);
-    if (e) {
-      printf("ERR: %s\n", err_print_all(e));
-      return;
-    }
-  }
-
-  printf("%d", values[0]);
-  for (int register_ = 1; register_ <= 255; ++register_)
-    printf(" %d", values[register_]);
-  printf("\n");
-}
-
-static void ShellHelp(void) {
-  printf(
-    "Available commands: \n"
-    "  read [-w|--word] REGISTER\n"
-    "  write [-w|--word] REGISTER VALUE\n"
-    "  read_all\n"
-    "  exit | quit\n"
-  );
-}
-
-static const char* read_arg(char** line) {
-  while (**line == ' ' || **line == '\t')
-    ++*line;
-
-  if (!**line)
-    return NULL;
-
-  const char* arg = *line;
-
-  ++*line;
-
-  while (**line && **line != ' ' && **line != '\t')
-    ++*line;
-
-  if (**line) {
-    **line = '\0';
-    ++*line;
-  }
-
-  return arg;
-}
-
-static void read_args(struct ShellArgs* args, char** line) {
-  args->count = 0;
-
-  while (args->count < ARRAY_SSIZE(args->args)) {
-    if (! (args->args[args->count] = read_arg(line)))
-      break;
-
-    args->count++;
-  }
-}
-
-static int Shell(void) {
-  check_root();
-
-  char buffer[8192];
-  char* line;
-  struct ShellArgs args;
-
-  signal(SIGINT, SIG_DFL);
-  signal(SIGTERM, SIG_DFL);
-
-  while (fgets(buffer, sizeof(buffer), stdin)) {
-    size_t len = strlen(buffer);
-
-    if (buffer[len - 1] != '\n') {
-      printf("ERR: Line too long\n");
-      continue;
-    }
-
-    buffer[len - 1] = '\0';
-    line = buffer;
-
-    read_args(&args, &line);
-
-    if (! args.count);
-    else if (!strcmp(args.args[0], "read"))     ShellRead(&args);
-    else if (!strcmp(args.args[0], "write"))    ShellWrite(&args);
-    else if (!strcmp(args.args[0], "read_all")) ShellReadAll(&args);
-    else if (!strcmp(args.args[0], "help"))     ShellHelp();
-    else if (!strcmp(args.args[0], "exit"))     return 0;
-    else if (!strcmp(args.args[0], "quit"))     return 0;
-    else
-      printf("ERR: No such command: %s (type `help` for a list of commands)\n", args.args[0]);
-
-    fflush(stdout);
-  }
-
-  return 0;
 }
