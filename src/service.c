@@ -97,7 +97,7 @@ Error Service_Init(void) {
   TemperatureThresholdManager_LegacyBehaviour = Service_ModelConfig.LegacyTemperatureThresholdsBehaviour;
 
   // Sensor ===================================================================
-  e = FS_Sensors_Init();
+  e = FS_Sensors_Init(true);
   if (e)
     goto error;
   FS_Sensors_Log();

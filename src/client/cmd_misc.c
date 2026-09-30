@@ -77,7 +77,7 @@ static int CompleteFans(void) {
 }
 
 static int CompleteSensors(void) {
-  FS_Sensors_Init();
+  FS_Sensors_Init(true);
 
   const char* having[4096];
   ssize_t     having_size = 0;

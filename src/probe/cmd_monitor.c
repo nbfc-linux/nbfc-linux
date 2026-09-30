@@ -140,7 +140,7 @@ static int Monitor(void) {
     max_loops = ARRAY_SSIZE(Registers_Log);
 
   if (options.cpu || options.gpu) {
-    e = FS_Sensors_Init();
+    e = FS_Sensors_Init(options.gpu);
     if (e)
       goto error;
   }

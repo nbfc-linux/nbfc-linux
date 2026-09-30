@@ -5,6 +5,8 @@
 #include "macros.h"
 #include "model_config.h"
 
+#include <stdbool.h>
+
 enum FS_TemperatureSource_Type {
   FS_TemperatureSource_File,
   FS_TemperatureSource_Command,
@@ -33,7 +35,7 @@ static inline FS_TemperatureSource* FS_Sensors_Sources_UnRef(size_t idx) {
   return &FS_Sensors_Sources.data[idx];
 }
 
-Error FS_Sensors_Init(void);
+Error FS_Sensors_Init(bool);
 void  FS_Sensors_Cleanup(void);
 void  FS_Sensors_Log(void);
 Error FS_TemperatureSource_GetTemperature(const FS_TemperatureSource*, float*);

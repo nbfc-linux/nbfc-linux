@@ -117,7 +117,7 @@ static int Sensors_Set(void) {
     return NBFC_EXIT_CMDLINE;
   }
 
-  FS_Sensors_Init();
+  FS_Sensors_Init(true);
   Service_LoadAllConfigFiles(&service_config, &model_config);
 
   if (Sensors_Options.fan >= model_config.FanConfigurations.size) {
@@ -253,7 +253,7 @@ static int Sensors_Show(void) {
 }
 
 static int Sensors_List(void) {
-  FS_Sensors_Init();
+  FS_Sensors_Init(true);
 
   const char* having[4096];
   ssize_t     having_size = 0;

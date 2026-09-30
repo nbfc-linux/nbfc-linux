@@ -165,7 +165,7 @@ void FS_Sensors_Log(void) {
 // FS_Sensors_Init / FS_Sensors_Cleanup
 // ============================================================================
 
-Error FS_Sensors_Init(void) {
+Error FS_Sensors_Init(bool use_gpu) {
   Error e;
   int slept;
   const int sleep_time = 30;
@@ -182,7 +182,7 @@ Error FS_Sensors_Init(void) {
   // If VFIO passthrough is active, skip nvidia-ml entirely.
   // Checking /proc/cmdline alone is not enough because users may
   // configure passthrough via /etc/modprobe.d/, driverctl, etc.
-  if (!VFIO_CheckProcCmdline() && !VFIO_CheckSysBusPciDevices()) {
+  if (use_gpu && !VFIO_CheckProcCmdline() && !VFIO_CheckSysBusPciDevices()) {
     // Wait for nvidia module
     for (; slept < sleep_time; ++slept) {
       Nvidia_Error ne = Nvidia_Init();

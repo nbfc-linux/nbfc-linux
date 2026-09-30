@@ -816,7 +816,7 @@ static int TestConfig_Run(void) {
     goto error;
 
   // Initialize Sensors
-  e = FS_Sensors_Init();
+  e = FS_Sensors_Init((TestConfig_Options.gpu_workers > 0));
   if (e)
     goto error;
 
