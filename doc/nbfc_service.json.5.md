@@ -521,6 +521,11 @@ The following functions are exposed to Lua:
 > Writes a 16-bit value to a two-byte register. Returns **error**,
 > **0**.
 
+**nvidia_temperature**():
+
+> Returns the NVIDIA GPU temperature in degrees Celsius via NVML, if
+> available. Returns **error**, **value** (integer).
+
 ## Lua Libraries
 
 To keep memory usage as low as possible, no Lua libraries are loaded by

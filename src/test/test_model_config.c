@@ -30,6 +30,7 @@
 #include "../program_name.c"
 #include "../fan.c"
 #include "../acpi_call.c"
+#include "../nvidia.c"
 #include "../process.c"
 #include "../str_functions.c"
 #include "../temperature_threshold_manager.c"

@@ -542,6 +542,12 @@ e, v = acpi_get_int(result, "1 0")<br />
 <p>Writes a 16-bit value to a two-byte register. Returns
 <strong>error</strong>, <strong>0</strong>.</p>
 </blockquote>
+<p><strong>nvidia_temperature</strong>():</p>
+<blockquote>
+<p>Returns the NVIDIA GPU temperature in degrees Celsius via NVML, if
+available. Returns <strong>error</strong>, <strong>value</strong>
+(integer).</p>
+</blockquote>
 <h2 id="lua-libraries">Lua Libraries</h2>
 <p>To keep memory usage as low as possible, no Lua libraries are loaded
 by default. They must be explicitly loaded when needed. See
