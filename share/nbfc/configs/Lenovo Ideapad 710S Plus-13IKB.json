@@ -12,8 +12,8 @@
    "MinSpeedValue": 38,
    "MaxSpeedValue": 92,
    "IndependentReadMinMaxValues": true,
-   "MinSpeedValueRead": 39,
-   "MaxSpeedValueRead": 61,
+   "MinSpeedValueRead": 37,
+   "MaxSpeedValueRead": 66,
    "ResetRequired": false,
    "FanSpeedResetValue": 0,
    "TemperatureThresholds": [
@@ -23,18 +23,18 @@
      "FanSpeed": 0.0
     },
     {
-     "UpThreshold": 58,
-     "DownThreshold": 50,
+     "UpThreshold": 70,
+     "DownThreshold": 60,
      "FanSpeed": 20.0
     },
     {
-     "UpThreshold": 68,
-     "DownThreshold": 60,
+     "UpThreshold": 75,
+     "DownThreshold": 71,
      "FanSpeed": 60.0
     },
     {
-     "UpThreshold": 78,
-     "DownThreshold": 70,
+     "UpThreshold": 85,
+     "DownThreshold": 81,
      "FanSpeed": 100.0
     }
    ],
@@ -49,6 +49,56 @@
      "FanSpeedValue": 0,
      "TargetOperation": "Read"
     }
+   ]
+  }
+ ],
+ "RegisterWriteConfigurations": [
+  {
+   "WriteMode": "Lua",
+   "WriteOccasion": "OnWriteFanSpeed",
+   "Description": "Keep the EC's dGPU GC6 flag (GC6F) in sync with GPU activity",
+   "LuaCode": [
+    "-- GC6F is the EC field at register 0x08, bit 0. The EC runs a fan",
+    "-- whenever the dGPU is powered, unless the firmware tells it the GPU",
+    "-- entered its GC6 low-power state. The Windows NVIDIA driver does this",
+    "-- via the firmware's GC6I/GC6O; the Linux driver does not, because the",
+    "-- GPU ACPI node has no _PR3, so the EC's dGPU fan floor stays on even",
+    "-- when the GPU is idle.",
+    "--",
+    "-- Mirror GC6 entry/exit from the GPU's temperature: tell the EC the GPU",
+    "-- is in GC6 when it is cool (so the fan may stop), and clear it when it",
+    "-- is hot so the EC runs its own dGPU thermal zone.",
+    "local err, reg = ec_read(8)",
+    "if err ~= nil or reg == nil then return nil, 0 end",
+    "",
+    "local temp = 100  -- fail safe: treat the GPU as hot if NVML is unavailable",
+    "local nerr, ntemp = nvidia_temperature()",
+    "if nerr == nil and ntemp ~= nil then temp = ntemp end",
+    "",
+    "-- hysteresis: hand cooling back above 60 C, go quiet again below 50 C",
+    "local cur = reg % 2",
+    "local want = cur",
+    "if cur == 1 then",
+    "  if temp >= 60 then want = 0 end",
+    "else",
+    "  if temp <= 50 then want = 1 end",
+    "end",
+    "",
+    "if want ~= cur then",
+    "  ec_write(8, reg - cur + want)",
+    "end",
+    "",
+    "return nil, 0"
+   ],
+   "ResetRequired": true,
+   "ResetWriteMode": "Lua",
+   "ResetLuaCode": [
+    "-- Hand the dGPU back to the EC when the service stops.",
+    "local err, reg = ec_read(8)",
+    "if err == nil and reg ~= nil then",
+    "  ec_write(8, reg - (reg % 2))",
+    "end",
+    "return nil, 0"
    ]
   }
  ]
