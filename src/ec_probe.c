@@ -373,6 +373,9 @@ int main(int argc, char* const argv[]) {
 #if ENABLE_EC_DEV_PORT
         case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable;         break;
 #endif
+#if ENABLE_EC_DUMMY
+        case EmbeddedControllerType_ECDummy:        ec = &EC_Dummy_VTable;         break;
+#endif
         default:
           Log_Error("%s: Invalid value: %s", p.option->optstring, p.optarg);
           return NBFC_EXIT_CMDLINE;
