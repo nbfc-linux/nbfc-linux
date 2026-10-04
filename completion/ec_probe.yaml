@@ -266,5 +266,85 @@ positionals:
     help: "CSV file containing the recordings"
     complete: ["file"]
 ---
+prog: "ec_probe poke"
+help: "Hold a register at a value, sampling another"
+options:
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+    capture: '_EC_PROBE_MAP_FILE'
+
+  - option_strings: ["-w", "--watch"]
+    metavar: "REGISTER"
+    help: "Register to sample (default: REGISTER)"
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
+
+  - option_strings: ["-t", "--timespan"]
+    metavar: "seconds"
+    help: "How long to hold VALUE"
+    complete: ["integer"]
+
+  - option_strings: ["-i", "--interval"]
+    metavar: "seconds"
+    help: "Sampling interval"
+    complete: ["float"]
+
+  - option_strings: ["-n", "--no-restore"]
+    help: "Do not restore the original value"
+
+positionals:
+  - number: 1
+    metavar: "REGISTER"
+    help: "Register to write"
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
+
+  - number: 2
+    metavar: "VALUE"
+    help: "Value to write"
+    complete: ["range", 0, 255]
+---
+prog: "ec_probe scan"
+help: "Try candidate values on a register, sampling another"
+options:
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+    capture: '_EC_PROBE_MAP_FILE'
+
+  - option_strings: ["-w", "--watch"]
+    metavar: "REGISTER"
+    help: "Register to sample (default: REGISTER)"
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
+
+  - option_strings: ["-t", "--timespan"]
+    metavar: "seconds"
+    help: "Seconds per candidate value"
+    complete: ["integer"]
+
+  - option_strings: ["-i", "--interval"]
+    metavar: "seconds"
+    help: "Sampling interval"
+    complete: ["float"]
+
+positionals:
+  - number: 1
+    metavar: "REGISTER"
+    help: "Register to write"
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
+---
 prog: "ec_probe shell"
 help: "Read commands from STDIN"

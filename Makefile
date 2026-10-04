@@ -303,6 +303,7 @@ src/ec_probe: \
 	src/probe/cmd_acpi_call.c \
 	src/probe/cmd_dump_load.c \
 	src/probe/cmd_monitor.c \
+	src/probe/cmd_poke_scan.c \
 	src/probe/cmd_read_write.c \
 	src/probe/cmd_shell.c \
 	src/probe/map.c \
