@@ -216,6 +216,12 @@ static int ConfigAnalysis_ACPI_GetInt(lua_State* l) {
   return Lua_ReturnInteger(l, CONFIG_ANALYSIS_DUMMY_RETURN_VALUE);
 }
 
+// Return a dummy instead of initializing NVML, so `nbfc rate-config` stays
+// deterministic and does not depend on the GPU being available.
+static int ConfigAnalysis_Nvidia_Temperature(lua_State* l) {
+  return Lua_ReturnInteger(l, CONFIG_ANALYSIS_DUMMY_RETURN_VALUE);
+}
+
 static Error ConfigAnalysis_Begin(void) {
   Error e;
 
@@ -232,6 +238,7 @@ static Error ConfigAnalysis_Begin(void) {
   lua_register(Lua_State, "acpi_call",     ConfigAnalysis_ACPI_Call);
   lua_register(Lua_State, "acpi_call_raw", ConfigAnalysis_ACPI_CallRaw);
   lua_register(Lua_State, "acpi_get_int",  ConfigAnalysis_ACPI_GetInt);
+  lua_register(Lua_State, "nvidia_temperature", ConfigAnalysis_Nvidia_Temperature);
   return err_success();
 }
 

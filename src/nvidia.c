@@ -72,12 +72,23 @@ void Nvidia_Close(void) {
   if (Nvidia_DlHandle)
     dlclose(Nvidia_DlHandle);
 
+  // Clear the whole NVML state, not just the handle: Nvidia_GetTemperature()
+  // checks these fields, and leaving stale function pointers behind while the
+  // library is unloaded would let that check pass and call into freed code
+  // (the daemon closes, forks and re-initializes NVML on startup).
   Nvidia_DlHandle = NULL;
+  Nvidia_nvmlInit_fn = NULL;
   Nvidia_nvmlShutdown_fn = NULL;
+  Nvidia_nvmlDeviceGetHandleByIndex_fn = NULL;
+  Nvidia_nvmlDeviceGetTemperature_fn = NULL;
+  Nvidia_Device = NULL;
 }
 
 Error Nvidia_GetTemperature(float* out) {
   unsigned int temp; // NOLINT
+
+  if (! Nvidia_Device || ! Nvidia_nvmlDeviceGetTemperature_fn)
+    return err_string("nvidia-ml: Not initialized");
 
   if (Nvidia_nvmlDeviceGetTemperature_fn(Nvidia_Device, NVML_TEMPERATURE_GPU, &temp) == NVML_SUCCESS)
     *out = (float) temp;

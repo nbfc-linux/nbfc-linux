@@ -2,6 +2,7 @@
 
 #include "ec.h"
 #include "acpi_call.h"
+#include "nvidia.h"
 
 #include <string.h> // strcmp
 #include <lauxlib.h>
@@ -152,6 +153,18 @@ static int Lua_ACPI_CallRaw(lua_State* l) {
   return Lua_ReturnString(l, result);
 }
 
+static int Lua_Nvidia_Temperature(lua_State* l) {
+  float temperature;
+  Error e = Nvidia_GetTemperature(&temperature);
+  if (e)
+    return Lua_ReturnError(l, err_print_all(e));
+
+  // Nvidia_GetTemperature() only ever yields a non-negative whole number, but
+  // keep the float -> integer conversion well-defined regardless.
+  uint64_t value = temperature > 0.0f ? (uint64_t) temperature : 0;
+  return Lua_ReturnInteger(l, value);
+}
+
 static int Lua_ACPI_GetInt(lua_State* l) {
   Error e;
   size_t len;
@@ -182,6 +195,7 @@ Error Lua_Open(void) {
   lua_register(Lua_State, "acpi_call",     Lua_ACPI_Call);
   lua_register(Lua_State, "acpi_call_raw", Lua_ACPI_CallRaw);
   lua_register(Lua_State, "acpi_get_int",  Lua_ACPI_GetInt);
+  lua_register(Lua_State, "nvidia_temperature", Lua_Nvidia_Temperature);
   return err_success();
 }
 

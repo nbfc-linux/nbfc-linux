@@ -253,6 +253,7 @@ src/nbfc_service: \
 	src/mkdir_p.c src/mkdir_p.h \
 	src/model_config.c src/model_config.h \
 	src/nbfc.h \
+	src/nvidia.c src/nvidia.h \
 	src/nxjson.c src/nxjson.h \
 	src/nxjson_utils.h \
 	src/nxjson_write.c src/nxjson_write.h \
@@ -368,6 +369,7 @@ src/nbfc: \
 	src/nxjson_utils.h \
 	src/nxjson_write.c src/nxjson_write.h \
 	src/nbfc.h \
+	src/nvidia.c src/nvidia.h \
 	src/process.h src/process.c \
 	src/program_name.h src/program_name.c \
 	src/regex_utils.h src/regex_utils.c \
