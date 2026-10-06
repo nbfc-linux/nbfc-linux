@@ -85,7 +85,7 @@ static Error Xml2Json_ParseBool(const xmlNode* node, const char* key, nx_json* p
   Error e = err_success();                                                    \
   for (xmlNode* node = root->children; node; node = node->next) {             \
     if (node->type == XML_ELEMENT_NODE) {                                     \
-      if (false);                                                             \
+      if (false) { }                                                          \
 
 #define XML2JSON_PARSE_END()                                                  \
       else {                                                                  \
@@ -265,12 +265,17 @@ Error Xml2Json_ConvertFile(const char* file, nx_json** out) {
     return err_string("Failed to parse XML file");
 
   root = xmlDocGetRootElement(doc);
-  if (! strcmp((const char*) root->name, "FanControlConfigV2"))
+  if (! root)
+    e = err_string("XML does not contain a root element");
+  else if (! strcmp((const char*) root->name, "FanControlConfigV2"))
     e = Xml2Json_Convert(root, out);
   else
     e = err_string("XML root node is not \"FanControlConfigV2\"");
 
   xmlFreeDoc(doc);
-  xmlCleanupParser();
+
+  // We don't call `xmlCleanupParser()` here, because it cleans up
+  // the global libxml state.
+
   return e;
 }

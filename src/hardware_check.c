@@ -10,6 +10,8 @@
 #include <stdio.h>  // snprintf
 #include <stdlib.h> // exit
 #include <string.h> // strerror
+#include <fcntl.h>  // O_CREAT, O_TRUNC, O_WRONLY
+#include <sys/stat.h> // S_IRUSR, S_IWUSR, S_IROTH, ...
 
 /*
  * Returns the notebook model name.

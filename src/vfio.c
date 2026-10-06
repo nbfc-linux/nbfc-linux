@@ -8,6 +8,7 @@
 #include <dirent.h> // DIR, opendir, readdir, closedir
 #include <string.h> // strstr, strcmp, strrchr
 #include <unistd.h> // readlink
+#include <linux/limits.h> // PATH_MAX
 
 // ============================================================================
 // VFIO passthrough detection helpers
@@ -44,7 +45,7 @@ bool VFIO_CheckSysBusPciDevices(void) {
     snprintf(vendor_path, sizeof(vendor_path),
              "%s/%s/vendor", VFIO_PCI_DEVICES_PATH, entry->d_name);
 
-    char vendor[8];
+    char vendor[16];
     FileResult res = File_Read(vendor, sizeof(vendor), vendor_path);
     if (!res.ok)
       continue;

@@ -134,7 +134,7 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
   AcpiInfo acpi_info = {0};
 
   // ==========================================================================
-  // Check if apcica-tools are installed
+  // Check if acpica-tools are installed
   // ==========================================================================
 
   e = AcpiAnalysis_IsAcpiExecInstalled();
@@ -225,7 +225,7 @@ static int AcpiDump_Map(array_of(str)* aml_files, bool unverified) {
   AcpiInfo acpi_info = {0};
 
   // ==========================================================================
-  // Check if apcica-tools are installed
+  // Check if acpica-tools are installed
   // ==========================================================================
 
   e = AcpiAnalysis_IsAcpiExecInstalled();

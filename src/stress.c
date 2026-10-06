@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/prctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -30,22 +31,8 @@ static pid_t Stress_GPU_PID = -1;
  * Returns 0 on failure.
  */
 size_t Stress_GetNumProcessors(void) {
-  char content[NBFC_MAX_FILE_SIZE];
-  size_t num = 0;
-
-  content[0] = '\n';
-
-  FileResult res = File_Read(content + 1, sizeof(content) - 1, STRESS_PROC_CPUINFO);
-  if (! res.ok)
-    return 0;
-
-  const char* p = content;
-  while ((p = strstr(p, "processor"))) {
-    num += (p[-1] == '\n');
-    p += STRLEN("processor");
-  }
-
-  return num;
+  long ret = sysconf(_SC_NPROCESSORS_ONLN);
+  return (ret == -1 ? 0 : ret);
 }
 
 Error Stress_IsInstalled(void) {

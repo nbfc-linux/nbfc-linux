@@ -6,10 +6,11 @@
 #include <stdlib.h> // system
 
 static inline Error Process_Call(const char* cmd) {
-  switch (system(cmd)) {
+  int ret = system(cmd);
+  switch (ret) {
   case 0:  return err_success();
-  case -1: return err_stdlib("system()");
-  default: return err_stringf("Could not execute `%s'", cmd);
+  case -1: return err_stdlib(cmd);
+  default: return err_stringf("Command `%s' returned %d", cmd, WEXITSTATUS(ret));
   }
 }
 

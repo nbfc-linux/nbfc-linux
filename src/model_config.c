@@ -453,7 +453,7 @@ Error TemperatureThresholds_Validate(
   bool has_100_FanSpeed = false;
 
   for_each_array(TemperatureThreshold*, t, *TemperatureThresholds) {
-    Trace_Push(trace, "TemperatureThresholds[%d]", PTR_DIFF(t, TemperatureThresholds->data));
+    Trace_Push(trace, "TemperatureThresholds[%zd]", PTR_DIFF(t, TemperatureThresholds->data));
 
     e = TemperatureThreshold_ValidateFields(t);
     e_check();
@@ -614,8 +614,15 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
   e = ModelConfig_ValidateFields(c);
   e_goto(err);
 
+  if (c->isset.Sponsor) {
+    Trace_Push(trace, "Sponsor");
+    e = Sponsor_ValidateFields(&c->Sponsor);
+    e_goto(err);
+    Trace_Pop(trace);
+  }
+
   for_each_array(RegisterWriteConfiguration*, r, c->RegisterWriteConfigurations) {
-    Trace_Push(trace, "RegisterWriteConfigurations[%d]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
+    Trace_Push(trace, "RegisterWriteConfigurations[%zd]", PTR_DIFF(r, c->RegisterWriteConfigurations.data));
 
     e = RegisterWriteConfiguration_ValidateFields(r);
     e_goto(err);
@@ -627,7 +634,7 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
   }
 
   for_each_array(FanConfiguration*, f, c->FanConfigurations) {
-    Trace_Push(trace, "FanConfigurations[%d]", PTR_DIFF(f, c->FanConfigurations.data));
+    Trace_Push(trace, "FanConfigurations[%zd]", PTR_DIFF(f, c->FanConfigurations.data));
 
     e = FanConfiguration_ValidateFields(f);
     e_goto(err);
@@ -635,7 +642,7 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
     // Add a default FanDisplayName
     if (f->FanDisplayName == NULL) {
       char fan_name[32];
-      snprintf(fan_name, sizeof(fan_name), "Fan #%d", PTR_DIFF(f, c->FanConfigurations.data));
+      snprintf(fan_name, sizeof(fan_name), "Fan #%zd", PTR_DIFF(f, c->FanConfigurations.data));
       f->FanDisplayName = Mem_Strdup(fan_name);
     }
 
@@ -733,7 +740,7 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
     }
 
     for_each_array(FanSpeedPercentageOverride* , o, f->FanSpeedPercentageOverrides) {
-      Trace_Push(trace, "FanSpeedPercentageOverrides[%d]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
+      Trace_Push(trace, "FanSpeedPercentageOverrides[%zd]", PTR_DIFF(o, f->FanSpeedPercentageOverrides.data));
 
       e = FanSpeedPercentageOverride_ValidateFields(o);
       e_goto(err);

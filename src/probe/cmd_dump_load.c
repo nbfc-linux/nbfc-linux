@@ -5,6 +5,7 @@
 
 #include <errno.h>  // errno
 #include <unistd.h> // isatty, STDOUT_FILENO
+#include <stddef.h> // size_t
 #include <stdio.h>  // printf
 #include <string.h> // strcmp, strncmp
 
@@ -222,7 +223,7 @@ static Error LoadRegisterTable(RegisterReadings* register_readings, const char* 
   if (strncmp(content, RegisterTableHeader, sizeof(RegisterTableHeader) - 1))
     goto error;
 
-  text = content + sizeof(RegisterTableHeader);
+  text = content + sizeof(RegisterTableHeader) - 1;
 
   for (int line_no = 0; line_no < 16; ++line_no) {
     // "00 | "
@@ -304,19 +305,19 @@ static int Watch(void) {
   Initialize_EC();
 
   Error e;
-  int max_loops = INT_MAX;
+  size_t max_loops = (size_t) -1;
 
   if (options.timespan)
-    max_loops = (int) ((float) options.timespan / options.interval);
+    max_loops = (size_t) ((float) options.timespan / options.interval);
 
-  if (max_loops > ARRAY_SSIZE(Registers_Log))
-    max_loops = ARRAY_SSIZE(Registers_Log);
+  if (max_loops > ARRAY_SIZE(Registers_Log))
+    max_loops = ARRAY_SIZE(Registers_Log);
 
   RegisterReadings* regs = Registers_Log;
   e = Registers_FromEC(regs);
   e_die();
 
-  for (int loops = 1; !quit && loops < max_loops; ++loops) {
+  for (size_t loops = 1; !quit && loops < max_loops; ++loops) {
     e = Registers_FromEC(regs + loops);
     e_die();
 

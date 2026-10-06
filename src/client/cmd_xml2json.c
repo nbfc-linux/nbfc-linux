@@ -1,3 +1,4 @@
+#include "../nbfc.h"
 #include "../xml2json.h"
 #include "../model_config_to_json.h"
 #include "../nxjson_write.h"

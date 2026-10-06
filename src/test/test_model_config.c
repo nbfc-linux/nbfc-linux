@@ -18,6 +18,7 @@
 #include "../ec.h"
 #include "../nbfc.h"
 #include "../buffer.c"
+#include "../io_utils.c"
 #include "../log.c"
 #include "../lua_bindings.c"
 #include "../error.c"

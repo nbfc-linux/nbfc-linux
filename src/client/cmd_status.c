@@ -6,6 +6,8 @@
 #include "service_control.h"
 #include "client_global.h"
 
+#include <stdio.h> // printf
+
 #define STATUS_CLEAR_SCREEN "\033c"
 
 const struct cli99_Option Status_CommandLine[] = {
@@ -78,6 +80,8 @@ static void Status_Print(void) {
       Status_PrintFan(&service_info.Fans.data[*fan_index]);
     }
   }
+
+  ServiceInfo_Free(&service_info);
 }
 
 int Status(void) {

@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h> // memset
 
-const char* to_binary(uint64_t val, unsigned pad)
+static inline const char* to_binary(uint64_t val, unsigned pad)
 {
   static char buf[65];
   unsigned i = 63;

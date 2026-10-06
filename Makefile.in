@@ -226,10 +226,12 @@ clean-all:
 
 src/nbfc_service: \
 	src/acpi_call.h src/acpi_call.c \
+	src/buffer.h src/buffer.c \
 	src/build.c \
 	src/config.h \
 	src/dmi.h src/dmi.c \
-	src/ec.h \
+	src/ec.h src/ec.c \
+	src/ec_available.h \
 	src/ec_debug.h src/ec_debug.c \
 	src/ec_dummy.h src/ec_dummy.c \
 	src/ec_linux.c src/ec_linux.h \
@@ -253,7 +255,9 @@ src/nbfc_service: \
 	src/mkdir_p.c src/mkdir_p.h \
 	src/model_config.c src/model_config.h \
 	src/nbfc.h \
+	src/nvidia.h src/nvidia.c \
 	src/nxjson.c src/nxjson.h \
+	src/nxjson_memory.c src/nxjson_memory.h \
 	src/nxjson_utils.h \
 	src/nxjson_write.c src/nxjson_write.h \
 	src/pidfile.c src/pidfile.h \
@@ -269,6 +273,7 @@ src/nbfc_service: \
 	src/str_functions.c src/str_functions.h \
 	src/temperature_filter.c src/temperature_filter.h \
 	src/temperature_threshold_manager.c src/temperature_threshold_manager.h \
+	src/trace.c src/trace.h \
 	src/vfio.c src/vfio.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/build.c -o src/nbfc_service $(LDLIBS_SERVICE) $(LDFLAGS)
 
@@ -288,6 +293,7 @@ src/ec_probe: \
 	src/file_utils.h src/file_utils.c \
 	src/fs_sensors.h src/fs_sensors.c \
 	src/help/ec_probe.help.h \
+	src/io_utils.c src/io_utils.h \
 	src/log.h src/log.c \
 	src/lua_bindings.h src/lua_bindings.c \
 	src/macros.h \

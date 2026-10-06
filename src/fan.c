@@ -3,6 +3,7 @@
 #include "error.h"
 #include "ec.h"
 #include "acpi_call.h"
+#include "lua_bindings.h"
 
 #include <math.h>    // fabs, round
 #include <errno.h>   // EINVAL
@@ -240,7 +241,7 @@ Error Fan_UpdateCurrentSpeed(Fan* self) {
   if (my.num_read_warnings < FAN_MAX_READ_WARNINGS) {
     my.num_read_warnings++;
 
-    Log_Warn("%s: Fan speed value (%d) not range of %s/%s",
+    Log_Warn("%s: Fan speed value (%d) not in range of %s/%s",
       my.fanConfig->FanDisplayName,
       speed,
       "MinSpeedValueRead",

@@ -2,6 +2,7 @@
 #define NBFC_PARSE_DOUBLE_H_
 
 #include <errno.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,6 +13,8 @@ static double parse_double(const char* s, double min, double max, const char** e
 
   if (errno)
     *errmsg = strerror(errno);
+  else if (isnan(val))
+    *errmsg = "value is not a number";
   else if (!*s || *end)
     *errmsg = strerror(EINVAL);
   else if (val < min)

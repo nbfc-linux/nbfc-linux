@@ -39,6 +39,7 @@ int main(int argc, const char** argv) {
   }
 }
 
+#include "../io_utils.c"
 #include "../log.c"
 #include "../program_name.c"
 #include "../error.c"

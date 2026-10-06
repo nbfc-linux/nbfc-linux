@@ -111,6 +111,7 @@ static void AML_Lexer_ParseString(AML_Lexer* l, AML_Token* t) {
       if (! AML_Lexer_PeekChar(l, t->len)) {
         t->type = AML_TOK_Error;
         l->error = "Unterminated string";
+        return;
       }
     }
 
@@ -411,16 +412,23 @@ AML_Token AML_Lexer_GetToken(AML_Lexer* l) {
  */
 Error AML_Lexer_GetTokens(AML_Lexer* l, array_of(AML_Token)* out) {
   size_t capacity = 1024;
-  out->size = 0;
+  memset(out, 0, sizeof(*out));
   array_calloc(AML_Token, *out, capacity);
 
   for (;;) {
     AML_Token t = AML_Lexer_GetToken(l);
 
     switch (t.type) {
-    case AML_TOK_Error: return err_string(l->error);
-    case AML_TOK_EOF:   return err_success();
-    default:            break;
+    case AML_TOK_Error:
+      Mem_Free(out->data);
+      memset(out, 0, sizeof(*out));
+      return err_string(l->error);
+
+    case AML_TOK_EOF:
+      return err_success();
+
+    default:
+      break;
     }
 
     if (out->size >= capacity) {

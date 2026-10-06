@@ -27,35 +27,85 @@
  * as an error; they are not converted or wrapped into unsigned values.
  */
 static uint64_t parse_unumber(const char* s, uint64_t min, uint64_t max, const char** errmsg) {
+  // 128 bytes are more than enough for any valid integer. If the source string
+  // is longer, truncating it is harmless because strtoll() will report ERANGE.
+  char buf[128];
+  size_t i = 0;
+  uint64_t val;
   int base = 10;
-  int start = 0;
   int is_negative = 0;
+  char* end = "";
+  errno = 0;
 
-  if (s[0] == '-')
+  // We accept exactly one sign
+  if (*s == '+') {
+    buf[i++] = *s;
+    ++s;
+  }
+  else if (*s == '-') {
     is_negative = 1;
+    ++s;
+  }
 
-  if (s[0] == '-' || s[0] == '+')
-    ++start;
+  // Leading zero
+  if (*s == '0') {
+    ++s;
 
-  if (s[start] == '0') {
-    if (s[start+1] >= '0' && s[start+1] <= '9') {
+    // No more chars
+    if (*s == '\0') {
+      val = 0;
+      goto check;
+    }
+
+    // Binary number
+    if (*s == 'b' || *s == 'B') {
+      ++s;
+      base = 2;
+      goto parse;
+    }
+
+    // Hexadecimal number
+    if (*s == 'x' || *s == 'X') {
+      ++s;
+      base = 16;
+      goto parse;
+    }
+
+    // Octal number
+    if (*s >= '0' && *s <= '9') {
       *errmsg = "octal values not supported";
       return 0;
     }
-
-    if (s[start+1] == 'x' || s[start+1] == 'X')
-      base = 16;
-    else if (s[start+1] == 'b' || s[start+1] == 'B')
-      base = 2;
   }
 
-  errno = 0;
-  char* end;
-  uint64_t val = strtoull(s, &end, base);
+parse:
+  // We (maybe) have a prefix, but the remaining string is empty
+  if (*s == '\0') {
+    errno = EINVAL;
+    goto check;
+  }
 
+  // Only accept hexadecimal chars; no whitespace
+  for (const char* c = s; *c && i < sizeof(buf) - 1; ++c)
+    if ((*c >= '0' && *c <= '9') ||
+        (*c >= 'A' && *c <= 'F') ||
+        (*c >= 'a' && *c <= 'f'))
+    {
+      buf[i++] = *c;
+    }
+    else
+    {
+      *errmsg = strerror(EINVAL);
+      return 0;
+    }
+
+  buf[i] = '\0';
+  val = strtoull(buf, &end, base);
+
+check:
   if (errno)
     *errmsg = strerror(errno);
-  else if (!*s || *end)
+  else if (*end)
     *errmsg = strerror(EINVAL);
   else if (is_negative && val)
     *errmsg = "value is negative";

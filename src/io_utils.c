@@ -20,8 +20,8 @@ bool IO_SendAll(int socket, const char* buffer, size_t length) {
     if (ret < 0) {
       if (errno != EINTR && errno != EAGAIN)
         return false;
-      else
-        continue;
+
+      continue;
     }
 
     total_sent += (size_t) ret;
@@ -30,7 +30,7 @@ bool IO_SendAll(int socket, const char* buffer, size_t length) {
   return true;
 }
 
-bool IO_WriteAll(int fd, const char *buffer, size_t length)
+bool IO_WriteAll(int fd, const char* buffer, size_t length)
 {
   size_t total_written = 0;
 

@@ -10,7 +10,8 @@
 
 #include <string.h> // memset
 #include <unistd.h> // close
-#include <sys/stat.h> // open, O_WRONLY, O_CREAT, O_TRUNC, S_IRUSR, ...
+#include <fcntl.h>  // open, O_WRONLY, O_CREAT, O_TRUNC
+#include <sys/stat.h> // open, S_IRUSR, S_IWUSR, S_IROTH, ...
 
 Error ServiceState_FromFile(ServiceState* service_state, const char* file) {
   Error e;
@@ -34,7 +35,7 @@ Error ServiceState_FromFile(ServiceState* service_state, const char* file) {
     goto err;
 
   for_each_array(float*, f, service_state->TargetFanSpeeds) {
-    Trace_Push(trace, "TargetFanSpeeds[%d]", PTR_DIFF(f, service_state->TargetFanSpeeds.data));
+    Trace_Push(trace, "TargetFanSpeeds[%zd]", PTR_DIFF(f, service_state->TargetFanSpeeds.data));
 
     if (*f > 100.0f) {
       Log_Warn("%s: Value cannot be greater than 100.0", trace->buf);
@@ -62,6 +63,7 @@ err:
 }
 
 Error ServiceState_Write(const ServiceState* service_state, const char* file) {
+  bool success = false;
   nx_json root = {0};
   nx_json* o = create_json_object(NULL, &root);
 
@@ -73,14 +75,12 @@ Error ServiceState_Write(const ServiceState* service_state, const char* file) {
   }
 
   int fd = open(file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-  if (fd == -1)
-    return err_stdlib(file);
-
-  bool success = nxjson_write_to_fd(o, fd, 2);
-
-  int errno_save = errno;
-  close(fd);
-  errno = errno_save;
+  if (fd >= 0) {
+    success = nxjson_write_to_fd(o, fd, 2);
+    int errno_save = errno;
+    close(fd);
+    errno = errno_save;
+  }
 
   nx_json_free(o);
 

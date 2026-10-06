@@ -11,6 +11,7 @@
 #include "../config.h"
 #include "../error.c"
 #include "../buffer.c"
+#include "../io_utils.c"
 #include "../memory.c"
 #include "../nxjson.c"
 #include "../nxjson_utils.h"

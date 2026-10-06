@@ -1,7 +1,11 @@
+#include "../error.h"
 #include "../file_utils.h"
 #include "../memory.h"
+#include "../parse_number.h"
 
+#include <stdio.h>  // snprintf
 #include <string.h> // strcmp
+#include <stdint.h>
 
 typedef struct {
   char    name[5];

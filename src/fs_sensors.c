@@ -229,6 +229,7 @@ Error FS_TemperatureSources_GetTemperature(
   TemperatureAlgorithmType algorithm,
   float* out)
 {
+  Error e;
   float tmp;
   float sum = 0;
   float min = FLT_MAX;
@@ -237,7 +238,7 @@ Error FS_TemperatureSources_GetTemperature(
 
   for_each_array(array_size_t*, ts_idx, *sources) {
     const FS_TemperatureSource* ts = FS_Sensors_Sources_UnRef(*ts_idx);
-    Error e = FS_TemperatureSource_GetTemperature(ts, &tmp);
+    e = FS_TemperatureSource_GetTemperature(ts, &tmp);
     e_warn();
     if (! e) {
       min = MIN(min, tmp);

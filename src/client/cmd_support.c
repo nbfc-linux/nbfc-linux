@@ -1,6 +1,8 @@
+#include <errno.h>  // errno
 #include <stdio.h>  // printf, puts
-#include <string.h> // strcmp, strlen
+#include <string.h> // strcmp, strlen, strerror
 #include <stdlib.h> // exit
+#include <unistd.h> // execl
 
 #include "../nbfc.h"
 #include "../log.h"
@@ -31,7 +33,7 @@ enum Support_Action {
   Support_Action_CreateArchive,
 };
 
-struct {
+static struct {
   enum Support_Action action;
   const char* archive_file;
 } Support_Options = {
@@ -318,15 +320,18 @@ static int Support_PrintCommand(void) {
   return NBFC_EXIT_SUCCESS;
 }
 
-int Support_CreateArchive(const char* archive_file) {
+static int Support_CreateArchive(const char* archive_file) {
   check_root();
 
-  return execl(
+  execl(
     NBFC_MAKE_ARCHIVE_SCRIPT_FILE,
     NBFC_MAKE_ARCHIVE_SCRIPT,
-    Mem_Strdup(archive_file),
+    archive_file,
     NULL
   );
+
+  Log_Error("execl(): %s", strerror(errno));
+  return NBFC_EXIT_FAILURE;
 }
 
 int Support(void) {

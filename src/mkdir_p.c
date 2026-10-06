@@ -22,7 +22,6 @@ int mkdir_p(const char* path, mode_t mode) {
     p++;
   }
 
-  errno = 0;
   if (mkdir(tmp, mode) != 0 && errno != EEXIST)
     ret = -1;
 

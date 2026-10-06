@@ -20,14 +20,14 @@ void EC_Cache_Close(void) {
 }
 
 Error EC_Cache_WriteByte(uint8_t register_, uint8_t value) {
-	(void) register_;
-	(void) value;
+  (void) register_;
+  (void) value;
   return err_string("NOT SUPPORTED");
 }
 
 Error EC_Cache_WriteWord(uint8_t register_, uint16_t value) {
-	(void) register_;
-	(void) value;
+  (void) register_;
+  (void) value;
   return err_string("NOT SUPPORTED");
 }
 

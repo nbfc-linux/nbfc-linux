@@ -1,4 +1,6 @@
+#include <errno.h>  // errno, ENOENT
 #include <string.h> // strcmp
+#include <stdbool.h>
 #include <linux/limits.h> // PATH_MAX
 
 #include "service_control.h"
@@ -6,13 +8,15 @@
 #include "check_root.h"
 
 #include "../nbfc.h"
+#include "../error.h"
 #include "../memory.h"
 #include "../help/client.help.h"
 #include "../nxjson_utils.h"
 #include "../fs_sensors.h"
 #include "../file_utils.h"
 
-/* nbfc sensors API:
+/*
+ * nbfc sensors API:
  *
  * nbfc sensors show
  * nbfc sensors list
@@ -64,16 +68,14 @@ struct {
 };
 
 static Error Sensors_IsValidSensor(const char* sensor) {
+  Error e;
+  FS_TemperatureSource_References found_sensors = {0};
+
   switch (sensor[0]) {
     case '@':
-      // TODO: Check if sensor group can be resolved to a sensor
-      if (!strcmp(sensor, "@CPU"))
-        return err_success();
-
-      if (!strcmp(sensor, "@GPU"))
-        return err_success();
-
-      return err_stringf("No such sensor group: %s", sensor);
+      e = FS_TemperatureSources_AddTemperatureSources(&found_sensors, sensor);
+      Mem_Free(found_sensors.data);
+      return e;
 
     case '/':
       if (File_Exists(sensor))
@@ -160,6 +162,13 @@ static int Sensors_Set(void) {
 
   e = ServiceConfig_Write(&service_config, NBFC_SERVICE_CONFIG);
   e_die();
+
+#if STRICT_CLEANUP
+  FS_Sensors_Cleanup();
+  ModelConfig_Free(&model_config);
+  // We can't call ServiceConfig_Free() here, since `ftsc->Sensors` references
+  // Sensors_Options.sensors, which is an array of non-freeable `const char*`
+#endif
 
   return NBFC_EXIT_SUCCESS;
 }
@@ -249,37 +258,37 @@ static int Sensors_Show(void) {
     printf("\n");
   }
 
+#if STRICT_CLEANUP
+  Mem_Free(fans);
+  ServiceConfig_Free(&service_config);
+  ModelConfig_Free(&model_config);
+#endif
+
   return NBFC_EXIT_SUCCESS;
 }
 
 static int Sensors_List(void) {
   FS_Sensors_Init(true);
 
-  const char* having[4096];
-  ssize_t     having_size = 0;
+  bool source_was_printed[32768] = {0};
 
   for_each_array(FS_TemperatureSource*, source, FS_Sensors_Sources) {
-    bool sensor_printed = false;
-
-    for (ssize_t i = 0; i < having_size; ++i) {
-      if (! strcmp(having[i], source->name)) {
-        sensor_printed = true;
-        break;
-      }
-    }
-
-    if (sensor_printed)
+    if (source_was_printed[source - FS_Sensors_Sources.data])
       continue;
-
-    having[having_size++] = source->name;
 
     printf("%s:\n", source->name);
 
     for_each_array(FS_TemperatureSource*, source2, FS_Sensors_Sources) {
-      if (! strcmp(source->name, source2->name))
+      if (! strcmp(source->name, source2->name)) {
         printf("\t%s\n", source2->file);
+        source_was_printed[source2 - FS_Sensors_Sources.data] = true;
+      }
     }
   }
+
+#if STRICT_CLEANUP
+  FS_Sensors_Cleanup();
+#endif
 
   return NBFC_EXIT_SUCCESS;
 }

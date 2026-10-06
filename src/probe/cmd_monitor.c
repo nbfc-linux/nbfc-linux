@@ -6,6 +6,7 @@
 
 #include <math.h>   // fabs
 #include <errno.h>  // errno
+#include <stddef.h> // size_t
 #include <stdio.h>  // printf, fprintf, fopen, fclose
 #include <stdlib.h> // strtoll
 #include <string.h> // strcmp
@@ -39,19 +40,21 @@ static const struct cli99_Option Evaluate_CommandLine[] = {
   cli99_Options_End()
 };
 
-static bool RegisterHasChanged(RegisterReadings readings[], int size, int register_) {
+static bool RegisterHasChanged(RegisterReadings readings[], size_t size, int register_) {
   if (size == 0)
     return false;
 
   const uint8_t first = readings[0].readings[register_];
-  for (range(int, i, 1, size))
+  for (range(size_t, i, 1, size))
     if (first != readings[i].readings[register_])
       return true;
   return false;
 }
 
-static void PrintMonitor(RegisterReadings readings[], int size, bool cpu, bool gpu) {
+static void PrintMonitor(RegisterReadings readings[], size_t size, bool cpu, bool gpu) {
   printf(CONSOLE_CLEAR);
+
+  const size_t begin = (size >= 24 ? size - 24 : 0);
 
   for (int register_ = 0; register_ < REGISTERS_SIZE; ++register_) {
     if (! RegisterHasChanged(readings, size, register_))
@@ -59,7 +62,7 @@ static void PrintMonitor(RegisterReadings readings[], int size, bool cpu, bool g
 
     printf(CONSOLE_GREEN "0x%.2X:", register_);
     uint8_t byte = readings[0].readings[register_];
-    for (range(int, i, MAX(size - 24, 0), size)) {
+    for (range(size_t, i, begin, size)) {
       const uint8_t diff = byte - readings[i].readings[register_];
       byte = readings[i].readings[register_];
       if (diff)
@@ -72,26 +75,26 @@ static void PrintMonitor(RegisterReadings readings[], int size, bool cpu, bool g
 
   if (cpu) {
     printf(CONSOLE_GREEN "@CPU:");
-    for (range(int, i, MAX(size - 24, 0), size))
+    for (range(size_t, i, begin, size))
       printf(CONSOLE_BOLD_WHITE " %d", (int) readings[i].cpu_temp);
     printf("\n");
   }
 
   if (gpu) {
     printf(CONSOLE_GREEN "@GPU:");
-    for (range(int, i, MAX(size - 24, 0), size))
+    for (range(size_t, i, begin, size))
       printf(CONSOLE_BOLD_WHITE " %d", (int) readings[i].gpu_temp);
     printf("\n");
   }
 }
 
-static void WriteMonitorReport(RegisterReadings readings[], int size, bool cpu, bool gpu, FILE* fh) {
+static void WriteMonitorReport(RegisterReadings readings[], size_t size, bool cpu, bool gpu, FILE* fh) {
   for (int register_ = 0; register_ < REGISTERS_SIZE; ++register_) {
     if (! RegisterHasChanged(readings, size, register_))
       continue;
 
     fprintf(fh, "%.2X", register_);
-    for (range(int, i, 0, size)) {
+    for (range(size_t, i, 0, size)) {
       if (options.clearly &&
           i > 0 &&
           readings[i].readings[register_] == readings[i - 1].readings[register_])
@@ -109,7 +112,7 @@ static void WriteMonitorReport(RegisterReadings readings[], int size, bool cpu, 
 
   if (cpu) {
     fprintf(fh, "@CPU");
-    for (range(int, i, 0, size)) {
+    for (range(size_t, i, 0, size)) {
       fprintf(fh, ",%.2f", readings[i].cpu_temp);
     }
     fprintf(fh, "\n");
@@ -117,7 +120,7 @@ static void WriteMonitorReport(RegisterReadings readings[], int size, bool cpu, 
 
   if (gpu) {
     fprintf(fh, "@GPU");
-    for (range(int, i, 0, size)) {
+    for (range(size_t, i, 0, size)) {
       fprintf(fh, ",%.2f", readings[i].gpu_temp);
     }
     fprintf(fh, "\n");
@@ -126,7 +129,7 @@ static void WriteMonitorReport(RegisterReadings readings[], int size, bool cpu, 
 
 static int Monitor(void) {
   Error e = err_success();
-  int max_loops = INT_MAX;
+  size_t max_loops = (size_t) -1;
   FS_TemperatureSource_References cpu_sensors = {0};
   FS_TemperatureSource_References gpu_sensors = {0};
 
@@ -134,10 +137,10 @@ static int Monitor(void) {
   Initialize_EC();
 
   if (options.timespan)
-    max_loops = (int) ((float) options.timespan / options.interval);
+    max_loops = (size_t) ((float) options.timespan / options.interval);
 
-  if (max_loops > ARRAY_SSIZE(Registers_Log))
-    max_loops = ARRAY_SSIZE(Registers_Log);
+  if (max_loops > ARRAY_SIZE(Registers_Log))
+    max_loops = ARRAY_SIZE(Registers_Log);
 
   if (options.cpu || options.gpu) {
     e = FS_Sensors_Init(options.gpu);
@@ -158,7 +161,7 @@ static int Monitor(void) {
   }
 
   RegisterReadings* regs = Registers_Log;
-  int loops = 0;
+  size_t loops = 0;
   while (loops < max_loops && !quit) {
     e = Registers_FromEC(regs + loops);
     if (e)
@@ -196,7 +199,11 @@ error:
   if (e)
     Log_Error("%s", err_print_all(e));
 
+#if STRICT_CLEANUP
   FS_Sensors_Cleanup();
+  Mem_Free(cpu_sensors.data);
+  Mem_Free(gpu_sensors.data);
+#endif
 
   return e ? NBFC_EXIT_FAILURE : NBFC_EXIT_SUCCESS;
 }

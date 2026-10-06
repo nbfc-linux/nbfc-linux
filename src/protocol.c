@@ -1,8 +1,6 @@
 #include "protocol.h"
 
-#include "nbfc.h"
 #include "memory.h"
-#include "nxjson_utils.h"
 #include "nxjson_write.h"
 
 #include <unistd.h>

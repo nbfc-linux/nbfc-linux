@@ -1,3 +1,10 @@
+#include "../error.h"
+#include "../parse_number.h"
+#include "../client/check_root.h"
+
+#include <stdio.h>  // printf, fflush
+#include <string.h> // strcmp, strlen
+
 struct ShellArgs {
   const char* args[64];
   ssize_t count;
@@ -216,7 +223,7 @@ static int Shell(void) {
 
     read_args(&args, &line);
 
-    if (args.count == 0);
+    if (args.count == 0) {}
     else if (!strcmp(args.args[0], "read"))     ShellRead(&args);
     else if (!strcmp(args.args[0], "write"))    ShellWrite(&args);
     else if (!strcmp(args.args[0], "read_all")) ShellReadAll(&args);

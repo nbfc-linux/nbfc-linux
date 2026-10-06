@@ -162,8 +162,15 @@ static const struct cli99_Option* Options[] = {
 
 int main(int argc, char* const argv[]) {
   if (geteuid() == 0) {
-    mkdir_p(NBFC_CONFIG_DIR, 0755);
-    mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755);
+    if (mkdir_p(NBFC_CONFIG_DIR, 0755) < 0) {
+      Log_Error("Cannot create directory: %s: %s", NBFC_CONFIG_DIR, strerror(errno));
+      exit(NBFC_EXIT_FAILURE);
+    }
+
+    if (mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755) < 0) {
+      Log_Error("Cannot create directory: %s: %s", NBFC_MODEL_CONFIGS_DIR_MUTABLE, strerror(errno));
+      exit(NBFC_EXIT_FAILURE);
+    }
   }
 
   if (argc == 1) {

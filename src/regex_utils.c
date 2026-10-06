@@ -57,6 +57,9 @@ char* RegEx_SubStr(const regmatch_t* m, const char* s) {
  * Copies at most `size - 1` characters and always NUL-terminates the output.
  */
 void RegEx_SubStr_Fixed(const regmatch_t* m, const char* s, char* out, size_t size) {
+  if (size == 0)
+    return;
+
   out[0] = '\0';
 
   if (m->rm_so < 0 || m->rm_eo < 0)

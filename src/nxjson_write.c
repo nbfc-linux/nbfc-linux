@@ -3,6 +3,7 @@
 #include "macros.h"
 #include "io_utils.h"
 
+#include <stdio.h>  // snprintf
 #include <string.h> // strlen
 #include <unistd.h> // write
 

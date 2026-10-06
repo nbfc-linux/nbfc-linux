@@ -4,9 +4,11 @@
 #include "macros.h"
 #include "program_name.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <string.h>
 #if ENABLE_SYSLOG
 #include <syslog.h>
 #endif
@@ -39,6 +41,7 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
   if (Log_LogLevel < level)
     return;
 
+  int errno_old = errno;
   char buf[LOG_BUFFER_SIZE];
   va_list args;
   va_start(args, fmt);
@@ -58,16 +61,30 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
 #endif
 
   switch (level) {
-    case LogLevel_Error: WriteToErr("ERROR");   break;
-    case LogLevel_Warn:  WriteToErr("WARNING"); break;
-    case LogLevel_Info:  WriteToErr("INFO");    break;
-    case LogLevel_Debug: WriteToErr("DEBUG");   break;
-    default: break;
+    case LogLevel_Error:
+      IO_WriteAll(STDERR_FILENO, "ERROR", STRLEN("ERROR"));
+      break;
+
+    case LogLevel_Warn:
+      IO_WriteAll(STDERR_FILENO, "WARNING", STRLEN("WARNING"));
+      break;
+
+    case LogLevel_Info:
+      IO_WriteAll(STDERR_FILENO, "INFO", STRLEN("INFO"));
+      break;
+
+    case LogLevel_Debug:
+      IO_WriteAll(STDERR_FILENO, "DEBUG", STRLEN("DEBUG"));
+      break;
+
+    default:
+      break;
   }
 
-  WriteToErr(": ");
-  WriteToErr(Program_Name);
-  WriteToErr(": ");
-  WriteToErr(buf);
-  WriteToErr("\n");
+  IO_WriteAll(STDERR_FILENO, ": ", 2);
+  IO_WriteAll(STDERR_FILENO, Program_Name, strlen(Program_Name));
+  IO_WriteAll(STDERR_FILENO, ": ", 2);
+  IO_WriteAll(STDERR_FILENO, buf, strlen(buf));
+  IO_WriteAll(STDERR_FILENO, "\n", 1);
+  errno = errno_old;
 }

@@ -5,7 +5,9 @@
 
 #include <stddef.h>
 
+#ifndef MEMORY_TRACE_ALLOCS
 #define MEMORY_TRACE_ALLOCS 0
+#endif
 
 #define MEMORY_TRACE __FILE__ ":" STRINGIFY(__LINE__)
 

@@ -225,7 +225,7 @@ static Error AcpiAnalysis_ExtractRegisters(const char* output, array_of(AcpiRegi
     AcpiRegister* acpi_register = &out->data[out->size++];
 
     acpi_register->name = RegEx_SubStr(&matches[1], text);
-    RegEx_SubStr_Fixed(&matches[4], text, acpi_register->region, sizeof(AcpiOperationRegion));
+    RegEx_SubStr_Fixed(&matches[4], text, acpi_register->region, sizeof(AcpiOperationRegionName));
     acpi_register->bit_offset = (uint32_t) RegEx_Strtoull(&matches[5], text, 16);
     acpi_register->bit_length = (uint32_t) RegEx_Strtoull(&matches[6], text, 16);
     acpi_register->access_byte_width = (uint32_t) RegEx_Strtoull(&matches[7], text, 16);

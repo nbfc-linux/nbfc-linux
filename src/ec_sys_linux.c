@@ -23,13 +23,14 @@ static inline Error EC_SysLinux_LoadKernelModule(void);
 static inline Error EC_SysLinux_LoadACPIKernelModule(void);
 
 Error EC_SysLinux_Open(void) {
+  Error e;
   EC_SysLinux_File = EC_SYS_LINUX_EC0_IO_PATH;
 
   EC_SysLinux_FD = open(EC_SYS_LINUX_EC0_IO_PATH, O_RDWR);
   if (EC_SysLinux_FD != -1)
     return err_success();
 
-  Error e = EC_SysLinux_LoadKernelModule();
+  e = EC_SysLinux_LoadKernelModule();
   e_check();
 
   EC_SysLinux_FD = open(EC_SYS_LINUX_EC0_IO_PATH, O_RDWR);
@@ -40,13 +41,14 @@ Error EC_SysLinux_Open(void) {
 }
 
 Error EC_SysLinux_ACPI_Open(void) {
+  Error e;
   EC_SysLinux_File = EC_SYS_LINUX_ACPI_EC_PATH;
 
   EC_SysLinux_FD = open(EC_SYS_LINUX_ACPI_EC_PATH, O_RDWR);
   if (EC_SysLinux_FD != -1)
     return err_success();
 
-  Error e = EC_SysLinux_LoadACPIKernelModule();
+  e = EC_SysLinux_LoadACPIKernelModule();
   e_check();
 
   EC_SysLinux_FD = open(EC_SYS_LINUX_ACPI_EC_PATH, O_RDWR);

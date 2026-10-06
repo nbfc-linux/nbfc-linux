@@ -12,7 +12,7 @@
 #define ACPI_ANALYSIS_ACPIEXEC_BIN    "acpiexec"
 #define ACPI_ANALYSIS_ACPI_DIR        "/sys/firmware/acpi/tables"
 #define ACPI_ANALYSIS_MAX_SEGMENT_LEN 4
-#define ACPI_ANALYSIS_MAX_SSDT_FILES  64
+#define ACPI_ANALYSIS_MAX_SSDT_FILES  256
 
 /*
  * Stores a register name.

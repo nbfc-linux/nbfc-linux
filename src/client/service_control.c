@@ -11,7 +11,6 @@
 #include <sys/socket.h> // connect, socket
 #include <sys/un.h>     // sockaddr_un
 
-#include "../log.h"
 #include "../sleep.h"
 #include "../nbfc.h"
 #include "../log.h"
@@ -21,7 +20,6 @@
 #include "../protocol.h"
 #include "../nxjson_utils.h"
 #include "../service_config.h"
-#include "../file_utils.h"
 
 pid_t Service_GetPID(void) {
   const char* err;
@@ -152,6 +150,17 @@ error:
   return e;
 }
 
+void ServiceInfo_Free(ServiceInfo* service_info) {
+  Mem_Free((char*) service_info->SelectedConfigId);
+
+  for_each_array(FanInfo*, fan, service_info->Fans) {
+    Mem_Free((char*) fan->Name);
+  }
+  Mem_Free(service_info->Fans.data);
+
+  memset(service_info, 0, sizeof(*service_info));
+}
+
 void Service_LoadAllConfigFiles(ServiceConfig* service_config, ModelConfig* model_config) {
   Error e;
   Trace trace = {0};
@@ -201,6 +210,8 @@ int Service_Start(bool read_only) {
     return NBFC_EXIT_FAILURE;
   }
 
+  // The NBFC service uses the same return statuses as the NBFC client,
+  // so the result can be returned directly.
   return WEXITSTATUS(ret);
 }
 
@@ -208,6 +219,7 @@ int Service_Stop(void) {
   pid_t pid = Service_GetPID();
   if (pid == -1) {
     Log_Error("Service not running");
+    // Returning success if the service is not running is intentional.
     return NBFC_EXIT_SUCCESS;
   }
 

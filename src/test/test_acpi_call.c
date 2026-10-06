@@ -7,6 +7,7 @@
 #include "../acpi_call.c"
 #include "../error.c"
 #include "../file_utils.c"
+#include "../io_utils.c"
 #include "../memory.c"
 #include "../nxjson.c"
 #include "../str_functions.c"

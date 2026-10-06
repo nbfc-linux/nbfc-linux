@@ -46,6 +46,7 @@ src/test/test_aml_analysis
 src/test/test_aml_lexer
 src/test/test_model_config
 src/test/test_config_validation
+src/test/test_parse_numbers
 src/test/DSDT.aml
 src/test/fingerprint_current_firmware
 

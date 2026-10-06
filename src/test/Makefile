@@ -1,10 +1,15 @@
 all: \
+	test_parse_numbers \
 	test_config_validation \
 	test_model_config \
 	test_acpi_call \
 	test_aml_lexer \
 	test_aml_analysis \
 	fingerprint_current_firmware
+
+test_parse_numbers: test_parse_numbers.c
+	$(CC) -O2 test_parse_numbers.c -lm -o test_parse_numbers
+	./test_parse_numbers
 
 test_config_validation: test_config_validation.c
 	$(CC) -O2 test_config_validation.c -llua -o test_config_validation
@@ -72,4 +77,5 @@ clean:
 	rm -f ./test_acpi_call
 	rm -f ./test_config_validation
 	rm -f ./test_model_config
+	rm -f ./test_parse_numbers
 	rm -f ./fingerprint_current_firmware

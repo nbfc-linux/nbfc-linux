@@ -5,6 +5,7 @@
 #include "acpi_analysis.h"
 
 #include <string.h> // strncmp, memset
+#include <stdbool.h>
 
 static void AML_Analysis_RemoveDoubleParentheses(array_of(AML_Token)*);
 
@@ -301,7 +302,7 @@ static Error AML_Analysis_Pattern_Init(AML_Analysis_Pattern* pattern, const char
 err:
   AML_Analysis_Pattern_Free(pattern);
   return e;
-};
+}
 
 static bool AML_Analysis_Tokens_Match_Pattern(
   array_of(AML_Token)* tokens,

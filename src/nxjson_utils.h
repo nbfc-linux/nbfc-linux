@@ -64,7 +64,7 @@ static inline nx_json* create_json_double(const char* key, nx_json* parent, doub
 
 static inline nx_json* create_json_bool(const char* key, nx_json* parent, bool val) {
   nx_json* json = create_json(NX_JSON_BOOL, key, parent);
-  json->val.i = val;
+  json->val.u = val;
   return json;
 }
 

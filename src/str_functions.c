@@ -124,6 +124,10 @@ static size_t levenshtein(const char* s1, size_t s1len, const char* s2, size_t s
 float str_similarity(const char* s1, const char* s2) {
   const size_t s1len = strlen(s1);
   const size_t s2len = strlen(s2);
+
+  if (s1len == 0 && s2len == 0)
+    return 1.0f;
+
   const size_t diff = levenshtein(s1, s1len, s2, s2len);
   if (s1len > s2len)
     return 1.0f - ((float) diff / (float) s1len);

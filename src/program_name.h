@@ -2,6 +2,6 @@
 #define NBFC_PROGRAM_NAME_H_
 
 extern const char* Program_Name;
-void Program_Name_Set(const char* path);
+void Program_Name_Set(const char*);
 
 #endif

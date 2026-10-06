@@ -4,7 +4,6 @@
 #include "macros.h"
 #include "error.h"
 
-#include <stdlib.h>
 #include <stdbool.h>
 
 typedef struct TemperatureFilter TemperatureFilter;

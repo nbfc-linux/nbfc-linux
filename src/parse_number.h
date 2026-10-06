@@ -24,31 +24,80 @@
  * This also protects against cases where a user forgets the 'x' in "0x".
  */
 static int64_t parse_number(const char* s, int64_t min, int64_t max, const char** errmsg) {
+  // 128 bytes are more than enough for any valid integer. If the source string
+  // is longer, truncating it is harmless because strtoll() will report ERANGE.
+  char buf[128];
+  size_t i = 0;
+  int64_t val;
   int base = 10;
-  int start = 0;
+  char* end = "";
+  errno = 0;
 
-  if (s[0] == '-' || s[0] == '+')
-    ++start;
+  // We accept exactly one sign
+  if (*s == '+' || *s == '-') {
+    buf[i++] = *s;
+    ++s;
+  }
 
-  if (s[start] == '0') {
-    if (s[start+1] >= '0' && s[start+1] <= '9') {
+  // Leading zero
+  if (*s == '0') {
+    ++s;
+
+    // No more chars
+    if (*s == '\0') {
+      val = 0;
+      goto check;
+    }
+
+    // Binary number
+    if (*s == 'b' || *s == 'B') {
+      ++s;
+      base = 2;
+      goto parse;
+    }
+
+    // Hexadecimal number
+    if (*s == 'x' || *s == 'X') {
+      ++s;
+      base = 16;
+      goto parse;
+    }
+
+    // Octal number
+    if (*s >= '0' && *s <= '9') {
       *errmsg = "octal values not supported";
       return 0;
     }
-
-    if (s[start+1] == 'x' || s[start+1] == 'X')
-      base = 16;
-    else if (s[start+1] == 'b' || s[start+1] == 'B')
-      base = 2;
   }
 
-  errno = 0;
-  char* end;
-  int64_t val = strtoll(s, &end, base);
+parse:
+  // We (maybe) have a prefix, but the remaining string is empty
+  if (*s == '\0') {
+    errno = EINVAL;
+    goto check;
+  }
 
+  // Only accept hexadecimal chars; no whitespace
+  for (const char* c = s; *c && i < sizeof(buf) - 1; ++c)
+    if ((*c >= '0' && *c <= '9') ||
+        (*c >= 'A' && *c <= 'F') ||
+        (*c >= 'a' && *c <= 'f'))
+    {
+      buf[i++] = *c;
+    }
+    else
+    {
+      *errmsg = strerror(EINVAL);
+      return 0;
+    }
+
+  buf[i] = '\0';
+  val = strtoll(buf, &end, base);
+
+check:
   if (errno)
     *errmsg = strerror(errno);
-  else if (!*s || *end)
+  else if (*end)
     *errmsg = strerror(EINVAL);
   else if (val < min)
     *errmsg = "value too small";

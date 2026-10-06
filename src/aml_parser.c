@@ -1,5 +1,8 @@
 #include "aml_parser.h"
 
+#include "macros.h"
+#include "memory.h"
+
 // Holds arguments for Scope() { }
 typedef struct AML_ScopeArgs AML_ScopeArgs;
 struct AML_ScopeArgs {

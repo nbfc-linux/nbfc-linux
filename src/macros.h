@@ -14,7 +14,7 @@
 #define MIN(A, B)         ((A) < (B) ? (A) : (B))
 #define STRLEN(S)         (sizeof(S) - 1)
 
-#define PTR_DIFF(A, B)    ((int) (A - B))
+#define PTR_DIFF(A, B)    ((size_t) (A - B))
 
 #define ARRAY_SIZE(A)     (sizeof(A) / sizeof(*A))
 #define ARRAY_SSIZE(A)    ((ssize_t) ARRAY_SIZE(A))
@@ -29,9 +29,6 @@
 
 #define for_each_array(TYPE, VAR, ARRAY) \
   for (TYPE VAR = (ARRAY).data; VAR != (ARRAY).data + (ARRAY).size; ++VAR)
-
-#define for_each_array_reverse(TYPE, VAR, ARRAY) \
-  for (TYPE VAR = (ARRAY).data + (ARRAY).size; --VAR != (ARRAY).data;)
 
 #define array_calloc(TYPE, ARRAY, SIZE) \
   (ARRAY).data = (TYPE*) Mem_Calloc((SIZE), sizeof(TYPE))

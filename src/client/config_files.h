@@ -1,6 +1,7 @@
 #ifndef NBFC_CONFIG_FILES_H_
 #define NBFC_CONFIG_FILES_H_
 
+#include "../error.h"
 #include "../macros.h"
 
 struct ConfigFile {

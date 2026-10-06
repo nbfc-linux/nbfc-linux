@@ -12,7 +12,7 @@ static void Test_AML_Lexer_GetToken(const char* s, AML_TokenType expected) {
 
   if (t.type != expected) {
     printf("Test_AML_Lexer_GetToken(\"%s\"): Expected: %s Having: %s\n",
-      AML_TokenType_ToStr(expected), AML_TokenType_ToStr(t.type));
+      s, AML_TokenType_ToStr(expected), AML_TokenType_ToStr(t.type));
 
     exit(1);
   }
@@ -105,6 +105,7 @@ int main(void) {
   return 0;
 }
 
+#include "../io_utils.c"
 #include "../memory.c"
 #include "../error.c"
 #include "../nxjson.c"

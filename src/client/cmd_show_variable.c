@@ -1,16 +1,14 @@
-#include <stdio.h>  // printf
-#include <string.h> // strcmp
+#include <stdio.h> // puts
 
 #include "client_global.h"
 
 #include "../nbfc.h"
-#include "../memory.h"
 #include "../log.h"
 #include "../str_functions.h"
 
 const struct cli99_Option ShowVariable_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),
-  {"variable", Option_ShowVariable_Variable, cli99_RequiredArgument},
+  {"variable", Option_ShowVariable_Variable, cli99_NormalPositional},
   cli99_Options_End()
 };
 
@@ -28,13 +26,13 @@ int ShowVariable(void) {
   }
 
   if (! str_cmp_ignorecase(variable, "config_file"))
-    printf("%s\n", NBFC_SERVICE_CONFIG);
+    puts(NBFC_SERVICE_CONFIG);
   else if (! str_cmp_ignorecase(variable, "socket_file"))
-    printf("%s\n", NBFC_SOCKET_PATH);
+    puts(NBFC_SOCKET_PATH);
   else if (! str_cmp_ignorecase(variable, "pid_file"))
-    printf("%s\n", NBFC_PID_FILE);
+    puts(NBFC_PID_FILE);
   else if (! str_cmp_ignorecase(variable, "model_configs_dir"))
-    printf("%s\n", NBFC_MODEL_CONFIGS_DIR);
+    puts(NBFC_MODEL_CONFIGS_DIR);
   else {
     ret = NBFC_EXIT_FAILURE;
     Log_Error("Unknown variable \"%s\". Choose from \"config_file\", \"socket_file\", \"pid_file\", \"model_configs_dir\"",

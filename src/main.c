@@ -46,7 +46,7 @@ static const struct option cli_options[] = {
   {0,                     0,                 0,     0 },
 };
 
-static const char cli_options_str[] = "hve:rfds:c:";
+static const char cli_options_str[] = "hve:rfdc:";
 
 static void parse_opts(int argc, char* const argv[]) {
   int o;
@@ -124,8 +124,15 @@ int main(int argc, char* const argv[])
     exit(NBFC_EXIT_FAILURE);
   }
 
-  mkdir_p(NBFC_CONFIG_DIR, 0755);
-  mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755);
+  if (mkdir_p(NBFC_CONFIG_DIR, 0755) < 0) {
+    Log_Error("Cannot create directory: %s: %s", NBFC_CONFIG_DIR, strerror(errno));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  if (mkdir_p(NBFC_MODEL_CONFIGS_DIR_MUTABLE, 0755) < 0) {
+    Log_Error("Cannot create directory: %s: %s", NBFC_MODEL_CONFIGS_DIR_MUTABLE, strerror(errno));
+    exit(NBFC_EXIT_FAILURE);
+  }
 
   Log_Init(options.fork);
   atexit(Log_Close);
@@ -243,7 +250,7 @@ int main(int argc, char* const argv[])
     }
 
     // ========================================================================
-    // Run the server loop for Service_ModelConfig.EcPollInterval miliseconds.
+    // Run the server loop for Service_ModelConfig.EcPollInterval milliseconds.
     // ========================================================================
     struct timeval start, current;
     gettimeofday(&start, NULL);

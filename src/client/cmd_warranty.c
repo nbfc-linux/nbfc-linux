@@ -1,4 +1,6 @@
-#include <stdio.h>
+#include "../nbfc.h"
+
+#include <stdio.h> // puts
 
 #define WARRANTY_TEXT \
 "NBFC-Linux is provided \"as is\", without any warranty of any kind.\n"        \

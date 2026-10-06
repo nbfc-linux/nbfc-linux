@@ -1,4 +1,4 @@
-﻿#include "temperature_threshold_manager.h"
+#include "temperature_threshold_manager.h"
 
 bool TemperatureThresholdManager_LegacyBehaviour = false;
 

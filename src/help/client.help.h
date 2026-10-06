@@ -18,7 +18,7 @@
  "    update              Download new configuration files\n"                  \
  "    wait-for-hwmon      Wait for /sys/class/hwmon/hwmon* files\n"            \
  "    get-model-name      Print out model name\n"                              \
- "    acpi-dump           Dumps information of your ACPI DSDT\n"               \
+ "    acpi-dump           Dumps information of your ACPI tables\n"             \
  "    rate-config         Rate a configuration file\n"                         \
  "    test-config         Test configuration files automatically\n"            \
  "    xml2json            Convert an XML configuration to JSON\n"              \
@@ -111,10 +111,10 @@
  "It should NOT be used to test arbitrary configurations.\n"                   \
  "\n"                                                                          \
  "Commands:\n"                                                                 \
- "  run [-i|--input INPUT] [-o|--output OUTPUT] [OPTION]\n"                    \
+ "  run [-i|--input INPUT] [-o|--output OUTPUT] [OPTIONS]\n"                   \
  "    Reads a list of configuration files from INPUT (default: STDIN)\n"       \
  "    Configurations will be loaded in read-only mode.\n"                      \
- "    The notebook's fans will be spinned up by stressing the CPU/GPU while\n" \
+ "    The notebook's fans will be spun up by stressing the CPU/GPU while\n"    \
  "    reading back the fan speed for each configuration.\n"                    \
  "    A report will be written to OUTPUT (default: nbfc.test-config.result.json)\n"\
  "\n"                                                                          \
@@ -312,10 +312,10 @@
  "Displays information on how to support the project.\n"                       \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
- "  --upload-firmware     Upload your notebook firmware without prompting\n"   \
- "  --print-command       Print command for manual firmware upload\n"          \
- "  --create-archive      Create a tar.gz archive containing your firmware\n"  \
- "  -h, --help            Show this help message and exit\n"                   \
+ "  --upload-firmware      Upload your notebook firmware without prompting\n"  \
+ "  --print-command        Print command for manual firmware upload\n"         \
+ "  --create-archive FILE  Create a tar.gz archive containing your firmware\n" \
+ "  -h, --help             Show this help message and exit\n"                  \
  "\n"                                                                          \
  "Thank you for using NBFC-Linux!\n"                                           \
  "\n"                                                                          \

@@ -63,7 +63,7 @@ declare_array_of(RegisterRule);
  * RegisterWriteFullMatch:
  *   Register in RegisterWriteConfiguration must match exactly (whole name).
  *
- * RegisterPartialMatch:
+ * RegisterWritePartialMatch:
  *   Register in RegisterWriteConfiguration must contain the given name.
  *
  * BadRegisterFullMatch:

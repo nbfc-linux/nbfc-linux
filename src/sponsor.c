@@ -3,6 +3,16 @@
 #include "log.h"
 #include "service.h"
 
+/*
+ * Prints the sponsor of a model configuration.
+ *
+ * The following fields are guaranteed to exist:
+ *   - sponsor->Name
+ *   - sponsor->URL
+ *
+ * The following fields are optional:
+ *   - sponsor->Description
+ */
 void Sponsor_Print(void) {
   if (! Service_ModelConfig.isset.Sponsor)
     return;

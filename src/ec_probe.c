@@ -48,6 +48,7 @@
 #include "cli99.c"          // src
 #include "file_utils.c"     // src
 #include "fs_sensors.c"     // src
+#include "io_utils.c"       // src
 #include "log.c"            // src
 #include "lua_bindings.c"   // src
 #include "memory.c"         // src

@@ -123,7 +123,7 @@ declare_array_of(ConfigRating_RegisterRating);
  *
  * info:
  *   Looked up method information.
- *   If `method_score` is `MethodScore_NotFound` this field is NULL.
+ *   If `score` is `MethodScore_NotFound` this field is NULL.
  */
 struct ConfigRating_MethodRating {
   char* call;

@@ -3,6 +3,11 @@
 
 #include <time.h>
 
+/*
+ * EINTR is intentionally ignored here. If interrupted by a signal, we do not
+ * want to resume sleeping, but continue as quickly as possible to the code
+ * that handles the signal, e.g. by checking the `quit` variable.
+ */
 static inline void sleep_ms(unsigned int milliseconds)
 {
   struct timespec ts;

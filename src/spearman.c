@@ -45,7 +45,7 @@ static void Spearman_ComputeRanks(double arr[], double ranks[], size_t n) {
     }
 
     // Average rank for ties (1-based indexing)
-    double avg_rank = (i + 1 + j) / 2.0; 
+    double avg_rank = (i + 1 + j) / 2.0;
     for (size_t k = i; k < j; k++) {
       ranks[elems[k].index] = avg_rank;
     }

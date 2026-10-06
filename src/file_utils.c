@@ -6,6 +6,21 @@
 #include <unistd.h> // open, read, write, close
 #include <string.h> // memcpy
 
+/*
+ * Read a file into a buffer.
+ *
+ * The file is read into `buf` with a maximum length of `size` bytes,
+ * including the terminating null byte.
+ *
+ * Returns a `FileResult`:
+ * - FileResult.ok: True on success, false otherwise.
+ * - FileResult.len: The length of the string, excluding null byte.
+ *
+ * The function fails, and sets `errno` if:
+ *  - the file did not fit into the buffer (EFBIG)
+ *  - the file could not be opened (see open(2))
+ *  - the file could not be read (see read(2))
+ */
 FileResult File_Read(char* buf, size_t size, const char* file) {
   FileResult result;
   result.ok = true;
@@ -50,6 +65,21 @@ FileResult File_Read(char* buf, size_t size, const char* file) {
   return result;
 }
 
+/*
+ * Read a file into a dynamically allocated buffer.
+ *
+ * The buffer is allocated by the function and stored in `*out`.
+ *
+ * The caller is responsible for freeing the buffer with `free()`.
+ *
+ * Returns a `FileResult`:
+ * - FileResult.ok: True on success, false otherwise.
+ * - FileResult.len: The length of the string, excluding the null byte.
+ *
+ * The function fails and sets `errno` if:
+ * - the file could not be opened (see open(2))
+ * - the file could not be read (see read(2))
+ */
 FileResult File_ReadDynamic(char** out, const char* file) {
   FileResult result;
   result.ok = true;
@@ -98,6 +128,20 @@ FileResult File_ReadDynamic(char** out, const char* file) {
   return result;
 }
 
+/*
+ * Write data to a file.
+ *
+ * The file is opened using `flags` and `mode`, and `size` bytes from `content`
+ * are written to it.
+ *
+ * Returns a `FileResult`:
+ * - FileResult.ok: True on success, false otherwise.
+ * - FileResult.len: The number of bytes written.
+ *
+ * The function fails and sets `errno` if:
+ * - the file could not be opened (see open(2))
+ * - the file could not be written (see write(2))
+ */
 FileResult File_Write(const char* file, int flags, mode_t mode, const char* content, size_t size) {
   FileResult result;
   result.ok = true;

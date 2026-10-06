@@ -1,6 +1,7 @@
 #include "../acpi_call.h"
 #include "../client/check_root.h"
 
+#include <errno.h>  // errno, ENOBUFS
 #include <stdio.h>  // printf, snprintf
 #include <string.h> // strlen, memcpy
 #include <stdbool.h>

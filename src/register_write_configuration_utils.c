@@ -4,6 +4,8 @@
 #include "acpi_call.h"
 #include "lua_bindings.h"
 
+extern const EC_VTable* ec;
+
 Error RegisterWriteConfiguration_Apply(RegisterWriteConfiguration* cfg) {
   Error e;
   uint8_t mask;
