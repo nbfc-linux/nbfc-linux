@@ -249,6 +249,7 @@ _nbfc_status() {
     '(--all --fan -a -f --service -s)'{-s,--service}'[Show service status]'
     '(--all --service -a -s)''*'{-f+,--fan=}'[Show status of fan (zero based)]':'FAN INDEX':"{_nbfc__exec 'nbfc complete-fans'}"
     '(--watch -w)'{-w+,--watch=}'[Show status periodically]':SECONDS:"_numbers -f 'Show status periodically'"
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command

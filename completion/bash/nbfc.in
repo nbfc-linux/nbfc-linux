@@ -152,6 +152,7 @@ _nbfc__parse_commandline() {
         -s|--service) VAR=OPT_service; ARGS=0; return;;
         -f|--fan) VAR=OPT_fan; ARGS=1; return;;
         -w|--watch) VAR=OPT_watch; ARGS=1; return;;
+        -j|--json) VAR=OPT_json; ARGS=0; return;;
       esac
     esac
     case "$1" in root:restart*)
@@ -263,9 +264,9 @@ _nbfc() {
 
   local END_OF_OPTIONS POSITIONALS
   local -a OPT_help OPT_version OPT_read_only OPT_all OPT_service OPT_fan
-  local -a OPT_watch OPT_list OPT_set OPT_recommend OPT_auto OPT_speed
+  local -a OPT_watch OPT_json OPT_list OPT_set OPT_recommend OPT_auto OPT_speed
   local -a OPT_algorithm OPT_sensor OPT_force OPT_parallel OPT_quiet
-  local -a OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_input OPT_json
+  local -a OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_input
   local -a OPT_print_rules OPT_rules OPT_no_download OPT_unverified OPT_bad
   local -a OPT_fan_count OPT_output OPT_gpu OPT_cpu OPT_interval OPT_threshold
   local -a OPT_break OPT_upload_firmware OPT_print_command OPT_create_archive
@@ -351,7 +352,7 @@ _nbfc_status() {
 
   case "$prev" in
     --*) __complete_option "$prev" "$cur" && return 0;;
-    -*([ash])[fw])
+    -*([asjh])[fw])
          __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
@@ -359,7 +360,7 @@ _nbfc_status() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*([ash])[fw]*)
+    -*([asjh])[fw]*)
       local i
       for ((i=2; i <= ${#cur}; ++i)); do
         local pre="${cur:0:$i}" value="${cur:$i}"
@@ -375,6 +376,7 @@ _nbfc_status() {
     (( ! ${#OPT_all[@]} && ! ${#OPT_fan[@]} && ! ${#OPT_service[@]} )) && opts+=(-a --all -s --service)
     (( ! ${#OPT_all[@]} && ! ${#OPT_service[@]} )) && opts+=(-f --fan=)
     (( ! ${#OPT_watch[@]} )) && opts+=(-w --watch=)
+    (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1

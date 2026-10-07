@@ -44,6 +44,9 @@ options:
     metavar: "SECONDS"
     help: "Show status periodically"
     complete: ["float"]
+
+  - option_strings: ["-j", "--json"]
+    help: "Use JSON output"
 ---
 prog: "nbfc config"
 help: "List or apply configs"

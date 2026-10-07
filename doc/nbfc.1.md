@@ -70,6 +70,12 @@ This program is used to control the NoteBook FanControl service.
 > **-w**, **\--watch** *SECONDS*
 >
 > > Show status periodically.
+>
+> **-j**, **\--json**
+>
+> > Use JSON output.
+> >
+> > If specified, all other options are ignored.
 
 **config** \[*OPTIONS*\]
 

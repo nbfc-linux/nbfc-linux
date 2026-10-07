@@ -216,7 +216,7 @@ function _nbfc__prepare
     '=>-h --help --version' \
     '(start)=>-r --read-only' \
     '(restart)=>-r --read-only' \
-    '(status)=>-a --all -s --service -f= --fan= -w= --watch=' \
+    '(status)=>-a --all -s --service -f= --fan= -w= --watch= -j --json' \
     '(config)=>-l --list -s= --set= -r --recommend' \
     '(set)=>-a --auto -s= --speed= -f= --fan=' \
     '(sensors)>(set)=>-f= --fan= -a= --algorithm= -s= --sensor= --force' \
@@ -311,10 +311,12 @@ set -l C001 "not $has_option -s --service -f --fan -a --all"
 set -l C002 "not $has_option -a --all -f --fan -s --service"
 set -l C003 "not $has_option -a --all -s --service"
 set -l C004 "not $has_option -w --watch"
+set -l C005 "not $has_option -j --json"
 complete -c $prog -n $P -n $C000 -n $C001 -s a -l all -d 'Show service and fan status (default)' -f
 complete -c $prog -n $P -n $C000 -n $C002 -s s -l service -d 'Show service status' -f
 complete -c $prog -n $P -n $C000 -n $C003 -s f -l fan -d 'Show status of fan (zero based)' -x -a '(nbfc complete-fans)'
 complete -c $prog -n $P -n $C000 -n $C004 -s w -l watch -d 'Show status periodically' -x
+complete -c $prog -n $P -n $C000 -n $C005 -s j -l json -d 'Use JSON output' -f
 
 # command nbfc config
 set -l C000 "$positional_contains 1 config"

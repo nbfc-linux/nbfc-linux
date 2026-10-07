@@ -18,6 +18,7 @@ enum Option {
   Option_Status_Service,
   Option_Status_Fan,
   Option_Status_Watch,
+  Option_Status_Json,
 
   // Sensors options
   Option_Sensors_Command,

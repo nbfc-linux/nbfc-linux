@@ -16,6 +16,7 @@ const struct cli99_Option Status_CommandLine[] = {
   {"-s|--service", Option_Status_Service, cli99_NoArgument      },
   {"-f|--fan",     Option_Status_Fan,     cli99_RequiredArgument},
   {"-w|--watch",   Option_Status_Watch,   cli99_RequiredArgument},
+  {"-j|--json",    Option_Status_Json,    cli99_NoArgument      },
   cli99_Options_End()
 };
 
@@ -23,6 +24,7 @@ struct {
   array_of(array_size_t) fans;
   bool                   all;
   bool                   service;
+  bool                   json;
   float                  watch;
 } Status_Options = {0};
 
@@ -84,7 +86,26 @@ static void Status_Print(void) {
   ServiceInfo_Free(&service_info);
 }
 
+static void Status_PrintJson(void) {
+  Error e;
+  char* buf = NULL;
+  const nx_json* out = NULL;
+
+  e = ServiceInfo_TryLoadJson(&buf, &out);
+  e_die();
+
+  nxjson_write_to_fd(out, STDOUT_FILENO, 2);
+
+  Mem_Free(buf);
+  nx_json_free(out);
+}
+
 int Status(void) {
+  if (Status_Options.json) {
+    Status_PrintJson();
+    return NBFC_EXIT_SUCCESS;
+  }
+
   if (!Status_Options.service && !Status_Options.all && !Status_Options.fans.size)
     Status_Options.all = true;
 

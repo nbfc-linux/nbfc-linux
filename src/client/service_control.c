@@ -100,17 +100,25 @@ error:
   }
 }
 
-Error ServiceInfo_TryLoad(ServiceInfo* service_info) {
+Error ServiceInfo_TryLoadJson(char** buf, const nx_json** out) {
   Error e;
   nx_json root = {0};
   nx_json* in = create_json_object(NULL, &root);
   create_json_string("Command", in, "status");
+  e = Client_Communicate(in, buf, out);
+  nx_json_free(in);
+  return e;
+}
 
+Error ServiceInfo_TryLoad(ServiceInfo* service_info) {
+  Error e;
   char* buf = NULL;
   const nx_json* out = NULL;
-  e = Client_Communicate(in, &buf, &out);
-  if (e)
+
+  e = ServiceInfo_TryLoadJson(&buf, &out);
+  if (e) {
     goto error;
+  }
 
   if (out->type != NX_JSON_OBJECT) {
     e = err_string("Not a JSON object");
@@ -143,7 +151,6 @@ Error ServiceInfo_TryLoad(ServiceInfo* service_info) {
   }
 
 error:
-  nx_json_free(in);
   nx_json_free(out);
   Mem_Free(buf);
 

@@ -266,6 +266,10 @@ int main(int argc, char* const argv[]) {
       }
       break;
 
+    case Option_Status_Json:
+      Status_Options.json = true;
+      break;
+
     // ========================================================================
     // Sensors options
     // ========================================================================

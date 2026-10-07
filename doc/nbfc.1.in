@@ -88,6 +88,13 @@ Show fan status.
 .RS
 Show status periodically.
 .RE
+
+.BR \-j ", " \-\-json
+.RS
+Use JSON output.
+
+If specified, all other options are ignored.
+.RE
 .RE
 
 .B config
