@@ -225,6 +225,7 @@ Error ServiceState_ValidateFields(ServiceState*);
 struct FanInfo {
 	const char*     Name;
 	float           Temperature;
+	float           CriticalTemperature;
 	bool            AutoMode;
 	bool            Critical;
 	float           CurrentSpeed;
@@ -234,6 +235,7 @@ struct FanInfo {
 	struct {
 		bool Name            : 1;
 		bool Temperature     : 1;
+		bool CriticalTemperature : 1;
 		bool AutoMode        : 1;
 		bool Critical        : 1;
 		bool CurrentSpeed    : 1;

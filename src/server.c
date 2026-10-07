@@ -134,6 +134,7 @@ static Error Server_Command_Status(int socket, const nx_json* json) {
     nx_json* fan_json = create_json_object(NULL, fans);
     create_json_string("Name", fan_json, fan->fanConfig->FanDisplayName);
     create_json_double("Temperature", fan_json, ftc->Temperature);
+    create_json_double("CriticalTemperature", fan_json, fan->criticalTemperature);
     create_json_bool("AutoMode", fan_json, (fan->mode == Fan_ModeAuto));
     create_json_bool("Critical", fan_json, fan->isCritical);
     create_json_double("CurrentSpeed", fan_json, Fan_GetCurrentSpeed(fan));

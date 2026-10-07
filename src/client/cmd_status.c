@@ -32,6 +32,7 @@ static void Status_PrintFan(const FanInfo* fan) {
   printf(
     "Fan Display Name         : %s\n"
     "Temperature              : %.2f\n"
+    "Critical Temperature     : %.2f\n"
     "Auto Control Enabled     : %s\n"
     "Critical Mode Enabled    : %s\n"
     "Current Fan Speed        : %.2f\n"
@@ -39,6 +40,7 @@ static void Status_PrintFan(const FanInfo* fan) {
     "Fan Speed Steps          : %d\n",
     fan->Name,
     (double) fan->Temperature,
+    (double) fan->CriticalTemperature,
     str_from_bool(fan->AutoMode),
     str_from_bool(fan->Critical),
     (double) fan->CurrentSpeed,

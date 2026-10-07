@@ -453,6 +453,11 @@
         "help": ""
       },
       {
+        "name": "CriticalTemperature",
+        "type": "float",
+        "help": ""
+      },
+      {
         "name": "AutoMode",
         "type": "bool",
         "help": ""

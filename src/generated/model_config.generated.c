@@ -741,6 +741,9 @@ Error FanInfo_ValidateFields(FanInfo* self) {
 	if (! self->isset.Temperature)
 		return err_stringf("%s: %s", "Temperature", "Missing option");
 
+	if (! self->isset.CriticalTemperature)
+		return err_stringf("%s: %s", "CriticalTemperature", "Missing option");
+
 	if (! self->isset.AutoMode)
 		return err_stringf("%s: %s", "AutoMode", "Missing option");
 
@@ -780,6 +783,11 @@ Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 			e = float_FromJson(&obj->Temperature, c);
 			if (!e)
 				obj->isset.Temperature = true;
+		}
+		else if (!strcmp(c->key, "CriticalTemperature")) {
+			e = float_FromJson(&obj->CriticalTemperature, c);
+			if (!e)
+				obj->isset.CriticalTemperature = true;
 		}
 		else if (!strcmp(c->key, "AutoMode")) {
 			e = bool_FromJson(&obj->AutoMode, c);
