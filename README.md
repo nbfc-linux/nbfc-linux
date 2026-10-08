@@ -111,6 +111,9 @@ Currently there are three GUI implementations:
 - [NBFC-XFCE4-Tray](https://github.com/nbfc-linux/nbfc-xfce4-tray)
   - Simple XFCE4 Panel Plugin (only for controlling the fans)
 
+- [whirr](https://codeberg.org/abhyuday-fr/whirr) (by [Abhyuday Pundir](https://github.com/abhyuday-fr/))
+  - Simple but beautiful TUI written in Go (only for controlling the fans)
+
 Getting started without the GUI
 -------------------------------
 
