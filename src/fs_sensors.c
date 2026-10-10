@@ -95,7 +95,7 @@ static Error FS_Sensors_Init_HwMon(void) {
   array_size_t n_sources = 0;
 
   for (const char* const* hwmonDir = LinuxHwmonDirs; *hwmonDir; ++hwmonDir) {
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 30; i++) {
       snprintf(dir,  PATH_MAX, *hwmonDir, i);
       snprintf(file, PATH_MAX, "%s/name", dir);
 
@@ -111,7 +111,7 @@ static Error FS_Sensors_Init_HwMon(void) {
 
       str_rstrip_whitespace(source_name, res.len);
 
-      for (int j = 0; j < 10; j++) {
+      for (int j = 0; j < 30; j++) {
         if (n_sources >= FS_SENSORS_MAX_SOURCES)
           goto end;
 
