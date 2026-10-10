@@ -11,7 +11,7 @@ Probing tool for the embedded controller
 .SH SYNOPSIS
 .PP
 .B ec_probe
-.RB { read " | " write " | " read_bit " | " write_bit " | " dump " | " load " | " monitor " | " evaluate " | " watch " | " acpi_call " | " graph " | " shell }
+.RB { read " | " write " | " read_bit " | " write_bit " | " dump " | " load " | " monitor " | " evaluate " | " watch " | " acpi_call " | " graph " | " lua " | " shell }
 .RI [ OPTIONS ]
 
 .SH OPTIONS
@@ -377,6 +377,16 @@ Draw the GPU temperature line in
 (default:
 .BR magenta ).
 .RE
+.RE
+
+.PP
+.B lua
+.I FILE
+.RS
+Execute a Lua file.
+
+This command is useful for experimenting with Lua while developing a
+configuration that uses Lua.
 .RE
 
 .PP

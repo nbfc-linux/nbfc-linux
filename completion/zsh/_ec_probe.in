@@ -151,6 +151,7 @@ _ec_probe__command() {
     acpi_call:'Call an ACPI method'
     graph:'Visualize recordings made by `ec_probe monitor -r`'
     evaluate:'Calculate correlation between registers and CPU/GPU temperature'
+    lua:'Execute a Lua file'
     shell:'Read commands from STDIN'
   )
 
@@ -180,6 +181,7 @@ _ec_probe() {
     acpi_call) _ec_probe_acpi_call; return $?;;
     graph) _ec_probe_graph; return $?;;
     evaluate) _ec_probe_evaluate; return $?;;
+    lua) _ec_probe_lua; return $?;;
     shell) _ec_probe_shell; return $?;;
   esac
 
@@ -366,6 +368,16 @@ _ec_probe_evaluate() {
     '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
     1:command1:_ec_probe__command
     2:'CSV file containing the recordings':_files
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_ec_probe_lua() {
+  local -a args=(
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
+    1:command1:_ec_probe__command
+    2:'Lua source file':_files
   )
   _arguments -S -s -w "${args[@]}"
 }

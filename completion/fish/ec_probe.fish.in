@@ -230,6 +230,7 @@ function _ec_probe__command
     acpi_call 'Call an ACPI method' \
     graph 'Visualize recordings made by `ec_probe monitor -r`' \
     evaluate 'Calculate correlation between registers and CPU/GPU temperature' \
+    lua 'Execute a Lua file' \
     shell 'Read commands from STDIN'
 end
 
@@ -375,5 +376,10 @@ set -l C001 "not $has_option -d --decimal"
 set -l C002 "$num_of_positionals -eq 1"
 complete -c $prog -n $P -n $C000 -n $C001 -s d -l decimal -d 'Read register values as decimal numbers' -f
 complete -c $prog -n $P -n $C002 -n $C000 -d 'CSV file containing the recordings' -Fr
+
+# command ec_probe lua
+set -l C000 "$num_of_positionals -eq 1"
+set -l C001 "$positional_contains 1 lua"
+complete -c $prog -n $P -n $C000 -n $C001 -d 'Lua source file' -Fr
 
 # vim: ft=fish ts=2 sts=2 sw=2 et

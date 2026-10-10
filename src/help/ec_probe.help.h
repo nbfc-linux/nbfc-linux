@@ -21,6 +21,7 @@
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
  "  acpi_call             Call an ACPI method\n"                               \
  "  graph                 Visualize recordings made by `ec_probe monitor -r`\n"\
+ "  lua                   Execute a Lua file\n"                                \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
@@ -210,4 +211,16 @@
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
  "  -d, --decimal         Read register values as decimal numbers\n"           \
+ ""
+
+#define EC_PROBE_LUA_HELP_TEXT                                                 \
+ "Usage: %s lua FILE\n"                                                        \
+ "\n"                                                                          \
+ "Execute a Lua file\n"                                                        \
+ "\n"                                                                          \
+ "This command is useful for experimenting with Lua while developing a\n"      \
+ "configuration that uses Lua.\n"                                              \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
  ""

@@ -249,6 +249,7 @@ _ec_probe() {
       acpi_call) _ec_probe_acpi_call && return 0;;
       graph) _ec_probe_graph && return 0;;
       evaluate) _ec_probe_evaluate && return 0;;
+      lua) _ec_probe_lua && return 0;;
       shell);;
     esac
   fi
@@ -296,7 +297,7 @@ _ec_probe() {
   fi
 
   (( ${#POSITIONALS[@]} == 1 )) && {
-    COMPREPLY=($(compgen -W 'dump load read write read_bit write_bit monitor watch acpi_call graph evaluate shell' -- "$cur"))
+    COMPREPLY=($(compgen -W 'dump load read write read_bit write_bit monitor watch acpi_call graph evaluate lua shell' -- "$cur"))
     return 0;
   }
 
@@ -760,6 +761,15 @@ _ec_probe_evaluate() {
     return 1
   fi
 
+  (( ${#POSITIONALS[@]} == 2 )) && {
+    _filedir
+    return 0;
+  }
+
+  return 1
+}
+
+_ec_probe_lua() {
   (( ${#POSITIONALS[@]} == 2 )) && {
     _filedir
     return 0;

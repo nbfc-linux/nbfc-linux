@@ -266,5 +266,13 @@ positionals:
     help: "CSV file containing the recordings"
     complete: ["file"]
 ---
+prog: "ec_probe lua"
+help: "Execute a Lua file"
+positionals:
+  - number: 1
+    metavar: "FILE"
+    help: "Lua source file"
+    complete: ["file"]
+---
 prog: "ec_probe shell"
 help: "Read commands from STDIN"

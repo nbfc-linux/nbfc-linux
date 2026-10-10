@@ -200,6 +200,7 @@ static const struct cli99_Option Main_CommandLine[] = {
 #include "probe/cmd_monitor.c"
 #include "probe/cmd_read_write.c"
 #include "probe/cmd_shell.c"
+#include "probe/cmd_lua.c"
 
 #define NBFC_EC_PROBE_COMMANDS \
   o("read",         Read,         READ,         Read)          \
@@ -214,6 +215,7 @@ static const struct cli99_Option Main_CommandLine[] = {
   o("graph",        Graph,        GRAPH,        Graph)         \
   o("evaluate",     Evaluate,     EVALUATE,     Evaluate)      \
   o("shell",        Shell,        SHELL,        Main)          \
+  o("lua",          Lua,          LUA,          Lua)           \
   o("help",         Help,         HELP,         Main)          \
 //  COMMAND         ENUM          HELP TEXT     COMMANDLINE
 
@@ -474,6 +476,10 @@ int main(int argc, char* const argv[]) {
     CHECK_REQUIRED_ARGUMENT(Option_File, "file");
     break;
 
+  case Command_Lua:
+    CHECK_REQUIRED_ARGUMENT(Option_File, "file");
+    break;
+
   default:
     break;
   }
@@ -499,6 +505,7 @@ int main(int argc, char* const argv[]) {
   case Command_Graph:    return Graph();
   case Command_Evaluate: return Evaluate();
   case Command_Shell:    return Shell();
+  case Command_Lua:      return Lua();
   default:               return NBFC_EXIT_FAILURE;
   }
 }

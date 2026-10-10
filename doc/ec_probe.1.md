@@ -10,7 +10,7 @@ Probing tool for the embedded controller
 
 **ec_probe** {**read** \| **write** \| **read_bit** \| **write_bit** \|
 **dump** \| **load** \| **monitor** \| **evaluate** \| **watch** \|
-**acpi_call** \| **graph** \| **shell**} \[*OPTIONS*\]
+**acpi_call** \| **graph** \| **lua** \| **shell**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -230,6 +230,13 @@ Probing tool for the embedded controller
 > **\--gpu-color** *COLOR*
 >
 > > Draw the GPU temperature line in *COLOR* (default: **magenta**).
+
+**lua** *FILE*
+
+> Execute a Lua file.
+>
+> This command is useful for experimenting with Lua while developing a
+> configuration that uses Lua.
 
 **shell**
 

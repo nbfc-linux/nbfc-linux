@@ -308,6 +308,7 @@ src/ec_probe: \
 	src/parse_unumber.h \
 	src/probe/cmd_acpi_call.c \
 	src/probe/cmd_dump_load.c \
+	src/probe/cmd_lua.c \
 	src/probe/cmd_monitor.c \
 	src/probe/cmd_read_write.c \
 	src/probe/cmd_shell.c \
