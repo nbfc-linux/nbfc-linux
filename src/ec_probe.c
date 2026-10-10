@@ -105,6 +105,8 @@ typedef enum NBFC_PACKED_ENUM {
   Option_AcpiCallMethod,
   Option_AcpiCallArgument,
   Option_Map,
+  Option_Watch,
+  Option_NoRestore,
   Option_Cpu,
   Option_Gpu,
   Option_RegisterColor,
@@ -127,8 +129,11 @@ static struct {
   bool        clearly;
   bool        decimal;
   bool        dry;
+  bool        no_restore;
   const char* register_ref;
+  const char* watch_ref;
   uint8_t     register_;
+  uint8_t     watch;
   uint16_t    value;
   uint8_t     bit_offset;
   uint8_t     bit_value;
@@ -198,6 +203,7 @@ static const struct cli99_Option Main_CommandLine[] = {
 #include "probe/cmd_acpi_call.c"
 #include "probe/cmd_dump_load.c"
 #include "probe/cmd_monitor.c"
+#include "probe/cmd_poke_scan.c"
 #include "probe/cmd_read_write.c"
 #include "probe/cmd_shell.c"
 
@@ -213,6 +219,8 @@ static const struct cli99_Option Main_CommandLine[] = {
   o("monitor",      Monitor,      MONITOR,      Monitor)       \
   o("graph",        Graph,        GRAPH,        Graph)         \
   o("evaluate",     Evaluate,     EVALUATE,     Evaluate)      \
+  o("poke",         Poke,         POKE,         Poke)          \
+  o("scan",         Scan,         SCAN,         Scan)          \
   o("shell",        Shell,        SHELL,        Main)          \
   o("help",         Help,         HELP,         Main)          \
 //  COMMAND         ENUM          HELP TEXT     COMMANDLINE
@@ -250,13 +258,12 @@ static const struct cli99_Option* Options[] = {
 #undef o
 };
 
-static void RegisterResolve(void) {
+static void RegisterLookup(const char* ref, uint8_t* out) {
   Error e;
   const char* err;
-  const char* const register_ref = options.register_ref;
 
-  if (register_ref[0] >= '0' && register_ref[0] <= '9') {
-    options.register_ = (uint8_t) parse_number(register_ref, 0, 255, &err);
+  if (ref[0] >= '0' && ref[0] <= '9') {
+    *out = (uint8_t) parse_number(ref, 0, 255, &err);
     if (err) {
       Log_Error("Register: %s", err);
       exit(NBFC_EXIT_CMDLINE);
@@ -265,8 +272,7 @@ static void RegisterResolve(void) {
   }
 
   if (! options.map) {
-    Log_Error("Register: %s: Not an integer and no -m|--map provided",
-              register_ref);
+    Log_Error("Register: %s: Not an integer and no -m|--map provided", ref);
     exit(NBFC_EXIT_CMDLINE);
   }
 
@@ -276,10 +282,16 @@ static void RegisterResolve(void) {
     exit(NBFC_EXIT_FAILURE);
   }
 
-  if (! Map_LookupRegister(register_ref, &options.register_)) {
-    Log_Error("Register: %s: Not found in map file", options.register_ref);
+  if (! Map_LookupRegister(ref, out)) {
+    Log_Error("Register: %s: Not found in map file", ref);
     exit(NBFC_EXIT_CMDLINE);
   }
+}
+
+static void RegisterResolve(void) {
+  RegisterLookup(options.register_ref, &options.register_);
+  if (options.watch_ref)
+    RegisterLookup(options.watch_ref, &options.watch);
 }
 
 static void Handle_Signal(int sig) {
@@ -338,17 +350,19 @@ int main(int argc, char* const argv[]) {
         return NBFC_EXIT_CMDLINE;
       }
       break;
-    case Option_Help:     printf(HelpTexts[cmd], argv[0]);         return 0;
-    case Option_Version:  printf("ec_probe " NBFC_VERSION "\n");   return 0;
-    case Option_Clearly:  options.clearly = true;                  break;
-    case Option_Decimal:  options.decimal = true;                  break;
-    case Option_Word:     options.use_word = true;                 break;
-    case Option_Dry:      options.dry = true;                      break;
-    case Option_Map:      options.map = p.optarg;                  break;
-    case Option_Report:   options.report   = p.optarg;             break;
-    case Option_Color:    options.color_mode = ColorModeEnable;    break;
-    case Option_NoColor:  options.color_mode = ColorModeDisable;   break;
-    case Option_File:     options.file = p.optarg;                 break;
+    case Option_Help:      printf(HelpTexts[cmd], argv[0]);         return 0;
+    case Option_Version:   printf("ec_probe " NBFC_VERSION "\n");   return 0;
+    case Option_Clearly:   options.clearly = true;                  break;
+    case Option_Decimal:   options.decimal = true;                  break;
+    case Option_Word:      options.use_word = true;                 break;
+    case Option_Dry:       options.dry = true;                      break;
+    case Option_Map:       options.map = p.optarg;                  break;
+    case Option_Watch:     options.watch_ref = p.optarg;            break;
+    case Option_NoRestore: options.no_restore = true;               break;
+    case Option_Report:    options.report   = p.optarg;             break;
+    case Option_Color:     options.color_mode = ColorModeEnable;    break;
+    case Option_NoColor:   options.color_mode = ColorModeDisable;   break;
+    case Option_File:      options.file = p.optarg;                 break;
     case Option_EmbeddedController:
       switch (EmbeddedControllerType_FromString(p.optarg)) {
 #if ENABLE_EC_SYS
@@ -359,6 +373,9 @@ int main(int argc, char* const argv[]) {
 #endif
 #if ENABLE_EC_DEV_PORT
         case EmbeddedControllerType_ECLinux:        ec = &EC_Linux_VTable;         break;
+#endif
+#if ENABLE_EC_DUMMY
+        case EmbeddedControllerType_ECDummy:        ec = &EC_Dummy_VTable;         break;
 #endif
         default:
           Log_Error("%s: Invalid value: %s", p.option->optstring, p.optarg);
@@ -474,6 +491,15 @@ int main(int argc, char* const argv[]) {
     CHECK_REQUIRED_ARGUMENT(Option_File, "file");
     break;
 
+  case Command_Poke:
+    CHECK_REQUIRED_ARGUMENT(Option_Register, "register");
+    CHECK_REQUIRED_ARGUMENT(Option_Value, "value");
+    break;
+
+  case Command_Scan:
+    CHECK_REQUIRED_ARGUMENT(Option_Register, "register");
+    break;
+
   default:
     break;
   }
@@ -498,6 +524,8 @@ int main(int argc, char* const argv[]) {
   case Command_Monitor:  return Monitor();
   case Command_Graph:    return Graph();
   case Command_Evaluate: return Evaluate();
+  case Command_Poke:     return Poke();
+  case Command_Scan:     return Scan();
   case Command_Shell:    return Shell();
   default:               return NBFC_EXIT_FAILURE;
   }

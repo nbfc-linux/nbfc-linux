@@ -21,6 +21,8 @@
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
  "  acpi_call             Call an ACPI method\n"                               \
  "  graph                 Visualize recordings made by `ec_probe monitor -r`\n"\
+ "  poke                  Hold a register at a value, sampling another\n"      \
+ "  scan                  Try candidate values on a register, sampling another\n"\
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
@@ -210,4 +212,52 @@
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
  "  -d, --decimal         Read register values as decimal numbers\n"           \
+ ""
+
+#define EC_PROBE_POKE_HELP_TEXT                                                \
+ "Usage: %s poke [-h] [-m FILE] [-w REGISTER] [-t SECONDS] [-i SECONDS]\n"     \
+ "            [-n] REGISTER VALUE\n"                                          \
+ "\n"                                                                          \
+ "Hold an EC register at a fixed value while sampling another register.\n"     \
+ "\n"                                                                          \
+ "The value is written repeatedly for `timespan` seconds, then the original\n" \
+ "register value is restored. Useful to test whether a register moves the fan.\n"\
+ "\n"                                                                          \
+ "Positional arguments:\n"                                                     \
+ "  REGISTER    Register to write\n"                                          \
+ "  VALUE       Value to write (0 - 255)\n"                                   \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help              Show this help message and exit\n"                 \
+ "  -m, --map FILE          Resolve register names from FILE\n"                \
+ "  -w, --watch REGISTER    Register to sample (default: REGISTER)\n"          \
+ "  -t, --timespan SECONDS  How long to hold VALUE (default: 10)\n"            \
+ "  -i, --interval SECONDS  Sampling interval (default: 0.5)\n"                \
+ "  -n, --no-restore        Do not restore the original value\n"              \
+ "\n"                                                                          \
+ "All input values are interpreted as decimal numbers by default.\n"           \
+ "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
+ ""
+
+#define EC_PROBE_SCAN_HELP_TEXT                                                \
+ "Usage: %s scan [-h] [-m FILE] [-w REGISTER] [-t SECONDS] [-i SECONDS]\n"     \
+ "            REGISTER\n"                                                      \
+ "\n"                                                                          \
+ "Try a series of candidate values on one register, sampling another\n"        \
+ "register for each, and report the minimum/maximum observed.\n"               \
+ "\n"                                                                          \
+ "The original value is restored between candidates and at the end.\n"         \
+ "\n"                                                                          \
+ "Positional arguments:\n"                                                     \
+ "  REGISTER    Register to write\n"                                          \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help              Show this help message and exit\n"                 \
+ "  -m, --map FILE          Resolve register names from FILE\n"                \
+ "  -w, --watch REGISTER    Register to sample (default: REGISTER)\n"          \
+ "  -t, --timespan SECONDS  Seconds per candidate value (default: 3)\n"        \
+ "  -i, --interval SECONDS  Sampling interval (default: 0.5)\n"                \
+ "\n"                                                                          \
+ "All input values are interpreted as decimal numbers by default.\n"           \
+ "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
  ""
