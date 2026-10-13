@@ -126,17 +126,72 @@ positionals:
     help: "Value to write"
     complete: ["choices", ["0", "1"]]
 ---
+prog: "ec_probe probe"
+help: "Write values to a register periodically"
+options:
+  - option_strings: ["-d", "--dry"]
+    help: "Do not write to the register"
+
+  - option_strings: ["-m", "--map"]
+    metavar: "FILE"
+    help: "Specify map file for resolving register names"
+    complete: ["file"]
+    capture: '_EC_PROBE_MAP_FILE'
+
+  - option_strings: ["-r", "--read"]
+    metavar: "REGISTER"
+    help: "Report a register's value (8-bit)"
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
+
+  - option_strings: ["--read-word"]
+    metavar: "REGISTER"
+    help: "Report a register's value (16-bit)"
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
+
+  - option_strings: ["-w", "--word"]
+    help: "Combine two registers into one (for writing only)"
+
+  - option_strings: ["-i", "--interval"]
+    metavar: "seconds"
+    help: "Specify interval for writing (seconds)"
+    complete: ["float"]
+
+  - option_strings: ["-t", "--timespan"]
+    metavar: "seconds"
+    help: "Specify how long to run (seconds)"
+    complete: ["integer"]
+
+positionals:
+  - number: 1
+    metavar: "REGISTER"
+    help: "Register destination"
+    complete: ['combine', [
+      ["range", 0, 255],
+      ["exec", '_ec_probe_complete_map_register']
+    ]]
+
+  - number: 2
+    metavar: "VALUES"
+    help: "Values to write"
+    complete: ["none"]
+---
 prog: "ec_probe monitor"
 help: "Monitor all EC registers for changes"
 options:
   - option_strings: ["-i", "--interval"]
     metavar: "seconds"
-    help: "Monitored timespan"
+    help: "Specify poll interval (seconds)"
     complete: ["float"]
 
   - option_strings: ["-t", "--timespan"]
     metavar: "seconds"
-    help: "Set poll intervall"
+    help: "Specify how long to run (seconds)"
     complete: ["integer"]
 
   - option_strings: ["-r", "--report"]
@@ -161,12 +216,12 @@ help: "Monitor all EC registers for changes (alternative version)"
 options:
   - option_strings: ["-i", "--interval"]
     metavar: "seconds"
-    help: "Sets the update interval in seconds"
+    help: "Specify poll interval (seconds)"
     complete: ["float"]
 
   - option_strings: ["-t", "--timespan"]
     metavar: "seconds"
-    help: "Sets how many seconds the program will run"
+    help: "Specify how long to run (seconds)"
     complete: ["integer"]
 ---
 prog: "ec_probe acpi_call"

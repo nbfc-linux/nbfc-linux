@@ -19,7 +19,6 @@
 #include "help/ec_probe.help.h"
 #include "log.h"
 
-#include <float.h>   // FLT_MAX
 #include <stdbool.h> // bool
 #include <stdio.h>   // printf
 #include <stdint.h>  // uint8_t, uint16_t, uint64_t
@@ -58,6 +57,7 @@
 #include "nxjson.c"         // src
 #include "program_name.c"   // src
 #include "process.c"        // src
+#include "range.c"          // src
 #include "spearman.c"       // src
 #include "str_functions.c"  // src
 #include "trace.c"          // src
@@ -90,7 +90,10 @@ typedef enum NBFC_PACKED_ENUM {
   Option_Word,
   Option_Dry,
   Option_Register,
+  Option_ReadRegister,
+  Option_ReadWordRegister,
   Option_Value,
+  Option_Values,
   Option_BitOffset,
   Option_BitValue,
   Option_Format,
@@ -118,6 +121,11 @@ typedef enum NBFC_PACKED_ENUM {
   ColorModeDisable,
 } ColorMode;
 
+struct ReadRegister {
+  const char* register_ref;
+  bool        word;
+};
+
 static struct {
   int         timespan;
   float       interval;
@@ -130,6 +138,7 @@ static struct {
   const char* register_ref;
   uint8_t     register_;
   uint16_t    value;
+  const char* values;
   uint8_t     bit_offset;
   uint8_t     bit_value;
   bool        use_word;
@@ -143,6 +152,7 @@ static struct {
   const char* register_color;
   const char* cpu_color;
   const char* gpu_color;
+  struct ReadRegister read_registers[4];
   uint64_t    _set;
 } options = {0};
 
@@ -186,6 +196,18 @@ static inline Error Registers_ToEC(RegisterReadings* readings) {
   return err_success();
 }
 
+static inline bool ReadRegisters_Add(const char* register_ref, bool word) {
+  for (size_t i = 0; i < ARRAY_SIZE(options.read_registers); ++i) {
+    if (! options.read_registers[i].register_ref) {
+      options.read_registers[i].register_ref = register_ref;
+      options.read_registers[i].word = word;
+      return true;
+    }
+  }
+
+  return false;
+}
+
 static const struct cli99_Option Main_CommandLine[] = {
   {"-e|--embedded-controller", Option_EmbeddedController, cli99_RequiredArgument},
   {"-h|--help",                Option_Help,               cli99_NoArgument      },
@@ -195,9 +217,46 @@ static const struct cli99_Option Main_CommandLine[] = {
 };
 
 #include "probe/map.c"
+
+static uint8_t RegisterResolve(const char* register_ref) {
+  Error e;
+  const char* err;
+  uint8_t result;
+
+  if (register_ref[0] >= '0' && register_ref[0] <= '9') {
+    result = (uint8_t) parse_number(register_ref, 0, 255, &err);
+    if (err) {
+      Log_Error("Register: %s", err);
+      exit(NBFC_EXIT_CMDLINE);
+    }
+
+    return result;
+  }
+
+  if (! options.map) {
+    Log_Error("Register: %s: Not an integer and no -m|--map provided",
+              register_ref);
+    exit(NBFC_EXIT_CMDLINE);
+  }
+
+  e = Map_Load(options.map);
+  if (e) {
+    Log_Error("%s: %s: %s", "-m|--map", options.map, err_print_all(e));
+    exit(NBFC_EXIT_FAILURE);
+  }
+
+  if (! Map_LookupRegister(register_ref, &result)) {
+    Log_Error("Register: %s: Not found in map file", register_ref);
+    exit(NBFC_EXIT_CMDLINE);
+  }
+
+  return result;
+}
+
 #include "probe/cmd_acpi_call.c"
 #include "probe/cmd_dump_load.c"
 #include "probe/cmd_monitor.c"
+#include "probe/cmd_probe.c"
 #include "probe/cmd_read_write.c"
 #include "probe/cmd_shell.c"
 #include "probe/cmd_lua.c"
@@ -208,6 +267,7 @@ static const struct cli99_Option Main_CommandLine[] = {
   o("read_bit",     ReadBit,      READ_BIT,     ReadBit)       \
   o("write_bit",    WriteBit,     WRITE_BIT,    WriteBit)      \
   o("acpi_call",    AcpiCall,     ACPI_CALL,    AcpiCall)      \
+  o("probe",        Probe,        PROBE,        Probe)         \
   o("dump",         Dump,         DUMP,         Dump)          \
   o("load",         Load,         LOAD,         Load)          \
   o("watch",        Watch,        WATCH,        Watch)         \
@@ -251,38 +311,6 @@ static const struct cli99_Option* Options[] = {
   NBFC_EC_PROBE_COMMANDS
 #undef o
 };
-
-static void RegisterResolve(void) {
-  Error e;
-  const char* err;
-  const char* const register_ref = options.register_ref;
-
-  if (register_ref[0] >= '0' && register_ref[0] <= '9') {
-    options.register_ = (uint8_t) parse_number(register_ref, 0, 255, &err);
-    if (err) {
-      Log_Error("Register: %s", err);
-      exit(NBFC_EXIT_CMDLINE);
-    }
-    return;
-  }
-
-  if (! options.map) {
-    Log_Error("Register: %s: Not an integer and no -m|--map provided",
-              register_ref);
-    exit(NBFC_EXIT_CMDLINE);
-  }
-
-  e = Map_Load(options.map);
-  if (e) {
-    Log_Error("%s: %s: %s", "-m|--map", options.map, err_print_all(e));
-    exit(NBFC_EXIT_FAILURE);
-  }
-
-  if (! Map_LookupRegister(register_ref, &options.register_)) {
-    Log_Error("Register: %s: Not found in map file", options.register_ref);
-    exit(NBFC_EXIT_CMDLINE);
-  }
-}
 
 static void Handle_Signal(int sig) {
   quit = sig;
@@ -333,12 +361,29 @@ int main(int argc, char* const argv[]) {
     case Option_Register:
       options.register_ref = p.optarg;
       break;
+    case Option_ReadRegister:
+      if (! ReadRegisters_Add(p.optarg, false)) {
+        Log_Error("%s: %s: Max number of read registers is %zu",
+          p.option->optstring, p.optarg, ARRAY_SIZE(options.read_registers));
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+    case Option_ReadWordRegister:
+      if (! ReadRegisters_Add(p.optarg, true)) {
+        Log_Error("%s: %s: Max number of read registers is %zu",
+          p.option->optstring, p.optarg, ARRAY_SIZE(options.read_registers));
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
     case Option_Value:
       options.value = (uint16_t) parse_number(p.optarg, 0, 65535, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
       }
+      break;
+    case Option_Values:
+      options.values = p.optarg;
       break;
     case Option_Help:     printf(HelpTexts[cmd], argv[0]);         return 0;
     case Option_Version:  printf("ec_probe " NBFC_VERSION "\n");   return 0;
@@ -375,7 +420,7 @@ int main(int argc, char* const argv[]) {
       }
       break;
     case Option_Interval:
-      options.interval = (float) parse_double(p.optarg, 0.1, FLT_MAX, &err);
+      options.interval = (float) parse_double(p.optarg, 0.1, 3600.0, &err);
       if (err) {
         Log_Error("%s: %s: %s", p.option->optstring, p.optarg, err);
         return NBFC_EXIT_CMDLINE;
@@ -464,6 +509,11 @@ int main(int argc, char* const argv[]) {
     CHECK_REQUIRED_ARGUMENT(Option_BitValue, "bit_value");
     break;
 
+  case Command_Probe:
+    CHECK_REQUIRED_ARGUMENT(Option_Register, "register");
+    CHECK_REQUIRED_ARGUMENT(Option_Values, "values");
+    break;
+
   case Command_AcpiCall:
     CHECK_REQUIRED_ARGUMENT(Option_AcpiCallMethod, "method");
     break;
@@ -487,7 +537,7 @@ int main(int argc, char* const argv[]) {
 #undef CHECK_REQUIRED_ARGUMENT
 
   if (options.register_ref)
-    RegisterResolve();
+    options.register_ = RegisterResolve(options.register_ref);
 
   signal(SIGINT,  Handle_Signal);
   signal(SIGTERM, Handle_Signal);
@@ -498,6 +548,7 @@ int main(int argc, char* const argv[]) {
   case Command_Write:    return Write();
   case Command_ReadBit:  return ReadBit();
   case Command_WriteBit: return WriteBit();
+  case Command_Probe:    return Probe();
   case Command_Dump:     return Dump();
   case Command_Load:     return Load();
   case Command_Watch:    return Watch();

@@ -16,6 +16,7 @@
  "  write                 Write a byte to an EC register\n"                    \
  "  read_bit              Read a bit from an EC register\n"                    \
  "  write_bit             Write a bit to an EC register\n"                     \
+ "  probe                 Write values periodically to an EC register\n"       \
  "  monitor               Monitor all EC registers for changes\n"              \
  "  evaluate              Evaluate a report written by monitor command\n"      \
  "  watch                 Monitor all EC registers for changes (alternative version)\n"\
@@ -122,6 +123,57 @@
  "  -h, --help      Show this help message and exit\n"                         \
  "  -d, --dry       Print the resulting value without writing it\n"            \
  "  -m, --map FILE  Resolve register name from FILE\n"                         \
+ "\n"                                                                          \
+ "All input values are interpreted as decimal numbers by default.\n"           \
+ "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\
+ ""
+
+#define EC_PROBE_PROBE_HELP_TEXT                                               \
+ "Usage: %s probe REGISTER VALUES [OPTIONS]\n"                                 \
+ "\n"                                                                          \
+ "Write VALUES periodically to REGISTER while optionally reading another.\n"   \
+ "\n"                                                                          \
+ "The register's original value will be restored afterward.\n"                 \
+ "\n"                                                                          \
+ "NOTE: This must not be relied upon as a safety mechanism.\n"                 \
+ "      Writing to the wrong register may still cause hardware damage.\n"      \
+ "\n"                                                                          \
+ "Positional arguments:\n"                                                     \
+ "  REGISTER    Register destination\n"                                        \
+ "  VALUES      Values to be written\n"                                        \
+ "\n"                                                                          \
+ "Examples for VALUES:\n"                                                      \
+ "  \"1\"             -- single value\n"                                       \
+ "  \"0xFF\"          -- single value (hex)\n"                                 \
+ "  \"1-100\"         -- range of values (step = +1)\n"                        \
+ "  \"100-1\"         -- range of values (step = -1)\n"                        \
+ "  \"0-255:5\"       -- range of values (step = +5)\n"                        \
+ "  \"255-0:-5\"      -- range of values (step = -5)\n"                        \
+ "  \"1-255:*2\"      -- range of values (step = *2)\n"                        \
+ "  \"0,50,100,255\"  -- list of values\n"                                     \
+ "  \"0-100,100-0\"   -- list of ranges\n"                                     \
+ "\n"                                                                          \
+ "Presets for VALUES:\n"                                                       \
+ "  \"all\"           -- 0 - 255\n"                                            \
+ "  \"bits\"          -- 1, 2, 4, 8, 16, 32, 64, 128\n"                        \
+ "  \"all_reversed\"  -- 255 - 0\n"                                            \
+ "  \"bits_reversed\" -- 128, 64, 32, 16, 8, 4, 2, 1\n"                        \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help          Show this help message and exit\n"                     \
+ "  -d, --dry           Do not write the values to register\n"                 \
+ "  -m, --map FILE      Resolve register names from FILE\n"                    \
+ "  -w, --word          Write two registers as one word\n"                     \
+ "  -r, --read REGISTER\n"                                                     \
+ "                      Read and report REGISTER during the probe\n"           \
+ "  --read-word REGISTER\n"                                                    \
+ "                      Read and report a 16-bit register during the probe\n"  \
+ "  -i, --interval SECONDS\n"                                                  \
+ "                      Sets interval for writing values\n"                    \
+ "  -t, --timespan SECONDS\n"                                                  \
+ "                      Sets how many seconds the program will run\n"          \
+ "\n"                                                                          \
+ "The options --read and --read-word can be used up to four times.\n"          \
  "\n"                                                                          \
  "All input values are interpreted as decimal numbers by default.\n"           \
  "Use the \"0x\" prefix for hexadecimal values and \"0b\" for binary values.\n"\

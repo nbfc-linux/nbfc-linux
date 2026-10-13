@@ -204,11 +204,13 @@ function _ec_probe__prepare
     '(write)=>-w --word -m= --map=' \
     '(read_bit)=>-m= --map=' \
     '(write_bit)=>-d --dry -m= --map=' \
+    '(probe)=>-d --dry -m= --map= -r= --read= --read-word= -w --word -i= --interval= -t= --timespan=' \
     '(monitor)=>-i= --interval= -t= --timespan= -r= --report= -c --clearly -d --decimal -C --cpu -G --gpu' \
     '(watch)=>-i= --interval= -t= --timespan=' \
     '(acpi_call)=>-m= --map= -d --dry' \
     '(graph)=>-d --decimal --register-color= --cpu-color= --gpu-color=' \
     '(evaluate)=>-d --decimal'
+  _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
   _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
   _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
   _ec_probe__capture_option _EC_PROBE_MAP_FILE -m --map
@@ -225,6 +227,7 @@ function _ec_probe__command
     write 'Write a byte to a EC register' \
     read_bit 'Read a bit from a EC register' \
     write_bit 'Write a bit to a EC register' \
+    probe 'Write values to a register periodically' \
     monitor 'Monitor all EC registers for changes' \
     watch 'Monitor all EC registers for changes (alternative version)' \
     acpi_call 'Call an ACPI method' \
@@ -308,6 +311,27 @@ complete -c $prog -n $P -n $C003 -n $C000 -d 'Register destination' -x -a '(seq 
 complete -c $prog -n $P -n $C004 -n $C000 -d 'Bit offset (0-7)' -x -a '(seq 0 7)'
 complete -c $prog -n $P -n $C005 -n $C000 -d 'Value to write' -x -a '0 1'
 
+# command ec_probe probe
+set -l C000 "$positional_contains 1 probe"
+set -l C001 "not $has_option -d --dry"
+set -l C002 "not $has_option -m --map"
+set -l C003 "not $has_option -r --read"
+set -l C004 "not $has_option --read-word"
+set -l C005 "not $has_option -w --word"
+set -l C006 "not $has_option -i --interval"
+set -l C007 "not $has_option -t --timespan"
+set -l C008 "$num_of_positionals -eq 1"
+set -l C009 "$num_of_positionals -eq 2"
+complete -c $prog -n $P -n $C000 -n $C001 -s d -l dry -d 'Do not write to the register' -f
+complete -c $prog -n $P -n $C000 -n $C002 -s m -l map -d 'Specify map file for resolving register names' -Fr
+complete -c $prog -n $P -n $C000 -n $C003 -s r -l read -d "Report a register's value (8-bit)" -x -a '(seq 0 255; _ec_probe_complete_map_register)'
+complete -c $prog -n $P -n $C000 -n $C004 -l read-word -d "Report a register's value (16-bit)" -x -a '(seq 0 255; _ec_probe_complete_map_register)'
+complete -c $prog -n $P -n $C000 -n $C005 -s w -l word -d 'Combine two registers into one (for writing only)' -f
+complete -c $prog -n $P -n $C000 -n $C006 -s i -l interval -d 'Specify interval for writing (seconds)' -x
+complete -c $prog -n $P -n $C000 -n $C007 -s t -l timespan -d 'Specify how long to run (seconds)' -x
+complete -c $prog -n $P -n $C008 -n $C000 -d 'Register destination' -x -a '(seq 0 255; _ec_probe_complete_map_register)'
+complete -c $prog -n $P -n $C009 -n $C000 -d 'Values to write' -x
+
 # command ec_probe monitor
 set -l C000 "$positional_contains 1 monitor"
 set -l C001 "not $has_option -i --interval"
@@ -317,8 +341,8 @@ set -l C004 "not $has_option -c --clearly"
 set -l C005 "not $has_option -d --decimal"
 set -l C006 "not $has_option -C --cpu"
 set -l C007 "not $has_option -G --gpu"
-complete -c $prog -n $P -n $C000 -n $C001 -s i -l interval -d 'Monitored timespan' -x
-complete -c $prog -n $P -n $C000 -n $C002 -s t -l timespan -d 'Set poll intervall' -x
+complete -c $prog -n $P -n $C000 -n $C001 -s i -l interval -d 'Specify poll interval (seconds)' -x
+complete -c $prog -n $P -n $C000 -n $C002 -s t -l timespan -d 'Specify how long to run (seconds)' -x
 complete -c $prog -n $P -n $C000 -n $C003 -s r -l report -d 'Save all readings as a CSV file' -Fr
 complete -c $prog -n $P -n $C000 -n $C004 -s c -l clearly -d 'Blanks out consecutive duplicate readings' -f
 complete -c $prog -n $P -n $C000 -n $C005 -s d -l decimal -d 'Output register readings in decimal format' -f
@@ -329,8 +353,8 @@ complete -c $prog -n $P -n $C000 -n $C007 -s G -l gpu -d 'Record GPU temperature
 set -l C000 "$positional_contains 1 watch"
 set -l C001 "not $has_option -i --interval"
 set -l C002 "not $has_option -t --timespan"
-complete -c $prog -n $P -n $C000 -n $C001 -s i -l interval -d 'Sets the update interval in seconds' -x
-complete -c $prog -n $P -n $C000 -n $C002 -s t -l timespan -d 'Sets how many seconds the program will run' -x
+complete -c $prog -n $P -n $C000 -n $C001 -s i -l interval -d 'Specify poll interval (seconds)' -x
+complete -c $prog -n $P -n $C000 -n $C002 -s t -l timespan -d 'Specify how long to run (seconds)' -x
 
 # command ec_probe acpi_call
 set -l C000 "$positional_contains 1 acpi_call"

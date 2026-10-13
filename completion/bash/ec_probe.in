@@ -115,6 +115,17 @@ _ec_probe__parse_commandline() {
         -G|--gpu) VAR=OPT_gpu; ARGS=0; return;;
       esac
     esac
+    case "$1" in root:probe*)
+      case "$2" in
+        -d|--dry) VAR=OPT_dry; ARGS=0; return;;
+        -m|--map) VAR=_EC_PROBE_MAP_FILE; ARGS=1; return;;
+        -r|--read) VAR=OPT_read; ARGS=1; return;;
+        --read-word) VAR=OPT_read_word; ARGS=1; return;;
+        -w|--word) VAR=OPT_word; ARGS=0; return;;
+        -i|--interval) VAR=OPT_interval; ARGS=1; return;;
+        -t|--timespan) VAR=OPT_timespan; ARGS=1; return;;
+      esac
+    esac
     case "$1" in root:write_bit*)
       case "$2" in
         -d|--dry) VAR=OPT_dry; ARGS=0; return;;
@@ -231,9 +242,9 @@ _ec_probe() {
 
   local END_OF_OPTIONS POSITIONALS
   local -a OPT_help OPT_embedded_controller OPT_color OPT_no_color OPT_word
-  local -a _EC_PROBE_MAP_FILE OPT_dry OPT_interval OPT_timespan OPT_report
-  local -a OPT_clearly OPT_decimal OPT_cpu OPT_gpu OPT_register_color
-  local -a OPT_cpu_color OPT_gpu_color
+  local -a _EC_PROBE_MAP_FILE OPT_dry OPT_read OPT_read_word OPT_interval
+  local -a OPT_timespan OPT_report OPT_clearly OPT_decimal OPT_cpu OPT_gpu
+  local -a OPT_register_color OPT_cpu_color OPT_gpu_color
   _ec_probe__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -244,6 +255,7 @@ _ec_probe() {
       write) _ec_probe_write && return 0;;
       read_bit) _ec_probe_read_bit && return 0;;
       write_bit) _ec_probe_write_bit && return 0;;
+      probe) _ec_probe_probe && return 0;;
       monitor) _ec_probe_monitor && return 0;;
       watch) _ec_probe_watch && return 0;;
       acpi_call) _ec_probe_acpi_call && return 0;;
@@ -297,7 +309,7 @@ _ec_probe() {
   fi
 
   (( ${#POSITIONALS[@]} == 1 )) && {
-    COMPREPLY=($(compgen -W 'dump load read write read_bit write_bit monitor watch acpi_call graph evaluate lua shell' -- "$cur"))
+    COMPREPLY=($(compgen -W 'dump load read write read_bit write_bit probe monitor watch acpi_call graph evaluate lua shell' -- "$cur"))
     return 0;
   }
 
@@ -554,6 +566,75 @@ _ec_probe_write_bit() {
 
   (( ${#POSITIONALS[@]} == 4 )) && {
     COMPREPLY=($(compgen -W '0 1' -- "$cur"))
+    return 0;
+  }
+
+  return 1
+}
+
+_ec_probe_probe() {
+  __complete_option() {
+    local opt="$1" cur="$2" ret=0
+
+    case "$opt" in
+      -m|--map)
+        _filedir;;
+      -@(-read@(|-word)|r))
+        COMPREPLY=($(compgen -W '{0..255}' -- "$cur"))
+        local COMPREPLY_OLD=("${COMPREPLY[@]}")
+        _ec_probe__exec _ec_probe_complete_map_register
+        COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}");;
+      -i|--interval|-t|--timespan);;
+      *) ret=1;;
+    esac
+
+    return $ret
+  }
+
+  case "$prev" in
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([dwh])[mrite])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
+    --*);;
+    -*([dwh])[mrite]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _ec_probe__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
+  esac
+
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_dry[@]} )) && opts+=(-d --dry)
+    (( ! ${#_EC_PROBE_MAP_FILE[@]} )) && opts+=(-m --map=)
+    (( ! ${#OPT_read[@]} )) && opts+=(-r --read=)
+    (( ! ${#OPT_read_word[@]} )) && opts+=(--read-word=)
+    (( ! ${#OPT_word[@]} )) && opts+=(-w --word)
+    (( ! ${#OPT_interval[@]} )) && opts+=(-i --interval=)
+    (( ! ${#OPT_timespan[@]} )) && opts+=(-t --timespan=)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  (( ${#POSITIONALS[@]} == 2 )) && {
+    COMPREPLY=($(compgen -W '{0..255}' -- "$cur"))
+    local COMPREPLY_OLD=("${COMPREPLY[@]}")
+    _ec_probe__exec _ec_probe_complete_map_register
+    COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}")
+    return 0;
+  }
+
+  (( ${#POSITIONALS[@]} == 3 )) && {
     return 0;
   }
 

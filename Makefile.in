@@ -310,11 +310,13 @@ src/ec_probe: \
 	src/probe/cmd_dump_load.c \
 	src/probe/cmd_lua.c \
 	src/probe/cmd_monitor.c \
+	src/probe/cmd_probe.c \
 	src/probe/cmd_read_write.c \
 	src/probe/cmd_shell.c \
 	src/probe/map.c \
 	src/process.h src/process.c \
 	src/program_name.h src/program_name.c \
+	src/range.h src/range.c \
 	src/spearman.h src/spearman.c \
 	src/sleep.h \
 	src/str_functions.h src/str_functions.c \
