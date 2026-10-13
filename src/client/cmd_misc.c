@@ -1,6 +1,6 @@
 #include <errno.h>  // errno
 #include <stdio.h>  // printf, snprintf
-#include <string.h> // strcmp, strcspn, strerror
+#include <string.h> // strcmp, strerror
 #include <stdbool.h>
 
 #include "../dmi.h"
@@ -15,39 +15,8 @@
 #include "service_control.h"
 
 static int WaitForHwmon(void) {
-  const char* hwmon_file_names[] = {
-    "/sys/class/hwmon/hwmon%d/name",
-    "/sys/class/hwmon/hwmon%d/device/name",
-    NULL
-  };
-  const char* linux_temp_sensor_names[] = {
-    "coretemp", "k10temp", "zenpower", NULL
-  };
-
-  char filename[1024];
-  char content[1024];
-
-  for (int tries = 0; tries < 30; tries++) {
-    for (const char** format = hwmon_file_names; *format; ++format) {
-      for (int i = 0; i < 10; i++) {
-        snprintf(filename, sizeof(filename), *format, i);
-        if (! File_Read(content, sizeof(content), filename).ok)
-          continue;
-
-        // trim the newline
-        content[strcspn(content, "\n")] = '\0';
-        for (const char** sensor_name = linux_temp_sensor_names; *sensor_name; ++sensor_name) {
-          if (!strcmp(content, *sensor_name)) {
-            printf("Success!\n");
-            return NBFC_EXIT_SUCCESS;
-          }
-        }
-      }
-    }
-    sleep_ms(1000);
-  }
-
-  return NBFC_EXIT_FAILURE;
+  Error e = FS_Sensors_Init(false);
+  return e ? NBFC_EXIT_FAILURE : NBFC_EXIT_SUCCESS;
 }
 
 static int GetModelName(void) {

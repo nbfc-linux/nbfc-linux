@@ -14,7 +14,12 @@
 #include <stdio.h>   // snprintf
 #include <stdlib.h>  // strtod
 #include <string.h>  // strstr
-#include <linux/limits.h> // PATH_MAX
+#include <dirent.h>  // DIR, opendir, readdir, closedir
+
+#define FS_SENSORS_HWMON_DIR    "/sys/class/hwmon"
+#define FS_SENSORS_MAX_SOURCES  8192
+#define FS_SENSORS_BUFFER_SIZE  (sizeof(FS_TemperatureSource) * FS_SENSORS_MAX_SOURCES)
+#define FS_SENSORS_MAX_PATH_LEN (sizeof("/sys/class/hwmon/hwmon1234567890/temp1234567890_input"))
 
 static inline bool IsCPUSensorName(const char* s) {
   return
@@ -32,13 +37,20 @@ static inline bool IsGPUSensorName(const char* s) {
     !strcmp(s, "radeon");
 }
 
-static const char* const LinuxHwmonDirs[] = {
-  "/sys/class/hwmon/hwmon%d",
-  "/sys/class/hwmon/hwmon%d/device",
-  NULL
-};
-
-static const char* const LinuxTempSensorFile = "temp%d_input";
+static bool IsTempInputName(const char* s) {
+  if (*s++ != 't') return false;
+  if (*s++ != 'e') return false;
+  if (*s++ != 'm') return false;
+  if (*s++ != 'p') return false;
+  while (*s >= '0' && *s <= '9') {++s;}
+  if (*s++ != '_') return false;
+  if (*s++ != 'i') return false;
+  if (*s++ != 'n') return false;
+  if (*s++ != 'p') return false;
+  if (*s++ != 'u') return false;
+  if (*s++ != 't') return false;
+  return (*s == '\0');
+}
 
 array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
@@ -83,66 +95,78 @@ Error FS_TemperatureSource_GetTemperature(const FS_TemperatureSource* self, floa
   return err_success();
 }
 
-#define FS_SENSORS_MAX_SOURCES 256
-#define FS_SENSORS_BUFFER_SIZE (sizeof(FS_TemperatureSource) * FS_SENSORS_MAX_SOURCES)
+static void FS_Sensors_AddHwMonTemperatureFiles(FS_TemperatureSource* out, size_t* n_sources, const char* dir, const char* name) {
+  Error e;
+  char path[FS_SENSORS_MAX_PATH_LEN];
+  struct dirent* entry;
+
+  snprintf(path, sizeof(path), "%s/%s", FS_SENSORS_HWMON_DIR, dir);
+
+  DIR* hwmon_dir = opendir(path);
+  if (! hwmon_dir)
+    return;
+
+  while ((entry = readdir(hwmon_dir))) {
+    if (! IsTempInputName(entry->d_name))
+      continue;
+
+    if (*n_sources >= FS_SENSORS_MAX_SOURCES)
+      break;
+
+    snprintf(path, sizeof(path), "%s/%s/%s", FS_SENSORS_HWMON_DIR, dir, entry->d_name);
+
+    FS_TemperatureSource* source = &out[*n_sources];
+    source->name = (char*) name;
+    source->file = path;
+    source->multiplier = 0.001f;
+    source->type = FS_TemperatureSource_File;
+
+    float t;
+    e = FS_TemperatureSource_GetTemperature(source, &t);
+    e_warn();
+    if (e)
+      continue;
+
+    source->name = Mem_Strdup(source->name);
+    source->file = Mem_Strdup(source->file);
+    (*n_sources)++;
+  }
+
+  closedir(hwmon_dir);
+}
 
 static Error FS_Sensors_Init_HwMon(void) {
   Error e;
-  char* dir = Buffer_Get(PATH_MAX);
-  char* file = Buffer_Get(PATH_MAX);
-  char* filename = Buffer_Get(PATH_MAX);
-  FS_TemperatureSource* sources = (FS_TemperatureSource*) Buffer_Get(FS_SENSORS_BUFFER_SIZE);
+  FS_TemperatureSource* sources;
   array_size_t n_sources = 0;
+  char file[FS_SENSORS_MAX_PATH_LEN];
+  char source_name[128];
 
-  for (const char* const* hwmonDir = LinuxHwmonDirs; *hwmonDir; ++hwmonDir) {
-    for (int i = 0; i < 30; i++) {
-      snprintf(dir,  PATH_MAX, *hwmonDir, i);
-      snprintf(file, PATH_MAX, "%s/name", dir);
+  DIR* hwmon_dir = opendir(FS_SENSORS_HWMON_DIR);
+  if (! hwmon_dir)
+    return err_stdlib(FS_SENSORS_HWMON_DIR);
 
-      char source_name[256];
-      FileResult res = File_Read(source_name, sizeof(source_name), file);
-      if (! res.ok) {
-        if (errno != ENOENT) {
-          e = err_stdlib(file);
-          e_warn();
-        }
-        continue;
-      }
+  sources = (FS_TemperatureSource*) Buffer_Get(FS_SENSORS_BUFFER_SIZE);
 
-      str_rstrip_whitespace(source_name, res.len);
+  struct dirent* entry;
+  while ((entry = readdir(hwmon_dir))) {
+    if (entry->d_name[0] == '.')
+      continue;
 
-      for (int j = 0; j < 30; j++) {
-        if (n_sources >= FS_SENSORS_MAX_SOURCES)
-          goto end;
+    snprintf(file, sizeof(file), "%s/%s/name", FS_SENSORS_HWMON_DIR, entry->d_name);
 
-        snprintf(filename, PATH_MAX, LinuxTempSensorFile, j);
-        snprintf(file, PATH_MAX, "%s/%s", dir, filename);
-
-        FS_TemperatureSource* source = &sources[n_sources];
-        source->name = source_name;
-        source->file = file;
-        source->multiplier = 0.001f;
-        source->type = FS_TemperatureSource_File;
-
-        float t;
-        e = FS_TemperatureSource_GetTemperature(source, &t);
-#ifndef NDEBUG
-        e_warn();
-#endif
-        if (e)
-          continue;
-
-        ++n_sources;
-        source->name = Mem_Strdup(source->name);
-        source->file = Mem_Strdup(source->file);
-      }
+    FileResult res = File_Read(source_name, sizeof(source_name), file);
+    if (! res.ok) {
+      e = err_stdlib(file);
+      e_warn();
+      continue;
     }
+
+    str_rstrip_whitespace(source_name, res.len);
+    FS_Sensors_AddHwMonTemperatureFiles(sources, &n_sources, entry->d_name, source_name);
   }
 
-end:
-  Buffer_Release(dir, PATH_MAX);
-  Buffer_Release(file, PATH_MAX);
-  Buffer_Release(filename, PATH_MAX);
+  closedir(hwmon_dir);
 
   if (! n_sources) {
     Buffer_Release((char*) sources, FS_SENSORS_BUFFER_SIZE);
