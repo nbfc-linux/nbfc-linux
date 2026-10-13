@@ -12,7 +12,7 @@ typedef struct ConfigFile ConfigFile;
 declare_array_of(ConfigFile);
 
 array_of(ConfigFile) List_All_Configs(void);
-array_of(ConfigFile) List_Recommended_Configs(void);
+array_of(ConfigFile) List_Recommended_Configs(const char*);
 
 Error ConfigFiles_FromFile(array_of(ConfigFile)*, const char*);
 

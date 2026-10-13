@@ -144,6 +144,7 @@ _nbfc__parse_commandline() {
         -l|--list) VAR=OPT_list; ARGS=0; return;;
         -s|--set) VAR=OPT_set; ARGS=1; return;;
         -r|--recommend) VAR=OPT_recommend; ARGS=0; return;;
+        -t|--threshold) VAR=OPT_threshold; ARGS=1; return;;
       esac
     esac
     case "$1" in root:status*)
@@ -264,12 +265,12 @@ _nbfc() {
 
   local END_OF_OPTIONS POSITIONALS
   local -a OPT_help OPT_version OPT_read_only OPT_all OPT_service OPT_fan
-  local -a OPT_watch OPT_json OPT_list OPT_set OPT_recommend OPT_auto OPT_speed
-  local -a OPT_algorithm OPT_sensor OPT_force OPT_parallel OPT_quiet
-  local -a OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_input
+  local -a OPT_watch OPT_json OPT_list OPT_set OPT_recommend OPT_threshold
+  local -a OPT_auto OPT_speed OPT_algorithm OPT_sensor OPT_force OPT_parallel
+  local -a OPT_quiet OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_input
   local -a OPT_print_rules OPT_rules OPT_no_download OPT_unverified OPT_bad
-  local -a OPT_fan_count OPT_output OPT_gpu OPT_cpu OPT_interval OPT_threshold
-  local -a OPT_break OPT_upload_firmware OPT_print_command OPT_create_archive
+  local -a OPT_fan_count OPT_output OPT_gpu OPT_cpu OPT_interval OPT_break
+  local -a OPT_upload_firmware OPT_print_command OPT_create_archive
   _nbfc__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -387,7 +388,13 @@ _nbfc_status() {
 
 _nbfc_config() {
   __complete_option() {
-    local opt="$1" cur="$2" ret=0
+    local opt="$1" cur="$2"
+
+    case "$opt" in -t|--threshold)
+      if (( ${#OPT_recommend[@]} )); then
+        return 0
+      fi;;
+    esac
 
     case "$opt" in
       -s|--set)
@@ -403,16 +410,16 @@ _nbfc_config() {
         COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}")
         local COMPREPLY_OLD=("${COMPREPLY[@]}")
         _filedir
-        COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}");;
-      *) ret=1;;
+        COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}")
+        return 0;;
     esac
 
-    return $ret
+    return 1
   }
 
   case "$prev" in
     --*) __complete_option "$prev" "$cur" && return 0;;
-    -*([lrh])[s])
+    -*([lrh])[st])
          __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
@@ -420,7 +427,7 @@ _nbfc_config() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*([lrh])[s]*)
+    -*([lrh])[st]*)
       local i
       for ((i=2; i <= ${#cur}; ++i)); do
         local pre="${cur:0:$i}" value="${cur:$i}"
@@ -434,6 +441,7 @@ _nbfc_config() {
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
     (( ! ${#OPT_list[@]} && ! ${#OPT_recommend[@]} && ! ${#OPT_set[@]} )) && opts+=(-l --list -s --set= -r --recommend)
+    (( ! ${#OPT_threshold[@]} )) && (( ${#OPT_recommend[@]} )) && opts+=(-t --threshold=)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1

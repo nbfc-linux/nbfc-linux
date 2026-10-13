@@ -337,6 +337,14 @@ int main(int argc, char* const argv[]) {
       Set_Config_Action(Config_Action_Recommend);
       break;
 
+    case Option_Config_Threshold:
+      Config_Options.threshold = (float) parse_double(p.optarg, 0.0, 100.0, &err);
+      if (err) {
+        Log_Error("%s: %s: %s", p.option->optstring, err, p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+      break;
+
     case Option_Config_Yes:
       Config_Options.yes = true;
       break;

@@ -17,9 +17,9 @@
 #include "client_global.h"
 #include "service_control.h"
 
-#define RECOMMENDED_CONFIG_MATCH_THRESHOLD 0.7f
+#define CONFIG_RECOMMENDED_MATCH_THRESHOLD 70.0f
 
-#define RECOMMENDED_WARNING \
+#define CONFIG_RECOMMENDED_WARNING \
   "\n"                                                                         \
   "                   ====================================\n"                  \
   "                   WARNING: This feature is deprecated!\n"                  \
@@ -91,6 +91,7 @@ const struct cli99_Option Config_CommandLine[] = {
   {"-r|--recommend", Option_Config_Recommend, cli99_NoArgument      },
   {"-s|--set",       Option_Config_Set,       cli99_RequiredArgument},
   {"-a|--apply",     Option_Config_Apply,     cli99_RequiredArgument},
+  {"-t|--threshold", Option_Config_Threshold, cli99_RequiredArgument},
   {"-y|--yes",       Option_Config_Yes,       cli99_NoArgument      },
   cli99_Options_End()
 };
@@ -98,8 +99,14 @@ const struct cli99_Option Config_CommandLine[] = {
 struct {
   Config_Action action;
   const char* config;
+  float threshold;
   bool yes;
-} Config_Options = {0};
+} Config_Options = {
+  Config_Action_None,
+  NULL,
+  CONFIG_RECOMMENDED_MATCH_THRESHOLD,
+  false
+};
 
 void Set_Config_Action(Config_Action action) {
   if (Config_Options.action && Config_Options.action != action) {
@@ -127,7 +134,7 @@ static int Config_Recommend(void) {
   char model_name[DMI_MAX_MODEL_NAME_LEN];
 
   if (isatty(STDOUT_FILENO) && !Config_Options.yes) {
-    fprintf(stderr, "%s", RECOMMENDED_WARNING);
+    fprintf(stderr, "%s", CONFIG_RECOMMENDED_WARNING);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -137,7 +144,7 @@ static int Config_Recommend(void) {
     return NBFC_EXIT_FAILURE;
   }
 
-  array_of(ConfigFile) files = List_Recommended_Configs();
+  array_of(ConfigFile) files = List_Recommended_Configs(model_name);
   char* config = Get_Supported_Config(&files, model_name);
 
   if (config) {
@@ -148,7 +155,7 @@ static int Config_Recommend(void) {
 
   bool have_match = false;
   for_each_array(ConfigFile*, file, files) {
-    if (file->diff >= RECOMMENDED_CONFIG_MATCH_THRESHOLD) {
+    if (file->diff >= (Config_Options.threshold / 100.0f)) {
       have_match = true;
       printf("%s\n", file->config_name);
     }

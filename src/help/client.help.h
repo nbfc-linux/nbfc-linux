@@ -60,6 +60,8 @@
  "  -l, --list            List all available configs\n"                        \
  "  -s, --set CONFIG      Set a configuration\n"                               \
  "  -r, --recommend       List configs with a similar notebook model name\n"   \
+ "  -t, --threshold PERCENT\n"                                                 \
+ "                        With -r|--recommend: Set similarity threshold\n"     \
  "\n"                                                                          \
  "If CONFIG is \"auto\", the service will attempt to automatically select\n"   \
  "a matching configuration.\n"                                                 \

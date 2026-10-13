@@ -217,7 +217,7 @@ function _nbfc__prepare
     '(start)=>-r --read-only' \
     '(restart)=>-r --read-only' \
     '(status)=>-a --all -s --service -f= --fan= -w= --watch= -j --json' \
-    '(config)=>-l --list -s= --set= -r --recommend' \
+    '(config)=>-l --list -s= --set= -r --recommend -t= --threshold=' \
     '(set)=>-a --auto -s= --speed= -f= --fan=' \
     '(sensors)>(set)=>-f= --fan= -a= --algorithm= -s= --sensor= --force' \
     '(update)=>-p= --parallel= -q --quiet' \
@@ -323,9 +323,12 @@ set -l C000 "$positional_contains 1 config"
 set -l C001 "not $has_option -s --set -r --recommend -l --list"
 set -l C002 "not $has_option -l --list -r --recommend -s --set"
 set -l C003 "not $has_option -l --list -s --set -r --recommend"
+set -l C004 "not $has_option -t --threshold"
+set -l C005 "$has_option -r --recommend"
 complete -c $prog -n $P -n $C000 -n $C001 -s l -l list -d 'List all available configs (default)' -f
 complete -c $prog -n $P -n $C000 -n $C002 -s s -l set -d 'Set a config' -x -a '(_nbfc__filedir -C /@DATADIR@/nbfc/configs; _nbfc__filedir -C /var/lib/nbfc/configs; _nbfc__filedir)'
 complete -c $prog -n $P -n $C000 -n $C003 -s r -l recommend -d 'List configs with names similar to your notebook' -f
+complete -c $prog -n $P -n $C000 -n $C004 -n $C005 -s t -l threshold -d 'Set threshold for listing configs (percent)' -x
 
 # command nbfc set
 set -l C000 "$positional_contains 1 set"

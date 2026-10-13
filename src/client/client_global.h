@@ -32,6 +32,7 @@ enum Option {
   Option_Config_Recommend,
   Option_Config_Set,
   Option_Config_Apply,
+  Option_Config_Threshold,
   Option_Config_Yes,
 
   // Rate-Config options

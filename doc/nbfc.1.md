@@ -93,6 +93,11 @@ This program is used to control the NoteBook FanControl service.
 >
 > > Set a config.
 >
+> **-t**, **\--threshold** *PERCENT*
+>
+> > With **-r, \--recommend**: Set the similarity threshold for listing
+> > recommended configs.
+>
 > If *CONFIG* is **auto**, the service will attempt to automatically
 > select a matching configuration.
 >

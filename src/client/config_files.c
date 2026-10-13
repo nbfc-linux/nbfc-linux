@@ -165,16 +165,7 @@ Error ConfigFiles_FromFile(array_of(ConfigFile)* out, const char* file) {
 
 // List all configs (in the static config directory as well as in the mutable config directory).
 // The `diff` field of the ConfigFile structure will also be set.
-array_of(ConfigFile) List_Recommended_Configs(void) {
-  Error e;
-  char model_name[DMI_MAX_MODEL_NAME_LEN];
-
-  e = DMI_GetModelName(model_name, sizeof(model_name));
-  if (e) {
-    Log_Error("%s", err_print_all(e));
-    exit(NBFC_EXIT_FAILURE);
-  }
-
+array_of(ConfigFile) List_Recommended_Configs(const char* model_name) {
   array_of(ConfigFile) files = List_All_Configs();
 
   for_each_array(ConfigFile*, file, files) {

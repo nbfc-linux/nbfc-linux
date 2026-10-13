@@ -118,6 +118,14 @@ List configs with a similar notebook model name.
 Set a config.
 .RE
 
+.BR \-t ", " \-\-threshold
+.I PERCENT
+.RS
+With
+.BR "-r, --recommend" :
+Set the similarity threshold for listing recommended configs.
+.RE
+
 If
 .I CONFIG
 is

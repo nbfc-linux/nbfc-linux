@@ -68,6 +68,11 @@ options:
   - option_strings: ["-r", "--recommend"]
     help: "List configs with names similar to your notebook"
     groups: ["group1"]
+
+  - option_strings: ["-t", "--threshold"]
+    help: "Set threshold for listing configs (percent)"
+    when: "has_option -r --recommend"
+    complete: ['none']
 ---
 prog: "nbfc set"
 help: "Control fan speed"

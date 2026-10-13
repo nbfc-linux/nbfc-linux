@@ -12,6 +12,14 @@ _nbfc__query() {
     get_positional)
       printf "%s" "${POSITIONALS[$1]}"
       return 0;;
+    has_option)
+      local option=''
+
+      for option in "${HAVING_OPTIONS[@]}"; do
+        _nbfc__array_contains "$option" "$@" && return 0
+      done
+
+      return 1;;
     init)
       local -a options=(${=1})
       shift;;
@@ -258,6 +266,10 @@ _nbfc_status() {
 }
 
 _nbfc_config() {
+  local opts='-l --list -s= --set= -r --recommend -t= --threshold= -h --help --version'
+  local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
+  _nbfc__query init "$opts" "${words[@]}"
+
   local -a args=(
     '(--recommend --set -r -s --list -l)'{-l,--list}'[List all available configs (default)]'
     '(--list --recommend -l -r --set -s)'{-s+,--set=}'[Set a config]':config:'{_nbfc_config__-s}'
@@ -266,6 +278,8 @@ _nbfc_config() {
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
   )
+  _nbfc__query has_option -r --recommend &&\
+    args+=('(--threshold -t)'{-t+,--threshold=}'[Set threshold for listing configs (percent)]':' ':' ')
   _arguments -S -s -w "${args[@]}"
 }
 
