@@ -112,6 +112,13 @@ The Author of the config file. Enter whatever you want.
 .RE
 
 .PP
+.BR Notice :
+.I String
+.RS
+A notice that will be printed when this configuration is set.
+.RE
+
+.PP
 .BR LegacyTemperatureThresholdsBehaviour :
 .I Boolean
 .RS

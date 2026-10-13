@@ -491,6 +491,9 @@ Error ModelConfig_ValidateFields(ModelConfig* self) {
 	if (false)
 		return err_stringf("%s: %s", "Author", "Missing option");
 
+	if (false)
+		return err_stringf("%s: %s", "Notice", "Missing option");
+
 	if (! self->isset.LegacyTemperatureThresholdsBehaviour)
 		self->LegacyTemperatureThresholdsBehaviour = false;
 
@@ -544,6 +547,11 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 			e = str_FromJson(&obj->Author, c);
 			if (!e)
 				obj->isset.Author = true;
+		}
+		else if (!strcmp(c->key, "Notice")) {
+			e = str_FromJson(&obj->Notice, c);
+			if (!e)
+				obj->isset.Notice = true;
 		}
 		else if (!strcmp(c->key, "LegacyTemperatureThresholdsBehaviour")) {
 			e = bool_FromJson(&obj->LegacyTemperatureThresholdsBehaviour, c);

@@ -296,6 +296,10 @@ void ModelConfig_ToJson(const ModelConfig* cfg, nx_json* parent, const char* key
     create_json_string("Author", obj, cfg->Author);
   }
 
+  if (cfg->isset.Notice) {
+    create_json_string("Notice", obj, cfg->Notice);
+  }
+
   if (cfg->isset.LuaLibraries) {
     // TODO: LuaLibraries
   }

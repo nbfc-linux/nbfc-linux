@@ -276,6 +276,8 @@ static int Config_Set(void) {
   printf("%s\n", CONFIG_SET_NOTICE);
   if (Config_ModelConfigNeedsAdvancedConfiguration(&model_config))
     printf("\n%s\n", CONFIG_ADVANCED_NOTICE);
+  if (model_config.isset.Notice)
+    printf("\nNotice: %s\n", model_config.Notice);
 
   return NBFC_EXIT_SUCCESS;
 }

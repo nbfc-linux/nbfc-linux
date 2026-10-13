@@ -145,6 +145,7 @@ Error Sponsor_ValidateFields(Sponsor*);
 struct ModelConfig {
 	const char*     NotebookModel;
 	const char*     Author;
+	const char*     Notice;
 	bool            LegacyTemperatureThresholdsBehaviour;
 	bool            LuaLibraries;
 	uint16_t        EcPollInterval;
@@ -158,6 +159,7 @@ struct ModelConfig {
 	struct {
 		bool NotebookModel   : 1;
 		bool Author          : 1;
+		bool Notice          : 1;
 		bool LegacyTemperatureThresholdsBehaviour : 1;
 		bool LuaLibraries    : 1;
 		bool EcPollInterval  : 1;

@@ -313,6 +313,12 @@
         "required": false
       },
       {
+        "name": "Notice",
+        "type": "const char*",
+        "help": "A notice that will be printed when the config is set",
+        "required": false
+      },
+      {
         "name": "LegacyTemperatureThresholdsBehaviour",
         "type": "bool",
         "default": "false"

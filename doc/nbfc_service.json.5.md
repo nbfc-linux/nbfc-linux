@@ -71,6 +71,10 @@ State file of the service (*/var/lib/nbfc/state.json*).
 
 > The Author of the config file. Enter whatever you want.
 
+**Notice**: *String*
+
+> A notice that will be printed when this configuration is set.
+
 **LegacyTemperatureThresholdsBehaviour**: *Boolean*
 
 > This option was introduced for being backwards compatible with
