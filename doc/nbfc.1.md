@@ -229,6 +229,8 @@ This program is used to control the NoteBook FanControl service.
 > > that may be accessible through the embedded controller are also
 > > considered. Their accessibility through the embedded controller
 > > cannot be guaranteed.
+> >
+> > **Use with caution!**
 >
 > **-q**, **\--quiet**
 >
@@ -324,6 +326,8 @@ This program is used to control the NoteBook FanControl service.
 > > that may be accessible through the embedded controller are printed.
 > > Their accessibility through the embedded controller cannot be
 > > guaranteed.
+> >
+> > **Use with caution!**
 >
 > **methods**
 >
@@ -345,6 +349,8 @@ This program is used to control the NoteBook FanControl service.
 > > that may be accessible through the embedded controller are printed.
 > > Their accessibility through the embedded controller cannot be
 > > guaranteed.
+> >
+> > **Use with caution!**
 >
 > **-d**, **\--dsdt** *FILE*
 >

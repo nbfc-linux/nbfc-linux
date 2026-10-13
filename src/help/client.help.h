@@ -94,7 +94,7 @@
  "  -m, --min-score SCORE Set minimum rating threshold for configurations\n"   \
  "  -n, --no-download     Don't download rules from the repository\n"          \
  "  -r, --rules FILE      Use an alternative rules file\n"                     \
- "  -u, --unverified      Include unverified EC registers\n"                   \
+ "  -u, --unverified      Include unverified EC registers (USE WITH CAUTION)\n"\
  "  -q, --quiet           Do not print register ratings\n"                     \
  "  --print-rules         Print configuration rating rules\n"                  \
  ""
@@ -157,7 +157,7 @@
  "  -d, --dsdt FILE       Use an alternative DSDT file\n"                      \
  "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
  "  -j, --json            Use JSON output\n"                                   \
- "  -u, --unverified      Include unverified EC registers\n"                   \
+ "  -u, --unverified      Include unverified EC registers (USE WITH CAUTION)\n"\
  ""
 
 #define CLIENT_STATUS_HELP_TEXT                                                \

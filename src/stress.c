@@ -14,7 +14,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#define STRESS_BIN          "stress-ng"
 #define STRESS_PROC_CPUINFO "/proc/cpuinfo"
 
 typedef enum {
@@ -33,14 +32,6 @@ static pid_t Stress_GPU_PID = -1;
 size_t Stress_GetNumProcessors(void) {
   long ret = sysconf(_SC_NPROCESSORS_ONLN);
   return (ret == -1 ? 0 : ret);
-}
-
-Error Stress_IsInstalled(void) {
-  if (system("type " STRESS_BIN " >/dev/null 2>/dev/null") == 0)
-    return err_success();
-
-  errno = ENOENT;
-  return err_stdlib(STRESS_BIN);
 }
 
 static Error Stress_Start(pid_t *pid, Stress_Type type, size_t workers) {

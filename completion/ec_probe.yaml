@@ -18,13 +18,13 @@ options:
   - option_strings: ["-C", "--no-color"]
     help: "Disable colored output"
 ---
-prog: "ec_probe load"
-help: "Load a previously made dump into the embedded controller"
-positionals:
-  - number: 1
-    metavar: "FILE"
-    complete: ["file"]
----
+# prog: "ec_probe load"
+# help: "Load a previously made dump into the embedded controller"
+# positionals:
+#   - number: 1
+#     metavar: "FILE"
+#     complete: ["file"]
+# ---
 prog: "ec_probe read"
 help: "Read a byte from a EC register"
 options:

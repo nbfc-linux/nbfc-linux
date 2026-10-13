@@ -5,8 +5,9 @@
 
 #include <stddef.h> // size_t
 
+#define STRESS_BIN "stress-ng"
+
 size_t Stress_GetNumProcessors(void);
-Error Stress_IsInstalled(void);
 
 Error Stress_CPU_Start(size_t);
 Error Stress_GPU_Start(size_t);

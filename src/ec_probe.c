@@ -254,7 +254,7 @@ static uint8_t RegisterResolve(const char* register_ref) {
 }
 
 #include "probe/cmd_acpi_call.c"
-#include "probe/cmd_dump_load.c"
+#include "probe/cmd_dump_watch.c"
 #include "probe/cmd_monitor.c"
 #include "probe/cmd_probe.c"
 #include "probe/cmd_read_write.c"

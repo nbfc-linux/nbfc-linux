@@ -4,6 +4,7 @@
 #include "error.h"
 
 #include <stdlib.h> // system
+#include <stdbool.h>
 
 static inline Error Process_Call(const char* cmd) {
   int ret = system(cmd);
@@ -15,5 +16,6 @@ static inline Error Process_Call(const char* cmd) {
 }
 
 int Process_Capture(const char* file, char* const argv[], char** out_stdout, char** out_stderr);
+bool Process_HasProgram(const char*);
 
 #endif

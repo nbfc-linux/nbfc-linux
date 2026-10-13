@@ -108,8 +108,6 @@ int main(int argc, char* const argv[])
 
   signal(SIGINT,  sig_handler);
   signal(SIGTERM, sig_handler);
-  signal(SIGUSR1, sig_handler);
-  signal(SIGUSR2, sig_handler);
 
   options.embedded_controller_type = EmbeddedControllerType_Unset;
   snprintf(options.service_config, sizeof(options.service_config), "%s", NBFC_SERVICE_CONFIG);

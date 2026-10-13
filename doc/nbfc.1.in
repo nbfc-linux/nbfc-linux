@@ -309,6 +309,8 @@ With this option, registers from
 .B SystemMemory
 operation regions that may be accessible through the embedded controller are also considered.
 Their accessibility through the embedded controller cannot be guaranteed.
+
+.B Use with caution!
 .RE
 
 .BR \-q ", " \-\-quiet
@@ -448,6 +450,8 @@ is specified, also registers from
 .B SystemMemory
 operation regions that may be accessible through the embedded controller are printed.
 Their accessibility through the embedded controller cannot be guaranteed.
+
+.B Use with caution!
 .RE
 
 .B methods
@@ -477,6 +481,8 @@ is specified, also registers from
 .B SystemMemory
 operation regions that may be accessible through the embedded controller are printed.
 Their accessibility through the embedded controller cannot be guaranteed.
+
+.B Use with caution!
 .RE
 
 .BR \-d ", " \-\-dsdt

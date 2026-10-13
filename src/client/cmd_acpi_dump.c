@@ -4,6 +4,7 @@
 #include "../file_utils.h"
 #include "../acpi_analysis.h"
 #include "../nxjson_write.h"
+#include "../process.h"
 
 #include "check_root.h"
 #include "client_global.h"
@@ -61,9 +62,8 @@ static int AcpiDump_DSL(array_of(str)* aml_files) {
   Error e;
   char* out;
 
-  e = AcpiAnalysis_IsIaslInstalled();
-  if (e) {
-    Log_Error("%s", err_print_all(e));
+  if (! Process_HasProgram(ACPI_ANALYSIS_IASL_BIN)) {
+    Log_Error("Program not found: %s", ACPI_ANALYSIS_IASL_BIN);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -88,9 +88,8 @@ static int AcpiDump_Methods(array_of(str)* aml_files, bool json) {
   Error e;
   AcpiInfo acpi_info = {0};
 
-  e = AcpiAnalysis_IsAcpiExecInstalled();
-  if (e) {
-    Log_Error("%s", err_print_all(e));
+  if (! Process_HasProgram(ACPI_ANALYSIS_ACPIEXEC_BIN)) {
+    Log_Error("Program not found: %s", ACPI_ANALYSIS_ACPIEXEC_BIN);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -137,9 +136,8 @@ static int AcpiDump_Registers(array_of(str)* aml_files, bool json, bool only_ec,
   // Check if acpica-tools are installed
   // ==========================================================================
 
-  e = AcpiAnalysis_IsAcpiExecInstalled();
-  if (e) {
-    Log_Error("%s", err_print_all(e));
+  if (! Process_HasProgram(ACPI_ANALYSIS_ACPIEXEC_BIN)) {
+    Log_Error("Program not found: %s", ACPI_ANALYSIS_ACPIEXEC_BIN);
     return NBFC_EXIT_FAILURE;
   }
 
@@ -228,9 +226,8 @@ static int AcpiDump_Map(array_of(str)* aml_files, bool unverified) {
   // Check if acpica-tools are installed
   // ==========================================================================
 
-  e = AcpiAnalysis_IsAcpiExecInstalled();
-  if (e) {
-    Log_Error("%s", err_print_all(e));
+  if (! Process_HasProgram(ACPI_ANALYSIS_ACPIEXEC_BIN)) {
+    Log_Error("Program not found: %s", ACPI_ANALYSIS_ACPIEXEC_BIN);
     return NBFC_EXIT_FAILURE;
   }
 

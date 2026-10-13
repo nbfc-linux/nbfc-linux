@@ -55,7 +55,7 @@ static bool IsTempInputName(const char* s) {
 array_of(FS_TemperatureSource) FS_Sensors_Sources = {0};
 
 Error FS_TemperatureSource_GetTemperature(const FS_TemperatureSource* self, float* out) {
-  char buf[32];
+  char buf[32] = {0};
   FileResult res;
   res.ok = true;
 
@@ -69,7 +69,7 @@ Error FS_TemperatureSource_GetTemperature(const FS_TemperatureSource* self, floa
     FILE* fh = popen(my.file, "r");
     if (! fh)
       return err_stdlib(my.file);
-    res.len = fread(buf, 1, sizeof(buf), fh);
+    res.len = fread(buf, 1, sizeof(buf) - 1, fh);
     int olderr = errno;
     pclose(fh);
     errno = olderr;

@@ -9,9 +9,8 @@ Probing tool for the embedded controller
 # SYNOPSIS
 
 **ec_probe** {**read** \| **write** \| **read_bit** \| **write_bit** \|
-**probe** \| **dump** \| **load** \| **monitor** \| **evaluate** \|
-**watch** \| **acpi_call** \| **graph** \| **lua** \| **shell**}
-\[*OPTIONS*\]
+**probe** \| **dump** \| **monitor** \| **evaluate** \| **watch** \|
+**acpi_call** \| **graph** \| **lua** \| **shell**} \[*OPTIONS*\]
 
 # OPTIONS
 
@@ -39,6 +38,8 @@ Probing tool for the embedded controller
 
 > Dump all EC registers.
 >
+> See **EXAMPLES** for sample output.
+>
 > **-c**, **\--color**
 >
 > > Force colored output.
@@ -46,10 +47,6 @@ Probing tool for the embedded controller
 > **-C**, **\--no-color**
 >
 > > Disable colored output.
-
-**load** *FILE*
-
-> Load a previously made dump into the embedded controller.
 
 **read** \[*OPTIONS*\] *REGISTER*
 
@@ -194,6 +191,8 @@ Probing tool for the embedded controller
 
 > Monitor all embedded controller registers for changes.
 >
+> See **EXAMPLES** for sample output.
+>
 > **-i**, **\--interval** *SECONDS*
 >
 > > Sets the update interval in seconds.
@@ -254,6 +253,8 @@ Probing tool for the embedded controller
 
 > Monitor all embedded controller registers for changes (alternative
 > version).
+>
+> See **EXAMPLES** for sample output.
 >
 > **-i**, **\--interval** *SECONDS*
 >
@@ -318,6 +319,42 @@ Probing tool for the embedded controller
 
 All input values are interpreted as decimal numbers by default. Use the
 \"0x\" prefix for hexadecimal values and \"0b\" for binary values.
+
+# EXAMPLES
+
+**ec_probe dump** / **ec_probe watch**
+
+>     ---|------------------------------------------------
+>        | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+>     ---|------------------------------------------------
+>     00 | 00 00 00 00 00 00 40 00 00 00 00 00 00 00 13 01
+>     10 | 01 18 30 1A FF 00 FF FF FF FF FF FF 08 00 00 01
+>     20 | 00 00 00 00 0F 00 00 00 00 01 20 00 00 36 4A 52
+>     30 | 4B 50 30 42 54 5A 49 38 41 53 4B 00 01 00 00 FF
+>     40 | FF FF FF 01 00 D4 BB 86 9C 4C 49 4F 4E 00 00 00
+>     50 | 00 09 FF FF 31 00 00 00 00 00 2D 41 00 02 81 26
+>     60 | 00 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>     70 | 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>     80 | 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>     90 | 33 33 33 2D 32 44 2D 33 34 48 54 30 33 30 34 31
+>     A0 | 00 01 00 C7 E1 00 00 40 00 00 00 08 64 1A 00 78
+>     B0 | 3E 3E 2D 00 00 00 00 00 00 00 08 00 32 12 11 11
+>     C0 | 70 00 5A 10 01 17 FC 31 88 2C 08 10 5A 10 64 23
+>     D0 | FA FF FC FF 00 00 5A 10 A2 01 5B 01 00 00 E0 00
+>     E0 | 00 00 00 A9 10 AA 10 A9 10 00 00 83 43 03 00 7F
+>     F0 | 00 16 00 00 00 00 FA 32 44 00 00 D4 56 03 00 00
+
+**ec_probe monitor**
+
+>     0x45: C9 C9 C9 C9 C9 C9 C9 FF FF FF FF FF FF FF FF FF
+>     0x46: EA EA EA EA EA EA EA FF FF FF FF FF FF FF FF FF
+>     0x5F: 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26
+>     0xB0: 3F 3F 41 41 41 40 40 40 41 41 41 41 41 41 41 41
+>     0xB1: 3F 3F 41 41 41 40 40 40 41 41 41 41 41 41 41 41
+>     0xD2: FD FD FD FD FD FD FD FD FD FD FD FD FE FE FE FE
+>     0xDB: 11 01 01 11 11 11 11 11 01 01 11 11 11 11 11 01
+>     0xF1: 05 2A 5A 04 09 02 06 0A 1A 4A 0A 03 07 00 05 09
+>     0xF2: 14 00 00 03 08 11 14 14 00 00 01 07 0F 14 14 00
 
 # EXIT STATUS
 

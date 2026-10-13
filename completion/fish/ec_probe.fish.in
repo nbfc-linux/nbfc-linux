@@ -222,7 +222,6 @@ end
 function _ec_probe__command
   printf '%s\t%s\n' \
     dump 'Dump all EC registers' \
-    load 'Load a previously made dump into the embedded controller' \
     read 'Read a byte from a EC register' \
     write 'Write a byte to a EC register' \
     read_bit 'Read a bit from a EC register' \
@@ -263,11 +262,6 @@ set -l C001 "not $has_option -c --color"
 set -l C002 "not $has_option -C --no-color"
 complete -c $prog -n $P -n $C000 -n $C001 -s c -l color -d 'Force colored output' -f
 complete -c $prog -n $P -n $C000 -n $C002 -s C -l no-color -d 'Disable colored output' -f
-
-# command ec_probe load
-set -l C000 "$num_of_positionals -eq 1"
-set -l C001 "$positional_contains 1 load"
-complete -c $prog -n $P -n $C000 -n $C001 -Fr
 
 # command ec_probe read
 set -l C000 "$positional_contains 1 read"

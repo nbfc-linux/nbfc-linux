@@ -7,7 +7,6 @@
 #include "nxjson_utils.h"
 
 #include <string.h> // strlen
-#include <stdlib.h> // system
 #include <linux/limits.h> // PATH_MAX
 
 #define ACPI_ANALYSIS_DSDT_TEMP_FILE       "/tmp/nbfc.acpi.dsdt.XXXXXX.dat"
@@ -141,28 +140,6 @@ static const AcpiOperationRegionName AcpiAnalysis_UnverifiedEmbeddedControllerRe
   "RAM",
   "PECM",
 };
-
-/*
- * Checks if the `iasl` program is installed.
- */
-Error AcpiAnalysis_IsIaslInstalled(void) {
-  if (system("type " ACPI_ANALYSIS_IASL_BIN " >/dev/null 2>/dev/null") == 0)
-    return err_success();
-
-  errno = ENOENT;
-  return err_stdlib(ACPI_ANALYSIS_IASL_BIN);
-}
-
-/*
- * Checks if the `acpiexec` program is installed.
- */
-Error AcpiAnalysis_IsAcpiExecInstalled(void) {
-  if (system("type " ACPI_ANALYSIS_ACPIEXEC_BIN " >/dev/null 2>/dev/null") == 0)
-    return err_success();
-
-  errno = ENOENT;
-  return err_stdlib(ACPI_ANALYSIS_ACPIEXEC_BIN);
-}
 
 void AcpiRegister_Free(AcpiRegister* acpi_register) {
   Mem_Free(acpi_register->name);

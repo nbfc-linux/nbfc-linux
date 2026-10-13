@@ -35,7 +35,7 @@ for r in range(len(ecs), 0, -1):
         print(f'#define EC_AVAILABLE_STR "{names}"\n')
 
 print("#else")
-print('#define EC_AVAILABLE_STR ""')
+print('#define EC_AVAILABLE_STR "none"')
 print("#endif")
 print()
 print('#endif')

@@ -141,7 +141,6 @@ _ec_probe__exec() {
 _ec_probe__command() {
   local items=(
     dump:'Dump all EC registers'
-    load:'Load a previously made dump into the embedded controller'
     read:'Read a byte from a EC register'
     write:'Write a byte to a EC register'
     read_bit:'Read a bit from a EC register'
@@ -172,7 +171,6 @@ _ec_probe() {
 
   case "$(_ec_probe__query get_positional 1)" in
     dump) _ec_probe_dump; return $?;;
-    load) _ec_probe_load; return $?;;
     read) _ec_probe_read; return $?;;
     write) _ec_probe_write; return $?;;
     read_bit) _ec_probe_read_bit; return $?;;
@@ -202,16 +200,6 @@ _ec_probe_dump() {
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
     1:command1:_ec_probe__command
-  )
-  _arguments -S -s -w "${args[@]}"
-}
-
-_ec_probe_load() {
-  local -a args=(
-    '(--help -h)'{-h,--help}'[show this help message and exit]'
-    '(--embedded-controller -e)'{-e+,--embedded-controller=}'[Specify embedded controller to use]':EC:'(acpi_ec ec_sys dev_port)'
-    1:command1:_ec_probe__command
-    2:FILE:_files
   )
   _arguments -S -s -w "${args[@]}"
 }

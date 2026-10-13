@@ -6,6 +6,7 @@
 #include "../file_utils.h"
 #include "../model_config_utils.h"
 #include "../nxjson_utils.h"
+#include "../process.h"
 
 #include <errno.h>  // errno
 #include <string.h> // memset, strerror
@@ -827,9 +828,8 @@ int RateConfig(void) {
   // Check if needed programs are installed
   // ==========================================================================
 
-  e = AcpiAnalysis_IsAcpiExecInstalled();
-  if (e) {
-    Log_Error("%s", err_print_all(e));
+  if (! Process_HasProgram(ACPI_ANALYSIS_ACPIEXEC_BIN)) {
+    Log_Error("Program not found: %s", ACPI_ANALYSIS_ACPIEXEC_BIN);
     return NBFC_EXIT_FAILURE;
   }
 

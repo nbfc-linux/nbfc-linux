@@ -250,7 +250,6 @@ _ec_probe() {
   if (( 0 < ${#POSITIONALS[@]} )); then
     case "${POSITIONALS[0]}" in
       dump) _ec_probe_dump && return 0;;
-      load) _ec_probe_load && return 0;;
       read) _ec_probe_read && return 0;;
       write) _ec_probe_write && return 0;;
       read_bit) _ec_probe_read_bit && return 0;;
@@ -309,7 +308,7 @@ _ec_probe() {
   fi
 
   (( ${#POSITIONALS[@]} == 1 )) && {
-    COMPREPLY=($(compgen -W 'dump load read write read_bit write_bit probe monitor watch acpi_call graph evaluate lua shell' -- "$cur"))
+    COMPREPLY=($(compgen -W 'dump read write read_bit write_bit probe monitor watch acpi_call graph evaluate lua shell' -- "$cur"))
     return 0;
   }
 
@@ -325,15 +324,6 @@ _ec_probe_dump() {
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
-
-  return 1
-}
-
-_ec_probe_load() {
-  (( ${#POSITIONALS[@]} == 2 )) && {
-    _filedir
-    return 0;
-  }
 
   return 1
 }

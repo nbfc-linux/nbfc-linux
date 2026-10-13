@@ -307,7 +307,7 @@ src/ec_probe: \
 	src/parse_number.h \
 	src/parse_unumber.h \
 	src/probe/cmd_acpi_call.c \
-	src/probe/cmd_dump_load.c \
+	src/probe/cmd_dump_watch.c \
 	src/probe/cmd_lua.c \
 	src/probe/cmd_monitor.c \
 	src/probe/cmd_probe.c \

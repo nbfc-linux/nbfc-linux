@@ -9,7 +9,6 @@
 #define CONSOLE_MAGENTA      "\033[0;35m"
 #define CONSOLE_CYAN         "\033[0;36m"
 #define CONSOLE_WHITE        "\033[0;37m"
-#define CONSOLE_GRAY         "\033[0;38m"
 
 #define CONSOLE_BOLD_BLACK   "\033[1;30m"
 #define CONSOLE_BOLD_RED     "\033[1;31m"
@@ -19,7 +18,6 @@
 #define CONSOLE_BOLD_MAGENTA "\033[1;35m"
 #define CONSOLE_BOLD_CYAN    "\033[1;36m"
 #define CONSOLE_BOLD_WHITE   "\033[1;37m"
-#define CONSOLE_BOLD_GRAY    "\033[1;38m"
 
 #define CONSOLE_RESET        "\033[0m"
 #define CONSOLE_CLEAR        "\033[1;1H\033[2J"

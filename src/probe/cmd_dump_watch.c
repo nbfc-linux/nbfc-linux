@@ -9,6 +9,10 @@
 #include <stdio.h>  // printf
 #include <string.h> // strcmp, strncmp
 
+// Loading a dump is disabled by default because restoring register values can
+// be dangerous, even if the dump was captured from a clean system state.
+#define PROBE_ENABLE_LOAD 0
+
 static const struct cli99_Option Dump_CommandLine[] = {
   cli99_Options_Include(&Main_CommandLine),
   {"-c|--color",    Option_Color,    cli99_NoArgument},
@@ -187,6 +191,7 @@ static void PrintDumpTable(RegisterReadings* register_readings, bool use_color) 
   printf("%s", CONSOLE_RESET);
 }
 
+#if PROBE_ENABLE_LOAD
 /*
  * Load a table like this:
  *
@@ -259,6 +264,7 @@ static Error LoadRegisterTable(RegisterReadings* register_readings, const char* 
 error:
   return err_string("File is not a valid register dump");
 }
+#endif
 
 static int Dump(void) {
   check_root();
@@ -281,6 +287,7 @@ static int Dump(void) {
   return NBFC_EXIT_SUCCESS;
 }
 
+#if PROBE_ENABLE_LOAD
 static int Load(void) {
   check_root();
   Initialize_EC();
@@ -299,6 +306,11 @@ static int Load(void) {
 
   return NBFC_EXIT_SUCCESS;
 }
+#else
+static int Load(void) {
+  return NBFC_EXIT_FAILURE;
+}
+#endif
 
 static int Watch(void) {
   check_root();

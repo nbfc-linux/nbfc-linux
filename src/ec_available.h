@@ -51,7 +51,7 @@
 #define EC_AVAILABLE_STR "dummy"
 
 #else
-#define EC_AVAILABLE_STR ""
+#define EC_AVAILABLE_STR "none"
 #endif
 
 #endif

@@ -11,7 +11,6 @@
  "\n"                                                                          \
  "Commands:\n"                                                                 \
  "  dump                  Dump all EC registers\n"                             \
- "  load                  Load a previously made dump\n"                       \
  "  read                  Read a byte from an EC register\n"                   \
  "  write                 Write a byte to an EC register\n"                    \
  "  read_bit              Read a bit from an EC register\n"                    \

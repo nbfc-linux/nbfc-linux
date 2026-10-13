@@ -24,6 +24,7 @@
 #include "../fs_sensors.h"
 #include "../fan.h"
 #include "../model_config.h"
+#include "../process.h"
 #include "../sleep.h"
 #include "../spearman.h"
 #include "../stress.h"
@@ -780,9 +781,10 @@ static int TestConfig_Run(void) {
     outfile = "/dev/stdout";
 
   // Check if stress is installed
-  e = Stress_IsInstalled();
-  if (e)
+  if (! Process_HasProgram(STRESS_BIN)) {
+    e = err_stringf("Program not found: %s", STRESS_BIN);
     goto error;
+  }
 
   // Read configuration filenames from input file
   e = ConfigFiles_FromFile(&files, infile);
