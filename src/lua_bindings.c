@@ -2,6 +2,8 @@
 
 #include "ec.h"
 #include "acpi_call.h"
+#include "fs_sensors.h"
+#include "memory.h"
 
 #include <string.h> // strcmp
 #include <lauxlib.h>
@@ -166,6 +168,39 @@ static int Lua_ACPI_GetInt(lua_State* l) {
   return Lua_ReturnInteger(l, result);
 }
 
+static int Lua_Sensors_GetTemperature(lua_State* l) {
+  const char* sensor = luaL_checklstring(l, 1, NULL);
+  TemperatureAlgorithmType algorithm = TemperatureAlgorithmType_Average;
+
+  if (lua_gettop(l) >= 2 && ! lua_isnil(l, 2)) {
+    const char* name = luaL_checklstring(l, 2, NULL);
+    algorithm = TemperatureAlgorithmType_FromString(name);
+    if (algorithm == TemperatureAlgorithmType_Unset)
+      return Lua_ReturnError(l, err_print_all(err_stringf("%s: Invalid temperature algorithm", name)));
+  }
+
+  FS_TemperatureSource_References sources = {0};
+  float temperature;
+  Error e;
+
+  e = FS_TemperatureSources_AddTemperatureSources(&sources, sensor);
+  if (e) {
+    Mem_Free(sources.data);
+    return Lua_ReturnError(l, err_print_all(e));
+  }
+
+  e = FS_TemperatureSources_GetTemperature(&sources, algorithm, &temperature);
+  Mem_Free(sources.data);
+
+  if (e)
+    return Lua_ReturnError(l, err_print_all(e));
+
+  // Temperatures are non-negative whole numbers here, but keep the
+  // float -> integer conversion well-defined regardless.
+  uint64_t value = temperature > 0.0f ? (uint64_t) temperature : 0;
+  return Lua_ReturnInteger(l, value);
+}
+
 Error Lua_Open(void) {
   if (Lua_State)
     return err_success();
@@ -182,6 +217,7 @@ Error Lua_Open(void) {
   lua_register(Lua_State, "acpi_call",     Lua_ACPI_Call);
   lua_register(Lua_State, "acpi_call_raw", Lua_ACPI_CallRaw);
   lua_register(Lua_State, "acpi_get_int",  Lua_ACPI_GetInt);
+  lua_register(Lua_State, "sensors_get_temperature", Lua_Sensors_GetTemperature);
   return err_success();
 }
 

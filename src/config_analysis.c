@@ -216,6 +216,13 @@ static int ConfigAnalysis_ACPI_GetInt(lua_State* l) {
   return Lua_ReturnInteger(l, CONFIG_ANALYSIS_DUMMY_RETURN_VALUE);
 }
 
+// sensors_get_temperature() would read real sensors; return a dummy so
+// `nbfc rate-config` stays deterministic and independent of the hardware.
+static int ConfigAnalysis_Sensors_GetTemperature(lua_State* l) {
+  luaL_checklstring(l, 1, NULL); // sensor
+  return Lua_ReturnInteger(l, CONFIG_ANALYSIS_DUMMY_RETURN_VALUE);
+}
+
 static Error ConfigAnalysis_Begin(void) {
   Error e;
 
@@ -232,6 +239,7 @@ static Error ConfigAnalysis_Begin(void) {
   lua_register(Lua_State, "acpi_call",     ConfigAnalysis_ACPI_Call);
   lua_register(Lua_State, "acpi_call_raw", ConfigAnalysis_ACPI_CallRaw);
   lua_register(Lua_State, "acpi_get_int",  ConfigAnalysis_ACPI_GetInt);
+  lua_register(Lua_State, "sensors_get_temperature", ConfigAnalysis_Sensors_GetTemperature);
   return err_success();
 }
 
