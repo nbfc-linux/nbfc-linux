@@ -1,0 +1,32 @@
+{
+  "NotebookModel": "Acer Aspire A514-54",
+  "Author": "Dibyabiva Seth",
+  "EcPollInterval": 1000,
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "CPU Fan",
+      "ResetRequired": true,
+      "ReadAcpiMethod": "\\_SB.PC00.LPCB.EC0.FANG 33026",
+      "WriteAcpiMethod": "\\_SB.PC00.LPCB.EC0.FANW 33026 $",
+      "ResetAcpiMethod": "\\_SB.PC00.LPCB.EC0.FANW 33026 0xFF",
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "TemperatureThresholds": [
+        { "DownThreshold":  0, "UpThreshold":  40, "FanSpeed":  40 },
+        { "DownThreshold": 41, "UpThreshold":  60, "FanSpeed":  60 },
+        { "DownThreshold": 61, "UpThreshold":  70, "FanSpeed":  80 },
+        { "DownThreshold": 71, "UpThreshold": 100, "FanSpeed": 100 }
+      ]
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Call",
+      "WriteOccasion": "OnWriteFanSpeed",
+      "AcpiMethod": "\\_SB_.PC00.LPCB.EC0.FANW 33030 0xFF",
+      "ResetRequired": true,
+      "ResetWriteMode": "Call",
+      "ResetAcpiMethod": "\\_SB_.PC00.LPCB.EC0.FANW 33030 0x5"
+    }
+  ]
+}
