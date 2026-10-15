@@ -17,7 +17,7 @@ test_range: test_range.c
 	./test_range
 
 test_config_validation: test_config_validation.c
-	$(CC) -O2 test_config_validation.c -llua -o test_config_validation
+	$(CC) -O2 test_config_validation.c -llua -ldl -o test_config_validation
 	./test_config_validation ./01-Basic/01-missing-NotebookModel.json
 	./test_config_validation ./01-Basic/02-missing-FanConfigurations.json
 	./test_config_validation ./01-Basic/03-invalid-size-FanConfigurations.json

@@ -506,6 +506,14 @@ The following functions are exposed to Lua:
 > > e, v = acpi_get_int(result, \"1 0\")\
 > > \-- v is 0xFF
 
+**sensors_get_temperature**(**sensor**, **algorithm**):
+
+> Returns the temperature of the named sensor in degrees Celsius. *sensor* may
+> be a sensor name (for example **nvidia-ml**), a group such as **@CPU** or
+> **@GPU**, or a hwmon source name. The optional *algorithm* is one of
+> **Average**, **Min** or **Max** (default: **Average**). Returns **error**,
+> **value** (integer).
+
 **ec_read**(**register**):
 
 > Reads a byte from the embedded controller. Returns **error**,

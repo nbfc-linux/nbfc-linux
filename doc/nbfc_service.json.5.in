@@ -777,6 +777,24 @@ e, v = acpi_get_int(result, "1 0")
 .RE
 .RE
 
+.BR sensors_get_temperature ( sensor ", " algorithm ):
+.RS
+Returns the temperature of the named sensor in degrees Celsius.
+.I sensor
+may be a sensor name (for example
+.BR nvidia-ml ),
+a group such as
+.BR @CPU " or " @GPU ,
+or a hwmon source name. The optional
+.I algorithm
+is one of
+.BR Average ", " Min " or " Max
+(default:
+.BR Average ).
+Returns
+.BR error ", " value " (integer)."
+.RE
+
 .BR ec_read ( register ):
 .RS
 Reads a byte from the embedded controller. Returns
