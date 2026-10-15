@@ -592,8 +592,16 @@ int main(int argc, char* const argv[]) {
       AcpiDump_Options.unverified = true;
       break;
 
+    case Option_AcpiDump_Prefix:
+      if (p.optarg[0] == '\0') {
+        Log_Error("%s: Empty prefix", p.option->optstring);
+        return NBFC_EXIT_CMDLINE;
+      }
+      AcpiDump_Options.prefix = p.optarg;
+      break;
+
     case Option_AcpiDump_Command:
-      AcpiDump_Options.action = AcpiDump_CommandFromString(p.optarg);
+      AcpiDump_Options.action = AcpiDump_CommandFromString(p.optarg, &p.options);
       if (AcpiDump_Options.action == AcpiDump_Action_None) {
         Log_Error("%s: Invalid command: %s", "acpi-dump", p.optarg);
         return NBFC_EXIT_CMDLINE;

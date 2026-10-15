@@ -228,9 +228,7 @@ This program is used to control the NoteBook FanControl service.
 > > With this option, registers from **SystemMemory** operation regions
 > > that may be accessible through the embedded controller are also
 > > considered. Their accessibility through the embedded controller
-> > cannot be guaranteed.
-> >
-> > **Use with caution!**
+> > cannot be guaranteed. **Use with caution!**
 >
 > **-q**, **\--quiet**
 >
@@ -325,9 +323,7 @@ This program is used to control the NoteBook FanControl service.
 > > specified, also registers from **SystemMemory** operation regions
 > > that may be accessible through the embedded controller are printed.
 > > Their accessibility through the embedded controller cannot be
-> > guaranteed.
-> >
-> > **Use with caution!**
+> > guaranteed. **Use with caution!**
 >
 > **methods**
 >
@@ -348,9 +344,19 @@ This program is used to control the NoteBook FanControl service.
 > > specified, also registers from **SystemMemory** operation regions
 > > that may be accessible through the embedded controller are printed.
 > > Their accessibility through the embedded controller cannot be
-> > guaranteed.
+> > guaranteed. **Use with caution!**
+>
+> **env** \[**-u**\|**\--unverified**\] \[**-p**\|**\--prefix**
+> *PREFIX*\]
+>
+> > Print sourceable environment variables for EC registers.
 > >
-> > **Use with caution!**
+> > Normally, only registers belonging to an **EmbeddedControl**
+> > operation region are printed. If **-u**\|**\--unverified** is
+> > specified, also registers from **SystemMemory** operation regions
+> > that may be accessible through the embedded controller are printed.
+> > Their accessibility through the embedded controller cannot be
+> > guaranteed. **Use with caution!**
 >
 > **-d**, **\--dsdt** *FILE*
 >

@@ -224,9 +224,12 @@ function _nbfc__prepare
     '(rate\-config)=>-H --full-help -a --all -d= --dsdt= -D= --dsdt-dir= -m= --min-score= -i= --input= -j --json --print-rules -r= --rules= -n --no-download -u --unverified -b --bad -q --quiet -f= --fan-count=' \
     '(test\-config)>(run)=>-i= --input= -o= --output= -g= --gpu= -c= --cpu= -I= --interval= -t= --threshold= -b= --break=' \
     '(test\-config)>(evaluate)=>-i= --input=' \
-    '(acpi\-dump)=>-d= --dsdt= -D= --dsdt-dir= -j --json' \
-    '(acpi\-dump)>(ec\-registers)=>-u --unverified' \
+    '(acpi\-dump)=>-d= --dsdt= -D= --dsdt-dir=' \
+    '(acpi\-dump)>(registers)=>-j --json' \
+    '(acpi\-dump)>(ec\-registers)=>-j --json -u --unverified' \
     '(acpi\-dump)>(map)=>-u --unverified' \
+    '(acpi\-dump)>(methods)=>-j --json' \
+    '(acpi\-dump)>(env)=>-p= --prefix= -u --unverified' \
     '(support)=>--upload-firmware --print-command --create-archive='
   return 0
 end
@@ -250,7 +253,8 @@ function _nbfc_acpi_dump__command
     ec-registers 'List all available EC registers' \
     map 'Generate a map file for ec_probe' \
     methods 'List all available ACPI methods' \
-    dsl 'Disassemble your ACPI tables'
+    dsl 'Disassemble your ACPI tables' \
+    env 'Outputs sourceable environment variables for EC registers'
 end
 
 function _nbfc__command
@@ -427,24 +431,44 @@ complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s i -l input -d 'Specify inp
 set -l C000 "$positional_contains 1 acpi-dump"
 set -l C001 "not $has_option -D --dsdt-dir"
 set -l C002 "not $has_option -d --dsdt -D --dsdt-dir"
-set -l C003 "not $has_option -j --json"
-set -l C004 "$num_of_positionals -eq 1"
+set -l C003 "$num_of_positionals -eq 1"
 complete -c $prog -n $P -n $C000 -n $C001 -s d -l dsdt -d 'Use an alternative DSDT file' -Fr
 complete -c $prog -n $P -n $C000 -n $C002 -s D -l dsdt-dir -d 'Use an alternative DSDT directory' -x -a '(__fish_complete_directories)'
-complete -c $prog -n $P -n $C000 -n $C003 -s j -l json -d 'Use JSON output' -f
-complete -c $prog -n $P -n $C004 -n $C000 -d Commands -f -a '(_nbfc_acpi_dump__command)'
+complete -c $prog -n $P -n $C003 -n $C000 -d Commands -f -a '(_nbfc_acpi_dump__command)'
+
+# command nbfc acpi-dump registers
+set -l C000 "$positional_contains 1 acpi-dump"
+set -l C001 "$positional_contains 2 registers"
+set -l C002 "not $has_option -j --json"
+complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s j -l json -d 'Use JSON output' -f
 
 # command nbfc acpi-dump ec-registers
 set -l C000 "$positional_contains 1 acpi-dump"
 set -l C001 "$positional_contains 2 ec-registers"
-set -l C002 "not $has_option -u --unverified"
-complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s u -l unverified -d 'Include unverified EC registers' -f
+set -l C002 "not $has_option -j --json"
+set -l C003 "not $has_option -u --unverified"
+complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s j -l json -d 'Use JSON output' -f
+complete -c $prog -n $P -n $C000 -n $C001 -n $C003 -s u -l unverified -d 'Include unverified EC registers' -f
 
 # command nbfc acpi-dump map
 set -l C000 "$positional_contains 1 acpi-dump"
 set -l C001 "$positional_contains 2 map"
 set -l C002 "not $has_option -u --unverified"
 complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s u -l unverified -d 'Include unverified EC registers' -f
+
+# command nbfc acpi-dump methods
+set -l C000 "$positional_contains 1 acpi-dump"
+set -l C001 "$positional_contains 2 methods"
+set -l C002 "not $has_option -j --json"
+complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s j -l json -d 'Use JSON output' -f
+
+# command nbfc acpi-dump env
+set -l C000 "$positional_contains 1 acpi-dump"
+set -l C001 "$positional_contains 2 env"
+set -l C002 "not $has_option -p --prefix"
+set -l C003 "not $has_option -u --unverified"
+complete -c $prog -n $P -n $C000 -n $C001 -n $C002 -s p -l prefix -d 'Use an alternative prefix (default: EC_)' -x
+complete -c $prog -n $P -n $C000 -n $C001 -n $C003 -s u -l unverified -d 'Include unverified EC registers' -f
 
 # command nbfc xml2json
 set -l C000 "$num_of_positionals -eq 1"

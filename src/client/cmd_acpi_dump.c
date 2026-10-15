@@ -18,8 +18,38 @@ const struct cli99_Option AcpiDump_CommandLine[] = {
   {"command",         Option_AcpiDump_Command,    cli99_NormalPositional},
   {"-d|--dsdt",       Option_AcpiDump_DSDT_File,  cli99_RequiredArgument},
   {"-D|--dsdt-dir",   Option_AcpiDump_DSDT_Dir,   cli99_RequiredArgument},
+  cli99_Options_End()
+};
+
+const struct cli99_Option AcpiDump_Registers_CommandLine[] = {
+  cli99_Options_Include(&AcpiDump_CommandLine),
+  {"-j|--json",       Option_AcpiDump_Json,       cli99_NoArgument      },
+  cli99_Options_End()
+};
+
+const struct cli99_Option AcpiDump_EcRegisters_CommandLine[] = {
+  cli99_Options_Include(&AcpiDump_CommandLine),
   {"-j|--json",       Option_AcpiDump_Json,       cli99_NoArgument      },
   {"-u|--unverified", Option_AcpiDump_Unverified, cli99_NoArgument      },
+  cli99_Options_End()
+};
+
+const struct cli99_Option AcpiDump_Methods_CommandLine[] = {
+  cli99_Options_Include(&AcpiDump_CommandLine),
+  {"-j|--json",       Option_AcpiDump_Json,       cli99_NoArgument      },
+  cli99_Options_End()
+};
+
+const struct cli99_Option AcpiDump_Map_CommandLine[] = {
+  cli99_Options_Include(&AcpiDump_CommandLine),
+  {"-u|--unverified", Option_AcpiDump_Unverified, cli99_NoArgument      },
+  cli99_Options_End()
+};
+
+const struct cli99_Option AcpiDump_Env_CommandLine[] = {
+  cli99_Options_Include(&AcpiDump_CommandLine),
+  {"-u|--unverified", Option_AcpiDump_Unverified, cli99_NoArgument      },
+  {"-p|--prefix",     Option_AcpiDump_Prefix,     cli99_RequiredArgument},
   cli99_Options_End()
 };
 
@@ -30,6 +60,7 @@ typedef enum NBFC_PACKED_ENUM {
   AcpiDump_Action_Methods,
   AcpiDump_Action_DSL,
   AcpiDump_Action_Map,
+  AcpiDump_Action_Env,
 } AcpiDump_Action;
 
 struct {
@@ -38,20 +69,47 @@ struct {
   bool unverified;
   array_of(str) files;
   const char* dir;
+  const char* prefix;
 } AcpiDump_Options = {
   AcpiDump_Action_None,
   false,
   false,
   {0},
   NULL,
+  "EC_",
 };
 
-AcpiDump_Action AcpiDump_CommandFromString(const char* s) {
-  if (! strcmp(s, "registers"))    return AcpiDump_Action_Registers;
-  if (! strcmp(s, "ec-registers")) return AcpiDump_Action_ECRegisters;
-  if (! strcmp(s, "methods"))      return AcpiDump_Action_Methods;
-  if (! strcmp(s, "dsl"))          return AcpiDump_Action_DSL;
-  if (! strcmp(s, "map"))          return AcpiDump_Action_Map;
+AcpiDump_Action AcpiDump_CommandFromString(const char* s, const struct cli99_Option** out) {
+  if (! strcmp(s, "registers")) {
+    *out = AcpiDump_Registers_CommandLine;
+    return AcpiDump_Action_Registers;
+  }
+
+  if (! strcmp(s, "ec-registers")) {
+    *out = AcpiDump_EcRegisters_CommandLine;
+    return AcpiDump_Action_ECRegisters;
+  }
+
+  if (! strcmp(s, "methods")) {
+    *out = AcpiDump_Methods_CommandLine;
+    return AcpiDump_Action_Methods;
+  }
+
+  if (! strcmp(s, "dsl")) {
+    *out = AcpiDump_CommandLine;
+    return AcpiDump_Action_DSL;
+  }
+
+  if (! strcmp(s, "map")) {
+    *out = AcpiDump_Map_CommandLine;
+    return AcpiDump_Action_Map;
+  }
+
+  if (! strcmp(s, "env")) {
+    *out = AcpiDump_Env_CommandLine;
+    return AcpiDump_Action_Env;
+  }
+
   return AcpiDump_Action_None;
 }
 
@@ -276,6 +334,68 @@ static int AcpiDump_Map(array_of(str)* aml_files, bool unverified) {
   return NBFC_EXIT_SUCCESS;
 }
 
+/*
+ * Outputs a sourceable list of environment variables containing
+ * EC register addresses:
+ *
+ *   EC_CFAN=0xDD
+ *   ...
+ */
+static int AcpiDump_Env(array_of(str)* aml_files, bool unverified, const char* prefix) {
+  Error e;
+  AcpiInfo acpi_info = {0};
+
+  // ==========================================================================
+  // Check if acpica-tools are installed
+  // ==========================================================================
+
+  if (! Process_HasProgram(ACPI_ANALYSIS_ACPIEXEC_BIN)) {
+    Log_Error("Program not found: %s", ACPI_ANALYSIS_ACPIEXEC_BIN);
+    return NBFC_EXIT_FAILURE;
+  }
+
+  // ==========================================================================
+  // Get ACPI info
+  // ==========================================================================
+
+  e = AcpiAnalysis_GetInfo(aml_files, &acpi_info);
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
+  // ==========================================================================
+  // Add unverified EC registers
+  // ==========================================================================
+
+  if (unverified)
+    AcpiAnalysis_AddUnverifiedEmbeddedControllerRegions(&acpi_info);
+
+  // ==========================================================================
+  // Output
+  // ==========================================================================
+
+  for_each_array(AcpiRegister*, register_, acpi_info.registers) {
+    if (! AcpiAnalysis_IsEmbeddedControllerRegion(&acpi_info, register_->region))
+      continue;
+
+    printf("%s%s=0x%X\n",
+      prefix,
+      AcpiAnalysis_RegisterBasename(register_->name),
+      register_->bit_offset / 8);
+  }
+
+  // ==========================================================================
+  // Free data
+  // ==========================================================================
+
+#if STRICT_CLEANUP
+  AcpiInfo_Free(&acpi_info);
+#endif
+
+  return NBFC_EXIT_SUCCESS;
+}
+
 static Error AcpiDump_MakeAMLFilesArray(void) {
   if (AcpiDump_Options.files.size)
     return err_success();
@@ -319,6 +439,7 @@ int AcpiDump(void) {
     case AcpiDump_Action_Registers:   return AcpiDump_Registers(aml_files, json, false, unverified);
     case AcpiDump_Action_ECRegisters: return AcpiDump_Registers(aml_files, json, true, unverified);
     case AcpiDump_Action_Map:         return AcpiDump_Map(aml_files, unverified);
+    case AcpiDump_Action_Env:         return AcpiDump_Env(aml_files, unverified, AcpiDump_Options.prefix);
     default:                          return NBFC_EXIT_FAILURE;
   }
 }

@@ -141,18 +141,30 @@
  ""                                                                            \
 
 #define CLIENT_ACPI_DUMP_HELP_TEXT                                             \
- "Usage: nbfc acpi-dump [-h] [-j|--json] [-d|--dsdt=FILE] <COMMAND>\n"         \
+ "Usage: nbfc acpi-dump [-h] [-d|--dsdt=FILE] [-D|--dsdt-dir=DIR] <COMMAND>\n" \
  "\n"                                                                          \
  "Dumps information of your ACPI tables.\n"                                    \
  "\n"                                                                          \
  "By default, the DSDT and all SSDTs are read from /sys/firmware/acpi/tables.\n"\
  "\n"                                                                          \
  "Commands:\n"                                                                 \
- "    registers           List all available registers\n"                      \
- "    ec-registers [-u]   List all available EC registers\n"                   \
- "    methods             List all available ACPI methods\n"                   \
- "    dsl                 Disassemble your ACPI tables\n"                      \
- "    map [-u]            Print a map for `ec_probe`\n"                        \
+ "  registers [-j|--json]\n"                                                   \
+ "    List all available registers\n"                                          \
+ "\n"                                                                          \
+ "  ec-registers [-u|--unverified] [-j|--json]\n"                              \
+ "    List all available EC registers\n"                                       \
+ "\n"                                                                          \
+ "  methods [-j|--json]\n"                                                     \
+ "    List all available ACPI methods\n"                                       \
+ "\n"                                                                          \
+ "  dsl\n"                                                                     \
+ "    Disassemble your ACPI tables\n"                                          \
+ "\n"                                                                          \
+ "  map [-u|--unverified]\n"                                                   \
+ "    Print a map for `ec_probe -m|--map`\n"                                   \
+ "\n"                                                                          \
+ "  env [-u|--unverified] [-p|--prefix PREFIX]\n"                              \
+ "    Print sourceable environment variables for EC registers\n"               \
  "\n"                                                                          \
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
@@ -160,6 +172,7 @@
  "  -D, --dsdt-dir DIR    Use an alternative DSDT directory\n"                 \
  "  -j, --json            Use JSON output\n"                                   \
  "  -u, --unverified      Include unverified EC registers (USE WITH CAUTION)\n"\
+ "  -p, --prefix PREFIX   Use an alternative prefix (default: \"EC_\")\n"      \
  ""
 
 #define CLIENT_STATUS_HELP_TEXT                                                \

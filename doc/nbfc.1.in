@@ -309,7 +309,6 @@ With this option, registers from
 .B SystemMemory
 operation regions that may be accessible through the embedded controller are also considered.
 Their accessibility through the embedded controller cannot be guaranteed.
-
 .B Use with caution!
 .RE
 
@@ -450,7 +449,6 @@ is specified, also registers from
 .B SystemMemory
 operation regions that may be accessible through the embedded controller are printed.
 Their accessibility through the embedded controller cannot be guaranteed.
-
 .B Use with caution!
 .RE
 
@@ -481,7 +479,24 @@ is specified, also registers from
 .B SystemMemory
 operation regions that may be accessible through the embedded controller are printed.
 Their accessibility through the embedded controller cannot be guaranteed.
+.B Use with caution!
+.RE
 
+.B env
+.RB [ \-u | \-\-unverified "] [" \-p | \-\-prefix
+.IR PREFIX ]
+.RS
+Print sourceable environment variables for EC registers.
+
+Normally, only registers belonging to an
+.B EmbeddedControl
+operation region are printed.
+If
+.BR \-u | \-\-unverified
+is specified, also registers from
+.B SystemMemory
+operation regions that may be accessible through the embedded controller are printed.
+Their accessibility through the embedded controller cannot be guaranteed.
 .B Use with caution!
 .RE
 

@@ -508,11 +508,11 @@ The following functions are exposed to Lua:
 
 **sensors_get_temperature**(**sensor**, **algorithm**):
 
-> Returns the temperature of the named sensor in degrees Celsius. *sensor* may
-> be a sensor name (for example **nvidia-ml**), a group such as **@CPU** or
-> **@GPU**, or a hwmon source name. The optional *algorithm* is one of
-> **Average**, **Min** or **Max** (default: **Average**). Returns **error**,
-> **value** (integer).
+> Returns the temperature of the named sensor in degrees Celsius.
+> *sensor* may be a sensor name (for example **nvidia-ml**), a group
+> such as **\@CPU** or **\@GPU**, or a hwmon source name. The optional
+> *algorithm* is one of **Average**, **Min** or **Max** (default:
+> **Average**). Returns **error**, **value** (integer).
 
 **ec_read**(**register**):
 

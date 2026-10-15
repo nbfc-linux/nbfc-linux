@@ -68,6 +68,7 @@ enum Option {
   Option_AcpiDump_DSDT_Dir,
   Option_AcpiDump_Json,
   Option_AcpiDump_Unverified,
+  Option_AcpiDump_Prefix,
 
   // Set options
   Option_Set_Auto,

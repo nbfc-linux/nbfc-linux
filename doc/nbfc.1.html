@@ -222,8 +222,8 @@ on the current system.</p>
 when rating a configuration. With this option, registers from
 <strong>SystemMemory</strong> operation regions that may be accessible
 through the embedded controller are also considered. Their accessibility
-through the embedded controller cannot be guaranteed.</p>
-<p><strong>Use with caution!</strong></p>
+through the embedded controller cannot be guaranteed. <strong>Use with
+caution!</strong></p>
 </blockquote>
 <p><strong>-q</strong>, <strong>--quiet</strong></p>
 <blockquote>
@@ -319,8 +319,8 @@ workers</strong>).</p>
 <strong>-u</strong>|<strong>--unverified</strong> is specified, also
 registers from <strong>SystemMemory</strong> operation regions that may
 be accessible through the embedded controller are printed. Their
-accessibility through the embedded controller cannot be guaranteed.</p>
-<p><strong>Use with caution!</strong></p>
+accessibility through the embedded controller cannot be guaranteed.
+<strong>Use with caution!</strong></p>
 </blockquote>
 <p><strong>methods</strong></p>
 <blockquote>
@@ -341,8 +341,21 @@ and addresses as well as ACPI method names.</p>
 <strong>-u</strong>|<strong>--unverified</strong> is specified, also
 registers from <strong>SystemMemory</strong> operation regions that may
 be accessible through the embedded controller are printed. Their
-accessibility through the embedded controller cannot be guaranteed.</p>
-<p><strong>Use with caution!</strong></p>
+accessibility through the embedded controller cannot be guaranteed.
+<strong>Use with caution!</strong></p>
+</blockquote>
+<p><strong>env</strong>
+[<strong>-u</strong>|<strong>--unverified</strong>]
+[<strong>-p</strong>|<strong>--prefix</strong> <em>PREFIX</em>]</p>
+<blockquote>
+<p>Print sourceable environment variables for EC registers.</p>
+<p>Normally, only registers belonging to an
+<strong>EmbeddedControl</strong> operation region are printed. If
+<strong>-u</strong>|<strong>--unverified</strong> is specified, also
+registers from <strong>SystemMemory</strong> operation regions that may
+be accessible through the embedded controller are printed. Their
+accessibility through the embedded controller cannot be guaranteed.
+<strong>Use with caution!</strong></p>
 </blockquote>
 <p><strong>-d</strong>, <strong>--dsdt</strong> <em>FILE</em></p>
 <blockquote>

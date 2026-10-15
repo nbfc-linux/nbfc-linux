@@ -67,6 +67,17 @@ _nbfc__parse_commandline() {
         --create-archive) VAR=OPT_create_archive; ARGS=1; return;;
       esac
     esac
+    case "$1" in root:acpi-dump:env*)
+      case "$2" in
+        -p|--prefix) VAR=OPT_prefix; ARGS=1; return;;
+        -u|--unverified) VAR=OPT_unverified; ARGS=0; return;;
+      esac
+    esac
+    case "$1" in root:acpi-dump:methods*)
+      case "$2" in
+        -j|--json) VAR=OPT_json; ARGS=0; return;;
+      esac
+    esac
     case "$1" in root:acpi-dump:map*)
       case "$2" in
         -u|--unverified) VAR=OPT_unverified; ARGS=0; return;;
@@ -74,14 +85,19 @@ _nbfc__parse_commandline() {
     esac
     case "$1" in root:acpi-dump:ec-registers*)
       case "$2" in
+        -j|--json) VAR=OPT_json; ARGS=0; return;;
         -u|--unverified) VAR=OPT_unverified; ARGS=0; return;;
+      esac
+    esac
+    case "$1" in root:acpi-dump:registers*)
+      case "$2" in
+        -j|--json) VAR=OPT_json; ARGS=0; return;;
       esac
     esac
     case "$1" in root:acpi-dump*)
       case "$2" in
         -d|--dsdt) VAR=OPT_dsdt; ARGS=1; return;;
         -D|--dsdt-dir) VAR=OPT_dsdt_dir; ARGS=1; return;;
-        -j|--json) VAR=OPT_json; ARGS=0; return;;
       esac
     esac
     case "$1" in root:test-config:evaluate*)
@@ -270,7 +286,7 @@ _nbfc() {
   local -a OPT_quiet OPT_full_help OPT_dsdt OPT_dsdt_dir OPT_min_score OPT_input
   local -a OPT_print_rules OPT_rules OPT_no_download OPT_unverified OPT_bad
   local -a OPT_fan_count OPT_output OPT_gpu OPT_cpu OPT_interval OPT_break
-  local -a OPT_upload_firmware OPT_print_command OPT_create_archive
+  local -a OPT_prefix OPT_upload_firmware OPT_print_command OPT_create_archive
   _nbfc__parse_commandline
 
   if (( 0 < ${#POSITIONALS[@]} )); then
@@ -809,11 +825,12 @@ _nbfc_test_config_evaluate() {
 _nbfc_acpi_dump() {
   if (( 1 < ${#POSITIONALS[@]} )); then
     case "${POSITIONALS[1]}" in
-      registers);;
+      registers) _nbfc_acpi_dump_registers && return 0;;
       ec-registers) _nbfc_acpi_dump_ec_registers && return 0;;
       map) _nbfc_acpi_dump_map && return 0;;
-      methods);;
+      methods) _nbfc_acpi_dump_methods && return 0;;
       dsl);;
+      env) _nbfc_acpi_dump_env && return 0;;
     esac
   fi
 
@@ -833,7 +850,7 @@ _nbfc_acpi_dump() {
 
   case "$prev" in
     --*) __complete_option "$prev" "$cur" && return 0;;
-    -*([jh])[dD])
+    -*([h])[dD])
          __complete_option "-${prev: -1}" "$cur" && return 0;;
   esac
 
@@ -841,7 +858,7 @@ _nbfc_acpi_dump() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
     --*);;
-    -*([jh])[dD]*)
+    -*([h])[dD]*)
       local i
       for ((i=2; i <= ${#cur}; ++i)); do
         local pre="${cur:0:$i}" value="${cur:$i}"
@@ -856,16 +873,27 @@ _nbfc_acpi_dump() {
     local -a opts
     (( ! ${#OPT_dsdt_dir[@]} )) && opts+=(-d --dsdt=)
     (( ! ${#OPT_dsdt[@]} && ! ${#OPT_dsdt_dir[@]} )) && opts+=(-D --dsdt-dir=)
-    (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
     return 1
   fi
 
   (( ${#POSITIONALS[@]} == 2 )) && {
-    COMPREPLY=($(compgen -W 'registers ec-registers map methods dsl' -- "$cur"))
+    COMPREPLY=($(compgen -W 'registers ec-registers map methods dsl env' -- "$cur"))
     return 0;
   }
+
+  return 1
+}
+
+_nbfc_acpi_dump_registers() {
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
 
   return 1
 }
@@ -873,6 +901,7 @@ _nbfc_acpi_dump() {
 _nbfc_acpi_dump_ec_registers() {
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
+    (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
     (( ! ${#OPT_unverified[@]} )) && opts+=(-u --unverified)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
@@ -885,6 +914,63 @@ _nbfc_acpi_dump_ec_registers() {
 _nbfc_acpi_dump_map() {
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts
+    (( ! ${#OPT_unverified[@]} )) && opts+=(-u --unverified)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  return 1
+}
+
+_nbfc_acpi_dump_methods() {
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_json[@]} )) && opts+=(-j --json)
+    COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
+    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+    return 1
+  fi
+
+  return 1
+}
+
+_nbfc_acpi_dump_env() {
+  __complete_option() {
+    local opt="$1" cur="$2" ret=0
+
+    case "$opt" in
+      -p|--prefix);;
+      *) ret=1;;
+    esac
+
+    return $ret
+  }
+
+  case "$prev" in
+    --*) __complete_option "$prev" "$cur" && return 0;;
+    -*([uh])[pdD])
+         __complete_option "-${prev: -1}" "$cur" && return 0;;
+  esac
+
+  case "$cur" in
+    --*=*)
+      __complete_option "${cur%%=*}" "${cur#*=}" && return 0;;
+    --*);;
+    -*([uh])[pdD]*)
+      local i
+      for ((i=2; i <= ${#cur}; ++i)); do
+        local pre="${cur:0:$i}" value="${cur:$i}"
+        __complete_option "-${pre: -1}" "$value" && {
+          _nbfc__prefix_compreply "$pre"
+          return 0
+        }
+      done;;
+  esac
+
+  if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
+    local -a opts
+    (( ! ${#OPT_prefix[@]} )) && opts+=(-p --prefix=)
     (( ! ${#OPT_unverified[@]} )) && opts+=(-u --unverified)
     COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))
     [[ ${COMPREPLY-} == *= ]] && compopt -o nospace

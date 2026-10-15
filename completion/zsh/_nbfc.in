@@ -183,6 +183,7 @@ _nbfc_acpi_dump__command() {
     map:'Generate a map file for ec_probe'
     methods:'List all available ACPI methods'
     dsl:'Disassemble your ACPI tables'
+    env:'Outputs sourceable environment variables for EC registers'
   )
 
   _describe -- command items
@@ -432,7 +433,7 @@ _nbfc_test_config_evaluate() {
 }
 
 _nbfc_acpi_dump() {
-  local opts='-d= --dsdt= -D= --dsdt-dir= -j --json -h --help --version'
+  local opts='-d= --dsdt= -D= --dsdt-dir= -h --help --version'
   local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''
   _nbfc__query init "$opts" "${words[@]}"
 
@@ -442,12 +443,12 @@ _nbfc_acpi_dump() {
     map) _nbfc_acpi_dump_map; return $?;;
     methods) _nbfc_acpi_dump_methods; return $?;;
     dsl) _nbfc_acpi_dump_dsl; return $?;;
+    env) _nbfc_acpi_dump_env; return $?;;
   esac
 
   local -a args=(
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
-    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -458,9 +459,9 @@ _nbfc_acpi_dump() {
 
 _nbfc_acpi_dump_registers() {
   local -a args=(
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
-    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -471,10 +472,10 @@ _nbfc_acpi_dump_registers() {
 
 _nbfc_acpi_dump_ec_registers() {
   local -a args=(
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
-    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -488,7 +489,6 @@ _nbfc_acpi_dump_map() {
     '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
-    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -499,9 +499,9 @@ _nbfc_acpi_dump_map() {
 
 _nbfc_acpi_dump_methods() {
   local -a args=(
+    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
-    '(--json -j)'{-j,--json}'[Use JSON output]'
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
@@ -514,7 +514,20 @@ _nbfc_acpi_dump_dsl() {
   local -a args=(
     '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
     '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
-    '(--json -j)'{-j,--json}'[Use JSON output]'
+    '(--help -h)'{-h,--help}'[show this help message and exit]'
+    '(--version)'--version"[show program's version number and exit]"
+    1:command1:_nbfc__command
+    2:command2:_nbfc_acpi_dump__command
+  )
+  _arguments -S -s -w "${args[@]}"
+}
+
+_nbfc_acpi_dump_env() {
+  local -a args=(
+    '(--prefix -p)'{-p+,--prefix=}'[Use an alternative prefix (default\: EC_)]':PREFIX:' '
+    '(--unverified -u)'{-u,--unverified}'[Include unverified EC registers]'
+    '(--dsdt-dir -D)''*'{-d+,--dsdt=}'[Use an alternative DSDT file]':FILE:_files
+    '(--dsdt -d --dsdt-dir -D)'{-D+,--dsdt-dir=}'[Use an alternative DSDT directory]':DIRECTORY:_directories
     '(--help -h)'{-h,--help}'[show this help message and exit]'
     '(--version)'--version"[show program's version number and exit]"
     1:command1:_nbfc__command
