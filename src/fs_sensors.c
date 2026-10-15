@@ -348,10 +348,18 @@ Error FS_TemperatureSources_AddTemperatureSources(
   }
 
   // ==========================================================================
-  // Add sensors by name or path (for available sensors)
+  // Add sensors by name, path or command (for available sensors)
   // ==========================================================================
   for_each_array(FS_TemperatureSource*, ts, FS_Sensors_Sources) {
     if (!strcmp(sensor, ts->name) || !strcmp(sensor, ts->file)) {
+      FS_TemperatureSources_AddTemperatureSource(out, FS_Sensors_Sources_Ref(ts));
+      found_sensors = true;
+      continue;
+    }
+
+    if (sensor[0] == '$' &&
+        !strcmp(ts->name, "command") && !strcmp(sensor + 1, ts->file))
+    {
       FS_TemperatureSources_AddTemperatureSource(out, FS_Sensors_Sources_Ref(ts));
       found_sensors = true;
     }
