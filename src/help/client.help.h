@@ -7,14 +7,16 @@
  "  -h, --help            Show this help message and exit\n"                   \
  "  --version             Show program's version number and exit\n"            \
  "\n"                                                                          \
- "Commands:\n"                                                                 \
+ "Service control commands:\n"                                                 \
  "    start               Start the service\n"                                 \
  "    stop                Stop the service\n"                                  \
  "    restart             Restart the service\n"                               \
  "    status              Show the service status\n"                           \
- "    sensors             Show or configure temperature sensors\n"             \
  "    config              List or apply configs\n"                             \
  "    set                 Control fan speed\n"                                 \
+ "    sensors             Show or configure temperature sensors\n"             \
+ "\n"                                                                          \
+ "Miscellaneous commands:\n"                                                   \
  "    update              Download new configuration files\n"                  \
  "    wait-for-hwmon      Wait for /sys/class/hwmon/hwmon* files\n"            \
  "    get-model-name      Print out model name\n"                              \
