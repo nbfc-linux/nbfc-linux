@@ -3,6 +3,7 @@
 #include "macros.h"
 #include "io_utils.h"
 
+#include <errno.h>  // errno
 #include <stdio.h>  // snprintf
 #include <string.h> // strlen
 #include <unistd.h> // write
@@ -21,6 +22,9 @@ typedef struct {
 } NxJson_Writer;
 
 static void NxJson_WriteRaw(NxJson_Writer* obj, const char* s) {
+  if (! obj->success)
+    return;
+
   const size_t len = strlen(s);
 
   if (obj->mode == NxJson_WriteModeWrite) {
@@ -58,24 +62,57 @@ static void NxJson_WriteStringEscaped(NxJson_Writer* obj, const char* s) {
       }
       else {
         unsigned codepoint;
+        char c1 = '\0';
+        char c2 = '\0';
+        char c3 = '\0';
+
+        if ((c1 = s[0])) {
+          if ((c2 = s[1])) {
+            c3 = s[2];
+          }
+        }
 
         if ((c & 0xE0) == 0xC0) {
+          if (c1 == '\0') {
+            errno = EILSEQ;
+            obj->success = false;
+            return;
+          }
+
           codepoint =
             ((c & 0x1F) << 6) |
-            (*s++ & 0x3F);
+            (c1 & 0x3F);
+
+          s += 1;
         }
         else if ((c & 0xF0) == 0xE0) {
+          if (c1 == '\0' || c2 == '\0') {
+            errno = EILSEQ;
+            obj->success = false;
+            return;
+          }
+
           codepoint =
             ((c & 0x0F) << 12) |
-            ((*s++ & 0x3F) << 6) |
-            (*s++ & 0x3F);
+            ((c1 & 0x3F) << 6) |
+            (c2 & 0x3F);
+
+          s += 2;
         }
         else if ((c & 0xF8) == 0xF0) {
+          if (c1 == '\0' || c2 == '\0' || c3 == '\0') {
+            errno = EILSEQ;
+            obj->success = false;
+            return;
+          }
+
           codepoint =
             ((c & 0x07) << 18) |
-            ((*s++ & 0x3F) << 12) |
-            ((*s++ & 0x3F) << 6) |
-            (*s++ & 0x3F);
+            ((c1 & 0x3F) << 12) |
+            ((c2 & 0x3F) << 6) |
+            (c3 & 0x3F);
+
+          s += 3;
         }
         else {
           NxJson_WriteRaw(obj, "\\uFFFD");
@@ -120,7 +157,7 @@ static void NxJson_WriteKeyNotNull(NxJson_Writer* obj, const nx_json* json) {
 void NxJson_WriteJsonObject(NxJson_Writer* obj, const nx_json* json, int indent) {
   static char buf[32];
 
-  while (json != NULL) {
+  while (obj->success && json != NULL) {
     switch (json->type) {
     case NX_JSON_OBJECT:
       NxJson_WriteIndention(obj, indent);
