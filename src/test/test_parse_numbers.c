@@ -167,6 +167,8 @@ int main() {
   T("07",     0,            INT64_MAX,    0,    "octal values not supported");
   T("08",     0,            INT64_MAX,    0,    "octal values not supported");
   T("09",     0,            INT64_MAX,    0,    "octal values not supported");
+  T("+01",    0,            INT64_MAX,    0,    "octal values not supported");
+  T("-01",    0,            INT64_MAX,    0,    "octal values not supported");
   T("0x",     INT64_MIN,    INT64_MAX,    0,    "Invalid argument");
   T("0X",     INT64_MIN,    INT64_MAX,    0,    "Invalid argument");
   T("0b",     INT64_MIN,    INT64_MAX,    0,    "Invalid argument");
@@ -215,6 +217,8 @@ int main() {
   T("07",     0,            UINT64_MAX,   0,    "octal values not supported");
   T("08",     0,            UINT64_MAX,   0,    "octal values not supported");
   T("09",     0,            UINT64_MAX,   0,    "octal values not supported");
+  T("+01",    0,            UINT64_MAX,   0,    "octal values not supported");
+  T("-01",    0,            UINT64_MAX,   0,    "octal values not supported");
   T("0x",     0,            UINT64_MAX,   0,    "Invalid argument");
   T("0X",     0,            UINT64_MAX,   0,    "Invalid argument");
   T("0b",     0,            UINT64_MAX,   0,    "Invalid argument");
