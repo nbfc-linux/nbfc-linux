@@ -398,19 +398,12 @@
  "\n"                                                                          \
  "      --sleep           System is about to go to sleep.\n"                   \
  "      --resume          System has just resumed from sleep.\n"               \
- ""
-
-#define CLIENT_RESET_EC_HELP_TEXT                                              \
- "Usage: nbfc reset-ec [-h]\n"                                                 \
  "\n"                                                                          \
- "Resets the embedded controller registers to their configured reset values.\n"\
+ "  reset-ec\n"                                         \
+ "    Resets the embedded controller registers to their configured reset\n"    \
+ "    values.\n"                                                               \
  "\n"                                                                          \
- "This command is intended for use after nbfc_service has been killed\n"       \
- "unexpectedly, for example with SIGKILL, when the service has no opportunity\n"\
- "to reset the EC registers during shutdown.\n"                                \
- "\n"                                                                          \
- "INTERNAL COMMAND ONLY\n"                                                     \
- "\n"                                                                          \
- "Optional arguments:\n"                                                       \
- "  -h, --help            Show this help message and exit\n"                   \
+ "    This command is intended for use after nbfc_service has been killed\n"   \
+ "    unexpectedly, for example with SIGKILL, when the service has no\n"       \
+ "    opportunity to reset the EC registers during shutdown.\n"                \
  ""

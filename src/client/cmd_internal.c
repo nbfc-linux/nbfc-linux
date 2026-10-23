@@ -25,6 +25,7 @@ const struct cli99_Option Internal_System_Sleep_CommandLine[] = {
 enum Internal_Command {
   Internal_Command_None,
   Internal_Command_System_Sleep,
+  Internal_Command_ResetEC,
 };
 typedef enum Internal_Command Internal_Command;
 
@@ -46,6 +47,7 @@ struct {
 
 Internal_Command Internal_Command_FromString(const char* s) {
   if (! strcmp(s, "system-sleep"))  return Internal_Command_System_Sleep;
+  if (! strcmp(s, "reset-ec"))      return Internal_Command_ResetEC;
   return Internal_Command_None;
 }
 
@@ -128,9 +130,78 @@ error:
 }
 
 
+static void Internal_ResetEc_ResetFans(ModelConfig* model_config) {
+  Error e;
+
+  for_each_array(FanConfiguration*, fan_config, model_config->FanConfigurations) {
+    Fan fan = {0};
+
+    e = Fan_Init(&fan, fan_config, model_config);
+    if (e) {
+      Log_Warn("Fan \"%s\": %s", fan_config->FanDisplayName, err_print_all(e));
+      continue;
+    }
+
+    e = Fan_ECReset(&fan);
+    if (e) {
+      Log_Warn("Fan \"%s\": %s", fan_config->FanDisplayName, err_print_all(e));
+    }
+  }
+}
+
+static int Internal_ResetEc(void) {
+  Error e;
+  ServiceConfig service_config = {0};
+  ModelConfig model_config = {0};
+
+  check_root();
+
+  // ==========================================================================
+  // Load service configuration + model configuration
+  // ==========================================================================
+  Service_LoadAllConfigFiles(&service_config, &model_config);
+
+  // ==========================================================================
+  // Open embedded controller
+  // ==========================================================================
+  if (service_config.isset.EmbeddedControllerType) {
+    ec = EC_By_EmbeddedControllerType(service_config.EmbeddedControllerType);
+  }
+  else {
+    e = EC_FindWorking(&ec);
+    if (e) {
+      Log_Error("%s", err_print_all(e));
+      return NBFC_EXIT_FAILURE;
+    }
+  }
+
+  e = ec->Open();
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    return NBFC_EXIT_FAILURE;
+  }
+
+  // ==========================================================================
+  // Open ACPI Call
+  // ==========================================================================
+  AcpiCall_Open();
+
+  // ==========================================================================
+  // Do the reset
+  // ==========================================================================
+  for (int i = 0; i < 10; ++i) {
+    RegisterWriteConfigurations_Reset(&model_config.RegisterWriteConfigurations);
+    Internal_ResetEc_ResetFans(&model_config);
+  }
+
+  return NBFC_EXIT_SUCCESS;
+}
+
+
 int Internal(void) {
   switch (Internal_Options.command) {
     case Internal_Command_System_Sleep:  return Internal_System_Sleep();
+    case Internal_Command_ResetEC:       return Internal_ResetEc();
     default:
       printf("%s", CLIENT_INTERNAL_HELP_TEXT);
       return NBFC_EXIT_CMDLINE;
