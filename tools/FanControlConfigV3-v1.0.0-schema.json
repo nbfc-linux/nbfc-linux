@@ -142,6 +142,16 @@
             "description": "Fan display name",
             "default": ""
           },
+          "SleepOverrideRequired": {
+            "type": "boolean",
+            "default": false,
+            "enum": [true, false],
+            "description": "Defines if the fan speed value should be overridden while the system is going to sleep until it is resumed."
+          },
+          "SleepFanSpeedOverrideValue": {
+            "$ref": "#/$defs/uword",
+            "description": "Defines the value which will be written to WriteRegister before the system is going to sleep."
+          },
           "TemperatureThresholds": {
             "type": "array",
             "description": "Defines how fast the fan runs at different temperatures",

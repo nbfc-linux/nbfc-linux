@@ -277,6 +277,12 @@ Error FanConfiguration_ValidateFields(FanConfiguration* self) {
 	if (false)
 		return err_stringf("%s: %s", "ResetLuaCode", "Missing option");
 
+	if (! self->isset.SleepOverrideRequired)
+		self->SleepOverrideRequired = false;
+
+	if (false)
+		return err_stringf("%s: %s", "SleepFanSpeedOverrideValue", "Missing option");
+
 	if (false)
 		return err_stringf("%s: %s", "TemperatureAlgorithmType", "Missing option");
 
@@ -400,6 +406,16 @@ Error FanConfiguration_FromJson(FanConfiguration* obj, const nx_json* json) {
 			e = LuaCode_FromJson(&obj->ResetLuaCode, c);
 			if (!e)
 				obj->isset.ResetLuaCode = true;
+		}
+		else if (!strcmp(c->key, "SleepOverrideRequired")) {
+			e = bool_FromJson(&obj->SleepOverrideRequired, c);
+			if (!e)
+				obj->isset.SleepOverrideRequired = true;
+		}
+		else if (!strcmp(c->key, "SleepFanSpeedOverrideValue")) {
+			e = uint16_t_FromJson(&obj->SleepFanSpeedOverrideValue, c);
+			if (!e)
+				obj->isset.SleepFanSpeedOverrideValue = true;
 		}
 		else if (!strcmp(c->key, "TemperatureAlgorithmType")) {
 			e = TemperatureAlgorithmType_FromJson(&obj->TemperatureAlgorithmType, c);
@@ -758,6 +774,9 @@ Error FanInfo_ValidateFields(FanInfo* self) {
 	if (! self->isset.Critical)
 		return err_stringf("%s: %s", "Critical", "Missing option");
 
+	if (! self->isset.SystemSleeping)
+		return err_stringf("%s: %s", "SystemSleeping", "Missing option");
+
 	if (! self->isset.CurrentSpeed)
 		return err_stringf("%s: %s", "CurrentSpeed", "Missing option");
 
@@ -806,6 +825,11 @@ Error FanInfo_FromJson(FanInfo* obj, const nx_json* json) {
 			e = bool_FromJson(&obj->Critical, c);
 			if (!e)
 				obj->isset.Critical = true;
+		}
+		else if (!strcmp(c->key, "SystemSleeping")) {
+			e = bool_FromJson(&obj->SystemSleeping, c);
+			if (!e)
+				obj->isset.SystemSleeping = true;
 		}
 		else if (!strcmp(c->key, "CurrentSpeed")) {
 			e = float_FromJson(&obj->CurrentSpeed, c);

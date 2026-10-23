@@ -2,6 +2,7 @@
 
 #include "nbfc.h"
 #include "macros.h"
+#include "nxjson.h"
 #include "nxjson_utils.h"
 #include "nxjson_write.h"
 #include "error.h"
@@ -137,11 +138,58 @@ static Error Server_Command_Status(int socket, const nx_json* json) {
     create_json_double("CriticalTemperature", fan_json, fan->criticalTemperature);
     create_json_bool("AutoMode", fan_json, (fan->mode == Fan_ModeAuto));
     create_json_bool("Critical", fan_json, fan->isCritical);
+    create_json_bool("SystemSleeping", fan_json, fan->isSystemSleeping);
     create_json_double("CurrentSpeed", fan_json, Fan_GetCurrentSpeed(fan));
     create_json_double("TargetSpeed", fan_json, Fan_GetTargetSpeed(fan));
     create_json_double("RequestedSpeed", fan_json, Fan_GetRequestedSpeed(fan));
     create_json_integer("SpeedSteps", fan_json, Fan_GetSpeedSteps(fan));
   }
+
+  Error e = Protocol_SendJson(socket, o);
+  nx_json_free(o);
+  return e;
+}
+
+
+/* Command "internal system-sleep"
+ *
+ * Examples of incoming JSON:
+ *
+ * {"Command": "set-system-sleeping", "Sleeping": <BOOLEAN>}
+ */
+static Error Server_Command_Set_System_Sleeping(int socket, const nx_json* json) {
+  int suspending = -1;
+
+  nx_json_for_each(c, json) {
+    if (!strcmp(c->key, "Command"))
+      continue;
+    else if (!strcmp(c->key, "Sleeping")) {
+      if (c->type == NX_JSON_BOOL) {
+        suspending = c->val.i;
+      } else {
+        return err_string("Speed: Invalid type. Either float or \"auto\"");
+      }
+    }
+    else {
+      return err_string("Unknown arguments");
+    }
+  }
+
+  if (suspending == -2)
+    return err_string("Missing argument: Sleeping");
+
+  for_enumerate_array(array_size_t, i, Service_Fans) {
+    Fan_SetSystemSleeping(&Service_Fans.data[i].Fan, (bool) suspending);
+
+    if (! options.read_only)
+      Fan_ECFlush(&Service_Fans.data[i].Fan);
+  }
+
+  Service_WriteTargetFanSpeedsToState();
+
+  nx_json root = {0};
+  nx_json *o = create_json_object(NULL, &root);
+  create_json_string("Status", o, "OK");
 
   Error e = Protocol_SendJson(socket, o);
   nx_json_free(o);
@@ -359,6 +407,8 @@ static void Server_HandleClient(Client* client) {
 
   if (!strcmp(command->val.text, "set-fan-speed"))
     e = Server_Command_Set_Fan(client->fd, json);
+  else if (!strcmp(command->val.text, "set-system-sleeping"))
+    e = Server_Command_Set_System_Sleeping(client->fd, json);
   else if (!strcmp(command->val.text, "status"))
     e = Server_Command_Status(client->fd, json);
   else

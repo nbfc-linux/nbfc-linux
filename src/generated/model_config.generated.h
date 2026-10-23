@@ -87,6 +87,8 @@ struct FanConfiguration {
 	uint16_t        FanSpeedResetValue;
 	const char*     ResetAcpiMethod;
 	LuaCode         ResetLuaCode;
+	bool            SleepOverrideRequired;
+	uint16_t        SleepFanSpeedOverrideValue;
 	TemperatureAlgorithmType TemperatureAlgorithmType;
 	array_of(str)   Sensors;
 	array_of(TemperatureThreshold) TemperatureThresholds;
@@ -112,6 +114,8 @@ struct FanConfiguration {
 		bool FanSpeedResetValue : 1;
 		bool ResetAcpiMethod : 1;
 		bool ResetLuaCode    : 1;
+		bool SleepOverrideRequired : 1;
+		bool SleepFanSpeedOverrideValue : 1;
 		bool TemperatureAlgorithmType : 1;
 		bool Sensors         : 1;
 		bool TemperatureThresholds : 1;
@@ -230,6 +234,7 @@ struct FanInfo {
 	float           CriticalTemperature;
 	bool            AutoMode;
 	bool            Critical;
+	bool            SystemSleeping;
 	float           CurrentSpeed;
 	float           TargetSpeed;
 	float           RequestedSpeed;
@@ -240,6 +245,7 @@ struct FanInfo {
 		bool CriticalTemperature : 1;
 		bool AutoMode        : 1;
 		bool Critical        : 1;
+		bool SystemSleeping  : 1;
 		bool CurrentSpeed    : 1;
 		bool TargetSpeed     : 1;
 		bool RequestedSpeed  : 1;
