@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+# Only signal NBFC if NBFC is currently running, failed signalling if NBFC is
+# running aborts sleep attempt
+if ! "@BINDIR@/nbfc" status --service >/dev/null;
+then
+	exit 0
+fi
+
+case "$1" in
+	suspend|hibernate)
+		"@BINDIR@/nbfc" suspend
+	;;
+
+	resume|thaw)
+		"@BINDIR@/nbfc" resume
+	;;
+esac

@@ -1,0 +1,24 @@
+[Unit]
+Description=NoteBook FanControl – Pause during suspend
+
+# Delay sleep until fan speed update has completed
+Before=sleep.target
+
+# Stop this unit once “sleep.target” is stopped on resume
+StopWhenUnneeded=true
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+# Run only when NBFC Linux is really running
+#
+# Prevent this unit from failing (and aborting sleep) if NBFC is stopped
+# irrespective of whether `nbfc_service` is currently managed by systemd or not.
+ExecCondition="@BINDIR@/nbfc" status --service
+
+ExecStart="@BINDIR@/nbfc" suspend
+ExecStop="@BINDIR@/nbfc" resume
+
+[Install]
+WantedBy=sleep.target
