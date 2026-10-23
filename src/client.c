@@ -96,6 +96,7 @@ const struct cli99_Option Main_CommandLine[] = {
 #include "client/cmd_reset_ec.c"
 #include "client/cmd_test_config.c"
 #include "client/cmd_xml2json.c"
+#include "client/cmd_internal.c"
 
 #define NBFC_CLIENT_COMMANDS \
   o("set",              Set,              SET,              Set)           \
@@ -120,6 +121,7 @@ const struct cli99_Option Main_CommandLine[] = {
   o("support",          Support,          SUPPORT,          Support)       \
   o("help",             Help,             HELP,             Main)          \
   o("faq",              FAQ,              FAQ,              Main)          \
+  o("internal",         Internal,         INTERNAL,         Internal)      \
   o("reset-ec",         ResetEc,          RESET_EC,         Main)
 //  COMMAND             ENUM              HELP TEXT         COMMANDLINE
 
@@ -625,6 +627,30 @@ int main(int argc, char* const argv[]) {
       break;
 
     // ========================================================================
+    // Internal options
+    // ========================================================================
+
+    case Option_Internal_Command:
+      Internal_Options.command = Internal_Command_FromString(p.optarg);
+      if (Internal_Options.command == Internal_Command_None) {
+        Log_Error("%s: Invalid command: %s", "internal", p.optarg);
+        return NBFC_EXIT_CMDLINE;
+      }
+
+      if (Internal_Options.command == Internal_Command_System_Sleep)
+        p.options = Internal_System_Sleep_CommandLine;
+
+      break;
+
+    case Option_Internal_System_Sleep_Sleep:
+      Internal_Options.sleep_command = Internal_Command_System_Sleep_Sleep;
+      break;
+
+    case Option_Internal_System_Sleep_Resume:
+      Internal_Options.sleep_command = Internal_Command_System_Sleep_Resume;
+      break;
+
+    // ========================================================================
     // Error
     // ========================================================================
 
@@ -657,6 +683,7 @@ int main(int argc, char* const argv[]) {
   case Command_Xml2Json:          return Xml2Json();
   case Command_FAQ:               return FAQ();
   case Command_ResetEc:           return ResetEc();
+  case Command_Internal:          return Internal();
   default:                        return NBFC_EXIT_FAILURE;
   }
 }

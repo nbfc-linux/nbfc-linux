@@ -385,6 +385,21 @@
  "\n"                                                                          \
  ""
 
+ #define CLIENT_INTERNAL_HELP_TEXT                                             \
+ "Usage: nbfc internal (system-sleep) [OPTIONS]\n"                             \
+ "\n"                                                                          \
+ "INTERNAL COMMANDS ONLY\n"                                                    \
+ "\n"                                                                          \
+ "Commands:\n"                                                                 \
+ "  system-sleep (--sleep|--resume)\n"                                         \
+ "    Informs the NBFC-Linux service that the system is about to go to\n"      \
+ "    sleep (either suspend or hibernation) and waits until the new fan\n"     \
+ "    speed value has been set.\n"                                             \
+ "\n"                                                                          \
+ "      --sleep           System is about to go to sleep.\n"                   \
+ "      --resume          System has just resumed from sleep.\n"               \
+ ""
+
 #define CLIENT_RESET_EC_HELP_TEXT                                              \
  "Usage: nbfc reset-ec [-h]\n"                                                 \
  "\n"                                                                          \
