@@ -247,6 +247,18 @@
         "required": false
       },
       {
+        "name": "SleepOverrideRequired",
+        "type": "bool",
+        "default": "false",
+        "description": "Defines if the fan speed value should be overridden while the system is going to sleep until it is resumed."
+      },
+      {
+        "name": "SleepFanSpeedOverrideValue",
+        "type": "uint16_t",
+        "help": "Defines the value which will be used as target value before the system is going to sleep.",
+        "required": false
+      },
+      {
         "name": "TemperatureAlgorithmType",
         "type": "TemperatureAlgorithmType",
         "help": "Either 'average', 'max' or 'min'",
@@ -470,6 +482,11 @@
       },
       {
         "name": "Critical",
+        "type": "bool",
+        "help": ""
+      },
+      {
+        "name": "SystemSleeping",
         "type": "bool",
         "help": ""
       },

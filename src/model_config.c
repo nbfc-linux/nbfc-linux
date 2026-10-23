@@ -685,6 +685,20 @@ Error ModelConfig_Validate(Trace* trace, ModelConfig* c) {
       }
     }
 
+    // If SleepOverrideRequired is true, ensure that
+    // "SleepFanSpeedOverrideValue" is also set
+    if (f->SleepOverrideRequired) {
+      if (!f->isset.SleepFanSpeedOverrideValue) {
+        e = err_stringf("Missing option: %s", "SleepFanSpeedOverrideValue");
+        goto err;
+      }
+    }
+    else {
+      if (f->isset.SleepFanSpeedOverrideValue) {
+        e = err_stringf("%s: Cannot be used SleepOverrideRequired == false", "SleepFanSpeedOverrideValue");
+        goto err;
+      }
+    }
     // Ensure that one (and only one) of "WriteRegister", "WriteAcpiMethod" and "WriteLuaCode" is set
     const int write_group = (
       f->isset.WriteRegister +

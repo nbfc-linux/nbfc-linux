@@ -92,6 +92,11 @@ enum Option {
 
   // Xml2Json options
   Option_Xml2Json_File,
+
+  // Internal options
+  Option_Internal_Command,
+  Option_Internal_System_Sleep_Sleep,
+  Option_Internal_System_Sleep_Resume,
 };
 
 extern const struct cli99_Option Main_CommandLine[];

@@ -385,17 +385,25 @@
  "\n"                                                                          \
  ""
 
-#define CLIENT_RESET_EC_HELP_TEXT                                              \
- "Usage: nbfc reset-ec [-h]\n"                                                 \
+ #define CLIENT_INTERNAL_HELP_TEXT                                             \
+ "Usage: nbfc internal (system-sleep) [OPTIONS]\n"                             \
  "\n"                                                                          \
- "Resets the embedded controller registers to their configured reset values.\n"\
+ "INTERNAL COMMANDS ONLY\n"                                                    \
  "\n"                                                                          \
- "This command is intended for use after nbfc_service has been killed\n"       \
- "unexpectedly, for example with SIGKILL, when the service has no opportunity\n"\
- "to reset the EC registers during shutdown.\n"                                \
+ "Commands:\n"                                                                 \
+ "  system-sleep (--sleep|--resume)\n"                                         \
+ "    Informs the NBFC-Linux service that the system is about to go to\n"      \
+ "    sleep (either suspend or hibernation) and waits until the new fan\n"     \
+ "    speed value has been set.\n"                                             \
  "\n"                                                                          \
- "INTERNAL COMMAND ONLY\n"                                                     \
+ "      --sleep           System is about to go to sleep.\n"                   \
+ "      --resume          System has just resumed from sleep.\n"               \
  "\n"                                                                          \
- "Optional arguments:\n"                                                       \
- "  -h, --help            Show this help message and exit\n"                   \
+ "  reset-ec\n"                                         \
+ "    Resets the embedded controller registers to their configured reset\n"    \
+ "    values.\n"                                                               \
+ "\n"                                                                          \
+ "    This command is intended for use after nbfc_service has been killed\n"   \
+ "    unexpectedly, for example with SIGKILL, when the service has no\n"       \
+ "    opportunity to reset the EC registers during shutdown.\n"                \
  ""

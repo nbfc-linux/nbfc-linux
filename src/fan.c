@@ -173,7 +173,12 @@ static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {
 // ============================================================================
 
 float Fan_GetTargetSpeed(const Fan* self) {
-  return my.isCritical ? 100.0f : my.targetFanSpeed;
+  if (my.isSystemSleeping && my.fanConfig->SleepOverrideRequired)
+    return my.fanConfig->SleepFanSpeedOverrideValue;
+  else if (my.isCritical)
+    return 100.0f;
+  else
+    return my.targetFanSpeed;
 }
 
 float Fan_GetRequestedSpeed(const Fan* self) {
@@ -216,6 +221,10 @@ Error Fan_SetFixedSpeed(Fan* self, float speed) {
 void Fan_SetAutoSpeed(Fan* self) {
   my.mode = Fan_ModeAuto;
   my.targetFanSpeed = ThresholdManager_GetCurrentThreshold(&my.threshMan)->FanSpeed;
+}
+
+void Fan_SetSystemSleeping(Fan* self, bool sleeping) {
+  my.isSystemSleeping = sleeping;
 }
 
 float Fan_GetCurrentSpeed(const Fan* self) {

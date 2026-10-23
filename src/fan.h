@@ -34,6 +34,7 @@ struct Fan {
   float currentSpeed;
   Fan_Mode mode;
   bool isCritical;
+  bool isSystemSleeping;
   uint8_t num_read_warnings;
 };
 
@@ -48,6 +49,7 @@ uint16_t Fan_GetSpeedSteps(const Fan*);
 void     Fan_SetTemperature(Fan*, float temperature);
 Error    Fan_SetFixedSpeed(Fan*, float speed);
 void     Fan_SetAutoSpeed(Fan*);
+void     Fan_SetSystemSleeping(Fan*, bool sleeping);
 
 Error    Fan_ECReset(Fan*);
 Error    Fan_ECFlush(Fan*);

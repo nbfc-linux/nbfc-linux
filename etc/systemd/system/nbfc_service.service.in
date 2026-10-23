@@ -4,7 +4,7 @@ Description=NoteBook FanControl service
 [Service]
 ExecStart=@BINDIR@/nbfc start
 ExecStop=@BINDIR@/nbfc stop
-ExecStopPost=@BINDIR@/nbfc reset-ec
+ExecStopPost=@BINDIR@/nbfc internal reset-ec
 Type=forking
 PIDFile=@RUNSTATEDIR@/nbfc_service.pid
 TimeoutStartSec=40
