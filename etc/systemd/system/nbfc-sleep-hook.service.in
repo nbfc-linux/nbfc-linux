@@ -1,0 +1,18 @@
+[Unit]
+Description=NoteBook FanControl – Pause during suspend
+
+# Delay sleep until fan speed update has completed
+Before=sleep.target
+
+# Stop this unit once “sleep.target” is stopped on resume
+StopWhenUnneeded=true
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecCondition="@BINDIR@/nbfc" status --service
+ExecStart="@BINDIR@/nbfc" internal system-sleep --sleep
+ExecStop="@BINDIR@/nbfc" internal system-sleep --resume
+
+[Install]
+WantedBy=sleep.target

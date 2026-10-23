@@ -13,6 +13,8 @@ runstatedir = @runstatedir@
 sysddir     = @prefix@/lib/systemd/system
 orcdir      = @sysconfdir@/init.d
 systemvdir  = @sysconfdir@/init.d
+pmdir       = @prefix@/lib/pm-utils
+elogindir   = @libexecdir@
 
 LUA_CFLAGS = $(shell pkg-config --cflags lua5.4 || pkg-config --cflags lua)
 LUA_LDLIBS = $(shell pkg-config --libs lua5.4 || pkg-config --libs lua)
@@ -40,14 +42,15 @@ override CPPFLAGS += \
 
 CORE  = src/nbfc_service src/nbfc src/ec_probe
 DOC   = doc/ec_probe.1 doc/nbfc.1 doc/nbfc_service.1 doc/nbfc_service.json.5 doc/nbfc.faq.7
-SYSTEMD = etc/systemd/system/nbfc_service.service
+SYSTEMD = etc/systemd/system/nbfc_service.service etc/systemd/system/nbfc-sleep-hook.service
 OPEN_RC = etc/init.d/nbfc_service.openrc
 SYSTEMV = etc/init.d/nbfc_service.systemv
+SUSPEND = etc/elogind/system-sleep/99nbfc etc/pm/sleep.d/99nbfc
 BASH_COMPLETION = completion/bash/ec_probe completion/bash/nbfc completion/bash/nbfc_service
 FISH_COMPLETION = completion/fish/ec_probe.fish completion/fish/nbfc.fish completion/fish/nbfc_service.fish
 ZSH_COMPLETION = completion/zsh/_ec_probe completion/zsh/_nbfc completion/zsh/_nbfc_service
 
-all: $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(SYSTEMV) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
+all: $(CORE) $(DOC) $(SYSTEMD) $(OPEN_RC) $(SYSTEMV) $(SUSPEND) $(BASH_COMPLETION) $(FISH_COMPLETION) $(ZSH_COMPLETION)
 
 install-core: $(CORE)
 	install -Dm 755 src/make_archive.sh $(DESTDIR)$(libdir)/nbfc/make_archive.sh
@@ -110,8 +113,11 @@ completion/zsh/_nbfc: completion/zsh/_nbfc.in
 completion/zsh/_nbfc_service: completion/zsh/_nbfc_service.in
 	$(REPLACE_VARS) < $< > $@
 
-# Systemd service file ########################################################
+# Systemd service and hook files ##############################################
 etc/systemd/system/nbfc_service.service: etc/systemd/system/nbfc_service.service.in
+	$(REPLACE_VARS) < $< > $@
+
+etc/systemd/system/nbfc-sleep-hook.service: etc/systemd/system/nbfc-sleep-hook.service.in
 	$(REPLACE_VARS) < $< > $@
 
 # OpenRC service file #########################################################
@@ -120,6 +126,13 @@ etc/init.d/nbfc_service.openrc: etc/init.d/nbfc_service.openrc.in
 
 # SystemV service file ########################################################
 etc/init.d/nbfc_service.systemv: etc/init.d/nbfc_service.systemv.in
+	$(REPLACE_VARS) < $< > $@
+
+# elogind and pm-utils hook files #############################################
+etc/elogind/system-sleep/99nbfc: etc/elogind/system-sleep/99nbfc.in
+	$(REPLACE_VARS) < $< > $@
+
+etc/pm/sleep.d/99nbfc: etc/pm/sleep.d/99nbfc.in
 	$(REPLACE_VARS) < $< > $@
 
 install-configs:
@@ -131,17 +144,22 @@ install-configs:
 	cp share/nbfc/model_support.json $(DESTDIR)$(datadir)/nbfc
 	cp -r share/nbfc/configs/* $(DESTDIR)$(datadir)/nbfc/configs
 
-install-systemd: etc/systemd/system/nbfc_service.service
+install-systemd: $(SYSTEMD)
 	# /usr/local/lib/systemd/system
-	install -Dm 644 etc/systemd/system/nbfc_service.service $(DESTDIR)$(sysddir)/nbfc_service.service
+	install -Dm 644 etc/systemd/system/nbfc_service.service     $(DESTDIR)$(sysddir)/nbfc_service.service
+	install -Dm 644 etc/systemd/system/nbfc-sleep-hook.service  $(DESTDIR)$(sysddir)/nbfc-sleep-hook.service
 
-install-openrc: etc/init.d/nbfc_service.openrc
+install-openrc: $(OPEN_RC) $(SUSPEND)
 	# /usr/local/etc/init.d
-	install -Dm 755 etc/init.d/nbfc_service.openrc		 $(DESTDIR)$(orcdir)/nbfc_service
+	install -Dm 755 etc/init.d/nbfc_service.openrc   $(DESTDIR)$(orcdir)/nbfc_service
+	install -Dm 755 etc/elogind/system-sleep/99nbfc  $(DESTDIR)$(elogindir)/system-sleep/99nbfc
+	install -Dm 755 etc/pm/sleep.d/99nbfc            $(DESTDIR)$(pmdir)/sleep.d/99nbfc
 
-install-systemv: etc/init.d/nbfc_service.systemv
+install-systemv: $(SYSTEMV) $(SUSPEND)
 	# /usr/local/etc/init.d
-	install -Dm 755 etc/init.d/nbfc_service.systemv	 $(DESTDIR)$(systemvdir)/nbfc_service
+	install -Dm 755 etc/init.d/nbfc_service.systemv  $(DESTDIR)$(systemvdir)/nbfc_service
+	install -Dm 755 etc/elogind/system-sleep/99nbfc  $(DESTDIR)$(elogindir)/system-sleep/99nbfc
+	install -Dm 755 etc/pm/sleep.d/99nbfc            $(DESTDIR)$(pmdir)/sleep.d/99nbfc
 
 install-docs: $(DOC)
 	install -Dm 644 doc/ec_probe.1           $(DESTDIR)$(man1dir)/ec_probe.1
@@ -177,7 +195,14 @@ uninstall:
 	rm -f $(DESTDIR)$(libdir)/nbfc/make_graph.py
 	
 	# /usr/local/lib/systemd/system
+	rm -f $(DESTDIR)$(sysddir)/nbfc-sleep-hook.service
 	rm -f $(DESTDIR)$(sysddir)/nbfc_service.service
+	
+	# /usr/local/lib/pm-utils
+	rm -f $(DESTDIR)$(pmdir)/sleep.d/99nbfc
+	
+	# /usr/local/lib/libexec
+	rm -f $(DESTDIR)$(elogindir)/system-sleep/99nbfc
 	
 	# /usr/local/etc/init.d
 	rm -f $(DESTDIR)$(orcdir)/nbfc_service

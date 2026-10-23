@@ -1,0 +1,15 @@
+#!/bin/sh
+if ! "@BINDIR@/nbfc" status --service >/dev/null;
+then
+	exit 0
+fi
+
+case "$1" in
+	pre/*)
+		"@BINDIR@/nbfc" internal system-sleep --sleep
+	;;
+
+	post/*)
+		"@BINDIR@/nbfc" internal system-sleep --resume
+	;;
+esac

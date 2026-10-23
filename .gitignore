@@ -27,8 +27,11 @@ completion/zsh/_nbfc
 completion/zsh/_nbfc_service
 
 etc/systemd/system/nbfc_service.service
+etc/systemd/system/nbfc-sleep-hook.service
 etc/init.d/nbfc_service.openrc
 etc/init.d/nbfc_service.systemv
+etc/elogind/system-sleep/99nbfc
+etc/pm/sleep.d/99nbfc
 
 src/*.o
 src/a.out
