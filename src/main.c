@@ -132,7 +132,7 @@ int main(int argc, char* const argv[])
     exit(NBFC_EXIT_FAILURE);
   }
 
-  Log_Init(options.fork);
+  bool keep_stderr = Log_Init(options.fork);
   atexit(Log_Close);
 
   Log_Info("NBFC-Linux comes with no warranty. Run `nbfc warranty` for details.");
@@ -215,7 +215,8 @@ int main(int argc, char* const argv[])
       // because a daemon should not be attached to a terminal.
       close(STDIN_FILENO);
       close(STDOUT_FILENO);
-      close(STDERR_FILENO);
+      if (! keep_stderr)
+        close(STDERR_FILENO);
 
       // Re-initialize nvidia after fork
       Nvidia_Init();

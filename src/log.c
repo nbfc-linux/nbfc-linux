@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/stat.h>
 #if ENABLE_SYSLOG
 #include <syslog.h>
 #endif
@@ -20,14 +21,32 @@ LogLevel Log_LogLevel = LogLevel_Info;
 #if ENABLE_SYSLOG
 static bool Log_UseSyslog = false;
 #endif
+static bool Log_UseJournalStderr = false;
 
-void Log_Init(bool use_syslog) {
+bool Log_Init(bool use_syslog) {
+  // Source: https://systemd.io/JOURNAL_NATIVE_PROTOCOL/#automatic-protocol-upgrading
+  const char* journal_stream = getenv("JOURNAL_STREAM");
+  uintmax_t dev, ino;
+  struct stat st;
+  if (journal_stream
+  &&  sscanf(journal_stream, "%ju:%ju", &dev, &ino) == 2
+  &&  fstat(STDERR_FILENO, &st) == 0
+  &&  (uintmax_t) st.st_dev == dev && (uintmax_t) st.st_ino == ino) {
+    // Journald-enhanced stderr logging
+    Log_UseJournalStderr = true;
+    return true;
+  }
+
 #if ENABLE_SYSLOG
   if (use_syslog) {
     openlog(Program_Name, LOG_PID | LOG_CONS, LOG_DAEMON);
     Log_UseSyslog = true;
+    return false;
   }
 #endif
+
+  // Standard stderr logging
+  return true;
 }
 
 void Log_Close(void) {
@@ -48,13 +67,30 @@ void Log_Log(LogLevel level, const char* fmt, ...) {
   vsnprintf(buf, sizeof(buf), fmt, args);
   va_end(args);
 
+  if (Log_UseJournalStderr) {
+    // Severity prefix: Levels in enum correspond to correct levels
+    char severity[4];
+    snprintf(severity, sizeof(severity) / sizeof(char), "<%d>", level);
+
+    // Print message line-wise, prefixing each line with severity
+    char* save_ptr = NULL;
+    char* line = strtok_r(buf, "\n", &save_ptr);
+    do {
+      WriteToErr(severity);
+      WriteToErr(line);
+      WriteToErr("\n");
+    } while ((line = strtok_r(NULL, "\n", &save_ptr)) != NULL);
+
+    return;
+  }
+
 #if ENABLE_SYSLOG
   if (Log_UseSyslog) {
     switch (level) {
-      case LogLevel_Error: syslog(LOG_ERR,     "%s", buf); break;
-      case LogLevel_Warn:  syslog(LOG_WARNING, "%s", buf); break;
-      case LogLevel_Info:  syslog(LOG_INFO,    "%s", buf); break;
-      case LogLevel_Debug: syslog(LOG_DEBUG,   "%s", buf); break;
+      case LogLevel_Error: syslog(LOG_ERR,     "%s", buf); return;
+      case LogLevel_Warn:  syslog(LOG_WARNING, "%s", buf); return;
+      case LogLevel_Info:  syslog(LOG_INFO,    "%s", buf); return;
+      case LogLevel_Debug: syslog(LOG_DEBUG,   "%s", buf); return;
       default: break;
     }
   }
