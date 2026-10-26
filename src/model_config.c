@@ -119,6 +119,8 @@ static Error RegisterWriteOccasion_FromJson(RegisterWriteOccasion* out, const nx
   if (e) return e;
   else if (!strcmp(s, "OnWriteFanSpeed"))  *out = RegisterWriteOccasion_OnWriteFanSpeed;
   else if (!strcmp(s, "OnInitialization")) *out = RegisterWriteOccasion_OnInitialization;
+  else if (!strcmp(s, "OnSuspend"))        *out = RegisterWriteOccasion_OnSuspend;
+  else if (!strcmp(s, "OnResume"))         *out = RegisterWriteOccasion_OnResume;
   else return err_stringf("Invalid value for %s: %s", "RegisterWriteOccasion", s);
   return e;
 }

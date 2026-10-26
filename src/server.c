@@ -96,7 +96,7 @@ static Error Server_Command_Set_Fan(int socket, const nx_json* json) {
       else
         Fan_SetFixedSpeed(&Service_Fans.data[i].Fan, speed);
 
-      if (! options.read_only)
+      if (Service_ShouldControlFans())
         Fan_ECFlush(&Service_Fans.data[i].Fan);
     }
   }
@@ -145,6 +145,43 @@ static Error Server_Command_Status(int socket, const nx_json* json) {
 
   Error e = Protocol_SendJson(socket, o);
   nx_json_free(o);
+  return e;
+}
+
+/* Command "suspend" + "resume"
+ *
+ * Examples of incoming JSON:
+ *
+ * {"Command": "suspend"}
+ * {"Command": "resume"}
+ */
+static Error Server_Command_SuspendResume(int socket, const nx_json* json, bool resuming) {
+  Error e;
+  struct ucred cred;
+  socklen_t len = sizeof(cred);
+
+  if (json->val.children.length > 1)
+    return err_string("Unknown arguments");
+
+  if (getsockopt(socket, SOL_SOCKET, SO_PEERCRED, &cred, &len) == -1)
+    return err_string("Failed to get credentials from socket");
+
+  if (cred.uid != 0)
+    return err_string("This operation requires root");
+
+  if (resuming)
+    e = Service_Resume();
+  else
+    e = Service_Suspend();
+
+  if (! e) {
+    nx_json root = {0};
+    nx_json *o = create_json_object(NULL, &root);
+    create_json_string("Status", o, "OK");
+    e = Protocol_SendJson(socket, o);
+    nx_json_free(o);
+  }
+
   return e;
 }
 
@@ -361,6 +398,10 @@ static void Server_HandleClient(Client* client) {
     e = Server_Command_Set_Fan(client->fd, json);
   else if (!strcmp(command->val.text, "status"))
     e = Server_Command_Status(client->fd, json);
+  else if (!strcmp(command->val.text, "suspend"))
+    e = Server_Command_SuspendResume(client->fd, json, false);
+  else if (!strcmp(command->val.text, "resume"))
+    e = Server_Command_SuspendResume(client->fd, json, true);
   else
     e = err_string("Invalid command");
 

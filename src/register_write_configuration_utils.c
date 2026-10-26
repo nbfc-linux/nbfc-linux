@@ -6,6 +6,14 @@
 
 extern const EC_VTable* ec;
 
+bool RegisterWriteConfigurations_HasSuspend(array_of(RegisterWriteConfiguration)* rwcs) {
+  for_each_array(RegisterWriteConfiguration*, cfg, *rwcs)
+    if (cfg->WriteOccasion == RegisterWriteOccasion_OnSuspend)
+      return true;
+
+  return false;
+}
+
 Error RegisterWriteConfiguration_Apply(RegisterWriteConfiguration* cfg) {
   Error e;
   uint8_t mask;
@@ -44,9 +52,9 @@ Error RegisterWriteConfiguration_Apply(RegisterWriteConfiguration* cfg) {
   }
 }
 
-Error RegisterWriteConfigurations_Apply(array_of(RegisterWriteConfiguration)* rwcs, bool initializing) {
+Error RegisterWriteConfigurations_Apply(array_of(RegisterWriteConfiguration)* rwcs, RegisterWriteOccasion occasion) {
   for_each_array(RegisterWriteConfiguration*, cfg, *rwcs) {
-    if (initializing || cfg->WriteOccasion == RegisterWriteOccasion_OnWriteFanSpeed) {
+    if (cfg->WriteOccasion == occasion) {
        Error e = RegisterWriteConfiguration_Apply(cfg);
        if (e)
          return e;

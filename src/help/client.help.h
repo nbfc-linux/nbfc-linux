@@ -399,3 +399,30 @@
  "Optional arguments:\n"                                                       \
  "  -h, --help            Show this help message and exit\n"                   \
  ""
+
+#define CLIENT_SUSPEND_HELP_TEXT                                               \
+ "Usage: nbfc suspend [-h]\n"                                                  \
+ "\n"                                                                          \
+ "Sets the service to suspend mode.\n"                                         \
+ "\n"                                                                          \
+ "This command only has an effect if the configuration contains a\n"           \
+ "RegisterWriteConfiguration with the WriteOccasion set to OnSuspend.\n"       \
+ "In that case, those writes are executed, and the service will NOT perform\n" \
+ "any further fan control until `nbfc resume` is invoked.\n"                   \
+ "\n"                                                                          \
+ "INTERNAL COMMAND ONLY\n"                                                     \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
+ ""
+
+#define CLIENT_RESUME_HELP_TEXT                                                \
+ "Usage: nbfc resume [-h]\n"                                                   \
+ "\n"                                                                          \
+ "Resumes the service from suspend mode.\n"                                    \
+ "\n"                                                                          \
+ "INTERNAL COMMAND ONLY\n"                                                     \
+ "\n"                                                                          \
+ "Optional arguments:\n"                                                       \
+ "  -h, --help            Show this help message and exit\n"                   \
+ ""

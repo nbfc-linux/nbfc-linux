@@ -545,6 +545,12 @@ writes the value once upon initialization (every time the fan control service st
 .IP \(bu 2
 .BR OnWriteFanSpeed :
 writes the value every time the fan speed is set.
+.IP \(bu 2
+.BR OnSuspend :
+writes the value every time the system suspends.
+.IP \(bu 2
+.BR OnResume :
+writes the value every time the system resumes from suspend.
 .RE
 
 .PP

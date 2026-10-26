@@ -30,5 +30,8 @@ Error Service_Init(void);
 Error Service_Loop(void);
 void  Service_Cleanup(void);
 void  Service_WriteTargetFanSpeedsToState(void);
+bool  Service_ShouldControlFans(void);
+Error Service_Suspend(void);
+Error Service_Resume(void);
 
 #endif

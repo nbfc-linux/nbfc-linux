@@ -4,8 +4,12 @@
 #include "error.h"
 #include "model_config.h"
 
+#include <stdbool.h>
+
+bool  RegisterWriteConfigurations_HasSuspend(array_of(RegisterWriteConfiguration)*);
+
 Error RegisterWriteConfiguration_Apply(RegisterWriteConfiguration*);
-Error RegisterWriteConfigurations_Apply(array_of(RegisterWriteConfiguration)*, bool);
+Error RegisterWriteConfigurations_Apply(array_of(RegisterWriteConfiguration)*, RegisterWriteOccasion);
 
 Error RegisterWriteConfiguration_Reset(RegisterWriteConfiguration*);
 Error RegisterWriteConfigurations_Reset(array_of(RegisterWriteConfiguration)*);

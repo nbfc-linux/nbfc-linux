@@ -19,6 +19,8 @@ enum NBFC_PACKED_ENUM RegisterWriteMode_ {
 enum NBFC_PACKED_ENUM RegisterWriteOccasion_ {
   RegisterWriteOccasion_OnWriteFanSpeed,
   RegisterWriteOccasion_OnInitialization,
+  RegisterWriteOccasion_OnSuspend,
+  RegisterWriteOccasion_OnResume,
   RegisterWriteOccasion_Unset,
 };
 

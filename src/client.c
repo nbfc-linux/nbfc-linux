@@ -94,6 +94,7 @@ const struct cli99_Option Main_CommandLine[] = {
 #include "client/cmd_acpi_dump.c"
 #include "client/cmd_rate_config.c"
 #include "client/cmd_reset_ec.c"
+#include "client/cmd_suspend_resume.c"
 #include "client/cmd_test_config.c"
 #include "client/cmd_xml2json.c"
 
@@ -120,6 +121,8 @@ const struct cli99_Option Main_CommandLine[] = {
   o("support",          Support,          SUPPORT,          Support)       \
   o("help",             Help,             HELP,             Main)          \
   o("faq",              FAQ,              FAQ,              Main)          \
+  o("suspend",          Suspend,          SUSPEND,          Main)          \
+  o("resume",           Resume,           RESUME,           Main)          \
   o("reset-ec",         ResetEc,          RESET_EC,         Main)
 //  COMMAND             ENUM              HELP TEXT         COMMANDLINE
 
@@ -656,6 +659,8 @@ int main(int argc, char* const argv[]) {
   case Command_Support:           return Support();
   case Command_Xml2Json:          return Xml2Json();
   case Command_FAQ:               return FAQ();
+  case Command_Suspend:           return Suspend();
+  case Command_Resume:            return Resume();
   case Command_ResetEc:           return ResetEc();
   default:                        return NBFC_EXIT_FAILURE;
   }
