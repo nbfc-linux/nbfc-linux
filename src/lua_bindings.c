@@ -262,6 +262,54 @@ Error Lua_LoadCode(const char* code, int* function_ref) {
   return err_success();
 }
 
+Error Lua_CallNoResult(int function_ref, uint64_t value) {
+  Error e;
+  Lua_CurrentValue = value;
+
+  // push function
+  lua_rawgeti(Lua_State, LUA_REGISTRYINDEX, function_ref);
+
+  // check if it's really a function
+  if (! lua_isfunction(Lua_State, -1)) {
+    e = err_string("lua_rawgeti() did not return a function");
+    lua_pop(Lua_State, 1);
+    return e;
+  }
+
+  // call
+  if (lua_pcall(Lua_State, 0, LUA_MULTRET, 0) != LUA_OK) {
+    const char* err = lua_tostring(Lua_State, -1);
+    e = err_string(err ? err : "Unknown Lua error");
+    lua_pop(Lua_State, 1);
+    return e;
+  }
+
+  // ensure we have 0 or 1 return values
+  int top = lua_gettop(Lua_State);
+  if (top != 0 && top != 1) {
+    lua_pop(Lua_State, top);
+    e = err_string("Lua code did not return 0 or 1 values");
+    return e;
+  }
+
+  if (top == 1) {
+    // stack:
+    // -1 = error
+
+    // check error
+    if (! lua_isnil(Lua_State, -1)) {
+      const char* err = lua_tostring(Lua_State, -1);
+      e = err_string(err ? err : "Unknown Lua error");
+      lua_pop(Lua_State, 1);
+      return e;
+    }
+
+    lua_pop(Lua_State, 1);
+  }
+
+  return err_success();
+}
+
 Error Lua_Call(int function_ref, uint64_t value, uint64_t* result) {
   Error e;
   Lua_CurrentValue = value;

@@ -794,6 +794,14 @@ Error ModelConfig_FromFile(ModelConfig* config, const char* file) {
   if (e)
     goto err;
 
+  if (config->isset.LuaInitCode) {
+    e = Lua_CallNoResult(config->LuaInitCode.function, 0);
+    if (e) {
+      e = err_chain_string(e, "LuaInitCode");
+      goto err;
+    }
+  }
+
 err:
   nx_json_free(js);
   Buffer_Release(file_content, NBFC_MAX_FILE_SIZE);
