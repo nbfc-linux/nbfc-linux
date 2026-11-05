@@ -201,6 +201,10 @@ Provides file input/output facilities and stream-based I/O operations.
 .BR os :
 Provides operating system interface functions such as time, environment, and process control.
 .RE
+.IP \(bu 2
+.BR package :
+Allows dynamic loading of installed system Lua packages (adds "require" function).
+.RE
 
 .PP
 .BR FirmwareFingerprint :
