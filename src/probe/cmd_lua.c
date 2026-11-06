@@ -57,5 +57,8 @@ int Lua(void) {
   e = Lua_UseLibrary(LUA_OSLIBNAME);
   e_die();
 
+  e = Lua_UseLibrary(LUA_LOADLIBNAME);
+  e_die();
+
   return Lua_RunFile(Lua_State, options.file);
 }

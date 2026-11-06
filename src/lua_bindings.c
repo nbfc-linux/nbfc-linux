@@ -227,7 +227,7 @@ Error Lua_UseLibrary(const char* libname) {
     return e;
 
   if (! strcmp(libname, "base"))
-    luaL_requiref(Lua_State, "_G", luaopen_base, 1);
+    luaL_requiref(Lua_State, LUA_GNAME, luaopen_base, 1);
   else if (! strcmp(libname, LUA_MATHLIBNAME))
     luaL_requiref(Lua_State, LUA_MATHLIBNAME, luaopen_math, 1);
   else if (! strcmp(libname, LUA_STRLIBNAME))
@@ -238,6 +238,8 @@ Error Lua_UseLibrary(const char* libname) {
     luaL_requiref(Lua_State, LUA_IOLIBNAME, luaopen_io, 1);
   else if (! strcmp(libname, LUA_OSLIBNAME))
     luaL_requiref(Lua_State, LUA_OSLIBNAME, luaopen_os, 1);
+  else if (! strcmp(libname, LUA_LOADLIBNAME))
+    luaL_requiref(Lua_State, LUA_LOADLIBNAME, luaopen_package, 1);
   else
     return err_stringf("%s: Unknown Lua library", libname);
 
