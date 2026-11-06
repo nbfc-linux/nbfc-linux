@@ -10,16 +10,18 @@
 
 enum LogLevel {
   LogLevel_Quiet,
-  LogLevel_Error,
-  LogLevel_Warn,
-  LogLevel_Info,
-  LogLevel_Debug
+
+  // Message log levels corresponding to kernel printk() log levels
+  LogLevel_Error = 3,
+  LogLevel_Warn = 4,
+  LogLevel_Info = 6,
+  LogLevel_Debug = 7,
 };
 typedef enum LogLevel LogLevel;
 
 extern LogLevel Log_LogLevel;
 
-void Log_Init(bool);
+bool Log_Init(bool);  // Returns whether to keep stderr open
 void Log_Close(void);
 void Log_Log(LogLevel, const char* fmt, ...) NBFC_PRINTF_LIKE(2, 3);
 
