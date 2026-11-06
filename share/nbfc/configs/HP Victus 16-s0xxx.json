@@ -1,0 +1,73 @@
+{
+  "NotebookModel": "HP Victus 16-s0xxx",
+  "Author": "izan",
+  "EcPollInterval": 1000,
+  "CriticalTemperature": 90,
+  "FanConfigurations": [
+    {
+      "FanDisplayName": "Fan 1",
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "ReadAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANG 33026",
+      "WriteAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANW 33026 $",
+      "ResetAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANW 33026 0x0",
+      "ResetRequired": true,
+      "TemperatureThresholds": [
+        { "UpThreshold": 45,  "DownThreshold": 0,  "FanSpeed": 0.0 },
+        { "UpThreshold": 55,  "DownThreshold": 40,  "FanSpeed": 20.0 },
+        { "UpThreshold": 62,  "DownThreshold": 50,  "FanSpeed": 25.0 },
+        { "UpThreshold": 67,  "DownThreshold": 60,  "FanSpeed": 35.0 },
+        { "UpThreshold": 72,  "DownThreshold": 65,  "FanSpeed": 45.0 },
+        { "UpThreshold": 77,  "DownThreshold": 70,  "FanSpeed": 55.0 },
+        { "UpThreshold": 82,  "DownThreshold": 75,  "FanSpeed": 75.0 },
+        { "UpThreshold": 85,  "DownThreshold": 80,  "FanSpeed": 87.5 },
+        { "UpThreshold": 90,  "DownThreshold": 83,  "FanSpeed": 100.0 }
+      ],
+      "Sensors": [
+        "k10temp"
+      ]
+    },
+    {
+      "FanDisplayName": "Fan 2",
+      "MinSpeedValue": 0,
+      "MaxSpeedValue": 100,
+      "ReadAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANG 33065",
+      "WriteAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANW 33065 $",
+      "ResetAcpiMethod": "\\_SB.PCI0.LPC0.EC0.FANW 33065 0x0",
+      "ResetRequired": true,
+      "TemperatureThresholds": [
+        { "UpThreshold": 55,  "DownThreshold": 0,  "FanSpeed": 0.0 },
+        { "UpThreshold": 62,  "DownThreshold": 50,  "FanSpeed": 25.0 },
+        { "UpThreshold": 67,  "DownThreshold": 60,  "FanSpeed": 35.0 },
+        { "UpThreshold": 72,  "DownThreshold": 65,  "FanSpeed": 45.0 },
+        { "UpThreshold": 77,  "DownThreshold": 70,  "FanSpeed": 55.0 },
+        { "UpThreshold": 82,  "DownThreshold": 75,  "FanSpeed": 75.0 },
+        { "UpThreshold": 85,  "DownThreshold": 80,  "FanSpeed": 87.5 },
+        { "UpThreshold": 90,  "DownThreshold": 83,  "FanSpeed": 100.0 }
+      ],
+      "Sensors": [
+        "k10temp"
+      ]
+    }
+  ],
+  "RegisterWriteConfigurations": [
+    {
+      "WriteMode": "Call",
+      "WriteOccasion": "OnWriteFanSpeed",
+      "AcpiMethod": "\\_SB_.PCI0.LPC0.EC0.FANW 33030 0xFF",
+      "ResetRequired": true,
+      "ResetWriteMode": "Call",
+      "ResetAcpiMethod": "\\_SB_.PCI0.LPC0.EC0.FANW 33030 0x0",
+      "Description": "Manual mode for Fan 1"
+    },
+    {
+      "WriteMode": "Call",
+      "WriteOccasion": "OnWriteFanSpeed",
+      "AcpiMethod": "\\_SB_.PCI0.LPC0.EC0.FANW 33069 0xFF",
+      "ResetRequired": true,
+      "ResetWriteMode": "Call",
+      "ResetAcpiMethod": "\\_SB_.PCI0.LPC0.EC0.FANW 33069 0x0",
+      "Description": "Manual mode for Fan 2"
+    }
+  ]
+}
