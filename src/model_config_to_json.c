@@ -80,6 +80,8 @@ static void RegisterWriteConfiguration_ToJson(const RegisterWriteConfiguration* 
     switch (cfg->WriteOccasion) {
     case RegisterWriteOccasion_OnInitialization: str = "OnInitialization"; break;
     case RegisterWriteOccasion_OnWriteFanSpeed:  str = "OnWriteFanSpeed";  break;
+    case RegisterWriteOccasion_OnSuspend:        str = "OnSuspend";        break;
+    case RegisterWriteOccasion_OnResume:         str = "OnResume";         break;
     case RegisterWriteOccasion_Unset: break;
     }
     create_json_string("WriteOccasion", obj, str);

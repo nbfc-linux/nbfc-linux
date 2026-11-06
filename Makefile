@@ -342,6 +342,7 @@ src/nbfc: \
 	src/client/cmd_start_stop.c \
 	src/client/cmd_status.c \
 	src/client/cmd_support.c \
+	src/client/cmd_suspend_resume.c \
 	src/client/cmd_test_config.c \
 	src/client/cmd_update.c \
 	src/client/cmd_warranty.c \

@@ -40,10 +40,11 @@ ModelConfig                        Service_ModelConfig = {0};
 ServiceConfig                      Service_ServiceConfig = {0};
 ServiceState                       Service_ServiceState = {0};
 array_of(FanTemperatureControl)    Service_Fans = {0};
+static bool                        Service_InSuspend = false;
 static enum Service_Initialization Service_State;
 
-static void  ResetEC(void);
-static bool  IsAcpiCallUsed(void);
+static void ResetEC(void);
+static bool IsAcpiCallUsed(void);
 
 Error Service_Init(void) {
   Error e;
@@ -170,9 +171,10 @@ Error Service_Init(void) {
   }
 
   // Register Write configurations ============================================
-  if (! options.read_only) {
+  if (Service_ShouldControlFans()) {
     e = RegisterWriteConfigurations_Apply(
-          &Service_ModelConfig.RegisterWriteConfigurations, true);
+          &Service_ModelConfig.RegisterWriteConfigurations,
+          RegisterWriteOccasion_OnInitialization);
     if (e)
       goto error;
   }
@@ -212,9 +214,19 @@ Error Service_Loop(void) {
     }
   }
 
-  if (! options.read_only) {
+  if (Service_ShouldControlFans()) {
+    if (re_init_required) {
+      e = RegisterWriteConfigurations_Apply(
+            &Service_ModelConfig.RegisterWriteConfigurations,
+            RegisterWriteOccasion_OnInitialization);
+
+      if (e)
+        goto error;
+    }
+
     e = RegisterWriteConfigurations_Apply(
-          &Service_ModelConfig.RegisterWriteConfigurations, re_init_required);
+          &Service_ModelConfig.RegisterWriteConfigurations,
+          RegisterWriteOccasion_OnWriteFanSpeed);
 
     if (e)
       goto error;
@@ -226,7 +238,7 @@ Error Service_Loop(void) {
       goto error;
 
     Fan_SetTemperature(&ftc->Fan, ftc->Temperature);
-    if (! options.read_only) {
+    if (Service_ShouldControlFans()) {
       e = Fan_ECFlush(&ftc->Fan);
       if (e)
         goto error;
@@ -293,6 +305,41 @@ void Service_WriteTargetFanSpeedsToState(void) {
     else
       Service_ServiceState.TargetFanSpeeds.data[i] = Fan_GetRequestedSpeed(fan);
   }
+}
+
+bool Service_ShouldControlFans(void) {
+  return !options.read_only && !Service_InSuspend;
+}
+
+Error Service_Suspend(void) {
+  Error e;
+
+  if (! RegisterWriteConfigurations_HasSuspend(&Service_ModelConfig.RegisterWriteConfigurations))
+    return err_success();
+
+  Log_Info("Suspending");
+
+  e = RegisterWriteConfigurations_Apply(
+    &Service_ModelConfig.RegisterWriteConfigurations,
+    RegisterWriteOccasion_OnSuspend);
+
+  if (e) {
+    Log_Error("%s", err_print_all(e));
+    Log_Error("Cancelled suspend");
+    return e;
+  }
+
+  Service_InSuspend = true;
+  return err_success();
+}
+
+Error Service_Resume(void) {
+  Log_Info("Resuming");
+
+  Service_InSuspend = false;
+  return RegisterWriteConfigurations_Apply(
+    &Service_ModelConfig.RegisterWriteConfigurations,
+    RegisterWriteOccasion_OnResume);
 }
 
 void Service_Cleanup(void) {

@@ -360,6 +360,11 @@ Allows to write to any EC register.
 >
 > - **OnWriteFanSpeed**: writes the value every time the fan speed is
 >   set.
+>
+> - **OnSuspend**: writes the value every time the system suspends.
+>
+> - **OnResume**: writes the value every time the system resumes from
+>   suspend.
 
 **Register**: *Integer* \>= 0 && *Integer* \<= 255
 
