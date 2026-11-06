@@ -34,8 +34,11 @@ Error RegisterWriteConfiguration_Apply(RegisterWriteConfiguration* cfg) {
 
   case RegisterWriteMode_Lua:
     e = Lua_Call(cfg->LuaCode.function, 0, &out);
-    if (e)
-      return err_chain_string(e, "LuaCode");
+    if (e) {
+      e = err_chain_string(e, "LuaCode");
+      e_warn();
+      return e;
+    }
     else
       return err_success();
 
