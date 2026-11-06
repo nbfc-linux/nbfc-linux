@@ -207,6 +207,17 @@ Allows dynamic loading of installed system Lua packages (adds "require" function
 .RE
 
 .PP
+.BR LuaInitCode :
+.IR String " or " "Array of String"
+.RS
+The Lua code to be executed on startup.
+.RB See " LUA CODE" .
+
+May be used for definining reusable functions and variables or initializing system state.
+Unlike other Lua functions, this should only return an error message or nothing.
+.RE
+
+.PP
 .BR FirmwareFingerprint :
 .I Array of String
 .RS

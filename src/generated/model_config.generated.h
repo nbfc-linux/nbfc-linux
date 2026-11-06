@@ -148,6 +148,7 @@ struct ModelConfig {
 	const char*     Notice;
 	bool            LegacyTemperatureThresholdsBehaviour;
 	bool            LuaLibraries;
+	LuaCode         LuaInitCode;
 	uint16_t        EcPollInterval;
 	int16_t         CriticalTemperature;
 	uint16_t        CriticalTemperatureOffset;
@@ -162,6 +163,7 @@ struct ModelConfig {
 		bool Notice          : 1;
 		bool LegacyTemperatureThresholdsBehaviour : 1;
 		bool LuaLibraries    : 1;
+		bool LuaInitCode     : 1;
 		bool EcPollInterval  : 1;
 		bool CriticalTemperature : 1;
 		bool CriticalTemperatureOffset : 1;
