@@ -1,0 +1,25 @@
+{
+    "NotebookModel": "HP Pavilion Laptop 15-cw0xxx",
+    "Author": "Benjamin Abendroth",
+    "EcPollInterval": 500,
+    "FanConfigurations": [
+        {
+            "FanDisplayName": "CPU Fan",
+            "WriteRegister": 88,
+            "ReadRegister": 88,
+            "MinSpeedValue": 50,
+            "MaxSpeedValue": 99,
+            "ResetRequired": false
+        }
+    ],
+    "RegisterWriteConfigurations": [
+        {
+            "WriteOccasion": "OnWriteFanSpeed",
+            "WriteMode": "Or",
+            "Register": 68,
+            "Value": 4,
+            "ResetRequired": false,
+            "Description": "Disable Fan Always On (FASO)"
+        }
+    ]
+}
