@@ -11,17 +11,6 @@ _nbfc_service__prefix_compreply() {
   done
 }
 
-_nbfc_service__dequote_words() {
-  local word dequoted break_pos in_quotes
-
-  words_dequoted=()
-
-  for word in "${words[@]}"; do
-    _nbfc_service__dequote "$word" dequoted break_pos in_quotes
-    words_dequoted+=("$dequoted")
-  done
-}
-
 _nbfc_service__dequote() {
   local in="$1" len=${#1} i=0 result='' ___break_pos=-1 ___in_quotes=0
 
@@ -34,7 +23,7 @@ _nbfc_service__dequote() {
           result+="${in:i:1}"
         done;;
       '"')
-        ___in_quotes=1
+        ___in_quotes=2
         for ((++i; i < len; ++i)); do
           [[ "${in:i:1}" == '"' ]] && { ___in_quotes=0; break; }
 
@@ -60,6 +49,17 @@ _nbfc_service__dequote() {
   ___RESULT="$result"
   ___BREAK_POS=$___break_pos
   ___IN_QUOTES=$___in_quotes
+}
+
+_nbfc_service__dequote_words() {
+  local word dequoted break_pos in_quotes
+
+  words_dequoted=()
+
+  for word in "${words[@]}"; do
+    _nbfc_service__dequote "$word" dequoted break_pos in_quotes
+    words_dequoted+=("$dequoted")
+  done
 }
 
 _nbfc_service__parse_commandline() {
@@ -125,9 +125,31 @@ _nbfc_service__parse_commandline() {
   done
 }
 
+_nbfc_service__sq_quote() {
+  local s="$1"
+  local q="'" e="'\\''"
+  printf '%s' "${s//"$q"/$e}"
+}
+
+_nbfc_service__dq_quote() {
+  local s="$1"
+  local s_bt='`' r_bt='\`'
+  local s_dl='$' r_dl='\$'
+  local s_dq='"' r_dq='\"'
+  s="${s//\\/\\\\}"
+  s="${s//"$s_bt"/$r_bt}"
+  s="${s//"$s_dl"/$r_dl}"
+  s="${s//"$s_dq"/$r_dq}"
+  printf '%s' "$s"
+}
+
 _nbfc_service() {
   local cur prev words cword split words_dequoted
   _init_completion -n =: || return
+  _CC_CUR="$cur"
+  local _cc_break _cc_inq
+  _nbfc_service__dequote "$cur" cur _cc_break _cc_inq
+  compopt -o noquote
   _nbfc_service__dequote_words
 
   local END_OF_OPTIONS POSITIONALS
@@ -137,6 +159,7 @@ _nbfc_service() {
 
   __complete_option() {
     local opt="$1" cur="$2" ret=0
+    _CC_CUR_PREFIX_OPTION="$1"
 
     case "$opt" in
       -c|--config-file)
@@ -186,6 +209,51 @@ _nbfc_service() {
   return 1
 }
 
-complete -F _nbfc_service nbfc_service
+
+_nbfc_service__finalize() {
+  local _CC_CUR _CC_CUR_PREFIX_OPTION
+  local word word_dequoted breakpos=-1 in_quote=0 word_prefix='' value
+  local -a out=()
+
+  _nbfc_service "$@"
+  local rc=$?
+
+  word="$_CC_CUR"
+
+  if (( ${#_CC_CUR_PREFIX_OPTION} == 2 )); then
+    word="${word#-*${_CC_CUR_PREFIX_OPTION:1:1}}"
+  elif (( ${#_CC_CUR_PREFIX_OPTION} > 0 )); then
+    word="${word#"$_CC_CUR_PREFIX_OPTION"=}"
+  fi
+
+  _nbfc_service__dequote "$word" word_dequoted breakpos in_quote
+
+  if (( breakpos != -1 )); then
+    word_prefix="${word_dequoted:0:breakpos}"
+  fi
+
+  for value in "${COMPREPLY[@]}"; do
+    if (( breakpos != -1 )) && [[ "$value" == "$word_prefix"* ]]; then
+      value="${value:$breakpos}"
+    fi
+
+    if [[ "$value" == *[!A-Za-z0-9_:,/+-]* ]]; then
+      case "$in_quote" in
+        0) value="$(printf '%q' "$value")"
+           value="${value//'\,'/,}";;
+        1) value="$(_nbfc_service__sq_quote "$value")";;
+        2) value="$(_nbfc_service__dq_quote "$value")";;
+      esac
+    fi
+
+    out+=("$value")
+  done
+
+  COMPREPLY=("${out[@]}")
+  return $rc
+}
+
+
+complete -F _nbfc_service__finalize nbfc_service
 
 # vim: ft=sh ts=2 sts=2 sw=2 et
