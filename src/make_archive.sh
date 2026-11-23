@@ -1,8 +1,12 @@
 #!/bin/sh
 
-NBFC_TEMP_DIR="/tmp/nbfc-linux.make-archive.dir.temp"
 NBFC_SUB_DIR="info"
-NBFC_DEST_DIR="$NBFC_TEMP_DIR/$NBFC_SUB_DIR"
+
+# Created below with mktemp -d. A fixed path under /tmp is predictable and lets
+# any local user pre-create it (or plant symlinks inside it), which would make
+# the root-owned redirections further down follow those symlinks.
+NBFC_TEMP_DIR=
+NBFC_DEST_DIR=
 
 task_begin() {
   echo -n "$1 ... " >&2
@@ -34,12 +38,19 @@ copy_acpi_table() {
   exit 1
 }
 
-[ "$EUID" -eq 0 ] || {
+[ "$(id -u)" -eq 0 ] || {
   echo "Please run this script as root" >&2
   exit 1
 }
 
-mkdir -p "$NBFC_DEST_DIR" || {
+NBFC_TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/nbfc-linux.make-archive.XXXXXXXX") || {
+  echo "Failed to create temporary directory" >&2
+  exit 1
+}
+NBFC_DEST_DIR="$NBFC_TEMP_DIR/$NBFC_SUB_DIR"
+
+mkdir "$NBFC_DEST_DIR" || {
+  cleanup
   exit 1
 }
 
