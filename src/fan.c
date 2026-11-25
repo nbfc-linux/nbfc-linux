@@ -117,8 +117,11 @@ static Error Fan_ECWriteValue(Fan* self, uint16_t value) {
   if (my.fanConfig->WriteLuaCode.function) {
     uint64_t out;
     Error e = Lua_Call(my.fanConfig->WriteLuaCode.function, value, &out);
-    if (e)
-      return err_chain_stringf(e, "%s: WriteLuaCode", my.fanConfig->FanDisplayName);
+    if (e) {
+      e = err_chain_stringf(e, "%s: WriteLuaCode", my.fanConfig->FanDisplayName);
+      e_warn();
+      return e;
+    }
     else
       return err_success();
   }
@@ -145,8 +148,11 @@ static Error Fan_ECReadValue(const Fan* self, uint16_t* out) {
   if (my.fanConfig->ReadLuaCode.function) {
     uint64_t val;
     e = Lua_Call(my.fanConfig->ReadLuaCode.function, 0, &val);
-    if (e)
-      return err_chain_stringf(e, "%s: ReadLuaCode", my.fanConfig->FanDisplayName);
+    if (e) {
+      e = err_chain_stringf(e, "%s: ReadLuaCode", my.fanConfig->FanDisplayName);
+      e_warn();
+      return e;
+    }
     else
       *out = val;
     return e;
