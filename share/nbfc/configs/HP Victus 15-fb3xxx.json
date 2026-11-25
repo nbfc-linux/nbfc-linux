@@ -1,0 +1,137 @@
+{
+    "NotebookModel": "Victus by HP Gaming Laptop 15-fb3xxx",
+    "Author": "SamuelGold",
+    "EcPollInterval": 2000,
+    "ReadWriteWords": false,
+    "CriticalTemperature": 85,
+    "FanConfigurations": [
+        {
+            "FanDisplayName": "CPU Fan",
+            "ReadRegister": 46,
+            "WriteRegister": 52,
+            "MinSpeedValue": 0,
+            "MaxSpeedValue": 55,
+            "IndependentReadMinMaxValues": true,
+            "MinSpeedValueRead": 0,
+            "MaxSpeedValueRead": 100,
+            "ResetRequired": true,
+            "FanSpeedResetValue": 255,
+            "Sensors": [
+                "@CPU",
+                "@GPU"
+            ],
+            "TemperatureAlgorithmType": "Max",
+            "TemperatureThresholds": [
+                {
+                    "UpThreshold": 58,
+                    "DownThreshold": 0,
+                    "FanSpeed": 0.0
+                },
+                {
+                    "UpThreshold": 62,
+                    "DownThreshold": 53,
+                    "FanSpeed": 22.0
+                },
+                {
+                    "UpThreshold": 65,
+                    "DownThreshold": 57,
+                    "FanSpeed": 30.0
+                },
+                {
+                    "UpThreshold": 70,
+                    "DownThreshold": 60,
+                    "FanSpeed": 40.0
+                },
+                {
+                    "UpThreshold": 75,
+                    "DownThreshold": 64,
+                    "FanSpeed": 55.0
+                },
+                {
+                    "UpThreshold": 80,
+                    "DownThreshold": 69,
+                    "FanSpeed": 75.0
+                },
+                {
+                    "UpThreshold": 100,
+                    "DownThreshold": 74,
+                    "FanSpeed": 100.0
+                }
+            ]
+        },
+        {
+            "FanDisplayName": "GPU Fan",
+            "ReadRegister": 47,
+            "WriteRegister": 53,
+            "MinSpeedValue": 0,
+            "MaxSpeedValue": 55,
+            "IndependentReadMinMaxValues": true,
+            "MinSpeedValueRead": 0,
+            "MaxSpeedValueRead": 100,
+            "ResetRequired": true,
+            "FanSpeedResetValue": 255,
+            "Sensors": [
+                "@CPU",
+                "@GPU"
+            ],
+            "TemperatureAlgorithmType": "Max",
+            "TemperatureThresholds": [
+                {
+                    "UpThreshold": 58,
+                    "DownThreshold": 0,
+                    "FanSpeed": 0.0
+                },
+                {
+                    "UpThreshold": 62,
+                    "DownThreshold": 53,
+                    "FanSpeed": 22.0
+                },
+                {
+                    "UpThreshold": 65,
+                    "DownThreshold": 57,
+                    "FanSpeed": 30.0
+                },
+                {
+                    "UpThreshold": 70,
+                    "DownThreshold": 60,
+                    "FanSpeed": 40.0
+                },
+                {
+                    "UpThreshold": 75,
+                    "DownThreshold": 64,
+                    "FanSpeed": 55.0
+                },
+                {
+                    "UpThreshold": 80,
+                    "DownThreshold": 69,
+                    "FanSpeed": 75.0
+                },
+                {
+                    "UpThreshold": 100,
+                    "DownThreshold": 74,
+                    "FanSpeed": 100.0
+                }
+            ]
+        }
+    ],
+    "RegisterWriteConfigurations": [
+        {
+            "Description": "Switch the EC to manual fan control",
+            "WriteOccasion": "OnInitialization",
+            "Register": 98,
+            "Value": 6,
+            "WriteMode": "Set",
+            "ResetRequired": true,
+            "ResetWriteMode": "Set",
+            "ResetValue": 0
+        },
+        {
+            "Description": "Reload the 120 s countdown after which the EC returns to BIOS control",
+            "WriteOccasion": "OnWriteFanSpeed",
+            "Register": 99,
+            "Value": 120,
+            "WriteMode": "Set",
+            "ResetRequired": false
+        }
+    ]
+}
