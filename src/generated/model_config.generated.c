@@ -500,6 +500,9 @@ Error ModelConfig_ValidateFields(ModelConfig* self) {
 	if (false)
 		return err_stringf("%s: %s", "LuaLibraries", "Missing option");
 
+	if (false)
+		return err_stringf("%s: %s", "LuaInitCode", "Missing option");
+
 	if (! self->isset.EcPollInterval)
 		self->EcPollInterval = 3000;
 
@@ -562,6 +565,11 @@ Error ModelConfig_FromJson(ModelConfig* obj, const nx_json* json) {
 			e = LuaLibraries_FromJson(&obj->LuaLibraries, c);
 			if (!e)
 				obj->isset.LuaLibraries = true;
+		}
+		else if (!strcmp(c->key, "LuaInitCode")) {
+			e = LuaCode_FromJson(&obj->LuaInitCode, c);
+			if (!e)
+				obj->isset.LuaInitCode = true;
 		}
 		else if (!strcmp(c->key, "EcPollInterval")) {
 			e = uint16_t_FromJson(&obj->EcPollInterval, c);

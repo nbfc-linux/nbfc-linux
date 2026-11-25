@@ -331,6 +331,12 @@
         "from_json": "LuaLibraries_FromJson"
       },
       {
+        "name": "LuaInitCode",
+        "type": "LuaCode",
+        "help": "Lua code to execute on startup, may be used to define reusable functions.",
+        "required": false
+      },
+      {
         "name": "EcPollInterval",
         "type": "uint16_t",
         "default": "3000",
